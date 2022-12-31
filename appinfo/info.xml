@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<info>
+    <id>integration_openai</id>
+    <name>OpenAI integration</name>
+    <summary>Integration of OpenAI ChatGPT and stable-diffusion</summary>
+    <description><![CDATA[OpenAI integration provides a link reference provider to get ChatGPT answers and stable-diffusion images.]]></description>
+    <version>1.0.0</version>
+    <licence>agpl</licence>
+    <author>Julien Veyssier</author>
+    <namespace>OpenAi</namespace>
+    <documentation>
+        <developer>https://github.com/julien-nc/integration_openai</developer>
+    </documentation>
+    <category>integration</category>
+    <category>dashboard</category>
+    <website>https://github.com/julien-nc/integration_openai</website>
+    <bugs>https://github.com/julien-nc/integration_openai/issues</bugs>
+    <screenshot>https://github.com/julien-nc/integration_openai/raw/master/img/screenshot1.jpg</screenshot>
+    <dependencies>
+        <nextcloud min-version="26" max-version="26"/>
+    </dependencies>
+    <settings>
+        <admin>OCA\OpenAi\Settings\Admin</admin>
+        <admin-section>OCA\OpenAi\Settings\AdminSection</admin-section>
+    </settings>
+</info>

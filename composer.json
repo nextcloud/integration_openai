@@ -1,0 +1,12 @@
+{
+    "name": "nextcloud/integration_openai",
+    "authors": [
+        {
+            "name": "Julien Veyssier",
+            "email": "eneiluj@posteo.net"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0"
+    }
+}
