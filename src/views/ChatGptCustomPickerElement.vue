@@ -51,15 +51,25 @@
 						<label for="size">
 							{{ t('integration_openai', 'Model to use') }}
 						</label>
-						<select
-							id="model"
-							v-model="completionModel">
-							<option v-for="m in models"
-								:key="m.id"
-								:value="m.id">
-								{{ m.id }} ({{ m.owned_by }})
-							</option>
-						</select>
+						<NcMultiselect
+							:value="completionModel"
+							class="model-select"
+							label="label"
+							track-by="id"
+							:placeholder="modelPlaceholder"
+							:options="formattedModels"
+							:user-select="false"
+							:internal-search="true"
+							@input="onModelSelected" />
+						<a v-tooltip.top="{ content: t('integration_openai', 'More information about OpenAI models') }"
+							href="https://beta.openai.com/docs/models"
+							target="_blank">
+							<NcButton>
+								<template #icon>
+									<HelpCircleIcon />
+								</template>
+							</NcButton>
+						</a>
 					</div>
 				</div>
 				<div class="footer">
@@ -75,13 +85,19 @@
 <script>
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
+import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 
 import NcModal from '@nextcloud/vue/dist/Components/NcModal.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
+import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
+
+import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip.js'
+import Vue from 'vue'
+Vue.directive('tooltip', Tooltip)
 
 export default {
 	name: 'ChatGptCustomPickerElement',
@@ -90,8 +106,10 @@ export default {
 		NcModal,
 		NcButton,
 		NcLoadingIcon,
+		NcMultiselect,
 		ChevronRightIcon,
 		ChevronDownIcon,
+		HelpCircleIcon,
 	},
 
 	props: {
@@ -113,6 +131,7 @@ export default {
 			models: [],
 			inputPlaceholder: t('integration_openai', 'What is the matter with putting pineapple on pizzas?'),
 			poweredByTitle: t('integration_openai', 'Powered by OpenAI'),
+			modelPlaceholder: t('integration_openai', 'Choose a model'),
 			showAdvanced: false,
 			completionModel: null,
 			completionNumber: 1,
@@ -124,6 +143,17 @@ export default {
 			return this.showAdvanced
 				? ChevronDownIcon
 				: ChevronRightIcon
+		},
+		formattedModels() {
+			if (this.models) {
+				return this.models.map(m => {
+					return {
+						...m,
+						label: m.id + ' (' + m.owned_by + ')',
+					}
+				})
+			}
+			return []
 		},
 	},
 
@@ -146,11 +176,23 @@ export default {
 			return axios.get(url)
 				.then((response) => {
 					this.models = response.data?.data
-					this.completionModel = response.data?.default_model_id
+					const defaultModelId = response.data?.default_model_id
+					const defaultModel = this.models.find(m => m.id === defaultModelId)
+					if (defaultModel) {
+						this.completionModel = {
+							...defaultModel,
+							label: defaultModel.id + ' (' + defaultModel.owned_by + ')',
+						}
+					}
 				})
 				.catch((error) => {
 					console.error(error)
 				})
+		},
+		onModelSelected(model) {
+			if (model) {
+				this.completionModel = model
+			}
 		},
 		onCancel() {
 			this.show = false
@@ -170,7 +212,7 @@ export default {
 				n: this.completionNumber,
 			}
 			if (this.completionModel) {
-				params.model = this.completionModel
+				params.model = this.completionModel.id
 			}
 			const url = generateUrl('/apps/integration_openai/completions')
 			return axios.post(url, params)
@@ -250,7 +292,7 @@ export default {
 			input {
 				width: 200px;
 			}
-			select {
+			.model-select {
 				width: 300px;
 			}
 		}
