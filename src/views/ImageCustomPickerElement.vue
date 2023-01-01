@@ -200,11 +200,6 @@ export default {
 		}
 	}
 
-	.advanced-button {
-		align-self: start;
-		margin-top: 12px;
-	}
-
 	.input-wrapper {
 		display: flex;
 		align-items: center;
@@ -212,6 +207,11 @@ export default {
 		input {
 			flex-grow: 1;
 		}
+	}
+
+	.advanced-button {
+		align-self: start;
+		margin-top: 12px;
 	}
 
 	.advanced {

@@ -23,6 +23,8 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
 class Application extends App implements IBootstrap {
 
 	public const APP_ID = 'integration_openai';
+	public const DEFAULT_COMPLETION_MODEL = 'text-davinci-003';
+	public const DEFAULT_IMAGE_SIZE = '1024x1024';
 
 	/**
 	 * @var IConfig

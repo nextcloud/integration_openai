@@ -43,16 +43,29 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * @param string $prompt
 	 * @return array|string[]
 	 */
-	public function createCompletion(string $prompt): array {
+	public function getModels(): array {
+		return $this->request('models');
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param int $n
+	 * @param string $model
+	 * @return array|string[]
+	 */
+	public function createCompletion(?string $userId, string $prompt, int $n = 1, string $model = Application::DEFAULT_COMPLETION_MODEL): array {
 		$params = [
-			'model' => 'text-davinci-003',
+			'model' => $model,
 			'prompt' => $prompt,
 			'max_tokens' => 300,
-			'n' => 1,
+			'n' => $n,
 		];
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
 		return $this->request('completions', $params, 'POST');
 	}
 
@@ -63,7 +76,7 @@ class OpenAiAPIService {
 	 * @param string $size
 	 * @return array|string[]
 	 */
-	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = '1024x1024'): array {
+	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
 		$params = [
 			'prompt' => $prompt,
 			'size' => $size,
