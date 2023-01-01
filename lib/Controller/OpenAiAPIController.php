@@ -23,6 +23,7 @@ class OpenAiAPIController extends Controller {
 
 	private OpenAiAPIService $openAiAPIService;
 	private IInitialState $initialStateService;
+	private ?string $userId;
 
 	public function __construct(string           $appName,
 								IRequest         $request,
@@ -32,6 +33,7 @@ class OpenAiAPIController extends Controller {
 		parent::__construct($appName, $request);
 		$this->openAiAPIService = $openAiAPIService;
 		$this->initialStateService = $initialStateService;
+		$this->userId = $userId;
 	}
 
 	/**
@@ -52,8 +54,8 @@ class OpenAiAPIController extends Controller {
 	 * @param string $prompt
 	 * @return DataResponse
 	 */
-	public function createImage(string $prompt): DataResponse {
-		$response = $this->openAiAPIService->createImage($prompt);
+	public function createImage(string $prompt, int $n = 1, string $size = '1024x1024'): DataResponse {
+		$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
 		if (isset($response['error'])) {
 			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
 		}

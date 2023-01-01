@@ -110,7 +110,6 @@ export default {
 			const url = generateUrl('/apps/integration_openai/completions')
 			return axios.post(url, params)
 				.then((response) => {
-					console.debug('completions response', response.data)
 					const data = response.data
 					if (data.choices && data.choices.length && data.choices.length > 0 && data.choices[0].text) {
 						this.onSubmit(data.choices[0].text.replace(/^\s+|\s+$/g, ''))
@@ -119,7 +118,7 @@ export default {
 					}
 				})
 				.catch((error) => {
-					console.debug('OpenAI completions request error', error)
+					console.error('OpenAI completions request error', error)
 				})
 				.then(() => {
 					this.loading = false

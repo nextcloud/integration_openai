@@ -1,7 +1,7 @@
 # OpenAI integration in Nextcloud
 
-This app adds:
-* A link reference provider to get ChatGPT answers and render stable-diffusion images in Talk and Text
+This app includes:
+* A link reference provider to get ChatGPT answers and generate DALL·E 2 images in Talk and Text
 
 ## 🔧 Configuration
 

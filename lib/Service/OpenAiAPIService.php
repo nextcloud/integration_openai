@@ -50,24 +50,29 @@ class OpenAiAPIService {
 		$params = [
 			'model' => 'text-davinci-003',
 			'prompt' => $prompt,
-			'max_tokens' => 200,
+			'max_tokens' => 300,
 			'n' => 1,
 		];
 		return $this->request('completions', $params, 'POST');
 	}
 
 	/**
+	 * @param string|null $userId
 	 * @param string $prompt
+	 * @param int $n
+	 * @param string $size
 	 * @return array|string[]
 	 */
-	public function createImage(string $prompt): array {
+	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = '1024x1024'): array {
 		$params = [
 			'prompt' => $prompt,
+			'size' => $size,
+			'n' => $n,
 			'response_format' => 'url',
-			'size' => '1024x1024',
-			'n' => 1,
-//			'user'=> $userId,
 		];
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
 		return $this->request('images/generations', $params, 'POST');
 	}
 

@@ -2,8 +2,8 @@
 <info>
     <id>integration_openai</id>
     <name>OpenAI integration</name>
-    <summary>Integration of OpenAI ChatGPT and stable-diffusion</summary>
-    <description><![CDATA[OpenAI integration provides a link reference provider to get ChatGPT answers and stable-diffusion images.]]></description>
+    <summary>Integration of OpenAI ChatGPT and DALL·E 2</summary>
+    <description><![CDATA[OpenAI integration provides a link reference provider to get ChatGPT answers and DALL·E 2 images.]]></description>
     <version>1.0.0</version>
     <licence>agpl</licence>
     <author>Julien Veyssier</author>
