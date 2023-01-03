@@ -1,85 +1,82 @@
 <template>
-	<div v-if="show" id="chatgpt-picker-modal-wrapper">
-		<NcModal
-			size="large"
-			:container="'#chatgpt-picker-modal-wrapper'"
-			@close="onCancel">
-			<div class="chatgpt-picker-modal-content">
-				<h2>
-					{{ t('integration_openai', 'Get a ChatGPT answer') }}
-					<a class="attribution"
-						target="_blank"
-						href="https://openai.com">
-						{{ poweredByTitle }}
-					</a>
-				</h2>
-				<div class="input-wrapper">
-					<input ref="search-input"
-						v-model="query"
-						type="text"
-						:placeholder="inputPlaceholder"
-						@keydown.enter="onInputEnter"
-						@keyup.esc="onCancel">
-					<NcLoadingIcon v-if="loading"
-						:size="20"
-						:title="t('integration_openai', 'Loading')" />
-					<NcButton v-else @click="onInputEnter">
-						{{ t('integration_openai', 'Submit') }}
-					</NcButton>
-				</div>
-				<NcButton class="advanced-button"
-					@click="showAdvanced = !showAdvanced">
-					<template #icon>
-						<component :is="showAdvancedIcon" />
-					</template>
-					{{ t('integration_openai', 'Advanced options') }}
+	<NcModal v-if="show"
+		size="large"
+		@close="onCancel">
+		<div class="chatgpt-picker-modal-content">
+			<h2>
+				{{ t('integration_openai', 'Get a ChatGPT answer') }}
+				<a class="attribution"
+					target="_blank"
+					href="https://openai.com">
+					{{ poweredByTitle }}
+				</a>
+			</h2>
+			<div class="input-wrapper">
+				<input ref="search-input"
+					v-model="query"
+					type="text"
+					:placeholder="inputPlaceholder"
+					@keydown.enter="onInputEnter"
+					@keyup.esc="onCancel">
+				<NcLoadingIcon v-if="loading"
+					:size="20"
+					:title="t('integration_openai', 'Loading')" />
+				<NcButton v-else @click="onInputEnter">
+					{{ t('integration_openai', 'Submit') }}
 				</NcButton>
-				<div v-show="showAdvanced" class="advanced">
-					<div class="line">
-						<label for="number">
-							{{ t('integration_openai', 'How many completions to generate') }}
-						</label>
-						<input
-							id="number"
-							v-model="completionNumber"
-							type="number"
-							min="1"
-							max="10"
-							step="1">
-					</div>
-					<div class="line">
-						<label for="size">
-							{{ t('integration_openai', 'Model to use') }}
-						</label>
-						<NcMultiselect
-							:value="completionModel"
-							class="model-select"
-							label="label"
-							track-by="id"
-							:placeholder="modelPlaceholder"
-							:options="formattedModels"
-							:user-select="false"
-							:internal-search="true"
-							@input="onModelSelected" />
-						<a v-tooltip.top="{ content: t('integration_openai', 'More information about OpenAI models') }"
-							href="https://beta.openai.com/docs/models"
-							target="_blank">
-							<NcButton>
-								<template #icon>
-									<HelpCircleIcon />
-								</template>
-							</NcButton>
-						</a>
-					</div>
+			</div>
+			<NcButton class="advanced-button"
+				@click="showAdvanced = !showAdvanced">
+				<template #icon>
+					<component :is="showAdvancedIcon" />
+				</template>
+				{{ t('integration_openai', 'Advanced options') }}
+			</NcButton>
+			<div v-show="showAdvanced" class="advanced">
+				<div class="line">
+					<label for="number">
+						{{ t('integration_openai', 'How many completions to generate') }}
+					</label>
+					<input
+						id="number"
+						v-model="completionNumber"
+						type="number"
+						min="1"
+						max="10"
+						step="1">
 				</div>
-				<div class="footer">
-					<NcButton @click="onCancel">
-						{{ t('integration_openai', 'Cancel') }}
-					</NcButton>
+				<div class="line">
+					<label for="size">
+						{{ t('integration_openai', 'Model to use') }}
+					</label>
+					<NcMultiselect
+						:value="completionModel"
+						class="model-select"
+						label="label"
+						track-by="id"
+						:placeholder="modelPlaceholder"
+						:options="formattedModels"
+						:user-select="false"
+						:internal-search="true"
+						@input="onModelSelected" />
+					<a v-tooltip.top="{ content: t('integration_openai', 'More information about OpenAI models') }"
+						href="https://beta.openai.com/docs/models"
+						target="_blank">
+						<NcButton>
+							<template #icon>
+								<HelpCircleIcon />
+							</template>
+						</NcButton>
+					</a>
 				</div>
 			</div>
-		</NcModal>
-	</div>
+			<div class="footer">
+				<NcButton @click="onCancel">
+					{{ t('integration_openai', 'Cancel') }}
+				</NcButton>
+			</div>
+		</div>
+	</NcModal>
 </template>
 
 <script>
@@ -250,7 +247,6 @@ export default {
 
 <style scoped lang="scss">
 .chatgpt-picker-modal-content {
-	width: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
