@@ -75,7 +75,6 @@ import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 
-import NcModal from '@nextcloud/vue/dist/Components/NcModal.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
@@ -91,7 +90,6 @@ export default {
 	name: 'ChatGptCustomPickerElement',
 
 	components: {
-		NcModal,
 		NcButton,
 		NcLoadingIcon,
 		NcMultiselect,
