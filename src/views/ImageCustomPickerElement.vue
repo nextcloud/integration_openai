@@ -1,76 +1,67 @@
 <template>
-	<NcModal v-if="show"
-		size="large"
-		@close="onCancel">
-		<div class="image-picker-modal-content">
-			<h2>
-				{{ t('integration_openai', 'Generate an image with DALL·E 2') }}
-				<a class="attribution"
-					target="_blank"
-					href="https://openai.com/dall-e-2/">
-					{{ poweredByTitle }}
-				</a>
-			</h2>
-			<div class="input-wrapper">
-				<input ref="search-input"
-					v-model="query"
-					type="text"
-					:placeholder="inputPlaceholder"
-					@keydown.enter="onInputEnter"
-					@keyup.esc="onCancel">
-				<NcLoadingIcon v-if="loading"
-					:size="20"
-					:title="t('integration_openai', 'Loading')" />
-				<NcButton v-else @click="onInputEnter">
-					{{ t('integration_openai', 'Submit') }}
-				</NcButton>
-			</div>
-			<NcButton class="advanced-button"
-				@click="showAdvanced = !showAdvanced">
-				<template #icon>
-					<component :is="showAdvancedIcon" />
-				</template>
-				{{ t('integration_openai', 'Advanced options') }}
+	<div class="dalle-picker-content">
+		<h2>
+			{{ t('integration_openai', 'Generate an image with DALL·E 2') }}
+			<a class="attribution"
+				target="_blank"
+				href="https://openai.com/dall-e-2/">
+				{{ poweredByTitle }}
+			</a>
+		</h2>
+		<div class="input-wrapper">
+			<input ref="dalle-search-input"
+				v-model="query"
+				type="text"
+				:placeholder="inputPlaceholder"
+				@keydown.enter="onInputEnter"
+				@keyup.esc="onCancel">
+			<NcLoadingIcon v-if="loading"
+				:size="20"
+				:title="t('integration_openai', 'Loading')" />
+			<NcButton v-else @click="onInputEnter">
+				{{ t('integration_openai', 'Submit') }}
 			</NcButton>
-			<div v-show="showAdvanced" class="advanced">
-				<div class="line">
-					<label for="number">
-						{{ t('integration_openai', 'Number of images to generate (1-10)') }}
-					</label>
-					<input
-						id="number"
-						v-model="imageNumber"
-						type="number"
-						min="1"
-						max="10"
-						step="1">
-				</div>
-				<div class="line">
-					<label for="size">
-						{{ t('integration_openai', 'Size of the generated images') }}
-					</label>
-					<select
-						id="size"
-						v-model="imageSize">
-						<option value="256x256">
-							256x256 px
-						</option>
-						<option value="512x512">
-							512x512 px
-						</option>
-						<option value="1024x1024">
-							1024x1024 px
-						</option>
-					</select>
-				</div>
+		</div>
+		<NcButton class="advanced-button"
+			@click="showAdvanced = !showAdvanced">
+			<template #icon>
+				<component :is="showAdvancedIcon" />
+			</template>
+			{{ t('integration_openai', 'Advanced options') }}
+		</NcButton>
+		<div v-show="showAdvanced" class="advanced">
+			<div class="line">
+				<label for="number">
+					{{ t('integration_openai', 'Number of images to generate (1-10)') }}
+				</label>
+				<input
+					id="number"
+					v-model="imageNumber"
+					type="number"
+					min="1"
+					max="10"
+					step="1">
 			</div>
-			<div class="footer">
-				<NcButton @click="onCancel">
-					{{ t('integration_openai', 'Cancel') }}
-				</NcButton>
+			<div class="line">
+				<label for="size">
+					{{ t('integration_openai', 'Size of the generated images') }}
+				</label>
+				<select
+					id="size"
+					v-model="imageSize">
+					<option value="256x256">
+						256x256 px
+					</option>
+					<option value="512x512">
+						512x512 px
+					</option>
+					<option value="1024x1024">
+						1024x1024 px
+					</option>
+				</select>
 			</div>
 		</div>
-	</NcModal>
+	</div>
 </template>
 
 <script>
@@ -108,7 +99,6 @@ export default {
 
 	data() {
 		return {
-			show: true,
 			query: '',
 			loading: false,
 			inputPlaceholder: t('integration_openai', 'cyberpunk pizza with pineapple, cats fighting with lightsabers'),
@@ -136,16 +126,14 @@ export default {
 
 	methods: {
 		focusOnInput() {
-			this.$nextTick(() => {
-				this.$refs['search-input']?.focus()
-			})
+			setTimeout(() => {
+				this.$refs['dalle-search-input']?.focus()
+			}, 300)
 		},
 		onCancel() {
-			this.show = false
 			this.$emit('cancel')
 		},
 		onSubmit(url) {
-			this.show = false
 			this.$emit('submit', url)
 		},
 		onInputEnter() {
@@ -181,12 +169,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.image-picker-modal-content {
+.dalle-picker-content {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 16px;
+	//padding: 16px;
 
 	h2 {
 		display: flex;
@@ -231,13 +219,6 @@ export default {
 			-moz-appearance: initial !important;
 			-webkit-appearance: initial !important;
 		}
-	}
-
-	.footer {
-		width: 100%;
-		margin-top: 8px;
-		display: flex;
-		justify-content: end;
 	}
 }
 </style>
