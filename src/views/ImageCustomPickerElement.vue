@@ -13,8 +13,7 @@
 				v-model="query"
 				type="text"
 				:placeholder="inputPlaceholder"
-				@keydown.enter="onInputEnter"
-				@keyup.esc="onCancel">
+				@keydown.enter="onInputEnter">
 			<NcLoadingIcon v-if="loading"
 				:size="20"
 				:title="t('integration_openai', 'Loading')" />
@@ -129,9 +128,6 @@ export default {
 			setTimeout(() => {
 				this.$refs['dalle-search-input']?.focus()
 			}, 300)
-		},
-		onCancel() {
-			this.$emit('cancel')
 		},
 		onSubmit(url) {
 			this.$emit('submit', url)

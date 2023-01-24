@@ -13,8 +13,7 @@
 				v-model="query"
 				type="text"
 				:placeholder="inputPlaceholder"
-				@keydown.enter="onInputEnter"
-				@keyup.esc="onCancel">
+				@keydown.enter="onInputEnter">
 			<NcLoadingIcon v-if="loading"
 				:size="20"
 				:title="t('integration_openai', 'Loading')" />
@@ -178,9 +177,6 @@ export default {
 			if (model) {
 				this.completionModel = model
 			}
-		},
-		onCancel() {
-			this.$emit('cancel')
 		},
 		onSubmit(url) {
 			this.$emit('submit', url)
