@@ -69,7 +69,7 @@ class ChatGptReferenceProvider extends ADiscoverableReferenceProvider  {
 	 * @inheritDoc
 	 */
 	public function getTitle(): string {
-		return $this->l10n->t('OpenAI\'s ChatGPT answers');
+		return $this->l10n->t('ChatGPT answers (by OpenAI)');
 	}
 
 	/**
