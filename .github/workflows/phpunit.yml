@@ -11,7 +11,7 @@ on:
       - tests/**
   push:
     branches:
-      - master
+      - main
       - stable*
       - test
     paths:
@@ -33,7 +33,7 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['8.0', '8.1']
+        php-versions: ['8.1']
         databases: ['sqlite']
         server-versions: ['master']
 

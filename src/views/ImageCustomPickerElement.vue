@@ -2,12 +2,12 @@
 	<div class="dalle-picker-content">
 		<h2>
 			{{ t('integration_openai', 'Generate an image with DALL·E 2') }}
-			<a class="attribution"
-				target="_blank"
-				href="https://openai.com/dall-e-2/">
-				{{ poweredByTitle }}
-			</a>
 		</h2>
+		<a class="attribution"
+			target="_blank"
+			href="https://openai.com/dall-e-2/">
+			{{ poweredByTitle }}
+		</a>
 		<div class="input-wrapper">
 			<input ref="dalle-search-input"
 				v-model="query"
@@ -176,9 +176,10 @@ export default {
 	h2 {
 		display: flex;
 		align-items: center;
-		.attribution {
-			margin-left: 16px;
-		}
+	}
+
+	.attribution {
+		padding-bottom: 8px;
 	}
 
 	.input-wrapper {

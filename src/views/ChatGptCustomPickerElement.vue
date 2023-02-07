@@ -2,12 +2,12 @@
 	<div class="chatgpt-picker-content">
 		<h2>
 			{{ t('integration_openai', 'Get a ChatGPT answer') }}
-			<a class="attribution"
-				target="_blank"
-				href="https://openai.com">
-				{{ poweredByTitle }}
-			</a>
 		</h2>
+		<a class="attribution"
+			target="_blank"
+			href="https://openai.com">
+			{{ poweredByTitle }}
+		</a>
 		<div class="input-wrapper">
 			<input ref="chatgpt-search-input"
 				v-model="query"
@@ -239,9 +239,10 @@ export default {
 	h2 {
 		display: flex;
 		align-items: center;
-		.attribution {
-			margin-left: 16px;
-		}
+	}
+
+	.attribution {
+		padding-bottom: 8px;
 	}
 
 	.input-wrapper {
