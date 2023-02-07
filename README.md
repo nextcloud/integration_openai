@@ -1,7 +1,8 @@
 # OpenAI integration in Nextcloud
 
-This app includes:
-* A custom link picker to get ChatGPT answers and generate DALL·E 2 images in Talk, Text and potentially anywhere in Nextcloud.
+This app includes 2 custom link pickers for Text, Talk and potentially anywhere in Nextcloud:
+* ChatGPT answers
+* DALL·E 2 images
 
 ## 🔧 Configuration
 

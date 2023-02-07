@@ -9,15 +9,17 @@
 			{{ poweredByTitle }}
 		</a>
 		<div class="input-wrapper">
-			<input ref="chatgpt-search-input"
-				v-model="query"
-				type="text"
-				:placeholder="inputPlaceholder"
+			<NcTextField
+				ref="chatgpt-search-input"
+				:value.sync="query"
+				:label="inputPlaceholder"
 				@keydown.enter="onInputEnter">
-			<NcLoadingIcon v-if="loading"
-				:size="20"
-				:title="t('integration_openai', 'Loading')" />
-			<NcButton v-else @click="onInputEnter">
+				<NcLoadingIcon v-if="loading" :size="16" />
+				<OpenAiIcon v-else :size="16" />
+			</NcTextField>
+			<NcButton
+				:disabled="loading"
+				@click="onInputEnter">
 				{{ t('integration_openai', 'Submit') }}
 			</NcButton>
 		</div>
@@ -55,7 +57,7 @@
 					:user-select="false"
 					:internal-search="true"
 					@input="onModelSelected" />
-				<a v-tooltip.top="{ content: t('integration_openai', 'More information about OpenAI models') }"
+				<a :title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
 					target="_blank">
 					<NcButton>
@@ -74,24 +76,25 @@ import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 
+import OpenAiIcon from '../components/icons/OpenAiIcon.vue'
+
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
-
-import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip.js'
-import Vue from 'vue'
-Vue.directive('tooltip', Tooltip)
 
 export default {
 	name: 'ChatGptCustomPickerElement',
 
 	components: {
+		OpenAiIcon,
 		NcButton,
 		NcLoadingIcon,
 		NcMultiselect,
+		NcTextField,
 		ChevronRightIcon,
 		ChevronDownIcon,
 		HelpCircleIcon,
@@ -152,7 +155,7 @@ export default {
 	methods: {
 		focusOnInput() {
 			setTimeout(() => {
-				this.$refs['chatgpt-search-input']?.focus()
+				this.$refs['chatgpt-search-input'].$el.getElementsByTagName('input')[0]?.focus()
 			}, 300)
 		},
 		getModels() {

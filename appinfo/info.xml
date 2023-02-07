@@ -15,7 +15,10 @@
     <category>dashboard</category>
     <website>https://github.com/julien-nc/integration_openai</website>
     <bugs>https://github.com/julien-nc/integration_openai/issues</bugs>
-    <screenshot>https://github.com/julien-nc/integration_openai/raw/master/img/screenshot1.jpg</screenshot>
+    <screenshot>https://github.com/julien-nc/integration_openai/raw/main/img/screenshot1.jpg</screenshot>
+    <screenshot>https://github.com/julien-nc/integration_openai/raw/main/img/screenshot2.jpg</screenshot>
+    <screenshot>https://github.com/julien-nc/integration_openai/raw/main/img/screenshot3.jpg</screenshot>
+    <screenshot>https://github.com/julien-nc/integration_openai/raw/main/img/screenshot4.jpg</screenshot>
     <dependencies>
         <nextcloud min-version="26" max-version="26"/>
     </dependencies>

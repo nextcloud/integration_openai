@@ -9,15 +9,17 @@
 			{{ poweredByTitle }}
 		</a>
 		<div class="input-wrapper">
-			<input ref="dalle-search-input"
-				v-model="query"
-				type="text"
-				:placeholder="inputPlaceholder"
+			<NcTextField
+				ref="dalle-search-input"
+				:value.sync="query"
+				:label="inputPlaceholder"
 				@keydown.enter="onInputEnter">
-			<NcLoadingIcon v-if="loading"
-				:size="20"
-				:title="t('integration_openai', 'Loading')" />
-			<NcButton v-else @click="onInputEnter">
+				<NcLoadingIcon v-if="loading" :size="16" />
+				<OpenAiIcon v-else :size="16" />
+			</NcTextField>
+			<NcButton
+				:disabled="loading"
+				@click="onInputEnter">
 				{{ t('integration_openai', 'Submit') }}
 			</NcButton>
 		</div>
@@ -67,9 +69,12 @@
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
 
+import OpenAiIcon from '../components/icons/OpenAiIcon.vue'
+
 import NcModal from '@nextcloud/vue/dist/Components/NcModal.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
@@ -81,8 +86,10 @@ export default {
 		NcModal,
 		NcButton,
 		NcLoadingIcon,
+		NcTextField,
 		ChevronRightIcon,
 		ChevronDownIcon,
+		OpenAiIcon,
 	},
 
 	props: {
@@ -126,7 +133,7 @@ export default {
 	methods: {
 		focusOnInput() {
 			setTimeout(() => {
-				this.$refs['dalle-search-input']?.focus()
+				this.$refs['dalle-search-input'].$el.getElementsByTagName('input')[0]?.focus()
 			}, 300)
 		},
 		onSubmit(url) {
