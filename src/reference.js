@@ -23,11 +23,14 @@ import {
 	registerCustomPickerElement,
 	CustomPickerRenderResult,
 } from '@nextcloud/vue-richtext'
-import './bootstrap.js'
-import Vue from 'vue'
-import ImageCustomPickerElement from './views/ImageCustomPickerElement.vue'
 
-registerCustomPickerElement('openai-image', (el, { providerId, accessible }) => {
+__webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
+__webpack_public_path__ = OC.linkTo('integration_openai', 'js/') // eslint-disable-line
+
+registerCustomPickerElement('openai-image', async (el, { providerId, accessible }) => {
+	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+	Vue.mixin({ methods: { t, n } })
+	const { default: ImageCustomPickerElement } = await import(/* webpackChunkName: "image-picker-lazy" */'./views/ImageCustomPickerElement.vue')
 	const Element = Vue.extend(ImageCustomPickerElement)
 	const vueElement = new Element({
 		propsData: {
@@ -38,5 +41,22 @@ registerCustomPickerElement('openai-image', (el, { providerId, accessible }) => 
 	return new CustomPickerRenderResult(vueElement.$el, vueElement)
 }, (el, renderResult) => {
 	console.debug('OpenAI image custom destroy callback. el', el, 'renderResult:', renderResult)
+	renderResult.object.$destroy()
+})
+
+registerCustomPickerElement('openai-chatgpt', async (el, { providerId, accessible }) => {
+	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+	Vue.mixin({ methods: { t, n } })
+	const { default: ChatGptCustomPickerElement } = await import(/* webpackChunkName: "gpt-picker-lazy" */'./views/ChatGptCustomPickerElement.vue')
+	const Element = Vue.extend(ChatGptCustomPickerElement)
+	const vueElement = new Element({
+		propsData: {
+			providerId,
+			accessible,
+		},
+	}).$mount(el)
+	return new CustomPickerRenderResult(vueElement.$el, vueElement)
+}, (el, renderResult) => {
+	console.debug('OpenAI ChatGPT custom destroy callback. el', el, 'renderResult:', renderResult)
 	renderResult.object.$destroy()
 })

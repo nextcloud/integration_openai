@@ -16,8 +16,7 @@ webpackConfig.stats = {
 const appId = 'integration_openai'
 webpackConfig.entry = {
 	adminSettings: { import: path.join(__dirname, 'src', 'adminSettings.js'), filename: appId + '-adminSettings.js' },
-	referenceChatGpt: { import: path.join(__dirname, 'src', 'referenceChatGpt.js'), filename: appId + '-referenceChatGpt.js' },
-	referenceImage: { import: path.join(__dirname, 'src', 'referenceImage.js'), filename: appId + '-referenceImage.js' },
+	reference: { import: path.join(__dirname, 'src', 'reference.js'), filename: appId + '-reference.js' },
 }
 
 webpackConfig.plugins.push(

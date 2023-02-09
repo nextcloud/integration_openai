@@ -34,7 +34,6 @@ class OpenAiReferenceListener implements IEventListener {
 			return;
 		}
 
-		Util::addScript(Application::APP_ID, Application::APP_ID . '-referenceChatGpt');
-		Util::addScript(Application::APP_ID, Application::APP_ID . '-referenceImage');
+		Util::addScript(Application::APP_ID, Application::APP_ID . '-reference');
 	}
 }
