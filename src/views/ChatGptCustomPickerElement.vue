@@ -21,7 +21,7 @@
 			</NcTextField>
 			<NcButton
 				type="primary"
-				:disabled="loading"
+				:disabled="loading || !query"
 				@click="onInputEnter">
 				{{ t('integration_openai', 'Submit') }}
 			</NcButton>
@@ -50,18 +50,10 @@
 				<label for="size">
 					{{ t('integration_openai', 'Model to use') }}
 				</label>
-				<NcMultiselect
-					:value="completionModel"
-					class="model-select"
-					label="label"
-					track-by="id"
-					:placeholder="modelPlaceholder"
+				<NcSelect
+					v-model="selectedModel"
 					:options="formattedModels"
-					:user-select="false"
-					:internal-search="true"
-					:max-height="200"
-					open-direction="top"
-					@input="onModelSelected" />
+					input-id="openai-model-select" />
 				<a :title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
 					target="_blank">
@@ -87,6 +79,7 @@ import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
@@ -100,6 +93,7 @@ export default {
 		NcLoadingIcon,
 		NcMultiselect,
 		NcTextField,
+		NcSelect,
 		ChevronRightIcon,
 		ChevronDownIcon,
 		HelpCircleIcon,
@@ -125,7 +119,7 @@ export default {
 			poweredByTitle: t('integration_openai', 'Powered by OpenAI'),
 			modelPlaceholder: t('integration_openai', 'Choose a model'),
 			showAdvanced: false,
-			completionModel: null,
+			selectedModel: null,
 			completionNumber: 1,
 		}
 	},
@@ -140,7 +134,8 @@ export default {
 			if (this.models) {
 				return this.models.map(m => {
 					return {
-						...m,
+						id: m.id,
+						value: m.id,
 						label: m.id + ' (' + m.owned_by + ')',
 					}
 				})
@@ -171,8 +166,9 @@ export default {
 					const defaultModelId = response.data?.default_model_id
 					const defaultModel = this.models.find(m => m.id === defaultModelId)
 					if (defaultModel) {
-						this.completionModel = {
-							...defaultModel,
+						this.selectedModel = {
+							id: defaultModel.id,
+							value: defaultModel.id,
 							label: defaultModel.id + ' (' + defaultModel.owned_by + ')',
 						}
 					}
@@ -180,11 +176,6 @@ export default {
 				.catch((error) => {
 					console.error(error)
 				})
-		},
-		onModelSelected(model) {
-			if (model) {
-				this.completionModel = model
-			}
 		},
 		onSubmit(url) {
 			this.$emit('submit', url)
@@ -198,8 +189,8 @@ export default {
 				prompt: this.query,
 				n: this.completionNumber,
 			}
-			if (this.completionModel) {
-				params.model = this.completionModel.id
+			if (this.selectedModel) {
+				params.model = this.selectedModel.id
 			}
 			const url = generateUrl('/apps/integration_openai/completions')
 			return axios.post(url, params)

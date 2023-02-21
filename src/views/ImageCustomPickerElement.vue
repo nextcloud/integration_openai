@@ -13,11 +13,14 @@
 				ref="dalle-search-input"
 				:value.sync="query"
 				:label="inputPlaceholder"
-				@keydown.enter="onInputEnter">
+				:show-trailing-button="!!query"
+				@keydown.enter="onInputEnter"
+				@trailing-button-click="query = ''">
 				<NcLoadingIcon v-if="loading" :size="16" />
 				<OpenAiIcon v-else :size="16" />
 			</NcTextField>
 			<NcButton
+				type="primary"
 				:disabled="loading"
 				@click="onInputEnter">
 				{{ t('integration_openai', 'Submit') }}
