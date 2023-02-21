@@ -1,7 +1,7 @@
 <template>
 	<div class="chatgpt-picker-content">
 		<h2>
-			{{ t('integration_openai', 'Get a ChatGPT answer') }}
+			{{ t('integration_openai', 'AI models text prediction') }}
 		</h2>
 		<a class="attribution"
 			target="_blank"
@@ -13,11 +13,14 @@
 				ref="chatgpt-search-input"
 				:value.sync="query"
 				:label="inputPlaceholder"
-				@keydown.enter="onInputEnter">
+				:show-trailing-button="!!query"
+				@keydown.enter="onInputEnter"
+				@trailing-button-click="query = ''">
 				<NcLoadingIcon v-if="loading" :size="16" />
 				<OpenAiIcon v-else :size="16" />
 			</NcTextField>
 			<NcButton
+				type="primary"
 				:disabled="loading"
 				@click="onInputEnter">
 				{{ t('integration_openai', 'Submit') }}
@@ -56,6 +59,8 @@
 					:options="formattedModels"
 					:user-select="false"
 					:internal-search="true"
+					:max-height="200"
+					open-direction="top"
 					@input="onModelSelected" />
 				<a :title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
@@ -267,6 +272,7 @@ export default {
 		padding: 12px 0;
 		.line {
 			display: flex;
+			margin-top: 8px;
 
 			label {
 				flex-grow: 1;

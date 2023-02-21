@@ -2,8 +2,9 @@
 <info>
     <id>integration_openai</id>
     <name>OpenAI integration</name>
-    <summary>Integration of OpenAI ChatGPT and DALL·E 2</summary>
-    <description><![CDATA[OpenAI integration provides a link reference provider to get ChatGPT answers and DALL·E 2 images.]]></description>
+    <summary>Integration of OpenAI's GPT-3 and DALL·E 2</summary>
+    <description><![CDATA[OpenAI integration provides a link reference provider to get
+OpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images.]]></description>
     <version>1.0.0</version>
     <licence>agpl</licence>
     <author>Julien Veyssier</author>
