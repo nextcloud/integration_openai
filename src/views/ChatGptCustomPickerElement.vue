@@ -1,7 +1,7 @@
 <template>
 	<div class="chatgpt-picker-content">
 		<h2>
-			{{ t('integration_openai', 'AI models text prediction') }}
+			{{ t('integration_openai', 'AI text generation') }}
 		</h2>
 		<a class="attribution"
 			target="_blank"
@@ -15,29 +15,33 @@
 				:label="inputPlaceholder"
 				:show-trailing-button="!!query"
 				@keydown.enter="onInputEnter"
-				@trailing-button-click="query = ''">
-				<NcLoadingIcon v-if="loading" :size="16" />
-				<OpenAiIcon v-else :size="16" />
-			</NcTextField>
+				@trailing-button-click="query = ''" />
+		</div>
+		<div class="footer">
+			<NcButton class="advanced-button"
+				@click="showAdvanced = !showAdvanced">
+				<template #icon>
+					<component :is="showAdvancedIcon" />
+				</template>
+				{{ t('integration_openai', 'Advanced options') }}
+			</NcButton>
 			<NcButton
 				type="primary"
 				:disabled="loading || !query"
 				@click="onInputEnter">
-				{{ t('integration_openai', 'Submit') }}
+				{{ t('integration_openai', 'Generate') }}
+				<template #icon>
+					<NcLoadingIcon v-if="loading" />
+					<CheckIcon v-else />
+				</template>
 			</NcButton>
 		</div>
-		<NcButton class="advanced-button"
-			@click="showAdvanced = !showAdvanced">
-			<template #icon>
-				<component :is="showAdvancedIcon" />
-			</template>
-			{{ t('integration_openai', 'Advanced options') }}
-		</NcButton>
 		<div v-show="showAdvanced" class="advanced">
 			<div class="line">
 				<label for="number">
-					{{ t('integration_openai', 'How many completions to generate') }}
+					{{ t('integration_openai', 'How many results to generate') }}
 				</label>
+				<div class="spacer" />
 				<input
 					id="number"
 					v-model="completionNumber"
@@ -50,25 +54,27 @@
 				<label for="size">
 					{{ t('integration_openai', 'Model to use') }}
 				</label>
-				<NcSelect
-					v-model="selectedModel"
-					:options="formattedModels"
-					input-id="openai-model-select" />
 				<a :title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
 					target="_blank">
-					<NcButton>
+					<NcButton type="tertiary">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
 					</NcButton>
 				</a>
+				<div class="spacer" />
+				<NcSelect
+					v-model="selectedModel"
+					:options="formattedModels"
+					input-id="openai-model-select" />
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+import CheckIcon from 'vue-material-design-icons/Check.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
@@ -97,6 +103,7 @@ export default {
 		ChevronRightIcon,
 		ChevronDownIcon,
 		HelpCircleIcon,
+		CheckIcon,
 	},
 
 	props: {
@@ -240,6 +247,10 @@ export default {
 		align-items: center;
 	}
 
+	.spacer {
+		flex-grow: 1;
+	}
+
 	.attribution {
 		padding-bottom: 8px;
 	}
@@ -253,9 +264,15 @@ export default {
 		}
 	}
 
-	.advanced-button {
-		align-self: start;
+	.footer {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: end;
 		margin-top: 12px;
+		> * {
+			margin-left: 4px;
+		}
 	}
 
 	.advanced {
@@ -263,11 +280,8 @@ export default {
 		padding: 12px 0;
 		.line {
 			display: flex;
+			align-items: center;
 			margin-top: 8px;
-
-			label {
-				flex-grow: 1;
-			}
 
 			input {
 				width: 200px;
@@ -278,6 +292,7 @@ export default {
 		}
 
 		input[type=number] {
+			width: 80px;
 			appearance: initial !important;
 			-moz-appearance: initial !important;
 			-webkit-appearance: initial !important;
