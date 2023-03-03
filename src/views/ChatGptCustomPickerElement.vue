@@ -1,7 +1,7 @@
 <template>
 	<div class="chatgpt-picker-content">
 		<h2>
-			{{ t('integration_openai', 'AI text generation') }}
+			{{ t('integration_openai', 'ChatGPT-like text generation') }}
 		</h2>
 		<a class="attribution"
 			target="_blank"
@@ -121,7 +121,7 @@ export default {
 			loading: false,
 			models: [],
 			inputPlaceholder: t('integration_openai', 'What is the matter with putting pineapple on pizza?'),
-			poweredByTitle: t('integration_openai', 'Powered by OpenAI'),
+			poweredByTitle: t('integration_openai', 'by OpenAI'),
 			modelPlaceholder: t('integration_openai', 'Choose a model'),
 			showAdvanced: false,
 			selectedModel: null,

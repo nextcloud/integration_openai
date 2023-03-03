@@ -116,7 +116,7 @@ export default {
 			query: '',
 			loading: false,
 			inputPlaceholder: t('integration_openai', 'cyberpunk pizza with pineapple, cats fighting with lightsabers'),
-			poweredByTitle: t('integration_openai', 'Powered by DALL·E 2 from OpenAI'),
+			poweredByTitle: t('integration_openai', 'by OpenAI with DALL·E 2'),
 			showAdvanced: false,
 			imageNumber: 1,
 			imageSize: '1024x1024',
