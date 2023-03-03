@@ -69,7 +69,7 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 	 * @inheritDoc
 	 */
 	public function getTitle(): string {
-		return $this->l10n->t('AI image generator (by OpenAI Dall-E 2)');
+		return $this->l10n->t('AI image generation (by OpenAI Dall-E 2)');
 	}
 
 	/**
