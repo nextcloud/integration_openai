@@ -5,7 +5,7 @@
     <summary>Integration of OpenAI's GPT-3 and DALL·E 2</summary>
     <description><![CDATA[OpenAI integration provides a link reference provider to get
 OpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images.]]></description>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <licence>agpl</licence>
     <author>Julien Veyssier</author>
     <namespace>OpenAi</namespace>
@@ -21,7 +21,7 @@ OpenAI text prediction (with many models including GPT-3) and generate DALL·E 2
     <screenshot>https://github.com/julien-nc/integration_openai/raw/main/img/screenshot3.jpg</screenshot>
     <screenshot>https://github.com/julien-nc/integration_openai/raw/main/img/screenshot4.jpg</screenshot>
     <dependencies>
-        <nextcloud min-version="26" max-version="26"/>
+        <nextcloud min-version="26" max-version="27"/>
     </dependencies>
     <settings>
         <admin>OCA\OpenAi\Settings\Admin</admin>
