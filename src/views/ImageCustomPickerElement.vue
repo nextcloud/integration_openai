@@ -1,7 +1,7 @@
 <template>
 	<div class="dalle-picker-content">
 		<h2>
-			{{ t('integration_openai', 'Generate an image with DALL·E 2') }}
+			{{ t('integration_openai', 'AI image generation') }}
 		</h2>
 		<a class="attribution"
 			target="_blank"
@@ -15,29 +15,34 @@
 				:label="inputPlaceholder"
 				:show-trailing-button="!!query"
 				@keydown.enter="onInputEnter"
-				@trailing-button-click="query = ''">
-				<NcLoadingIcon v-if="loading" :size="16" />
-				<OpenAiIcon v-else :size="16" />
-			</NcTextField>
+				@trailing-button-click="query = ''" />
+		</div>
+		<div class="footer">
+			<NcButton class="advanced-button"
+				type="tertiary"
+				@click="showAdvanced = !showAdvanced">
+				<template #icon>
+					<component :is="showAdvancedIcon" />
+				</template>
+				{{ t('integration_openai', 'Advanced options') }}
+			</NcButton>
 			<NcButton
 				type="primary"
-				:disabled="loading"
+				:disabled="loading || !query"
 				@click="onInputEnter">
-				{{ t('integration_openai', 'Submit') }}
+				{{ t('integration_openai', 'Generate') }}
+				<template #icon>
+					<NcLoadingIcon v-if="loading" />
+					<ArrowRightIcon v-else />
+				</template>
 			</NcButton>
 		</div>
-		<NcButton class="advanced-button"
-			@click="showAdvanced = !showAdvanced">
-			<template #icon>
-				<component :is="showAdvancedIcon" />
-			</template>
-			{{ t('integration_openai', 'Advanced options') }}
-		</NcButton>
 		<div v-show="showAdvanced" class="advanced">
 			<div class="line">
 				<label for="number">
 					{{ t('integration_openai', 'Number of images to generate (1-10)') }}
 				</label>
+				<div class="spacer" />
 				<input
 					id="number"
 					v-model="imageNumber"
@@ -50,6 +55,7 @@
 				<label for="size">
 					{{ t('integration_openai', 'Size of the generated images') }}
 				</label>
+				<div class="spacer" />
 				<select
 					id="size"
 					v-model="imageSize">
@@ -69,10 +75,9 @@
 </template>
 
 <script>
+import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
-
-import OpenAiIcon from '../components/icons/OpenAiIcon.vue'
 
 import NcModal from '@nextcloud/vue/dist/Components/NcModal.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
@@ -92,7 +97,7 @@ export default {
 		NcTextField,
 		ChevronRightIcon,
 		ChevronDownIcon,
-		OpenAiIcon,
+		ArrowRightIcon,
 	},
 
 	props: {
@@ -188,7 +193,12 @@ export default {
 		align-items: center;
 	}
 
+	.spacer {
+		flex-grow: 1;
+	}
+
 	.attribution {
+		color: var(--color-text-maxcontrast);
 		padding-bottom: 8px;
 	}
 
@@ -196,14 +206,17 @@ export default {
 		display: flex;
 		align-items: center;
 		width: 100%;
-		input {
-			flex-grow: 1;
-		}
 	}
 
-	.advanced-button {
-		align-self: start;
+	.footer {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: end;
 		margin-top: 12px;
+		> * {
+			margin-left: 4px;
+		}
 	}
 
 	.advanced {
@@ -211,10 +224,8 @@ export default {
 		padding: 12px 0;
 		.line {
 			display: flex;
-
-			label {
-				flex-grow: 1;
-			}
+			align-items: center;
+			margin-top: 8px;
 
 			input,
 			select {
@@ -223,6 +234,7 @@ export default {
 		}
 
 		input[type=number] {
+			width: 80px;
 			appearance: initial !important;
 			-moz-appearance: initial !important;
 			-webkit-appearance: initial !important;

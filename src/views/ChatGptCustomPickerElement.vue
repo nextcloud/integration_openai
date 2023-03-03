@@ -19,6 +19,7 @@
 		</div>
 		<div class="footer">
 			<NcButton class="advanced-button"
+				type="tertiary"
 				@click="showAdvanced = !showAdvanced">
 				<template #icon>
 					<component :is="showAdvancedIcon" />
@@ -32,7 +33,7 @@
 				{{ t('integration_openai', 'Generate') }}
 				<template #icon>
 					<NcLoadingIcon v-if="loading" />
-					<CheckIcon v-else />
+					<ArrowRightIcon v-else />
 				</template>
 			</NcButton>
 		</div>
@@ -74,12 +75,10 @@
 </template>
 
 <script>
-import CheckIcon from 'vue-material-design-icons/Check.vue'
+import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
-
-import OpenAiIcon from '../components/icons/OpenAiIcon.vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
@@ -94,7 +93,6 @@ export default {
 	name: 'ChatGptCustomPickerElement',
 
 	components: {
-		OpenAiIcon,
 		NcButton,
 		NcLoadingIcon,
 		NcMultiselect,
@@ -103,7 +101,7 @@ export default {
 		ChevronRightIcon,
 		ChevronDownIcon,
 		HelpCircleIcon,
-		CheckIcon,
+		ArrowRightIcon,
 	},
 
 	props: {
@@ -122,7 +120,7 @@ export default {
 			query: '',
 			loading: false,
 			models: [],
-			inputPlaceholder: t('integration_openai', 'What is the matter with putting pineapple on pizzas?'),
+			inputPlaceholder: t('integration_openai', 'What is the matter with putting pineapple on pizza?'),
 			poweredByTitle: t('integration_openai', 'Powered by OpenAI'),
 			modelPlaceholder: t('integration_openai', 'Choose a model'),
 			showAdvanced: false,
@@ -223,7 +221,7 @@ export default {
 					this.onSubmit(answers[0])
 				} else {
 					const multiAnswers = answers.map((a, i) => {
-						return '-- ' + t('integration_openai', 'Answer {index}', { index: i + 1 }) + '\n\n' + a
+						return t('integration_openai', 'Result {index}', { index: i + 1 }) + '\n' + a
 					})
 					this.onSubmit(multiAnswers.join('\n\n'))
 				}
@@ -252,6 +250,7 @@ export default {
 	}
 
 	.attribution {
+		color: var(--color-text-maxcontrast);
 		padding-bottom: 8px;
 	}
 
@@ -259,9 +258,6 @@ export default {
 		display: flex;
 		align-items: center;
 		width: 100%;
-		input {
-			flex-grow: 1;
-		}
 	}
 
 	.footer {
