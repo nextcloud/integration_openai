@@ -42,7 +42,7 @@ registerCustomPickerElement('openai-image', async (el, { providerId, accessible 
 }, (el, renderResult) => {
 	console.debug('OpenAI image custom destroy callback. el', el, 'renderResult:', renderResult)
 	renderResult.object.$destroy()
-})
+}, 'normal')
 
 registerCustomPickerElement('openai-chatgpt', async (el, { providerId, accessible }) => {
 	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
@@ -59,4 +59,4 @@ registerCustomPickerElement('openai-chatgpt', async (el, { providerId, accessibl
 }, (el, renderResult) => {
 	console.debug('OpenAI ChatGPT custom destroy callback. el', el, 'renderResult:', renderResult)
 	renderResult.object.$destroy()
-})
+}, 'normal')
