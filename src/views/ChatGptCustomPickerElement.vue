@@ -39,6 +39,14 @@
 		</div>
 		<div v-show="showAdvanced" class="advanced">
 			<div class="line">
+				<div class="spacer" />
+				<NcCheckboxRadioSwitch
+					class="include-query"
+					:checked.sync="includeQuery">
+					{{ t('integration_openai', 'Include the input text in the result') }}
+				</NcCheckboxRadioSwitch>
+			</div>
+			<div class="line">
 				<label for="number">
 					{{ t('integration_openai', 'How many results to generate') }}
 				</label>
@@ -85,6 +93,7 @@ import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
@@ -98,6 +107,7 @@ export default {
 		NcMultiselect,
 		NcTextField,
 		NcSelect,
+		NcCheckboxRadioSwitch,
 		ChevronRightIcon,
 		ChevronDownIcon,
 		HelpCircleIcon,
@@ -125,6 +135,7 @@ export default {
 			modelPlaceholder: t('integration_openai', 'Choose a model'),
 			showAdvanced: false,
 			selectedModel: null,
+			includeQuery: false,
 			completionNumber: 1,
 		}
 	},
@@ -218,12 +229,18 @@ export default {
 			const answers = choices.filter(c => !!c.text).map(c => c.text.replace(/^\s+|\s+$/g, ''))
 			if (answers.length > 0) {
 				if (answers.length === 1) {
-					this.onSubmit(answers[0])
+					const result = this.includeQuery
+						? t('integration_openai', 'Query') + '\n' + this.query + '\n\n' + t('integration_openai', 'Result') + '\n' + answers[0]
+						: answers[0]
+					this.onSubmit(result)
 				} else {
 					const multiAnswers = answers.map((a, i) => {
 						return t('integration_openai', 'Result {index}', { index: i + 1 }) + '\n' + a
 					})
-					this.onSubmit(multiAnswers.join('\n\n'))
+					const result = this.includeQuery
+						? t('integration_openai', 'Query') + '\n' + this.query + '\n\n' + multiAnswers.join('\n\n')
+						: multiAnswers.join('\n\n')
+					this.onSubmit(result)
 				}
 			}
 		},
@@ -292,6 +309,10 @@ export default {
 			appearance: initial !important;
 			-moz-appearance: initial !important;
 			-webkit-appearance: initial !important;
+		}
+
+		.include-query {
+			margin-right: 16px;
 		}
 	}
 }
