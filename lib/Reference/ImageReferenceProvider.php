@@ -24,7 +24,6 @@ namespace OCA\OpenAi\Reference;
 
 use OCA\OpenAi\Db\ImageGenerationMapper;
 use OCA\OpenAi\Db\ImageUrlMapper;
-use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\Reference;
 use OC\Collaboration\Reference\ReferenceManager;
@@ -42,29 +41,17 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 
 	private OpenAiAPIService $openAiAPIService;
 	private ?string $userId;
-	private IConfig $config;
-	private ReferenceManager $referenceManager;
 	private IL10N $l10n;
 	private IURLGenerator $urlGenerator;
-	private ImageGenerationMapper $imageGenerationMapper;
-	private ImageUrlMapper $imageUrlMapper;
 
 	public function __construct(OpenAiAPIService $openAiAPIService,
-								IConfig $config,
 								IL10N $l10n,
 								IURLGenerator $urlGenerator,
-								ImageGenerationMapper $imageGenerationMapper,
-								ImageUrlMapper $imageUrlMapper,
-								ReferenceManager $referenceManager,
 								?string $userId) {
 		$this->openAiAPIService = $openAiAPIService;
 		$this->userId = $userId;
-		$this->config = $config;
-		$this->referenceManager = $referenceManager;
 		$this->l10n = $l10n;
 		$this->urlGenerator = $urlGenerator;
-		$this->imageGenerationMapper = $imageGenerationMapper;
-		$this->imageUrlMapper = $imageUrlMapper;
 	}
 
 	/**
@@ -115,21 +102,7 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 			}
 
 			$reference = new Reference($referenceText);
-
-			try {
-				$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
-				$urls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
-				$richObjectInfo = [
-					'hash' => $hash,
-					'urls' => $urls,
-					'prompt' => $imageGeneration->getPrompt(),
-				];
-			} catch (DoesNotExistException $e) {
-				$richObjectInfo = [
-					'error' => 'notfound',
-				];
-			}
-
+			$richObjectInfo = $this->openAiAPIService->getGenerationInfo($hash);
 			$reference->setRichObject(
 				self::RICH_OBJECT_TYPE,
 				$richObjectInfo,

@@ -65,15 +65,15 @@ export default {
 	props: {
 		hash: {
 			type: String,
-			required: true,
+			default: null,
 		},
 		urls: {
 			type: Array,
-			required: true,
+			default: () => [],
 		},
 		prompt: {
 			type: String,
-			required: true,
+			default: null,
 		},
 		error: {
 			type: String,

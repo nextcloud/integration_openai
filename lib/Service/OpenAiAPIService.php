@@ -131,6 +131,7 @@ class OpenAiAPIService {
 		try {
 			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
 			$imageUrls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
+			$this->imageGenerationMapper->touchImageGeneration($imageGeneration->getId());
 			return [
 				'hash' => $hash,
 				'prompt' => $imageGeneration->getPrompt(),
