@@ -5,8 +5,8 @@
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
- * @author Julien Veyssier <eneiluj@posteo.net>
- * @copyright Julien Veyssier 2022
+ * @author Julien Veyssier <julien-nc@posteo.net>
+ * @copyright Julien Veyssier 2023
  */
 
 return [
@@ -15,5 +15,8 @@ return [
 		['name' => 'openAiAPI#getModels', 'url' => '/models', 'verb' => 'GET'],
 		['name' => 'openAiAPI#createCompletion', 'url' => '/completions', 'verb' => 'POST'],
 		['name' => 'openAiAPI#createImage', 'url' => '/images/generations', 'verb' => 'POST'],
+		['name' => 'openAiAPI#createImage', 'url' => '/images/generations', 'verb' => 'POST'],
+		['name' => 'openAiAPI#getImageGenerationContent', 'url' => '/images/generations/{hash}/{urlId}', 'verb' => 'GET'],
+		['name' => 'openAiAPI#getImageGenerationPage', 'url' => '/i/{hash}', 'verb' => 'GET'],
 	],
 ];

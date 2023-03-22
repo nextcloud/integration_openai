@@ -1,7 +1,7 @@
 /**
- * @copyright Copyright (c) 2022 Julien Veyssier <eneiluj@posteo.net>
+ * @copyright Copyright (c) 2022 Julien Veyssier <julien-nc@posteo.net>
  *
- * @author Julien Veyssier <eneiluj@posteo.net>
+ * @author Julien Veyssier <julien-nc@posteo.net>
  *
  * @license AGPL-3.0-or-later
  *
@@ -22,10 +22,24 @@
 // with nc/vue 7.8.0, if we remove this, nothing works...
 import {} from '@nextcloud/vue-richtext'
 
-import { registerCustomPickerElement, NcCustomPickerRenderResult } from '@nextcloud/vue/dist/Components/NcRichText.js'
+import { registerWidget, registerCustomPickerElement, NcCustomPickerRenderResult } from '@nextcloud/vue/dist/Components/NcRichText.js'
 
 __webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
 __webpack_public_path__ = OC.linkTo('integration_openai', 'js/') // eslint-disable-line
+
+registerWidget('integration_openai_image', async (el, { richObjectType, richObject, accessible }) => {
+	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+	Vue.mixin({ methods: { t, n } })
+	const { default: ImageReferenceWidget } = await import(/* webpackChunkName: "reference-image-lazy" */'./views/ImageReferenceWidget.vue')
+	const Widget = Vue.extend(ImageReferenceWidget)
+	new Widget({
+		propsData: {
+			richObjectType,
+			richObject,
+			accessible,
+		},
+	}).$mount(el)
+})
 
 registerCustomPickerElement('openai-image', async (el, { providerId, accessible }) => {
 	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')

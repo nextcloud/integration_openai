@@ -3,7 +3,7 @@
  * Nextcloud - OpenAI
  *
  *
- * @author Julien Veyssier <eneiluj@posteo.net>
+ * @author Julien Veyssier <julien-nc@posteo.net>
  * @copyright Julien Veyssier 2022
  */
 

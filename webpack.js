@@ -17,6 +17,7 @@ const appId = 'integration_openai'
 webpackConfig.entry = {
 	adminSettings: { import: path.join(__dirname, 'src', 'adminSettings.js'), filename: appId + '-adminSettings.js' },
 	reference: { import: path.join(__dirname, 'src', 'reference.js'), filename: appId + '-reference.js' },
+	imageGenerationPage: { import: path.join(__dirname, 'src', 'imageGenerationPage.js'), filename: appId + '-imageGenerationPage.js' },
 }
 
 webpackConfig.plugins.push(

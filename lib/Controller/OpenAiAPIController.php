@@ -5,7 +5,7 @@
  * This file is licensed under the Affero General Public License version 3 or
  * later. See the COPYING file.
  *
- * @author Julien Veyssier <eneiluj@posteo.net>
+ * @author Julien Veyssier <julien-nc@posteo.net>
  * @copyright Julien Veyssier 2022
  */
 
@@ -14,7 +14,9 @@ namespace OCA\OpenAi\Controller;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IRequest;
 
@@ -39,6 +41,7 @@ class OpenAiAPIController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * @return DataResponse
 	 */
 	public function getModels(): DataResponse {
@@ -52,6 +55,7 @@ class OpenAiAPIController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $model
@@ -67,6 +71,7 @@ class OpenAiAPIController extends Controller {
 
 	/**
 	 * @NoAdminRequired
+	 *
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $size
@@ -78,5 +83,40 @@ class OpenAiAPIController extends Controller {
 			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
 		}
 		return new DataResponse($response);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @param string $hash
+	 * @param int $urlId
+	 * @return DataDisplayResponse
+	 */
+	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse {
+		$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
+		if ($image !== null && isset($image['body'], $image['headers'])) {
+			$response = new DataDisplayResponse(
+				$image['body'],
+				Http::STATUS_OK,
+				['Content-Type' => $image['headers']['Content-Type'][0] ?? 'image/jpeg']
+			);
+			$response->cacheFor(60 * 60 * 24, false, true);
+			return $response;
+		}
+		return new DataDisplayResponse('', Http::STATUS_NOT_FOUND);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 *
+	 * @param string $hash
+	 * @return TemplateResponse
+	 */
+	public function getImageGenerationPage(string $hash): TemplateResponse {
+		$generationData = $this->openAiAPIService->getGenerationInfo($hash);
+		$this->initialStateService->provideInitialState('generation', $generationData);
+		return new TemplateResponse(Application::APP_ID, 'imageGenerationPage');
 	}
 }

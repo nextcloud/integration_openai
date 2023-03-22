@@ -1,8 +1,8 @@
 <?php
 /**
- * @copyright Copyright (c) 2022 Julien Veyssier <eneiluj@posteo.net>
+ * @copyright Copyright (c) 2022 Julien Veyssier <julien-nc@posteo.net>
  *
- * @author Julien Veyssier <eneiluj@posteo.net>
+ * @author Julien Veyssier <julien-nc@posteo.net>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -22,6 +22,9 @@
 
 namespace OCA\OpenAi\Reference;
 
+use OCA\OpenAi\Db\ImageGenerationMapper;
+use OCA\OpenAi\Db\ImageUrl;
+use OCA\OpenAi\Db\ImageUrlMapper;
 use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\Reference;
 use OC\Collaboration\Reference\ReferenceManager;
@@ -35,7 +38,7 @@ use OCP\IURLGenerator;
 
 class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 
-	private const RICH_OBJECT_TYPE = Application::APP_ID . '_image_internal_link';
+	private const RICH_OBJECT_TYPE = Application::APP_ID . '_image';
 
 	private OpenAiAPIService $openAiAPIService;
 	private ?string $userId;
@@ -43,11 +46,15 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 	private ReferenceManager $referenceManager;
 	private IL10N $l10n;
 	private IURLGenerator $urlGenerator;
+	private ImageGenerationMapper $imageGenerationMapper;
+	private ImageUrlMapper $imageUrlMapper;
 
 	public function __construct(OpenAiAPIService $openAiAPIService,
 								IConfig $config,
 								IL10N $l10n,
 								IURLGenerator $urlGenerator,
+								ImageGenerationMapper $imageGenerationMapper,
+								ImageUrlMapper $imageUrlMapper,
 								ReferenceManager $referenceManager,
 								?string $userId) {
 		$this->openAiAPIService = $openAiAPIService;
@@ -56,6 +63,8 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 		$this->referenceManager = $referenceManager;
 		$this->l10n = $l10n;
 		$this->urlGenerator = $urlGenerator;
+		$this->imageGenerationMapper = $imageGenerationMapper;
+		$this->imageUrlMapper = $imageUrlMapper;
 	}
 
 	/**
@@ -92,16 +101,7 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 	 * @inheritDoc
 	 */
 	public function matchReference(string $referenceText): bool {
-		return false;
-		/*
-		$start = $this->urlGenerator->getAbsoluteURL('/apps/' . Application::APP_ID);
-		$startIndex = $this->urlGenerator->getAbsoluteURL('/index.php/apps/' . Application::APP_ID);
-
-		// link example: https://nextcloud.local/index.php/apps/integration_openai/i/3jf5wq3hibbqvickir7ysqehfi
-		$noIndexMatch = preg_match('/^' . preg_quote($start, '/') . '\/i\/[0-9a-z]+$/', $referenceText) === 1;
-		$indexMatch = preg_match('/^' . preg_quote($startIndex, '/') . '\/i\/[0-9a-z]+$/', $referenceText) === 1;
-		return $noIndexMatch || $indexMatch;
-		*/
+		return $this->getImageGenerationHash($referenceText) !== null;
 	}
 
 	/**
@@ -109,10 +109,19 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 	 */
 	public function resolveReference(string $referenceText): ?IReference {
 		if ($this->matchReference($referenceText)) {
-			$imageId = $this->getImageId($referenceText);
+			$hash = $this->getImageGenerationHash($referenceText);
+			if ($hash === null) {
+				return null;
+			}
+
+			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
+			$urls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
+
 			$reference = new Reference($referenceText);
 			$richObjectInfo = [
-				'completionId' => $imageId,
+				'hash' => $hash,
+				'urls' => $urls,
+				'prompt' => $imageGeneration->getPrompt(),
 			];
 
 			$reference->setRichObject(
@@ -129,41 +138,35 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 	 * @param string $url
 	 * @return array|null
 	 */
-	private function getImageId(string $url): ?string {
-		preg_match('/\/i\/([0-9a-z]+)$/i', $url, $matches);
+	private function getImageGenerationHash(string $url): ?string {
+		$start = $this->urlGenerator->getAbsoluteURL('/apps/' . Application::APP_ID);
+		$startIndex = $this->urlGenerator->getAbsoluteURL('/index.php/apps/' . Application::APP_ID);
+
+		// link example: https://nextcloud.local/index.php/apps/integration_openai/i/3jf5wq3hibbqvickir7ysqehfi
+		preg_match('/^' . preg_quote($start, '/') . '\/i\/([0-9a-z]+)$/i', $url, $matches);
 		if (count($matches) > 1) {
 			return $matches[1];
 		}
+
+		preg_match('/^' . preg_quote($startIndex, '/') . '\/i\/([0-9a-z]+)$/i', $url, $matches);
+		if (count($matches) > 1) {
+			return $matches[1];
+		}
+
 		return null;
 	}
 
 	/**
-	 * We use the userId here because when connecting/disconnecting from the GitHub account,
-	 * we want to invalidate all the user cache and this is only possible with the cache prefix
 	 * @inheritDoc
 	 */
 	public function getCachePrefix(string $referenceId): string {
-		return $this->userId ?? '';
+		return '';
 	}
 
 	/**
-	 * We don't use the userId here but rather a reference unique id
 	 * @inheritDoc
 	 */
 	public function getCacheKey(string $referenceId): ?string {
-		$predictionId = $this->getImageId($referenceId);
-		if ($predictionId !== null) {
-			return $predictionId;
-		}
-
 		return $referenceId;
-	}
-
-	/**
-	 * @param string $userId
-	 * @return void
-	 */
-	public function invalidateUserCache(string $userId): void {
-		$this->referenceManager->invalidateCache($userId);
 	}
 }

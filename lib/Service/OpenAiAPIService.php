@@ -11,10 +11,15 @@
 
 namespace OCA\OpenAi\Service;
 
+use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Db\ImageGenerationMapper;
+use OCA\OpenAi\Db\ImageUrlMapper;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\Http\Client\IClient;
 use OCP\IConfig;
 use OCP\IL10N;
@@ -27,6 +32,8 @@ class OpenAiAPIService {
 	private IL10N $l10n;
 	private IConfig $config;
 	private IClient $client;
+	private ImageGenerationMapper $imageGenerationMapper;
+	private ImageUrlMapper $imageUrlMapper;
 
 	/**
 	 * Service to make requests to OpenAI REST API
@@ -35,11 +42,15 @@ class OpenAiAPIService {
 								LoggerInterface $logger,
 								IL10N $l10n,
 								IConfig $config,
+								ImageGenerationMapper $imageGenerationMapper,
+								ImageUrlMapper $imageUrlMapper,
 								IClientService $clientService) {
 		$this->client = $clientService->newClient();
 		$this->logger = $logger;
 		$this->l10n = $l10n;
 		$this->config = $config;
+		$this->imageGenerationMapper = $imageGenerationMapper;
+		$this->imageUrlMapper = $imageUrlMapper;
 	}
 
 	/**
@@ -86,7 +97,56 @@ class OpenAiAPIService {
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
-		return $this->request('images/generations', $params, 'POST');
+		$apiResponse = $this->request('images/generations', $params, 'POST');
+		if (isset($apiResponse['error'])) {
+			return $apiResponse;
+		}
+
+		if (isset($apiResponse['data']) && is_array($apiResponse['data'])) {
+			$urls = array_map(static function (array $result) {
+				return $result['url'] ?? null;
+			}, $apiResponse['data']);
+			$urls = array_filter($urls, static function (?string $url) {
+				return $url !== null;
+			});
+			$urls = array_values($urls);
+			if (!empty($urls)) {
+				$hash = md5(implode('|', $urls));
+				$ts = (new DateTime())->getTimestamp();
+				$this->imageGenerationMapper->createImageGeneration($hash, $prompt, $ts, $urls);
+				return ['hash' => $hash];
+			}
+		}
+
+		return $apiResponse;
+	}
+
+	public function getGenerationInfo(string $hash): array {
+		$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
+		$imageUrls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
+		return [
+			'hash' => $hash,
+			'prompt' => $imageGeneration->getPrompt(),
+			'urls' => $imageUrls,
+		];
+	}
+
+	/**
+	 * @param string $hash
+	 * @param int $urlId
+	 * @return array|null
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws \OCP\DB\Exception
+	 */
+	public function getGenerationImage(string $hash, int $urlId): ?array {
+		$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
+		$imageUrl = $this->imageUrlMapper->getImageUrlOfGeneration($imageGeneration->getId(), $urlId);
+		$imageResponse = $this->client->get($imageUrl->getUrl());
+		return [
+			'body' => $imageResponse->getBody(),
+			'headers' => $imageResponse->getHeaders(),
+		];
 	}
 
 	/**

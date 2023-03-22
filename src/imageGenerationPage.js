@@ -6,12 +6,12 @@
  * later. See the COPYING file.
  *
  * @author Julien Veyssier <julien-nc@posteo.net>
- * @copyright Julien Veyssier 2022
+ * @copyright Julien Veyssier 2023
  */
 
 import Vue from 'vue'
-import AdminSettings from './components/AdminSettings.vue'
+import ImageGenerationPage from './views/ImageGenerationPage.vue'
 Vue.mixin({ methods: { t, n } })
 
-const View = Vue.extend(AdminSettings)
-new View().$mount('#openai_prefs')
+const View = Vue.extend(ImageGenerationPage)
+new View().$mount('#content')

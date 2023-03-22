@@ -1,4 +1,4 @@
 # Authors
 
-* Julien Veyssier <eneiluj@posteo.net> (Developper)
+* Julien Veyssier <julien-nc@posteo.net> (Developper)
 

@@ -160,12 +160,13 @@ export default {
 			const url = generateUrl('/apps/integration_openai/images/generations')
 			return axios.post(url, params)
 				.then((response) => {
-					const data = response.data?.data
-					if (data && data.length && data.length > 0) {
-						const value = data.filter(d => !!d.url).map(d => d.url).join(' , ')
-						this.onSubmit(value)
+					const hash = response.data?.hash
+					if (hash && hash.length && hash.length > 0) {
+						const link = window.location.protocol + '//' + window.location.host
+							+ generateUrl('/apps/integration_openai/i/{hash}', { hash })
+						this.onSubmit(link)
 					} else {
-						this.error = response.data.error
+						this.error = response.data?.error ?? t('integration_openai', 'Unknown error')
 					}
 				})
 				.catch((error) => {
