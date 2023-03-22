@@ -35,6 +35,7 @@
 			<a v-for="url in urls"
 				:key="url.id"
 				:href="url.url"
+				:aria-label="t('integration_openai', 'Open image in a new tab')"
 				target="_blank"
 				class="image-wrapper">
 				<OpenAiImage :src="getProxiedImageUrl(url.id)" />

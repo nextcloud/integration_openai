@@ -70,7 +70,7 @@ export default {
 ::v-deep .generation {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	//height: 100%;
 	align-items: center;
 	justify-content: center;
 }

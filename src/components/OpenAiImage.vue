@@ -29,6 +29,7 @@
 		<img v-show="isImageLoaded"
 			class="image"
 			:src="src"
+			:aria-label="t('integration_openai', 'Generated image')"
 			@load="isImageLoaded = true">
 	</div>
 </template>
