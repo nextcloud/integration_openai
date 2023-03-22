@@ -20,7 +20,7 @@
   -->
 
 <template>
-	<ImageGeneration ::hash="richObject.hash"
+	<ImageGeneration :hash="richObject.hash"
 		:urls="richObject.urls"
 		:prompt="richObject.prompt" />
 </template>
