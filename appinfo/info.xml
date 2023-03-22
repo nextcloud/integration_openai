@@ -23,6 +23,12 @@ OpenAI text prediction (with many models including GPT-3) and generate DALL·E 2
     <dependencies>
         <nextcloud min-version="26" max-version="27"/>
     </dependencies>
+    <background-jobs>
+		<job>OCA\OpenAi\Cron\CleanupImageGenerations</job>
+	</background-jobs>
+	<commands>
+		<command>OCA\OpenAi\Command\CleanupImageGenerations</command>
+	</commands>
     <settings>
         <admin>OCA\OpenAi\Settings\Admin</admin>
         <admin-section>OCA\OpenAi\Settings\AdminSection</admin-section>

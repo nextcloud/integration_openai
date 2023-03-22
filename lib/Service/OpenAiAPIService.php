@@ -121,14 +121,26 @@ class OpenAiAPIService {
 		return $apiResponse;
 	}
 
+	/**
+	 * @param string $hash
+	 * @return array|string[]
+	 * @throws MultipleObjectsReturnedException
+	 * @throws \OCP\DB\Exception
+	 */
 	public function getGenerationInfo(string $hash): array {
-		$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
-		$imageUrls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
-		return [
-			'hash' => $hash,
-			'prompt' => $imageGeneration->getPrompt(),
-			'urls' => $imageUrls,
-		];
+		try {
+			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
+			$imageUrls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
+			return [
+				'hash' => $hash,
+				'prompt' => $imageGeneration->getPrompt(),
+				'urls' => $imageUrls,
+			];
+		} catch (DoesNotExistException $e) {
+			return [
+				'error' => 'notfound',
+			];
+		}
 	}
 
 	/**

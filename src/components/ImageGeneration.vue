@@ -27,11 +27,15 @@
 				{{ t('integration_openai', 'OpenAI image generation') + ':' }}
 			</strong>
 			&nbsp;
-			<span>
+			<span v-if="error">
+				{{ formattedError }}
+			</span>
+			<span v-else>
 				{{ prompt }}
 			</span>
 		</span>
-		<div class="images">
+		<div v-if="!error"
+			class="images">
 			<a v-for="url in urls"
 				:key="url.id"
 				:href="url.url"
@@ -71,6 +75,10 @@ export default {
 			type: String,
 			required: true,
 		},
+		error: {
+			type: String,
+			default: null,
+		},
 	},
 
 	data() {
@@ -80,6 +88,12 @@ export default {
 	},
 
 	computed: {
+		formattedError() {
+			if (this.error === 'notfound') {
+				return t('integration_openai', 'Image information was not found on the server. The data might have been cleaned up because the image has not been displayed during more than 10 days.')
+			}
+			return '??'
+		},
 	},
 
 	mounted() {

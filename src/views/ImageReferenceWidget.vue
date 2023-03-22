@@ -22,7 +22,8 @@
 <template>
 	<ImageGeneration :hash="richObject.hash"
 		:urls="richObject.urls"
-		:prompt="richObject.prompt" />
+		:prompt="richObject.prompt"
+		:error="richObject.error" />
 </template>
 
 <script>

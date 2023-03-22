@@ -23,8 +23,8 @@
 namespace OCA\OpenAi\Reference;
 
 use OCA\OpenAi\Db\ImageGenerationMapper;
-use OCA\OpenAi\Db\ImageUrl;
 use OCA\OpenAi\Db\ImageUrlMapper;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\Reference;
 use OC\Collaboration\Reference\ReferenceManager;
@@ -114,15 +114,21 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 				return null;
 			}
 
-			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
-			$urls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
-
 			$reference = new Reference($referenceText);
-			$richObjectInfo = [
-				'hash' => $hash,
-				'urls' => $urls,
-				'prompt' => $imageGeneration->getPrompt(),
-			];
+
+			try {
+				$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
+				$urls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
+				$richObjectInfo = [
+					'hash' => $hash,
+					'urls' => $urls,
+					'prompt' => $imageGeneration->getPrompt(),
+				];
+			} catch (DoesNotExistException $e) {
+				$richObjectInfo = [
+					'error' => 'notfound',
+				];
+			}
 
 			$reference->setRichObject(
 				self::RICH_OBJECT_TYPE,

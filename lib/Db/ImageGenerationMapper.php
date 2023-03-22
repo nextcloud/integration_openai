@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace OCA\OpenAi\Db;
 
 use DateTime;
+use OCA\OpenAi\AppInfo\Application;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -142,5 +143,40 @@ class ImageGenerationMapper extends QBMapper {
 		$qb->resetQueryParts();
 
 		return $this->delete($imageGeneration);
+	}
+
+	/**
+	 * @param int $maxAge
+	 * @return int
+	 * @throws Exception
+	 */
+	public function cleanupGenerations(int $maxAge = Application::MAX_GENERATION_IDLE_TIME): int {
+		$ts = (new DateTime())->getTimestamp();
+		$maxTimestamp = $ts - $maxAge;
+
+		$qb = $this->db->getQueryBuilder();
+
+		// get generations that will be deleted
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->lt('last_used_timestamp', $qb->createNamedParameter($maxTimestamp, IQueryBuilder::PARAM_INT))
+			);
+
+		/** @var ImageGeneration[] $generations */
+		$generations = $this->findEntities($qb);
+		foreach ($generations as $generation) {
+			$this->imageUrlMapper->deleteImageGenerationUrls($generation->getId());
+		}
+
+		// does not work
+		// $this->imageUrlMapper->cleanupUrls($maxTimestamp);
+
+		// delete generations
+		$qb->delete($this->getTableName())
+			->where(
+				$qb->expr()->lt('last_used_timestamp', $qb->createNamedParameter($maxTimestamp, IQueryBuilder::PARAM_INT))
+			);
+		return $qb->executeStatement();
 	}
 }

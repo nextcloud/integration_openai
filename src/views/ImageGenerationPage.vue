@@ -24,7 +24,8 @@
 		<NcAppContent>
 			<ImageGeneration :hash="generation.hash"
 				:urls="generation.urls"
-				:prompt="generation.prompt" />
+				:prompt="generation.prompt"
+				:error="generation.error" />
 		</NcAppContent>
 	</NcContent>
 </template>

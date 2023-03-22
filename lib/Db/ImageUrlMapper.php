@@ -25,6 +25,8 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Db;
 
+use DateTime;
+use OCA\OpenAi\AppInfo\Application;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -104,5 +106,29 @@ class ImageUrlMapper extends QBMapper {
 			);
 		$qb->executeStatement();
 		$qb->resetQueryParts();
+	}
+
+	/**
+	 * @param int $maxAge
+	 * @return int
+	 * @throws Exception
+	 */
+	public function cleanupUrls(int $maxAge = Application::MAX_GENERATION_IDLE_TIME): int {
+		$ts = (new DateTime())->getTimestamp();
+		$maxTimestamp = $ts - $maxAge;
+
+		$qb = $this->db->getQueryBuilder();
+
+		// this does not work. is it even possible to do this? it is done in
+		// https://github.com/nextcloud/mail/blob/main/lib/Db/AliasMapper.php#L124-L129
+		/*
+		$qb->delete($this->getTableName(), 'aliases')
+			->innerJoin('aliases', 'openai_i_gen', 'gen', $qb->expr()->eq('gen.id', 'url.generation_id'))
+			->where(
+				$qb->expr()->lt('gen.last_used_timestamp', $qb->createNamedParameter($maxTimestamp, IQueryBuilder::PARAM_INT)),
+			);
+		*/
+
+		return $qb->executeStatement();
 	}
 }
