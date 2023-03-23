@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- 'include query' option in gpt custom picker
+- link preview for Dall-e image generations
+
 ## 1.0.2 – 2023-03-03
 ### Changed
 - improve design
