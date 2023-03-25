@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - 'include query' option in gpt custom picker
 - link preview for Dall-e image generations
+- support for gpt-3.5
+- admin setting to choose default completion model
+- save last used model as default user-specific default completion model
 
 ## 1.0.2 – 2023-03-03
 ### Changed
