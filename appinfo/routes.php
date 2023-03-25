@@ -16,7 +16,7 @@ return [
 		['name' => 'openAiAPI#getModels', 'url' => '/models', 'verb' => 'GET'],
 		['name' => 'openAiAPI#createCompletion', 'url' => '/completions', 'verb' => 'POST'],
 		['name' => 'openAiAPI#createImage', 'url' => '/images/generations', 'verb' => 'POST'],
-		['name' => 'openAiAPI#createImage', 'url' => '/images/generations', 'verb' => 'POST'],
+		['name' => 'openAiAPI#transcribe', 'url' => '/audio/transcriptions', 'verb' => 'POST'],
 		['name' => 'openAiAPI#getImageGenerationContent', 'url' => '/images/generations/{hash}/{urlId}', 'verb' => 'GET'],
 		['name' => 'openAiAPI#getImageGenerationPage', 'url' => '/i/{hash}', 'verb' => 'GET'],
 	],

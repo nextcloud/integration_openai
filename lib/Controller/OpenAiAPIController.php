@@ -79,6 +79,21 @@ class OpenAiAPIController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 *
+	 * @param string $audioBase64
+	 * @param bool $translate
+	 * @return DataResponse
+	 */
+	public function transcribe(string $audioBase64, bool $translate = true): DataResponse {
+		$response = $this->openAiAPIService->transcribe($audioBase64, $translate);
+		if (isset($response['error'])) {
+			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
+		}
+		return new DataResponse($response);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $size

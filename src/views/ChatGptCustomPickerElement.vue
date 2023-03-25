@@ -60,7 +60,7 @@
 					step="1">
 			</div>
 			<div class="line">
-				<label for="openai-completion-model">
+				<label for="openai-completion-model-select">
 					{{ t('integration_openai', 'Model to use') }}
 				</label>
 				<a :title="t('integration_openai', 'More information about OpenAI models')"
@@ -74,10 +74,10 @@
 				</a>
 				<div class="spacer" />
 				<NcSelect
-					id="openai-completion-model"
 					v-model="selectedModel"
+					class="model-select"
 					:options="formattedModels"
-					input-id="openai-model-select" />
+					input-id="openai-completion-model-select" />
 			</div>
 		</div>
 	</div>

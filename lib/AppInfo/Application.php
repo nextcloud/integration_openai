@@ -12,6 +12,7 @@ namespace OCA\OpenAi\AppInfo;
 use OCA\OpenAi\Listener\OpenAiReferenceListener;
 use OCA\OpenAi\Reference\ChatGptReferenceProvider;
 use OCA\OpenAi\Reference\ImageReferenceProvider;
+use OCA\OpenAi\Reference\WhisperReferenceProvider;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\IConfig;
 
@@ -45,6 +46,7 @@ class Application extends App implements IBootstrap {
 		if ($apiKey !== '') {
 			$context->registerReferenceProvider(ChatGptReferenceProvider::class);
 			$context->registerReferenceProvider(ImageReferenceProvider::class);
+			$context->registerReferenceProvider(WhisperReferenceProvider::class);
 			$context->registerEventListener(RenderReferenceEvent::class, OpenAiReferenceListener::class);
 		}
 	}

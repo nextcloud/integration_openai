@@ -110,6 +110,24 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @param string $audioBase64
+	 * @param bool $translate
+	 * @return array|string[]
+	 */
+	public function transcribe(string $audioBase64, bool $translate = true): array {
+		$params = [
+			'model' => 'whisper-1',
+			'file' => base64_decode(str_replace('data:audio/mp3;base64,', '', $audioBase64)),
+//			'file' => $audioBase64,
+			'response_format' => 'json',
+		];
+		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
+		$contentType = 'multipart/form-data';
+//		$contentType = 'application/x-www-form-urlencoded';
+		return $this->request($endpoint, $params, 'POST', $contentType);
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param int $n
@@ -203,7 +221,7 @@ class OpenAiAPIService {
 	 * @param string $method HTTP query method
 	 * @return array decoded request result or error
 	 */
-	public function request(string $endPoint, array $params = [], string $method = 'GET'): array {
+	public function request(string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
 		try {
 			$apiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
 			if ($apiKey === '') {
@@ -214,17 +232,39 @@ class OpenAiAPIService {
 			$options = [
 				'headers' => [
 					'User-Agent' => 'Nextcloud OpenAI integration',
-					'Content-Type' => 'application/json',
 					'Authorization' => 'Bearer ' . $apiKey,
 				],
 			];
+			if ($contentType === null) {
+				$options['headers']['Content-Type'] = 'application/json';
+			} elseif ($contentType === 'multipart/form-data') {
+				// no header in this case
+				// $options['headers']['Content-Type'] = $contentType;
+			} else {
+				$options['headers']['Content-Type'] = $contentType;
+			}
 
 			if (count($params) > 0) {
 				if ($method === 'GET') {
 					$paramsContent = http_build_query($params);
 					$url .= '?' . $paramsContent;
 				} else {
-					$options['body'] = json_encode($params);
+					if ($contentType === 'multipart/form-data') {
+						$multipart = [];
+						foreach ($params as $key => $value) {
+							$part = [
+								'name' => $key,
+								'contents' => $value,
+							];
+							if ($key === 'file') {
+								$part['filename'] = 'file.mp3';
+							}
+							$multipart[] = $part;
+						}
+						$options['multipart'] = $multipart;
+					} else {
+						$options['body'] = json_encode($params);
+					}
 				}
 			}
 

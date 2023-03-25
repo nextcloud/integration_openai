@@ -74,3 +74,20 @@ registerCustomPickerElement('openai-chatgpt', async (el, { providerId, accessibl
 	console.debug('OpenAI ChatGPT custom destroy callback. el', el, 'renderResult:', renderResult)
 	renderResult.object.$destroy()
 }, 'normal')
+
+registerCustomPickerElement('openai-whisper', async (el, { providerId, accessible }) => {
+	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+	Vue.mixin({ methods: { t, n } })
+	const { default: WhisperCustomPickerElement } = await import(/* webpackChunkName: "whisper-picker-lazy" */'./views/WhisperCustomPickerElement.vue')
+	const Element = Vue.extend(WhisperCustomPickerElement)
+	const vueElement = new Element({
+		propsData: {
+			providerId,
+			accessible,
+		},
+	}).$mount(el)
+	return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
+}, (el, renderResult) => {
+	console.debug('OpenAI Whisper custom destroy callback. el', el, 'renderResult:', renderResult)
+	renderResult.object.$destroy()
+}, 'normal')
