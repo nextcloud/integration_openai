@@ -23,7 +23,7 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
 class Application extends App implements IBootstrap {
 
 	public const APP_ID = 'integration_openai';
-	public const DEFAULT_COMPLETION_MODEL = 'text-davinci-003';
+	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
 	public const DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
 

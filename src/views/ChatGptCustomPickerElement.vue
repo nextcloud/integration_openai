@@ -28,7 +28,7 @@
 			</NcButton>
 			<NcButton
 				type="primary"
-				:disabled="loading || !query"
+				:disabled="loading || !query || !selectedModel"
 				@click="onInputEnter">
 				{{ t('integration_openai', 'Generate') }}
 				<template #icon>
@@ -60,7 +60,7 @@
 					step="1">
 			</div>
 			<div class="line">
-				<label for="size">
+				<label for="openai-completion-model">
 					{{ t('integration_openai', 'Model to use') }}
 				</label>
 				<a :title="t('integration_openai', 'More information about OpenAI models')"
@@ -74,6 +74,7 @@
 				</a>
 				<div class="spacer" />
 				<NcSelect
+					id="openai-completion-model"
 					v-model="selectedModel"
 					:options="formattedModels"
 					input-id="openai-model-select" />
@@ -90,7 +91,6 @@ import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
-import NcMultiselect from '@nextcloud/vue/dist/Components/NcMultiselect.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
@@ -105,7 +105,6 @@ export default {
 	components: {
 		NcButton,
 		NcLoadingIcon,
-		NcMultiselect,
 		NcTextField,
 		NcSelect,
 		NcCheckboxRadioSwitch,
@@ -180,18 +179,36 @@ export default {
 			return axios.get(url)
 				.then((response) => {
 					this.models = response.data?.data
-					const defaultModelId = response.data?.default_model_id
+					const defaultModelId = response.data?.default_completion_model_id
 					const defaultModel = this.models.find(m => m.id === defaultModelId)
-					if (defaultModel) {
+					const modelToSelect = defaultModel ?? this.models[0] ?? null
+					if (modelToSelect) {
 						this.selectedModel = {
-							id: defaultModel.id,
-							value: defaultModel.id,
-							label: defaultModel.id + ' (' + defaultModel.owned_by + ')',
+							id: modelToSelect.id,
+							value: modelToSelect.id,
+							label: modelToSelect.id + ' (' + modelToSelect.owned_by + ')',
 						}
 					}
 				})
 				.catch((error) => {
 					console.error(error)
+				})
+		},
+		saveModel(modelId) {
+			const req = {
+				values: {
+					default_completion_model_id: modelId,
+				},
+			}
+			const url = generateUrl('/apps/integration_openai/config')
+			return axios.put(url, req)
+				.then((response) => {
+				})
+				.catch((error) => {
+					showError(
+						t('integration_openai', 'Failed to save OpenAI default model ID')
+						+ ': ' + error.response?.request?.responseText
+					)
 				})
 		},
 		onSubmit(url) {
@@ -208,6 +225,7 @@ export default {
 			}
 			if (this.selectedModel) {
 				params.model = this.selectedModel.id
+				this.saveModel(this.selectedModel.id)
 			}
 			const url = generateUrl('/apps/integration_openai/completions')
 			return axios.post(url, params)

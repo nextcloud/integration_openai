@@ -11,6 +11,7 @@
 
 return [
 	'routes' => [
+		['name' => 'config#setConfig', 'url' => '/config', 'verb' => 'PUT'],
 		['name' => 'config#setAdminConfig', 'url' => '/admin-config', 'verb' => 'PUT'],
 		['name' => 'openAiAPI#getModels', 'url' => '/models', 'verb' => 'GET'],
 		['name' => 'openAiAPI#createCompletion', 'url' => '/completions', 'verb' => 'POST'],

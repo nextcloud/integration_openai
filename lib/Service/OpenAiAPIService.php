@@ -61,13 +61,22 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @param string $userId
+	 * @return string
+	 */
+	public function getUserDefaultCompletionModelId(string $userId): string {
+		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		return $this->config->getUserValue($userId, Application::APP_ID, 'default_completion_model_id', $adminModel) ?: $adminModel;
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $model
 	 * @return array|string[]
 	 */
-	public function createCompletion(?string $userId, string $prompt, int $n = 1, string $model = Application::DEFAULT_COMPLETION_MODEL): array {
+	public function createCompletion(?string $userId, string $prompt, int $n, string $model): array {
 		$params = [
 			'model' => $model,
 			'prompt' => $prompt,
@@ -87,7 +96,7 @@ class OpenAiAPIService {
 	 * @param string $model
 	 * @return array|string[]
 	 */
-	public function createChatCompletion(?string $userId, string $prompt, int $n = 1, string $model = Application::DEFAULT_COMPLETION_MODEL): array {
+	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model): array {
 		$params = [
 			'model' => $model,
 			'messages' => [['role' => 'user', 'content' => $prompt ]],

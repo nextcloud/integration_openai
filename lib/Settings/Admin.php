@@ -23,9 +23,11 @@ class Admin implements ISettings {
 	 */
 	public function getForm(): TemplateResponse {
 		$apiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
+		$defaultAdminCompletionModelId = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 
 		$adminConfig = [
 			'api_key' => $apiKey,
+			'default_completion_model_id' => $defaultAdminCompletionModelId,
 		];
 		$this->initialStateService->provideInitialState('admin-config', $adminConfig);
 
