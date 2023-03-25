@@ -97,6 +97,7 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadi
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	name: 'ChatGptCustomPickerElement',
@@ -220,13 +221,16 @@ export default {
 				})
 				.catch((error) => {
 					console.error('OpenAI completions request error', error)
+					showError(error.response?.data?.body?.error?.message ?? t('integration_openai', 'Unknown OpenAI API error'))
 				})
 				.then(() => {
 					this.loading = false
 				})
 		},
 		processCompletion(choices) {
-			const answers = choices.filter(c => !!c.text).map(c => c.text.replace(/^\s+|\s+$/g, ''))
+			const answers = this.selectedModel.id.startsWith('gpt-')
+				? choices.filter(c => !!c.message?.content).map(c => c.message?.content.replace(/^\s+|\s+$/g, ''))
+				: choices.filter(c => !!c.text).map(c => c.text.replace(/^\s+|\s+$/g, ''))
 			if (answers.length > 0) {
 				if (answers.length === 1) {
 					const result = this.includeQuery

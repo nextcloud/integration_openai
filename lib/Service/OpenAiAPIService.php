@@ -84,6 +84,26 @@ class OpenAiAPIService {
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param int $n
+	 * @param string $model
+	 * @return array|string[]
+	 */
+	public function createChatCompletion(?string $userId, string $prompt, int $n = 1, string $model = Application::DEFAULT_COMPLETION_MODEL): array {
+		$params = [
+			'model' => $model,
+			'messages' => [['role' => 'user', 'content' => $prompt ]],
+			'max_tokens' => 300,
+			'n' => $n,
+		];
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
+		return $this->request('chat/completions', $params, 'POST');
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param int $n
 	 * @param string $size
 	 * @return array|string[]
 	 */
@@ -153,13 +173,18 @@ class OpenAiAPIService {
 	 * @throws \OCP\DB\Exception
 	 */
 	public function getGenerationImage(string $hash, int $urlId): ?array {
-		$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
-		$imageUrl = $this->imageUrlMapper->getImageUrlOfGeneration($imageGeneration->getId(), $urlId);
-		$imageResponse = $this->client->get($imageUrl->getUrl());
-		return [
-			'body' => $imageResponse->getBody(),
-			'headers' => $imageResponse->getHeaders(),
-		];
+		try {
+			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
+			$imageUrl = $this->imageUrlMapper->getImageUrlOfGeneration($imageGeneration->getId(), $urlId);
+			$imageResponse = $this->client->get($imageUrl->getUrl());
+			return [
+				'body' => $imageResponse->getBody(),
+				'headers' => $imageResponse->getHeaders(),
+			];
+		} catch (Exception | Throwable $e) {
+			$this->logger->debug('OpenAI image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
+		}
+		return null;
 	}
 
 	/**
