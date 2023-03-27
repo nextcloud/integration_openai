@@ -79,7 +79,6 @@ import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
 
-import NcModal from '@nextcloud/vue/dist/Components/NcModal.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
@@ -91,7 +90,6 @@ export default {
 	name: 'ImageCustomPickerElement',
 
 	components: {
-		NcModal,
 		NcButton,
 		NcLoadingIcon,
 		NcTextField,
