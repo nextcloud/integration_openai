@@ -20,8 +20,10 @@
 			</div>
 			<p class="settings-hint">
 				<InformationOutlineIcon :size="20" class="icon" />
-				<a href="https://openai.com/api" target="_blank">
-					{{ t('integration_openai', 'You can create a free API key in your user settings in https://openai.com/api') }}
+				{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
+				&nbsp;
+				<a :href="apiKeyUrl" target="_blank" class="external">
+					{{ apiKeyUrl }}
 				</a>
 			</p>
 			<div v-if="models"
@@ -86,6 +88,7 @@ export default {
 			readonly: true,
 			models: null,
 			selectedModel: null,
+			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 		}
 	},
 
