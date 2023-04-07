@@ -85,6 +85,7 @@ import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
+import { showError } from '@nextcloud/dialogs'
 
 export default {
 	name: 'ImageCustomPickerElement',
@@ -169,6 +170,10 @@ export default {
 				})
 				.catch((error) => {
 					console.error('OpenAI image request error', error)
+					showError(
+						t('integration_openai', 'OpenAI error') + ': '
+							+ (error.response?.data?.body?.error?.message ?? t('integration_openai', 'Unknown OpenAI API error'))
+					)
 				})
 				.then(() => {
 					this.loading = false

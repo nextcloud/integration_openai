@@ -151,7 +151,7 @@ export default {
 					console.debug('openai whisper request error', error)
 					showError(
 						t('integration_openai', 'Failed to get transcription/translation')
-						+ ': ' + (error.response?.data?.body?.detail ?? error.response?.data?.error)
+						+ ': ' + (error.response?.data?.body?.error?.message ?? error.response?.data?.error)
 					)
 				})
 				.then(() => {

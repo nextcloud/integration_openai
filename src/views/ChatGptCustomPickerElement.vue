@@ -239,7 +239,10 @@ export default {
 				})
 				.catch((error) => {
 					console.error('OpenAI completions request error', error)
-					showError(error.response?.data?.body?.error?.message ?? t('integration_openai', 'Unknown OpenAI API error'))
+					showError(
+						t('integration_openai', 'OpenAI error') + ': '
+							+ (error.response?.data?.body?.error?.message ?? t('integration_openai', 'Unknown OpenAI API error'))
+					)
 				})
 				.then(() => {
 					this.loading = false

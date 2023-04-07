@@ -42,7 +42,8 @@
 				:aria-label="t('integration_openai', 'Open image in a new tab')"
 				target="_blank"
 				class="image-wrapper">
-				<OpenAiImage :src="getProxiedImageUrl(url.id)" />
+				<OpenAiImage :src="getProxiedImageUrl(url.id)"
+					:direct-link="url.url" />
 			</a>
 		</div>
 	</div>

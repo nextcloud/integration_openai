@@ -21,16 +21,23 @@
 
 <template>
 	<div>
-		<div v-if="!isImageLoaded" class="loading-icon">
+		<div v-if="isImageLoading" class="loading-icon">
 			<NcLoadingIcon
 				:size="44"
 				:title="t('integration_openai', 'Loading image')" />
 		</div>
-		<img v-show="isImageLoaded"
+		<img v-show="!isImageLoading && !failed"
 			class="image"
 			:src="src"
 			:aria-label="t('integration_openai', 'Generated image')"
-			@load="isImageLoaded = true">
+			@load="isImageLoading = false"
+			@error="onError">
+		<span v-if="failed">
+			{{ t('integration_openai', 'The remote image cannot be fetched. OpenAI might have deleted it.') }}
+			<a :href="directLink" target="_blank" class="external">
+				{{ t('integration_openai', 'Direct image link') }}
+			</a>
+		</span>
 	</div>
 </template>
 
@@ -49,11 +56,16 @@ export default {
 			type: String,
 			required: true,
 		},
+		directLink: {
+			type: String,
+			required: true,
+		},
 	},
 
 	data() {
 		return {
-			isImageLoaded: false,
+			isImageLoading: true,
+			failed: false,
 		}
 	},
 
@@ -64,6 +76,10 @@ export default {
 	},
 
 	methods: {
+		onError(e) {
+			this.isImageLoading = false
+			this.failed = true
+		},
 	},
 }
 </script>
