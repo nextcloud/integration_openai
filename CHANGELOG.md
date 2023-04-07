@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.3 – 2023-04-07
 ### Added
 - 'include query' option in gpt custom picker
 - link preview for Dall-e image generations
@@ -13,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - admin setting to choose default completion model
 - save last used model as default user-specific default completion model
 - Whisper speech-to-text smart picker provider to translate/transcode
+
+### Fixed
+- show error message of failing API request responses
 
 ## 1.0.2 – 2023-03-03
 ### Changed
