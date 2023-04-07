@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.4 – 2023-04-07
+### Added
+- gpt picker option to set max number of tokens (~words) to generate
+
 ## 1.0.3 – 2023-04-07
 ### Added
 - 'include query' option in gpt custom picker
