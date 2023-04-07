@@ -47,12 +47,12 @@
 				</NcCheckboxRadioSwitch>
 			</div>
 			<div class="line">
-				<label for="number">
+				<label for="nb-results">
 					{{ t('integration_openai', 'How many results to generate') }}
 				</label>
 				<div class="spacer" />
 				<input
-					id="number"
+					id="nb-results"
 					v-model="completionNumber"
 					type="number"
 					min="1"
@@ -78,6 +78,19 @@
 					class="model-select"
 					:options="formattedModels"
 					input-id="openai-completion-model-select" />
+			</div>
+			<div class="line">
+				<label for="max-tokens">
+					{{ t('integration_openai', 'Maximum number of tokens to generate') }}
+				</label>
+				<div class="spacer" />
+				<input
+					id="max-tokens"
+					v-model="maxTokens"
+					type="number"
+					min="10"
+					max="100000"
+					step="1">
 			</div>
 		</div>
 	</div>
@@ -137,6 +150,7 @@ export default {
 			selectedModel: null,
 			includeQuery: false,
 			completionNumber: 1,
+			maxTokens: 1000,
 		}
 	},
 
@@ -222,6 +236,7 @@ export default {
 			const params = {
 				prompt: this.query,
 				n: this.completionNumber,
+				maxTokens: this.maxTokens,
 			}
 			if (this.selectedModel) {
 				params.model = this.selectedModel.id

@@ -76,11 +76,11 @@ class OpenAiAPIService {
 	 * @param string $model
 	 * @return array|string[]
 	 */
-	public function createCompletion(?string $userId, string $prompt, int $n, string $model): array {
+	public function createCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000): array {
 		$params = [
 			'model' => $model,
 			'prompt' => $prompt,
-			'max_tokens' => 300,
+			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
 		if ($userId !== null) {
@@ -96,11 +96,11 @@ class OpenAiAPIService {
 	 * @param string $model
 	 * @return array|string[]
 	 */
-	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model): array {
+	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000): array {
 		$params = [
 			'model' => $model,
 			'messages' => [['role' => 'user', 'content' => $prompt ]],
-			'max_tokens' => 300,
+			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
 		if ($userId !== null) {

@@ -61,14 +61,14 @@ class OpenAiAPIController extends Controller {
 	 * @param string|null $model
 	 * @return DataResponse
 	 */
-	public function createCompletion(string $prompt, int $n = 1, ?string $model = null): DataResponse {
+	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse {
 		if ($model === null) {
 			$model = $this->openAiAPIService->getUserDefaultCompletionModelId($this->userId);
 		}
 		if (str_starts_with($model, 'gpt-')) {
-			$response = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, $n, $model);
+			$response = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, $n, $model, $maxTokens);
 		} else {
-			$response = $this->openAiAPIService->createCompletion($this->userId, $prompt, $n, $model);
+			$response = $this->openAiAPIService->createCompletion($this->userId, $prompt, $n, $model, $maxTokens);
 		}
 		if (isset($response['error'])) {
 			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
