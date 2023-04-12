@@ -45,6 +45,7 @@
 			</span>
 			<NcButton
 				type="primary"
+				:aria-label="submitButtonLabel"
 				:disabled="loading || audio === null"
 				@click="onInputEnter">
 				<template #icon>
@@ -52,7 +53,7 @@
 						:size="20" />
 					<ArrowRightIcon v-else />
 				</template>
-				{{ t('integration_openai', 'Submit') }}
+				{{ submitButtonLabel }}
 			</NcButton>
 		</div>
 	</div>
@@ -105,6 +106,11 @@ export default {
 	},
 
 	computed: {
+		submitButtonLabel() {
+			return this.mode === 'transcribe'
+				? t('integration_openai', 'Transcribe')
+				: t('integration_openai', 'Translate')
+		},
 	},
 
 	watch: {
@@ -169,6 +175,7 @@ export default {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	padding: 12px 16px 16px 16px;
 
 	h2 {
 		display: flex;

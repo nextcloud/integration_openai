@@ -20,6 +20,7 @@
 		<div class="footer">
 			<NcButton class="advanced-button"
 				type="tertiary"
+				:aria-label="t('integration_openai', 'Show/hide advanced options')"
 				@click="showAdvanced = !showAdvanced">
 				<template #icon>
 					<component :is="showAdvancedIcon" />
@@ -28,6 +29,7 @@
 			</NcButton>
 			<NcButton
 				type="primary"
+				:aria-label="t('integration_openai', 'Generate text with OpenAI')"
 				:disabled="loading || !query || !selectedModel"
 				@click="onInputEnter">
 				{{ t('integration_openai', 'Generate') }}
@@ -66,7 +68,8 @@
 				<a :title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
 					target="_blank">
-					<NcButton type="tertiary">
+					<NcButton type="tertiary"
+						:aria-label="t('integration_openai', 'More information about OpenAI models')">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -295,7 +298,7 @@ export default {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	//padding: 16px;
+	padding: 12px 16px 16px 16px;
 
 	h2 {
 		display: flex;
