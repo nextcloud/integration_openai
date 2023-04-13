@@ -124,7 +124,7 @@ class OpenAiAPIService {
 		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
 		$contentType = 'multipart/form-data';
 //		$contentType = 'application/x-www-form-urlencoded';
-		return $this->request($endpoint, $params, 'POST', $contentType, 60);
+		return $this->request($endpoint, $params, 'POST', $contentType);
 	}
 
 	/**
@@ -221,7 +221,7 @@ class OpenAiAPIService {
 	 * @param string $method HTTP query method
 	 * @return array decoded request result or error
 	 */
-	public function request(string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, int $timeout = 30): array {
+	public function request(string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, int $timeout = 60): array {
 		try {
 			$apiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
 			if ($apiKey === '') {
