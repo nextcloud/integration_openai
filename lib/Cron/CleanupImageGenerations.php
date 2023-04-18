@@ -31,16 +31,12 @@ use OCP\BackgroundJob\TimedJob;
 use Psr\Log\LoggerInterface;
 
 class CleanupImageGenerations extends TimedJob {
-	private LoggerInterface $logger;
-	private ImageGenerationMapper $imageGenerationMapper;
 
 	public function __construct(ITimeFactory $time,
-								ImageGenerationMapper $imageGenerationMapper,
-								LoggerInterface $logger) {
+								private ImageGenerationMapper $imageGenerationMapper,
+								private LoggerInterface $logger) {
 		parent::__construct($time);
-		$this->logger = $logger;
 		$this->setInterval(60 * 60 * 24);
-		$this->imageGenerationMapper = $imageGenerationMapper;
 	}
 
 	protected function run($argument) {

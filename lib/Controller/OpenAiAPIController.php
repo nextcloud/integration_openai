@@ -24,19 +24,12 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 
 class OpenAiAPIController extends Controller {
 
-	private OpenAiAPIService $openAiAPIService;
-	private IInitialState $initialStateService;
-	private ?string $userId;
-
-	public function __construct(string           $appName,
-								IRequest         $request,
-								OpenAiAPIService $openAiAPIService,
-								IInitialState    $initialStateService,
-								?string          $userId) {
+	public function __construct(string                   $appName,
+								IRequest                 $request,
+								private OpenAiAPIService $openAiAPIService,
+								private IInitialState    $initialStateService,
+								private ?string          $userId) {
 		parent::__construct($appName, $request);
-		$this->openAiAPIService = $openAiAPIService;
-		$this->initialStateService = $initialStateService;
-		$this->userId = $userId;
 	}
 
 	/**

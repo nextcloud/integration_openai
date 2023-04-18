@@ -21,11 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanupImageGenerations extends Command {
 
-	private ImageGenerationMapper $imageGenerationMapper;
-
-	public function __construct(ImageGenerationMapper $imageGenerationMapper) {
+	public function __construct(private ImageGenerationMapper $imageGenerationMapper) {
 		parent::__construct();
-		$this->imageGenerationMapper = $imageGenerationMapper;
 	}
 
 	protected function configure() {

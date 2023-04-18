@@ -26,7 +26,6 @@ use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OC\Collaboration\Reference\ReferenceManager;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\Collaboration\Reference\IReference;
-use OCP\IConfig;
 use OCP\IL10N;
 
 use OCP\IURLGenerator;
@@ -35,20 +34,10 @@ class WhisperReferenceProvider extends ADiscoverableReferenceProvider  {
 
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_whisper';
 
-	private ?string $userId;
-	private ReferenceManager $referenceManager;
-	private IL10N $l10n;
-	private IURLGenerator $urlGenerator;
-
-	public function __construct(IConfig $config,
-								IL10N $l10n,
-								IURLGenerator $urlGenerator,
-								ReferenceManager $referenceManager,
+	public function __construct(private IL10N $l10n,
+								private IURLGenerator $urlGenerator,
+								private ReferenceManager $referenceManager,
 								?string $userId) {
-		$this->userId = $userId;
-		$this->referenceManager = $referenceManager;
-		$this->l10n = $l10n;
-		$this->urlGenerator = $urlGenerator;
 	}
 
 	/**

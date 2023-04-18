@@ -37,12 +37,10 @@ use OCP\IDBConnection;
 use OCP\AppFramework\Db\DoesNotExistException;
 
 class ImageGenerationMapper extends QBMapper {
-	private ImageUrlMapper $imageUrlMapper;
 
 	public function __construct(IDBConnection  $db,
-								ImageUrlMapper $imageUrlMapper) {
+								private ImageUrlMapper $imageUrlMapper) {
 		parent::__construct($db, 'openai_i_gen', ImageGeneration::class);
-		$this->imageUrlMapper = $imageUrlMapper;
 	}
 
 	/**

@@ -28,16 +28,12 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
 
-	/**
-	 * @var IConfig
-	 */
-	private $config;
+	private IConfig $config;
 
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);
 
 		$container = $this->getContainer();
-		/** @var IConfig config */
 		$this->config = $container->query(IConfig::class);
 	}
 

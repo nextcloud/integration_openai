@@ -27,30 +27,20 @@ use Psr\Log\LoggerInterface;
 use OCP\Http\Client\IClientService;
 use Throwable;
 
+/**
+ * Service to make requests to OpenAI REST API
+ */
 class OpenAiAPIService {
-	private LoggerInterface $logger;
-	private IL10N $l10n;
-	private IConfig $config;
 	private IClient $client;
-	private ImageGenerationMapper $imageGenerationMapper;
-	private ImageUrlMapper $imageUrlMapper;
 
-	/**
-	 * Service to make requests to OpenAI REST API
-	 */
 	public function __construct (string $appName,
-								LoggerInterface $logger,
-								IL10N $l10n,
-								IConfig $config,
-								ImageGenerationMapper $imageGenerationMapper,
-								ImageUrlMapper $imageUrlMapper,
+								private LoggerInterface $logger,
+								private IL10N $l10n,
+								private IConfig $config,
+								private ImageGenerationMapper $imageGenerationMapper,
+								private ImageUrlMapper $imageUrlMapper,
 								IClientService $clientService) {
 		$this->client = $clientService->newClient();
-		$this->logger = $logger;
-		$this->l10n = $l10n;
-		$this->config = $config;
-		$this->imageGenerationMapper = $imageGenerationMapper;
-		$this->imageUrlMapper = $imageUrlMapper;
 	}
 
 	/**

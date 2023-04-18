@@ -21,16 +21,11 @@ use OCP\PreConditionNotMetException;
 
 class ConfigController extends Controller {
 
-	private IConfig $config;
-	private ?string $userId;
-
 	public function __construct(string   $appName,
 								IRequest $request,
-								IConfig  $config,
-								?string  $userId) {
+								private IConfig  $config,
+								private ?string  $userId) {
 		parent::__construct($appName, $request);
-		$this->config = $config;
-		$this->userId = $userId;
 	}
 
 	/**

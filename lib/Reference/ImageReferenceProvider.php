@@ -22,15 +22,11 @@
 
 namespace OCA\OpenAi\Reference;
 
-use OCA\OpenAi\Db\ImageGenerationMapper;
-use OCA\OpenAi\Db\ImageUrlMapper;
 use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\Reference;
-use OC\Collaboration\Reference\ReferenceManager;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Collaboration\Reference\IReference;
-use OCP\IConfig;
 use OCP\IL10N;
 
 use OCP\IURLGenerator;
@@ -39,19 +35,10 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_image';
 
-	private OpenAiAPIService $openAiAPIService;
-	private ?string $userId;
-	private IL10N $l10n;
-	private IURLGenerator $urlGenerator;
-
-	public function __construct(OpenAiAPIService $openAiAPIService,
-								IL10N $l10n,
-								IURLGenerator $urlGenerator,
+	public function __construct(private OpenAiAPIService $openAiAPIService,
+								private IL10N $l10n,
+								private IURLGenerator $urlGenerator,
 								?string $userId) {
-		$this->openAiAPIService = $openAiAPIService;
-		$this->userId = $userId;
-		$this->l10n = $l10n;
-		$this->urlGenerator = $urlGenerator;
 	}
 
 	/**
