@@ -18,6 +18,7 @@ use GuzzleHttp\Exception\ServerException;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\ImageGenerationMapper;
 use OCA\OpenAi\Db\ImageUrlMapper;
+use OCA\OpenAi\Db\PromptMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\Http\Client\IClient;
@@ -39,6 +40,7 @@ class OpenAiAPIService {
 								private IConfig $config,
 								private ImageGenerationMapper $imageGenerationMapper,
 								private ImageUrlMapper $imageUrlMapper,
+								private PromptMapper $promptMapper,
 								IClientService $clientService) {
 		$this->client = $clientService->newClient();
 	}
@@ -60,11 +62,23 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @param string $userId
+	 * @param int $type
+	 * @return array
+	 * @throws \OCP\DB\Exception
+	 */
+	public function getPromptHistory(string $userId, int $type): array {
+		return $this->promptMapper->getPromptsOfUser($userId, $type);
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $model
+	 * @param int $maxTokens
 	 * @return array|string[]
+	 * @throws \OCP\DB\Exception
 	 */
 	public function createCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000): array {
 		$params = [
@@ -76,6 +90,7 @@ class OpenAiAPIService {
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
+		$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
 		return $this->request('completions', $params, 'POST');
 	}
 
@@ -84,7 +99,9 @@ class OpenAiAPIService {
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $model
+	 * @param int $maxTokens
 	 * @return array|string[]
+	 * @throws \OCP\DB\Exception
 	 */
 	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000): array {
 		$params = [
@@ -96,6 +113,7 @@ class OpenAiAPIService {
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
+		$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
 		return $this->request('chat/completions', $params, 'POST');
 	}
 
@@ -123,6 +141,7 @@ class OpenAiAPIService {
 	 * @param int $n
 	 * @param string $size
 	 * @return array|string[]
+	 * @throws \OCP\DB\Exception
 	 */
 	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
 		$params = [

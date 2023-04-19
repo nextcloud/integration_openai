@@ -28,6 +28,10 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
 
+	public const PROMPT_TYPE_IMAGE = 0;
+	public const PROMPT_TYPE_TEXT = 1;
+	public const MAX_PROMPT_PER_TYPE_PER_USER = 3;
+
 	private IConfig $config;
 
 	public function __construct(array $urlParams = []) {

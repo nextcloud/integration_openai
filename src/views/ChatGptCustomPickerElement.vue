@@ -40,6 +40,12 @@
 			</NcButton>
 		</div>
 		<div v-show="showAdvanced" class="advanced">
+			<NcSelect
+				class="prompt-select"
+				:placeholder="t('integration_openai', 'Recent prompts...')"
+				:options="formattedPrompts"
+				input-id="openai-prompt-select"
+				@input="onPromptSelected" />
 			<div class="line">
 				<div class="spacer" />
 				<NcCheckboxRadioSwitch
@@ -154,6 +160,7 @@ export default {
 			includeQuery: false,
 			completionNumber: 1,
 			maxTokens: 1000,
+			prompts: null,
 		}
 	},
 
@@ -175,6 +182,26 @@ export default {
 			}
 			return []
 		},
+		formattedPrompts() {
+			if (this.prompts) {
+				return this.prompts.slice().sort((a, b) => {
+					const tsA = a.timestamp
+					const tsB = b.timestamp
+					return tsA > tsB
+						? -1
+						: tsA < tsB
+							? 1
+							: 0
+				}).map(p => {
+					return {
+						id: p.id,
+						value: p.value,
+						label: p.value,
+					}
+				})
+			}
+			return []
+		},
 	},
 
 	watch: {
@@ -183,6 +210,7 @@ export default {
 	mounted() {
 		this.focusOnInput()
 		this.getModels()
+		this.getPromptHistory()
 	},
 
 	methods: {
@@ -190,6 +218,25 @@ export default {
 			setTimeout(() => {
 				this.$refs['chatgpt-search-input'].$el.getElementsByTagName('input')[0]?.focus()
 			}, 300)
+		},
+		getPromptHistory() {
+			const params = {
+				params: {
+					type: 1,
+				},
+			}
+			const url = generateUrl('/apps/integration_openai/prompts')
+			return axios.get(url, params)
+				.then((response) => {
+					this.prompts = response.data
+				})
+				.catch((error) => {
+					console.error(error)
+				})
+		},
+		onPromptSelected(prompt) {
+			this.query = prompt.value
+			this.focusOnInput()
 		},
 		getModels() {
 			const url = generateUrl('/apps/integration_openai/models')
@@ -318,6 +365,11 @@ export default {
 		display: flex;
 		align-items: center;
 		width: 100%;
+	}
+
+	.prompt-select {
+		width: 100%;
+		margin-top: 4px;
 	}
 
 	.footer {

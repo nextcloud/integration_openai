@@ -13,11 +13,14 @@ namespace OCA\OpenAi\Controller;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
+use OCP\DB\Exception;
 use OCP\IRequest;
 
 use OCA\OpenAi\Service\OpenAiAPIService;
@@ -49,10 +52,27 @@ class OpenAiAPIController extends Controller {
 	/**
 	 * @NoAdminRequired
 	 *
+	 * @param int $type
+	 * @return DataResponse
+	 * @throws Exception
+	 */
+	public function getPromptHistory(int $type): DataResponse {
+		$response = $this->openAiAPIService->getPromptHistory($this->userId, $type);
+		if (isset($response['error'])) {
+			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
+		}
+		return new DataResponse($response);
+	}
+
+	/**
+	 * @NoAdminRequired
+	 *
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string|null $model
+	 * @param int $maxTokens
 	 * @return DataResponse
+	 * @throws Exception
 	 */
 	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse {
 		if ($model === null) {
@@ -91,6 +111,7 @@ class OpenAiAPIController extends Controller {
 	 * @param int $n
 	 * @param string $size
 	 * @return DataResponse
+	 * @throws Exception
 	 */
 	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse {
 		$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
@@ -107,6 +128,9 @@ class OpenAiAPIController extends Controller {
 	 * @param string $hash
 	 * @param int $urlId
 	 * @return DataDisplayResponse
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
 	 */
 	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse {
 		$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
@@ -128,6 +152,8 @@ class OpenAiAPIController extends Controller {
 	 *
 	 * @param string $hash
 	 * @return TemplateResponse
+	 * @throws Exception
+	 * @throws MultipleObjectsReturnedException
 	 */
 	public function getImageGenerationPage(string $hash): TemplateResponse {
 		$generationData = $this->openAiAPIService->getGenerationInfo($hash);
