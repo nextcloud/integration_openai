@@ -31,6 +31,14 @@
 				<label for="size">
 					{{ t('integration_openai', 'Default completion model to use') }}
 				</label>
+				<div class="spacer" />
+				<NcSelect
+					v-model="selectedModel"
+					class="model-select"
+					:options="formattedModels"
+					:no-wrap="true"
+					input-id="openai-model-select"
+					@input="onModelSelected" />
 				<a :title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
 					target="_blank">
@@ -40,12 +48,6 @@
 						</template>
 					</NcButton>
 				</a>
-				<div class="spacer" />
-				<NcSelect
-					v-model="selectedModel"
-					:options="formattedModels"
-					input-id="openai-model-select"
-					@input="onModelSelected" />
 			</div>
 		</div>
 	</div>
@@ -202,6 +204,10 @@ export default {
 		> input {
 			width: 300px;
 		}
+	}
+
+	.model-select {
+		min-width: 350px;
 	}
 }
 </style>
