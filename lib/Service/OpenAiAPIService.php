@@ -159,6 +159,7 @@ class OpenAiAPIService {
 		}
 
 		if (isset($apiResponse['data']) && is_array($apiResponse['data'])) {
+			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_IMAGE, $userId, $prompt);
 			$urls = array_map(static function (array $result) {
 				return $result['url'] ?? null;
 			}, $apiResponse['data']);

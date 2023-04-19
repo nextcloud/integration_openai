@@ -40,6 +40,12 @@
 			</NcButton>
 		</div>
 		<div v-show="showAdvanced" class="advanced">
+			<NcSelect
+				class="prompt-select"
+				:placeholder="t('integration_openai', 'Recent prompts...')"
+				:options="formattedPrompts"
+				input-id="openai-prompt-select"
+				@input="onPromptSelected" />
 			<div class="line">
 				<label for="number">
 					{{ t('integration_openai', 'Number of images to generate (1-10)') }}
@@ -84,6 +90,7 @@ import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
@@ -96,6 +103,7 @@ export default {
 		NcButton,
 		NcLoadingIcon,
 		NcTextField,
+		NcSelect,
 		ChevronRightIcon,
 		ChevronDownIcon,
 		ArrowRightIcon,
@@ -121,6 +129,7 @@ export default {
 			showAdvanced: false,
 			imageNumber: 1,
 			imageSize: '1024x1024',
+			prompts: null,
 		}
 	},
 
@@ -130,6 +139,26 @@ export default {
 				? ChevronDownIcon
 				: ChevronRightIcon
 		},
+		formattedPrompts() {
+			if (this.prompts) {
+				return this.prompts.slice().sort((a, b) => {
+					const tsA = a.timestamp
+					const tsB = b.timestamp
+					return tsA > tsB
+						? -1
+						: tsA < tsB
+							? 1
+							: 0
+				}).map(p => {
+					return {
+						id: p.id,
+						value: p.value,
+						label: p.value,
+					}
+				})
+			}
+			return []
+		},
 	},
 
 	watch: {
@@ -137,6 +166,7 @@ export default {
 
 	mounted() {
 		this.focusOnInput()
+		this.getPromptHistory()
 	},
 
 	methods: {
@@ -144,6 +174,25 @@ export default {
 			setTimeout(() => {
 				this.$refs['dalle-search-input'].$el.getElementsByTagName('input')[0]?.focus()
 			}, 300)
+		},
+		getPromptHistory() {
+			const params = {
+				params: {
+					type: 0,
+				},
+			}
+			const url = generateUrl('/apps/integration_openai/prompts')
+			return axios.get(url, params)
+				.then((response) => {
+					this.prompts = response.data
+				})
+				.catch((error) => {
+					console.error(error)
+				})
+		},
+		onPromptSelected(prompt) {
+			this.query = prompt.value
+			this.focusOnInput()
 		},
 		onSubmit(url) {
 			this.$emit('submit', url)
@@ -212,6 +261,11 @@ export default {
 		display: flex;
 		align-items: center;
 		width: 100%;
+	}
+
+	.prompt-select {
+		width: 100%;
+		margin-top: 4px;
 	}
 
 	.footer {
