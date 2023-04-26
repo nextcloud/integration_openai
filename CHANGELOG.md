@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.5 – 2023-04-26
+
+### Added
+
+- add prompt history for text and image generation @julien-nc
+
+### Changed
+
+- add padding in the picker component because the one in the picker will be removed @julien-nc
+- get rid of `@nextcloud/vue-richtext` dependency as the build bug has been solved in the nextcloud webpack config @julien-nc
+
 ## 1.0.4 – 2023-04-07
 ### Added
 - gpt picker option to set max number of tokens (~words) to generate
