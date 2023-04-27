@@ -13,6 +13,7 @@ use OCA\OpenAi\Listener\OpenAiReferenceListener;
 use OCA\OpenAi\Reference\ChatGptReferenceProvider;
 use OCA\OpenAi\Reference\ImageReferenceProvider;
 use OCA\OpenAi\Reference\WhisperReferenceProvider;
+use OCA\OpenAi\SpeechToText\STTProvider;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\IConfig;
 
@@ -48,6 +49,10 @@ class Application extends App implements IBootstrap {
 			$context->registerReferenceProvider(ImageReferenceProvider::class);
 			$context->registerReferenceProvider(WhisperReferenceProvider::class);
 			$context->registerEventListener(RenderReferenceEvent::class, OpenAiReferenceListener::class);
+
+			if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '27.0.0', '>=')) {
+				$context->registerSpeechToTextProvider(STTProvider::class);
+			}
 		}
 	}
 

@@ -21,9 +21,12 @@ use OCA\OpenAi\Db\ImageUrlMapper;
 use OCA\OpenAi\Db\PromptMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\Files\File;
+use OCP\Files\NotPermittedException;
 use OCP\Http\Client\IClient;
 use OCP\IConfig;
 use OCP\IL10N;
+use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 use OCP\Http\Client\IClientService;
 use Throwable;
@@ -122,11 +125,37 @@ class OpenAiAPIService {
 	 * @param bool $translate
 	 * @return array|string[]
 	 */
-	public function transcribe(string $audioBase64, bool $translate = true): array {
+	public function transcribeBase64Mp3(string $audioBase64, bool $translate = true): array	{
+		return $this->transcribe(
+			base64_decode(str_replace('data:audio/mp3;base64,', '', $audioBase64)),
+			$translate
+		);
+	}
+
+	/**
+	 * @param File $file
+	 * @param bool $translate
+	 * @return string
+	 * @throws NotPermittedException
+	 * @throws LockedException
+	 */
+	public function transcribeFile(File $file, bool $translate = false): string {
+		$transcriptionResponse = $this->transcribe($file->getContent(), $translate);
+		if (!isset($transcriptionResponse['text'])) {
+			throw new Exception('Error transcribing file "' . $file->getName() . '": ' . json_encode($transcriptionResponse));
+		}
+		return $transcriptionResponse['text'];
+	}
+
+	/**
+	 * @param string $audioFileContent
+	 * @param bool $translate
+	 * @return array|string[]
+	 */
+	public function transcribe(string $audioFileContent, bool $translate = true): array {
 		$params = [
 			'model' => 'whisper-1',
-			'file' => base64_decode(str_replace('data:audio/mp3;base64,', '', $audioBase64)),
-//			'file' => $audioBase64,
+			'file' => $audioFileContent,
 			'response_format' => 'json',
 		];
 		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
