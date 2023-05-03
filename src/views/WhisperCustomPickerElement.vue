@@ -223,6 +223,14 @@ export default {
 	}
 
 	::v-deep .recorder {
+		background-color: var(--color-main-background) !important;
+		.ar-content * {
+			color: var(--color-main-text) !important;
+		}
+		.ar-icon {
+			background-color: var(--color-main-background) !important;
+			fill: var(--color-main-text) !important;
+		}
 		.ar-recorder__time-limit {
 			position: unset !important;
 		}
@@ -231,6 +239,12 @@ export default {
 		}
 		.ar-records {
 			height: unset !important;
+			&__record--selected {
+				background-color: var(--color-background-dark) !important;
+				.ar-icon {
+					background-color: var(--color-background-dark) !important;
+				}
+			}
 		}
 	}
 }
