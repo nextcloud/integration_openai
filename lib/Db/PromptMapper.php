@@ -127,6 +127,7 @@ class PromptMapper extends QBMapper {
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
 			);
 		}
+		$qb->orderBy('timestamp', 'DESC');
 
 		return $this->findEntities($qb);
 	}
