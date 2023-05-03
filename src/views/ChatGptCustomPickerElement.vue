@@ -17,6 +17,14 @@
 				@keydown.enter="onInputEnter"
 				@trailing-button-click="query = ''" />
 		</div>
+		<div class="prompts">
+			<NcUserBubble v-for="p in prompts"
+				:key="p.id"
+				size="30"
+				avatar-image="icon-history"
+				:display-name="p.value"
+				@click="query = p.value" />
+		</div>
 		<div class="footer">
 			<NcButton class="advanced-button"
 				type="tertiary"
@@ -40,12 +48,6 @@
 			</NcButton>
 		</div>
 		<div v-show="showAdvanced" class="advanced">
-			<NcSelect
-				class="prompt-select"
-				:placeholder="t('integration_openai', 'Recent prompts...')"
-				:options="formattedPrompts"
-				input-id="openai-prompt-select"
-				@input="onPromptSelected" />
 			<div class="line">
 				<div class="spacer" />
 				<NcCheckboxRadioSwitch
@@ -116,6 +118,7 @@ import NcLoadingIcon from '@nextcloud/vue/dist/Components/NcLoadingIcon.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
+import NcUserBubble from '@nextcloud/vue/dist/Components/NcUserBubble.js'
 
 import axios from '@nextcloud/axios'
 import { generateUrl } from '@nextcloud/router'
@@ -134,6 +137,7 @@ export default {
 		ChevronDownIcon,
 		HelpCircleIcon,
 		ArrowRightIcon,
+		NcUserBubble,
 	},
 
 	props: {
@@ -182,26 +186,6 @@ export default {
 			}
 			return []
 		},
-		formattedPrompts() {
-			if (this.prompts) {
-				return this.prompts.slice().sort((a, b) => {
-					const tsA = a.timestamp
-					const tsB = b.timestamp
-					return tsA > tsB
-						? -1
-						: tsA < tsB
-							? 1
-							: 0
-				}).map(p => {
-					return {
-						id: p.id,
-						value: p.value,
-						label: p.value,
-					}
-				})
-			}
-			return []
-		},
 	},
 
 	watch: {
@@ -233,10 +217,6 @@ export default {
 				.catch((error) => {
 					console.error(error)
 				})
-		},
-		onPromptSelected(prompt) {
-			this.query = prompt.value
-			this.focusOnInput()
 		},
 		getModels() {
 			const url = generateUrl('/apps/integration_openai/models')
@@ -350,6 +330,16 @@ export default {
 	h2 {
 		display: flex;
 		align-items: center;
+	}
+
+	.prompts {
+		margin-top: 8px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		> * {
+			margin-right: 8px;
+		}
 	}
 
 	.spacer {
