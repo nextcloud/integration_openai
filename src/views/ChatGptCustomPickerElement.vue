@@ -49,12 +49,12 @@
 		</div>
 		<div v-show="showAdvanced" class="advanced">
 			<div class="line">
-				<div class="spacer" />
 				<NcCheckboxRadioSwitch
 					class="include-query"
 					:checked.sync="includeQuery">
-					{{ t('integration_openai', 'Include the input text in the result') }}
+					{{ t('integration_openai', 'Include the prompt in the result') }}
 				</NcCheckboxRadioSwitch>
+				<div class="spacer" />
 			</div>
 			<div class="line">
 				<label for="nb-results">
@@ -300,7 +300,7 @@ export default {
 			if (answers.length > 0) {
 				if (answers.length === 1) {
 					const result = this.includeQuery
-						? t('integration_openai', 'Query') + '\n' + this.query + '\n\n' + t('integration_openai', 'Result') + '\n' + answers[0]
+						? t('integration_openai', 'Prompt') + '\n' + this.query + '\n\n' + t('integration_openai', 'Result') + '\n' + answers[0]
 						: answers[0]
 					this.onSubmit(result)
 				} else {
@@ -308,7 +308,7 @@ export default {
 						return t('integration_openai', 'Result {index}', { index: i + 1 }) + '\n' + a
 					})
 					const result = this.includeQuery
-						? t('integration_openai', 'Query') + '\n' + this.query + '\n\n' + multiAnswers.join('\n\n')
+						? t('integration_openai', 'Prompt') + '\n' + this.query + '\n\n' + multiAnswers.join('\n\n')
 						: multiAnswers.join('\n\n')
 					this.onSubmit(result)
 				}
