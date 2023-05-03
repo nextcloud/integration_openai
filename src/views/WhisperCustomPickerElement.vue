@@ -16,23 +16,23 @@
 			:show-upload-button="false"
 			:after-recording="onRecordEnd" />
 		<div class="form-wrapper">
-			<div class="line">
-				<label>
-					{{ t('integration_openai', 'Action') }}
-				</label>
-				<div class="spacer" />
+			<div class="line justified">
 				<div class="radios">
 					<NcCheckboxRadioSwitch
+						:button-variant="true"
 						:checked.sync="mode"
 						type="radio"
 						value="transcribe"
+						button-variant-grouped="horizontal"
 						name="mode">
 						{{ t('integration_openai', 'Transcribe') }}
 					</NcCheckboxRadioSwitch>
 					<NcCheckboxRadioSwitch
+						:button-variant="true"
 						:checked.sync="mode"
 						type="radio"
 						value="translate"
+						button-variant-grouped="horizontal"
 						name="mode">
 						{{ t('integration_openai', 'Translate (only to English)') }}
 					</NcCheckboxRadioSwitch>
@@ -198,9 +198,6 @@ export default {
 		margin: 8px 0;
 		.radios {
 			display: flex;
-			> * {
-				margin: 0 16px;
-			}
 		}
 	}
 
@@ -209,6 +206,9 @@ export default {
 		align-items: center;
 		margin-top: 8px;
 		width: 100%;
+		&.justified {
+			justify-content: center;
+		}
 	}
 
 	.footer {
