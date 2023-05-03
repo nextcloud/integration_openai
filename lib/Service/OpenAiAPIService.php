@@ -173,6 +173,7 @@ class OpenAiAPIService {
 	 * @throws \OCP\DB\Exception
 	 */
 	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
+		$this->config->setUserValue($userId, Application::APP_ID, 'last_image_size', $size);
 		$params = [
 			'prompt' => $prompt,
 			'size' => $size,

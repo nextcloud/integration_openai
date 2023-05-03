@@ -151,6 +151,7 @@ export default {
 	mounted() {
 		this.focusOnInput()
 		this.getPromptHistory()
+		this.getLastImageSize()
 	},
 
 	methods: {
@@ -169,6 +170,16 @@ export default {
 			return axios.get(url, params)
 				.then((response) => {
 					this.prompts = response.data
+				})
+				.catch((error) => {
+					console.error(error)
+				})
+		},
+		getLastImageSize() {
+			const url = generateUrl('/apps/integration_openai/last-image-size')
+			return axios.get(url)
+				.then((response) => {
+					this.imageSize = response.data
 				})
 				.catch((error) => {
 					console.error(error)

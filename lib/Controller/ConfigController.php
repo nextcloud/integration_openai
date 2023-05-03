@@ -56,4 +56,12 @@ class ConfigController extends Controller {
 		}
 		return new DataResponse(1);
 	}
+
+	/**
+	 * @return DataResponse
+	 */
+	public function getLastImageSize(): DataResponse {
+		$size = $this->config->getUserValue($this->userId, Application::APP_ID, 'last_image_size', Application::DEFAULT_IMAGE_SIZE);
+		return new DataResponse($size);
+	}
 }
