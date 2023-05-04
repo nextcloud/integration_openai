@@ -127,7 +127,8 @@ class PromptMapper extends QBMapper {
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
 			);
 		}
-		$qb->orderBy('timestamp', 'DESC');
+		$qb->orderBy('timestamp', 'DESC')
+			->setMaxResults(Application::MAX_PROMPT_PER_TYPE_PER_USER);
 
 		return $this->findEntities($qb);
 	}
@@ -150,7 +151,6 @@ class PromptMapper extends QBMapper {
 		}
 
 		// if the prompt does not exist, cleanup and create it
-		$this->cleanupUserPrompts($userId, $type);
 
 		$prompt = new Prompt();
 		$prompt->setType($type);
@@ -160,7 +160,11 @@ class PromptMapper extends QBMapper {
 			$timestamp = (new DateTime())->getTimestamp();
 		}
 		$prompt->setTimestamp($timestamp);
-		return $this->insert($prompt);
+		$insertedPrompt = $this->insert($prompt);
+
+		$this->cleanupUserPrompts($userId, $type);
+
+		return $insertedPrompt;
 	}
 
 	/**

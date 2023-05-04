@@ -31,7 +31,7 @@ class Application extends App implements IBootstrap {
 
 	public const PROMPT_TYPE_IMAGE = 0;
 	public const PROMPT_TYPE_TEXT = 1;
-	public const MAX_PROMPT_PER_TYPE_PER_USER = 3;
+	public const MAX_PROMPT_PER_TYPE_PER_USER = 5;
 
 	private IConfig $config;
 
