@@ -35,11 +35,12 @@
 			</span>
 		</span>
 		<div v-if="!error"
-			class="images">
+			:class="{ images: true, vertical: orientation === 'vertical' }">
 			<a v-for="url in urls"
 				:key="url.id"
 				:href="url.url"
 				:aria-label="t('integration_openai', 'Open image in a new tab')"
+				:title="t('integration_openai', 'Open image in a new tab')"
 				target="_blank"
 				class="image-wrapper">
 				<OpenAiImage :src="getProxiedImageUrl(url.id)"
@@ -79,6 +80,11 @@ export default {
 		error: {
 			type: String,
 			default: null,
+		},
+		orientation: {
+			type: String,
+			default: 'vertical',
+			validator: val => ['horizontal', 'vertical'].includes(val),
 		},
 	},
 
@@ -128,6 +134,7 @@ export default {
 
 	.images {
 		margin-top: 12px;
+		display: flex;
 
 		.image-wrapper {
 			width: 100%;
@@ -135,7 +142,15 @@ export default {
 			align-items: center;
 			justify-content: center;
 			position: relative;
-			margin-top: 8px;
+			margin: 8px 4px 0 4px;
+		}
+
+		&.vertical {
+			flex-direction: column;
+			.image-wrapper {
+				margin-left: 0px;
+				margin-right: 0px;
+			}
 		}
 	}
 }

@@ -23,7 +23,8 @@
 	<ImageGeneration :hash="richObject.hash"
 		:urls="richObject.urls"
 		:prompt="richObject.prompt"
-		:error="richObject.error" />
+		:error="richObject.error"
+		:orientation="orientation" />
 </template>
 
 <script>
@@ -48,6 +49,11 @@ export default {
 		accessible: {
 			type: Boolean,
 			default: true,
+		},
+		orientation: {
+			type: String,
+			default: 'vertical',
+			validator: val => ['horizontal', 'vertical'].includes(val),
 		},
 	},
 

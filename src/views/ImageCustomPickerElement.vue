@@ -14,17 +14,21 @@
 				:value.sync="query"
 				:label="inputPlaceholder"
 				:show-trailing-button="!!query"
-				@keydown.enter="onInputEnter"
+				@keydown.enter="generate"
 				@trailing-button-click="query = ''" />
 		</div>
-		<div class="prompts">
+		<div v-if="reference === null"
+			class="prompts">
 			<NcUserBubble v-for="p in prompts"
 				:key="p.id"
-				size="30"
+				:size="30"
 				avatar-image="icon-history"
 				:display-name="p.value"
 				@click="query = p.value" />
 		</div>
+		<ImageReferenceWidget v-else
+			:rich-object="reference.richObject"
+			orientation="horizontal" />
 		<div class="footer">
 			<NcButton class="advanced-button"
 				type="tertiary"
@@ -36,14 +40,24 @@
 				{{ t('integration_openai', 'Advanced options') }}
 			</NcButton>
 			<NcButton
-				type="primary"
-				:aria-label="t('integration_openai', 'Generate images with OpenAI')"
+				type="secondary"
+				:aria-label="t('integration_openai', 'Preview images with OpenAI')"
 				:disabled="loading || !query"
-				@click="onInputEnter">
-				{{ t('integration_openai', 'Generate') }}
+				@click="generate">
+				{{ previewButtonLabel }}
 				<template #icon>
 					<NcLoadingIcon v-if="loading" />
-					<ArrowRightIcon v-else />
+					<EyeRefreshIcon v-else-if="resultUrl !== null" />
+					<EyeIcon v-else />
+				</template>
+			</NcButton>
+			<NcButton v-if="resultUrl !== null"
+				type="primary"
+				:aria-label="t('integration_openai', 'Submit the current preview')"
+				@click="submit">
+				{{ t('integration_openai', 'Send') }}
+				<template #icon>
+					<ArrowRightIcon />
 				</template>
 			</NcButton>
 		</div>
@@ -85,6 +99,8 @@
 </template>
 
 <script>
+import EyeIcon from 'vue-material-design-icons/Eye.vue'
+import EyeRefreshIcon from 'vue-material-design-icons/EyeRefresh.vue'
 import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
@@ -95,14 +111,17 @@ import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcUserBubble from '@nextcloud/vue/dist/Components/NcUserBubble.js'
 
+import ImageReferenceWidget from './ImageReferenceWidget.vue'
+
 import axios from '@nextcloud/axios'
-import { generateUrl } from '@nextcloud/router'
+import { generateUrl, generateOcsUrl } from '@nextcloud/router'
 import { showError } from '@nextcloud/dialogs'
 
 export default {
 	name: 'ImageCustomPickerElement',
 
 	components: {
+		ImageReferenceWidget,
 		NcButton,
 		NcLoadingIcon,
 		NcTextField,
@@ -111,6 +130,8 @@ export default {
 		ChevronDownIcon,
 		ArrowRightIcon,
 		NcUserBubble,
+		EyeIcon,
+		EyeRefreshIcon,
 	},
 
 	props: {
@@ -128,6 +149,8 @@ export default {
 		return {
 			query: '',
 			loading: false,
+			resultUrl: null,
+			reference: null,
 			inputPlaceholder: t('integration_openai', 'cyberpunk pizza with pineapple, cats fighting with lightsabers'),
 			poweredByTitle: t('integration_openai', 'by OpenAI with DALL·E 2'),
 			showAdvanced: false,
@@ -142,6 +165,11 @@ export default {
 			return this.showAdvanced
 				? ChevronDownIcon
 				: ChevronRightIcon
+		},
+		previewButtonLabel() {
+			return this.resultUrl !== null
+				? t('integration_openai', 'Regenerate')
+				: t('integration_openai', 'Preview')
 		},
 	},
 
@@ -185,13 +213,14 @@ export default {
 					console.error(error)
 				})
 		},
-		onSubmit(url) {
-			this.$emit('submit', url)
+		submit() {
+			this.$emit('submit', this.resultUrl)
 		},
-		onInputEnter() {
+		generate() {
 			if (this.query === '') {
 				return
 			}
+			this.resultUrl = null
 			this.loading = true
 			const params = {
 				prompt: this.query,
@@ -203,9 +232,9 @@ export default {
 				.then((response) => {
 					const hash = response.data?.hash
 					if (hash && hash.length && hash.length > 0) {
-						const link = window.location.protocol + '//' + window.location.host
+						this.resultUrl = window.location.protocol + '//' + window.location.host
 							+ generateUrl('/apps/integration_openai/i/{hash}', { hash })
-						this.onSubmit(link)
+						this.resolveResult()
 					} else {
 						this.error = response.data?.error ?? t('integration_openai', 'Unknown error')
 					}
@@ -216,6 +245,22 @@ export default {
 						t('integration_openai', 'OpenAI error') + ': '
 							+ (error.response?.data?.body?.error?.message ?? t('integration_openai', 'Unknown OpenAI API error'))
 					)
+				})
+				.then(() => {
+					this.loading = false
+				})
+		},
+		resolveResult() {
+			this.loading = true
+			this.abortController = new AbortController()
+			axios.get(generateOcsUrl('references/resolve', 2) + '?reference=' + encodeURIComponent(this.resultUrl), {
+				signal: this.abortController.signal,
+			})
+				.then((response) => {
+					this.reference = response.data.ocs.data.references[this.resultUrl]
+				})
+				.catch((error) => {
+					console.error(error)
 				})
 				.then(() => {
 					this.loading = false
