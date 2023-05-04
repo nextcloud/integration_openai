@@ -54,6 +54,7 @@
 			<NcButton v-if="resultUrl !== null"
 				type="primary"
 				:aria-label="t('integration_openai', 'Submit the current preview')"
+				:disabled="loading"
 				@click="submit">
 				{{ t('integration_openai', 'Send') }}
 				<template #icon>
@@ -220,7 +221,6 @@ export default {
 			if (this.query === '') {
 				return
 			}
-			this.resultUrl = null
 			this.loading = true
 			const params = {
 				prompt: this.query,
