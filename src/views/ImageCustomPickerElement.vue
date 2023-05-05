@@ -224,7 +224,7 @@ export default {
 			this.loading = true
 			const params = {
 				prompt: this.query,
-				n: this.imageNumber,
+				n: parseInt(this.imageNumber),
 				size: this.imageSize,
 			}
 			const url = generateUrl('/apps/integration_openai/images/generations')
