@@ -17,7 +17,7 @@
 				@keydown.enter="generate"
 				@trailing-button-click="query = ''" />
 		</div>
-		<div v-if="result === null"
+		<div v-if="result === null || query === ''"
 			class="prompts">
 			<NcUserBubble v-for="p in prompts"
 				:key="p.id"
@@ -26,7 +26,7 @@
 				:display-name="p.value"
 				@click="query = p.value" />
 		</div>
-		<div v-else
+		<div v-if="result !== null"
 			class="preview">
 			<h3>{{ t('integration_openai', 'Preview') }}</h3>
 			<NcRichContenteditable :value.sync="result"

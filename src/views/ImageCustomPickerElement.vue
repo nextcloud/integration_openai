@@ -17,7 +17,7 @@
 				@keydown.enter="generate"
 				@trailing-button-click="query = ''" />
 		</div>
-		<div v-if="reference === null"
+		<div v-if="reference === null || query === ''"
 			class="prompts">
 			<NcUserBubble v-for="p in prompts"
 				:key="p.id"
@@ -26,7 +26,7 @@
 				:display-name="p.value"
 				@click="query = p.value" />
 		</div>
-		<ImageReferenceWidget v-else
+		<ImageReferenceWidget v-if="reference !== null"
 			:rich-object="reference.richObject"
 			orientation="horizontal" />
 		<div class="footer">
