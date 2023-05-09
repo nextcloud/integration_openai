@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.6 – 2023-05-09
+
+### Added
+
+- implement OCP\SpeechToText\ISpeechToTextProvider @julien-nc
+
+### Changed
+
+- improve style of the whisper picker component, respect dark theme @julien-nc
+- improve style of the GPT and Dall-e picker components @julien-nc
+- remember last image size for Dall-e picker @julien-nc
+- implement 2 step flow in GPT and Dall-e picker components, preview/adjust before submitting @julien-nc
+
 ## 1.0.5 – 2023-04-26
 
 ### Added
