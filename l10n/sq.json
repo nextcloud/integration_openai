@@ -1,0 +1,9 @@
+{ "translations": {
+    "Preview" : "Parapamje ",
+    "Advanced options" : "Opsione të avancuara",
+    "Send" : "Dërgo",
+    "Result" : "Rezultatet",
+    "Unknown error" : "Gabim i panjohur",
+    "Translate" : "Përkthe"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

@@ -1,0 +1,10 @@
+{ "translations": {
+    "Bad HTTP method" : "Mètodu HTTP no bàlidu",
+    "Bad credentials" : "Credentziales non bàlidas",
+    "Connected accounts" : "Contos connètidos",
+    "Advanced options" : "Sèberos avantzados",
+    "Result" : "Resurtadu",
+    "Unknown error" : "Errore disconnotu",
+    "Translate" : "Borta"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

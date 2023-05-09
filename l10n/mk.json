@@ -1,0 +1,9 @@
+{ "translations": {
+    "Bad credentials" : "Неточни акредитиви",
+    "Connected accounts" : "Поврзани сметки",
+    "Advanced options" : "Напредни опции",
+    "Send" : "Прати",
+    "Unknown error" : "Непозната грешка",
+    "Translate" : "Преведи"
+},"pluralForm" :"nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;"
+}

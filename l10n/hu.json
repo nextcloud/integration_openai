@@ -1,0 +1,11 @@
+{ "translations": {
+    "Bad HTTP method" : "Hibás HTTP metódus",
+    "Bad credentials" : "Hibás hitelesítő adatok",
+    "Connected accounts" : "Kapcsolt fiókok",
+    "Preview" : "Előnézet",
+    "Advanced options" : "Speciális beállítások",
+    "Send" : "Küldés",
+    "Unknown error" : "Ismeretlen hiba",
+    "Translate" : "Lefordítás"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

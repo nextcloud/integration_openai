@@ -1,0 +1,9 @@
+{ "translations": {
+    "Bad credentials" : "Credenciais incorrectas",
+    "Connected accounts" : "Contas conectadas",
+    "Preview" : "Vista previa",
+    "Advanced options" : "Opcións avanzadas",
+    "Send" : "Enviar",
+    "Unknown error" : "Erro descoñecido"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
