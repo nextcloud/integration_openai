@@ -5,6 +5,8 @@ OC.L10N.register(
     "Preview" : "پیش‌نمایش",
     "Advanced options" : "گزینه‌های پیش‌رفته",
     "Send" : "ارسال",
-    "Unknown error" : "خطای ناشناخته"
+    "Result" : "شروع به اسکنیک",
+    "Unknown error" : "خطای ناشناخته",
+    "Translate" : "ترجمه"
 },
 "nplurals=2; plural=(n > 1);");

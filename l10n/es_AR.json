@@ -1,4 +1,9 @@
 { "translations": {
-    "Preview" : "Vista previa"
+    "Preview" : "Vista previa",
+    "Advanced options" : "Opciones avanzadas",
+    "Send" : "Enviar",
+    "Result" : "Resultado",
+    "Unknown error" : "Error desconocido",
+    "Translate" : "Traducir"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

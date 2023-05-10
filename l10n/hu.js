@@ -7,6 +7,7 @@ OC.L10N.register(
     "Preview" : "Előnézet",
     "Advanced options" : "Speciális beállítások",
     "Send" : "Küldés",
+    "Result" : "Eredmény",
     "Unknown error" : "Ismeretlen hiba",
     "Translate" : "Lefordítás"
 },

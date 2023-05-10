@@ -1,5 +1,11 @@
 { "translations": {
+    "Bad HTTP method" : "Κακή μέθοδος HTTP",
+    "Bad credentials" : "Εσφαλμένα διαπιστευτήρια",
     "Connected accounts" : "Συνδεδεμένοι λογαριασμοί",
-    "Preview" : "Προεπισκόπηση"
+    "Preview" : "Προεπισκόπηση",
+    "Advanced options" : "Επιλογές για προχωρημένους",
+    "Result" : "Αποτέλεσμα",
+    "Unknown error" : "Άγνωστο σφάλμα",
+    "Translate" : "Μετάφραση"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
