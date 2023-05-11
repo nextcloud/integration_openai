@@ -47,7 +47,7 @@
 				{{ previewButtonLabel }}
 				<template #icon>
 					<NcLoadingIcon v-if="loading" />
-					<EyeRefreshIcon v-else-if="resultUrl !== null" />
+					<RefreshIcon v-else-if="resultUrl !== null" />
 					<EyeIcon v-else />
 				</template>
 			</NcButton>
@@ -101,7 +101,7 @@
 
 <script>
 import EyeIcon from 'vue-material-design-icons/Eye.vue'
-import EyeRefreshIcon from 'vue-material-design-icons/EyeRefresh.vue'
+import RefreshIcon from 'vue-material-design-icons/Refresh.vue'
 import ArrowRightIcon from 'vue-material-design-icons/ArrowRight.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronDownIcon from 'vue-material-design-icons/ChevronDown.vue'
@@ -132,7 +132,7 @@ export default {
 		ArrowRightIcon,
 		NcUserBubble,
 		EyeIcon,
-		EyeRefreshIcon,
+		RefreshIcon,
 	},
 
 	props: {
