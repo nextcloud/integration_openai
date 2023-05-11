@@ -13,6 +13,7 @@
 				ref="chatgpt-search-input"
 				:value.sync="query"
 				:label="inputPlaceholder"
+				:disabled="loading"
 				:show-trailing-button="!!query"
 				@keydown.enter="generate"
 				@trailing-button-click="query = ''" />
@@ -32,6 +33,7 @@
 			<NcRichContenteditable :value.sync="result"
 				class="editable-preview"
 				:multiline="true"
+				:disabled="loading"
 				:placeholder="t('integration_openai', 'Preview content')"
 				:link-autocomplete="false" />
 		</div>
