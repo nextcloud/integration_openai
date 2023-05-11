@@ -22,6 +22,8 @@
 			class="prompts">
 			<NcUserBubble v-for="p in prompts"
 				:key="p.id"
+				class="prompt-bubble"
+				:title="p.value"
 				:size="30"
 				avatar-image="icon-history"
 				:display-name="p.value"
@@ -293,6 +295,10 @@ export default {
 		> * {
 			margin-right: 8px;
 		}
+	}
+
+	.prompt-bubble {
+		max-width: 250px;
 	}
 
 	.spacer {
