@@ -14,6 +14,7 @@ use OCA\OpenAi\Reference\ChatGptReferenceProvider;
 use OCA\OpenAi\Reference\ImageReferenceProvider;
 use OCA\OpenAi\Reference\WhisperReferenceProvider;
 use OCA\OpenAi\SpeechToText\STTProvider;
+use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\IConfig;
 
@@ -49,6 +50,7 @@ class Application extends App implements IBootstrap {
 			$context->registerReferenceProvider(ImageReferenceProvider::class);
 			$context->registerReferenceProvider(WhisperReferenceProvider::class);
 			$context->registerEventListener(RenderReferenceEvent::class, OpenAiReferenceListener::class);
+			$context->registerTranslationProvider(TranslationProvider::class);
 
 			if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '27.0.0', '>=')) {
 				$context->registerSpeechToTextProvider(STTProvider::class);

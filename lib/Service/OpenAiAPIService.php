@@ -80,10 +80,12 @@ class OpenAiAPIService {
 	 * @param int $n
 	 * @param string $model
 	 * @param int $maxTokens
+	 * @param bool $storePrompt
 	 * @return array|string[]
 	 * @throws \OCP\DB\Exception
 	 */
-	public function createCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000): array {
+	public function createCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
+									 bool $storePrompt = true): array {
 		$params = [
 			'model' => $model,
 			'prompt' => $prompt,
@@ -93,7 +95,9 @@ class OpenAiAPIService {
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
-		$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+		if ($storePrompt) {
+			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+		}
 		return $this->request('completions', $params, 'POST');
 	}
 
@@ -103,10 +107,12 @@ class OpenAiAPIService {
 	 * @param int $n
 	 * @param string $model
 	 * @param int $maxTokens
+	 * @param bool $storePrompt
 	 * @return array|string[]
 	 * @throws \OCP\DB\Exception
 	 */
-	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000): array {
+	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
+										 bool $storePrompt = true): array {
 		$params = [
 			'model' => $model,
 			'messages' => [['role' => 'user', 'content' => $prompt ]],
@@ -116,7 +122,9 @@ class OpenAiAPIService {
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
-		$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+		if ($storePrompt) {
+			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+		}
 		return $this->request('chat/completions', $params, 'POST');
 	}
 
