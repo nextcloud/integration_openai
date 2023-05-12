@@ -222,25 +222,48 @@ export default {
 		}
 	}
 
-	::v-deep .recorder {
+	:deep(.recorder) {
 		background-color: var(--color-main-background) !important;
+		box-shadow: unset !important;
 		.ar-content * {
 			color: var(--color-main-text) !important;
 		}
 		.ar-icon {
 			background-color: var(--color-main-background) !important;
 			fill: var(--color-main-text) !important;
+			border: 1px solid var(--color-border) !important;
 		}
 		.ar-recorder__time-limit {
 			position: unset !important;
 		}
-		.ar-player__time {
-			font-size: 14px;
+		.ar-player {
+			&-bar {
+				border: 1px solid var(--color-border) !important;
+			}
+			.ar-line-control {
+				background-color: var(--color-background-dark) !important;
+				&__head {
+					background-color: var(--color-main-text) !important;
+				}
+			}
+			&__time {
+				font-size: 14px;
+			}
+			.ar-volume {
+				&__icon {
+					background-color: var(--color-main-background) !important;
+					fill: var(--color-main-text) !important;
+				}
+			}
 		}
 		.ar-records {
 			height: unset !important;
+			&__record {
+				border-bottom: 1px solid var(--color-border) !important;
+			}
 			&__record--selected {
 				background-color: var(--color-background-dark) !important;
+				border: 1px solid var(--color-border) !important;
 				.ar-icon {
 					background-color: var(--color-background-dark) !important;
 				}
