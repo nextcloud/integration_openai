@@ -6,6 +6,7 @@ OC.L10N.register(
     "Preview" : "Forskoðun",
     "Advanced options" : "Ítarlegir valkostir",
     "Send" : "Senda",
+    "Result" : "Niðurstöður",
     "Unknown error" : "Óþekkt villa",
     "Translate" : "Þýða"
 },
