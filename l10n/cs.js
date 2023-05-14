@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "ChatGPT-like text generation (by OpenAI)" : "Vytváření textu jako s ChatGPT (od OpenAI)",
+    "AI image generation (by OpenAI Dall-E 2)" : "Vytváření obrázků pomocí AI (pomocí OpenAI Dall-E 2)",
+    "AI speech-to-text (Whisper via OpenAI)" : "Řeč na text pomocí AI (Whisper prostřednictvím OpenAI",
     "Bad HTTP method" : "Nesprávná HTTP metoda",
     "Bad credentials" : "Nesprávné přihlašovací údaje",
     "Connected accounts" : "Propojené účty",
@@ -12,6 +15,7 @@ OC.L10N.register(
     "OpenAI admin options saved" : "Předvolby správy pro OpenAI uloženy",
     "Failed to save OpenAI admin options" : "Nepodařilo se uložit předvolby správy pro OpenAI",
     "OpenAI image generation" : "Vytváření obrázků pomocí OpenAI",
+    "Open image in a new tab" : "Otevřít obrázek v novém panelu",
     "Loading image" : "Obrázek je načítán",
     "Generated image" : "Vytvořený obrázek",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "Obrázek se nepodařilo od protějšku získat. V OpenAI ho možná smazali.",
@@ -39,6 +43,8 @@ OC.L10N.register(
     "Result" : "Výsledek",
     "Result {index}" : "Výsledek {index}",
     "AI image generation" : "Vytváření obrázků pomocí AI",
+    "Preview images with OpenAI" : "Náhled obrázků s OpenAI",
+    "Submit the current preview" : "Odeslat stávající náhled",
     "Number of images to generate (1-10)" : "Počet obrázků, které vytvořit (1-10)",
     "Size of the generated images" : "Velikost vytvářených obrázků",
     "cyberpunk pizza with pineapple, cats fighting with lightsabers" : "kyberpunková pizza s ananasem, kočky bojující světelnými meči",
