@@ -285,7 +285,6 @@ class OpenAiAPIService {
 		try {
 			$adminApiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
 			$apiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key', $adminApiKey) ?: $adminApiKey;
-			error_log('APAPAPAPA '.$apiKey);
 			if ($apiKey === '') {
 				return ['error' => 'No API key'];
 			}
