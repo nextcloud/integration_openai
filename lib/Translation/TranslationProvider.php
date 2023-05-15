@@ -27,19 +27,23 @@ declare(strict_types=1);
 namespace OCA\OpenAi\Translation;
 
 use Exception;
+use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\ICacheFactory;
 use OCP\L10N\IFactory;
+use OCP\Translation\IDetectLanguageProvider;
 use OCP\Translation\ITranslationProvider;
 use OCP\Translation\LanguageTuple;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class TranslationProvider implements ITranslationProvider {
+class TranslationProvider implements ITranslationProvider, IDetectLanguageProvider {
 
 	public function __construct(
 		private ICacheFactory $cacheFactory,
 		private IFactory $l10nFactory,
 		private OpenAiAPIService $openAiAPIService,
+		private LoggerInterface $logger,
 		private ?string $userId
 	) {
 	}
@@ -52,7 +56,6 @@ class TranslationProvider implements ITranslationProvider {
 		$cache = $this->cacheFactory->createDistributed('integration_openai');
 		if ($cached = $cache->get('languages')) {
 			return array_map(function ($entry) {
-				error_log('YEP');
 				return $entry instanceof LanguageTuple ? $entry : LanguageTuple::fromArray($entry);
 			}, $cached);
 		}
@@ -78,6 +81,27 @@ class TranslationProvider implements ITranslationProvider {
 		return $availableLanguages;
 	}
 
+	public function detectLanguage(string $text): ?string {
+		$prompt = 'What language is this (answer with the language name only, in English): ' . $text;
+		$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, 'gpt-3.5-turbo', 100, false);
+		if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
+			$choice = $completion['choices'][0];
+			if (isset($choice['message'], $choice['message']['content'])) {
+				return $choice['message']['content'];
+			}
+		}
+		return null;
+	}
+
+	private function getCoreLanguagesByCode(): array {
+		$coreL = $this->l10nFactory->getLanguages();
+		$coreLanguages = array_reduce(array_merge($coreL['commonLanguages'], $coreL['otherLanguages']), function ($carry, $val) {
+			$carry[$val['code']] = $val['name'];
+			return $carry;
+		});
+		return $coreLanguages;
+	}
+
 	public function translate(?string $fromLanguage, string $toLanguage, string $text): string {
 		$cacheKey = ($fromLanguage ?? '') . '/' . $toLanguage . '/' . md5($text);
 
@@ -87,17 +111,15 @@ class TranslationProvider implements ITranslationProvider {
 		}
 
 		try {
-			$coreL = $this->l10nFactory->getLanguages();
-			$coreLanguages = array_reduce(array_merge($coreL['commonLanguages'], $coreL['otherLanguages']), function ($carry, $val) {
-				$carry[$val['code']] = $val['name'];
-				return $carry;
-			});
+			$coreLanguages = $this->getCoreLanguagesByCode();
 
 			$toLanguage = $coreLanguages[$toLanguage];
 			if ($fromLanguage !== null) {
+				$this->logger->debug('OpenAI translation FROM['.$fromLanguage.'] TO['.$toLanguage.']', ['app' => Application::APP_ID]);
 				$fromLanguage = $coreLanguages[$fromLanguage];
 				$prompt = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ' . $text;
 			} else {
+				$this->logger->debug('OpenAI translation TO['.$toLanguage.']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $text;
 			}
 			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, 'gpt-3.5-turbo', 4000, false);
