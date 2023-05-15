@@ -32,5 +32,7 @@ OpenAI text prediction (with many models including GPT-3) and generate DALL·E 2
     <settings>
         <admin>OCA\OpenAi\Settings\Admin</admin>
         <admin-section>OCA\OpenAi\Settings\AdminSection</admin-section>
+        <personal>OCA\OpenAi\Settings\Personal</personal>
+        <personal-section>OCA\OpenAi\Settings\PersonalSection</personal-section>
     </settings>
 </info>

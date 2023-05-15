@@ -22,6 +22,7 @@ use OCA\OpenAi\Db\PromptMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\Files\File;
+use OCP\Files\GenericFileException;
 use OCP\Files\NotPermittedException;
 use OCP\Http\Client\IClient;
 use OCP\IConfig;
@@ -37,22 +38,25 @@ use Throwable;
 class OpenAiAPIService {
 	private IClient $client;
 
-	public function __construct (string $appName,
-								private LoggerInterface $logger,
-								private IL10N $l10n,
-								private IConfig $config,
-								private ImageGenerationMapper $imageGenerationMapper,
-								private ImageUrlMapper $imageUrlMapper,
-								private PromptMapper $promptMapper,
-								IClientService $clientService) {
+	public function __construct(
+		string $appName,
+		private LoggerInterface $logger,
+		private IL10N $l10n,
+		private IConfig $config,
+		private ImageGenerationMapper $imageGenerationMapper,
+		private ImageUrlMapper $imageUrlMapper,
+		private PromptMapper $promptMapper,
+		IClientService $clientService
+	) {
 		$this->client = $clientService->newClient();
 	}
 
 	/**
+	 * @param string $userId
 	 * @return array|string[]
 	 */
-	public function getModels(): array {
-		return $this->request('models');
+	public function getModels(string $userId): array {
+		return $this->request($userId, 'models');
 	}
 
 	/**
@@ -98,7 +102,7 @@ class OpenAiAPIService {
 		if ($storePrompt) {
 			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
 		}
-		return $this->request('completions', $params, 'POST');
+		return $this->request($userId, 'completions', $params, 'POST');
 	}
 
 	/**
@@ -125,30 +129,34 @@ class OpenAiAPIService {
 		if ($storePrompt) {
 			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
 		}
-		return $this->request('chat/completions', $params, 'POST');
+		return $this->request($userId, 'chat/completions', $params, 'POST');
 	}
 
 	/**
+	 * @param string|null $userId
 	 * @param string $audioBase64
 	 * @param bool $translate
 	 * @return array|string[]
 	 */
-	public function transcribeBase64Mp3(string $audioBase64, bool $translate = true): array	{
+	public function transcribeBase64Mp3(?string $userId, string $audioBase64, bool $translate = true): array	{
 		return $this->transcribe(
+			$userId,
 			base64_decode(str_replace('data:audio/mp3;base64,', '', $audioBase64)),
 			$translate
 		);
 	}
 
 	/**
+	 * @param string|null $userId
 	 * @param File $file
 	 * @param bool $translate
 	 * @return string
-	 * @throws NotPermittedException
 	 * @throws LockedException
+	 * @throws NotPermittedException
+	 * @throws GenericFileException
 	 */
-	public function transcribeFile(File $file, bool $translate = false): string {
-		$transcriptionResponse = $this->transcribe($file->getContent(), $translate);
+	public function transcribeFile(?string $userId, File $file, bool $translate = false): string {
+		$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate);
 		if (!isset($transcriptionResponse['text'])) {
 			throw new Exception('Error transcribing file "' . $file->getName() . '": ' . json_encode($transcriptionResponse));
 		}
@@ -156,11 +164,12 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @param string|null $userId
 	 * @param string $audioFileContent
 	 * @param bool $translate
 	 * @return array|string[]
 	 */
-	public function transcribe(string $audioFileContent, bool $translate = true): array {
+	public function transcribe(?string $userId, string $audioFileContent, bool $translate = true): array {
 		$params = [
 			'model' => 'whisper-1',
 			'file' => $audioFileContent,
@@ -169,7 +178,7 @@ class OpenAiAPIService {
 		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
 		$contentType = 'multipart/form-data';
 //		$contentType = 'application/x-www-form-urlencoded';
-		return $this->request($endpoint, $params, 'POST', $contentType);
+		return $this->request($userId, $endpoint, $params, 'POST', $contentType);
 	}
 
 	/**
@@ -191,7 +200,7 @@ class OpenAiAPIService {
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
-		$apiResponse = $this->request('images/generations', $params, 'POST');
+		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
 		if (isset($apiResponse['error'])) {
 			return $apiResponse;
 		}
@@ -264,14 +273,19 @@ class OpenAiAPIService {
 
 	/**
 	 * Make an HTTP request to the OpenAI API
+	 * @param string $userId
 	 * @param string $endPoint The path to reach
 	 * @param array $params Query parameters (key/val pairs)
 	 * @param string $method HTTP query method
+	 * @param string|null $contentType
+	 * @param int $timeout
 	 * @return array decoded request result or error
 	 */
-	public function request(string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, int $timeout = 60): array {
+	public function request(string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, int $timeout = 60): array {
 		try {
-			$apiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
+			$adminApiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
+			$apiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key', $adminApiKey) ?: $adminApiKey;
+			error_log('APAPAPAPA '.$apiKey);
 			if ($apiKey === '') {
 				return ['error' => 'No API key'];
 			}

@@ -27,11 +27,13 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 
 class OpenAiAPIController extends Controller {
 
-	public function __construct(string                   $appName,
-								IRequest                 $request,
-								private OpenAiAPIService $openAiAPIService,
-								private IInitialState    $initialStateService,
-								private ?string          $userId) {
+	public function __construct(
+		string                   $appName,
+		IRequest                 $request,
+		private OpenAiAPIService $openAiAPIService,
+		private IInitialState    $initialStateService,
+		private ?string          $userId
+	) {
 		parent::__construct($appName, $request);
 	}
 
@@ -41,7 +43,7 @@ class OpenAiAPIController extends Controller {
 	 * @return DataResponse
 	 */
 	public function getModels(): DataResponse {
-		$response = $this->openAiAPIService->getModels();
+		$response = $this->openAiAPIService->getModels($this->userId);
 		if (isset($response['error'])) {
 			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
 		}
@@ -97,7 +99,7 @@ class OpenAiAPIController extends Controller {
 	 * @return DataResponse
 	 */
 	public function transcribe(string $audioBase64, bool $translate = true): DataResponse {
-		$response = $this->openAiAPIService->transcribeBase64Mp3($audioBase64, $translate);
+		$response = $this->openAiAPIService->transcribeBase64Mp3($this->userId, $audioBase64, $translate);
 		if (isset($response['error'])) {
 			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
 		}
