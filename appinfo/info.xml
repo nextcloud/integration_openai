@@ -5,7 +5,7 @@
     <summary>Integration of OpenAI's GPT-3 and DALL·E 2</summary>
     <description><![CDATA[OpenAI integration provides a link reference provider to get
 OpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images.]]></description>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <licence>agpl</licence>
     <author>Julien Veyssier</author>
     <namespace>OpenAi</namespace>

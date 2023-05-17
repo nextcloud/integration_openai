@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.8 – 2023-05-17
+
+### Added
+
+- translation provider @julien-nc
+- allow user-specific API keys [#16](https://github.com/nextcloud/integration_openai/issues/16) @julien-nc
+
+### Changed
+
+- improve style of audio recorder @julien-nc
+- use latest nextcloud/vue so the picker modal size can be set by the provider
+
 ## 1.0.7 – 2023-05-11
 
 ### Changed
