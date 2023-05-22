@@ -1,8 +1,11 @@
 { "translations": {
     "ChatGPT-like text generation (by OpenAI)" : "ChatGPT-liknande textgenerering (av OpenAI)",
+    "AI image generation (by OpenAI Dall-E 2)" : "AI-bildgenerering (av OpenAI Dall-E 2)",
+    "AI speech-to-text (Whisper via OpenAI)" : "AI-tal-till-text (Whisper via OpenAI)",
     "Bad HTTP method" : "Felaktig HTTP-metod",
     "Bad credentials" : "Ogiltiga inloggningsuppgifter",
     "Connected accounts" : "Anslutna konton",
+    "OpenAI's Whisper Speech-To-Text" : "OpenAI:s Whisper Tal-Till-Text",
     "OpenAI integration" : "OpenAI-integration",
     "Integration of OpenAI's GPT-3 and DALL·E 2" : "Integration av OpenAI:s GPT-3 och DALL·E 2",
     "OpenAI API key" : "OpenAI API-nyckel",
