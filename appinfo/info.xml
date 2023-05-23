@@ -21,7 +21,7 @@ OpenAI text prediction (with many models including GPT-3) and generate DALL·E 2
     <screenshot>https://github.com/julien-nc/integration_openai/raw/main/img/screenshot3.jpg</screenshot>
     <screenshot>https://github.com/julien-nc/integration_openai/raw/main/img/screenshot4.jpg</screenshot>
     <dependencies>
-        <nextcloud min-version="26" max-version="27"/>
+        <nextcloud min-version="26" max-version="28"/>
     </dependencies>
     <background-jobs>
 		<job>OCA\OpenAi\Cron\CleanupImageGenerations</job>
