@@ -20,71 +20,80 @@
  */
 
 import { registerWidget, registerCustomPickerElement, NcCustomPickerRenderResult } from '@nextcloud/vue/dist/Components/NcRichText.js'
+import { loadState } from '@nextcloud/initial-state'
 
 __webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
 __webpack_public_path__ = OC.linkTo('integration_openai', 'js/') // eslint-disable-line
 
-registerWidget('integration_openai_image', async (el, { richObjectType, richObject, accessible }) => {
-	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
-	Vue.mixin({ methods: { t, n } })
-	const { default: ImageReferenceWidget } = await import(/* webpackChunkName: "reference-image-lazy" */'./views/ImageReferenceWidget.vue')
-	const Widget = Vue.extend(ImageReferenceWidget)
-	new Widget({
-		propsData: {
-			richObjectType,
-			richObject,
-			accessible,
-		},
-	}).$mount(el)
-})
+const features = loadState('integration_openai', 'features')
 
-registerCustomPickerElement('openai-image', async (el, { providerId, accessible }) => {
-	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
-	Vue.mixin({ methods: { t, n } })
-	const { default: ImageCustomPickerElement } = await import(/* webpackChunkName: "image-picker-lazy" */'./views/ImageCustomPickerElement.vue')
-	const Element = Vue.extend(ImageCustomPickerElement)
-	const vueElement = new Element({
-		propsData: {
-			providerId,
-			accessible,
-		},
-	}).$mount(el)
-	return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
-}, (el, renderResult) => {
-	console.debug('OpenAI image custom destroy callback. el', el, 'renderResult:', renderResult)
-	renderResult.object.$destroy()
-}, 'normal')
+if (features.image_picker_enabled) {
+	registerWidget('integration_openai_image', async (el, { richObjectType, richObject, accessible }) => {
+		const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+		Vue.mixin({ methods: { t, n } })
+		const { default: ImageReferenceWidget } = await import(/* webpackChunkName: "reference-image-lazy" */'./views/ImageReferenceWidget.vue')
+		const Widget = Vue.extend(ImageReferenceWidget)
+		new Widget({
+			propsData: {
+				richObjectType,
+				richObject,
+				accessible,
+			},
+		}).$mount(el)
+	})
 
-registerCustomPickerElement('openai-chatgpt', async (el, { providerId, accessible }) => {
-	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
-	Vue.mixin({ methods: { t, n } })
-	const { default: ChatGptCustomPickerElement } = await import(/* webpackChunkName: "gpt-picker-lazy" */'./views/ChatGptCustomPickerElement.vue')
-	const Element = Vue.extend(ChatGptCustomPickerElement)
-	const vueElement = new Element({
-		propsData: {
-			providerId,
-			accessible,
-		},
-	}).$mount(el)
-	return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
-}, (el, renderResult) => {
-	console.debug('OpenAI ChatGPT custom destroy callback. el', el, 'renderResult:', renderResult)
-	renderResult.object.$destroy()
-}, 'normal')
+	registerCustomPickerElement('openai-image', async (el, { providerId, accessible }) => {
+		const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+		Vue.mixin({ methods: { t, n } })
+		const { default: ImageCustomPickerElement } = await import(/* webpackChunkName: "image-picker-lazy" */'./views/ImageCustomPickerElement.vue')
+		const Element = Vue.extend(ImageCustomPickerElement)
+		const vueElement = new Element({
+			propsData: {
+				providerId,
+				accessible,
+			},
+		}).$mount(el)
+		return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
+	}, (el, renderResult) => {
+		console.debug('OpenAI image custom destroy callback. el', el, 'renderResult:', renderResult)
+		renderResult.object.$destroy()
+	}, 'normal')
+}
 
-registerCustomPickerElement('openai-whisper', async (el, { providerId, accessible }) => {
-	const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
-	Vue.mixin({ methods: { t, n } })
-	const { default: WhisperCustomPickerElement } = await import(/* webpackChunkName: "whisper-picker-lazy" */'./views/WhisperCustomPickerElement.vue')
-	const Element = Vue.extend(WhisperCustomPickerElement)
-	const vueElement = new Element({
-		propsData: {
-			providerId,
-			accessible,
-		},
-	}).$mount(el)
-	return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
-}, (el, renderResult) => {
-	console.debug('OpenAI Whisper custom destroy callback. el', el, 'renderResult:', renderResult)
-	renderResult.object.$destroy()
-}, 'normal')
+if (features.text_completion_picker_enabled) {
+	registerCustomPickerElement('openai-chatgpt', async (el, { providerId, accessible }) => {
+		const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+		Vue.mixin({ methods: { t, n } })
+		const { default: ChatGptCustomPickerElement } = await import(/* webpackChunkName: "gpt-picker-lazy" */'./views/ChatGptCustomPickerElement.vue')
+		const Element = Vue.extend(ChatGptCustomPickerElement)
+		const vueElement = new Element({
+			propsData: {
+				providerId,
+				accessible,
+			},
+		}).$mount(el)
+		return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
+	}, (el, renderResult) => {
+		console.debug('OpenAI ChatGPT custom destroy callback. el', el, 'renderResult:', renderResult)
+		renderResult.object.$destroy()
+	}, 'normal')
+}
+
+if (features.whisper_picker_enabled) {
+	registerCustomPickerElement('openai-whisper', async (el, { providerId, accessible }) => {
+		const { default: Vue } = await import(/* webpackChunkName: "vue-lazy" */'vue')
+		Vue.mixin({ methods: { t, n } })
+		const { default: WhisperCustomPickerElement } = await import(/* webpackChunkName: "whisper-picker-lazy" */'./views/WhisperCustomPickerElement.vue')
+		const Element = Vue.extend(WhisperCustomPickerElement)
+		const vueElement = new Element({
+			propsData: {
+				providerId,
+				accessible,
+			},
+		}).$mount(el)
+		return new NcCustomPickerRenderResult(vueElement.$el, vueElement)
+	}, (el, renderResult) => {
+		console.debug('OpenAI Whisper custom destroy callback. el', el, 'renderResult:', renderResult)
+		renderResult.object.$destroy()
+	}, 'normal')
+}

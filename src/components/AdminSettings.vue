@@ -6,6 +6,23 @@
 		</h2>
 		<div id="openai-content">
 			<div class="line">
+				<label for="openai-url">
+					<EarthIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'LocalAI URL (leave empty to use openai.com)') }}
+				</label>
+				<input id="openai-url"
+					v-model="state.url"
+					type="text"
+					:readonly="readonly"
+					:placeholder="t('integration_openai', 'example:') + ' http://localhost:8080'"
+					@input="onInput"
+					@focus="readonly = false">
+			</div>
+			<p class="settings-hint">
+				<InformationOutlineIcon :size="20" class="icon" />
+				{{ t('integration_openai', 'This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080') }}
+			</p>
+			<div v-show="state.url === ''" class="line">
 				<label for="openai-api-key">
 					<KeyIcon :size="20" class="icon" />
 					{{ t('integration_openai', 'OpenAI API key') }}
@@ -18,7 +35,7 @@
 					@input="onInput"
 					@focus="readonly = false">
 			</div>
-			<p class="settings-hint">
+			<p v-show="state.url === ''" class="settings-hint">
 				<InformationOutlineIcon :size="20" class="icon" />
 				{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
 				&nbsp;
@@ -49,12 +66,43 @@
 					</NcButton>
 				</a>
 			</div>
+			<div v-if="configured">
+				<h3>
+					{{ t('integration_openai', 'Select which features you want to enable') }}
+				</h3>
+				<NcCheckboxRadioSwitch
+					:checked="state.whisper_picker_enabled"
+					@update:checked="onCheckboxChanged($event, 'whisper_picker_enabled')">
+					{{ t('integration_openai', 'Whisper transcription/translation with the Smart Picker') }}
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch
+					:checked="state.image_picker_enabled"
+					@update:checked="onCheckboxChanged($event, 'image_picker_enabled')">
+					{{ t('integration_openai', 'Image generation with the Smart Picker') }}
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch
+					:checked="state.text_completion_picker_enabled"
+					@update:checked="onCheckboxChanged($event, 'text_completion_picker_enabled')">
+					{{ t('integration_openai', 'Text generation with the Smart Picker') }}
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch
+					:checked="state.translation_provider_enabled"
+					@update:checked="onCheckboxChanged($event, 'translation_provider_enabled')">
+					{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch
+					:checked="state.stt_provider_enabled"
+					@update:checked="onCheckboxChanged($event, 'stt_provider_enabled')">
+					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
+				</NcCheckboxRadioSwitch>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
+import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 
@@ -62,6 +110,7 @@ import OpenAiIcon from './icons/OpenAiIcon.vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
@@ -75,10 +124,12 @@ export default {
 	components: {
 		OpenAiIcon,
 		KeyIcon,
+		EarthIcon,
 		InformationOutlineIcon,
 		HelpCircleIcon,
 		NcButton,
 		NcSelect,
+		NcCheckboxRadioSwitch,
 	},
 
 	props: [],
@@ -95,13 +146,17 @@ export default {
 	},
 
 	computed: {
+		configured() {
+			return !!this.state.url || !!this.state.api_key
+		},
 		formattedModels() {
 			if (this.models) {
 				return this.models.map(m => {
 					return {
 						id: m.id,
 						value: m.id,
-						label: m.id + ' (' + m.owned_by + ')',
+						label: m.id
+							+ (m.owned_by ? ' (' + m.owned_by + ')' : ''),
 					}
 				})
 			}
@@ -131,7 +186,8 @@ export default {
 						this.selectedModel = {
 							id: modelToSelect.id,
 							value: modelToSelect.id,
-							label: modelToSelect.id + ' (' + modelToSelect.owned_by + ')',
+							label: modelToSelect.id
+								+ (modelToSelect.owned_by ? ' (' + modelToSelect.owned_by + ')' : ''),
 						}
 					}
 				})
@@ -143,10 +199,15 @@ export default {
 			this.state.default_completion_model_id = selected.id
 			this.saveOptions({ default_completion_model_id: this.state.default_completion_model_id })
 		},
+		onCheckboxChanged(newValue, key) {
+			this.state[key] = newValue
+			this.saveOptions({ [key]: this.state[key] ? '1' : '0' })
+		},
 		onInput() {
 			delay(() => {
 				this.saveOptions({
 					api_key: this.state.api_key,
+					url: this.state.url,
 				}).then(() => {
 					this.models = null
 					if (this.state.api_key) {

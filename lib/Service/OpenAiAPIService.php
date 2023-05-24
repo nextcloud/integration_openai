@@ -138,11 +138,13 @@ class OpenAiAPIService {
 	 * @param bool $translate
 	 * @return array|string[]
 	 */
-	public function transcribeBase64Mp3(?string $userId, string $audioBase64, bool $translate = true): array	{
+	public function transcribeBase64Mp3(?string $userId, string $audioBase64, bool $translate = true,
+										string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): array	{
 		return $this->transcribe(
 			$userId,
 			base64_decode(str_replace('data:audio/mp3;base64,', '', $audioBase64)),
-			$translate
+			$translate,
+			$model
 		);
 	}
 
@@ -155,8 +157,9 @@ class OpenAiAPIService {
 	 * @throws NotPermittedException
 	 * @throws GenericFileException
 	 */
-	public function transcribeFile(?string $userId, File $file, bool $translate = false): string {
-		$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate);
+	public function transcribeFile(?string $userId, File $file, bool $translate = false,
+								   string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): string {
+		$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
 		if (!isset($transcriptionResponse['text'])) {
 			throw new Exception('Error transcribing file "' . $file->getName() . '": ' . json_encode($transcriptionResponse));
 		}
@@ -167,11 +170,13 @@ class OpenAiAPIService {
 	 * @param string|null $userId
 	 * @param string $audioFileContent
 	 * @param bool $translate
+	 * @param string $model
 	 * @return array|string[]
 	 */
-	public function transcribe(?string $userId, string $audioFileContent, bool $translate = true): array {
+	public function transcribe(?string $userId, string $audioFileContent, bool $translate = true,
+							   string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): array {
 		$params = [
-			'model' => 'whisper-1',
+			'model' => $model,
 			'file' => $audioFileContent,
 			'response_format' => 'json',
 		];
@@ -283,20 +288,26 @@ class OpenAiAPIService {
 	 */
 	public function request(string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, int $timeout = 60): array {
 		try {
-			$adminApiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
-			$apiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key', $adminApiKey) ?: $adminApiKey;
-			if ($apiKey === '') {
-				return ['error' => 'No API key'];
-			}
+			$serviceUrl = $this->config->getAppValue(Application::APP_ID, 'url', Application::OPENAI_API_BASE_URL) ?: Application::OPENAI_API_BASE_URL;
 
-			$url = 'https://api.openai.com/v1/' . $endPoint;
+			$url = $serviceUrl . '/v1/' . $endPoint;
 			$options = [
 				'timeout' => $timeout,
 				'headers' => [
 					'User-Agent' => 'Nextcloud OpenAI integration',
-					'Authorization' => 'Bearer ' . $apiKey,
 				],
 			];
+
+			// an API key is mandatory when using OpenAI
+			$adminApiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
+			$apiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key', $adminApiKey) ?: $adminApiKey;
+			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
+				return ['error' => 'An API key is required for api.openai.com'];
+			}
+			if ($apiKey !== '') {
+				$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
+			}
+
 			if ($contentType === null) {
 				$options['headers']['Content-Type'] = 'application/json';
 			} elseif ($contentType === 'multipart/form-data') {
