@@ -21,7 +21,7 @@
 		<div v-if="result === null || query === ''"
 			class="prompts">
 			<NcUserBubble v-for="p in prompts"
-				:key="p.id"
+				:key="p.id + p.value"
 				class="prompt-bubble"
 				:title="p.value"
 				:size="30"
@@ -298,6 +298,12 @@ export default {
 		submit() {
 			this.$emit('submit', this.result.trim())
 		},
+		insertPrompt(prompt) {
+			this.prompts.unshift({
+				id: 0,
+				value: prompt,
+			})
+		},
 		generate() {
 			if (this.query === '') {
 				return
@@ -318,6 +324,7 @@ export default {
 					const data = response.data
 					if (data.choices && data.choices.length && data.choices.length > 0) {
 						this.processCompletion(data.choices)
+						this.insertPrompt(this.query)
 					} else {
 						this.error = response.data.error
 					}

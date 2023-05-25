@@ -22,7 +22,7 @@
 				<InformationOutlineIcon :size="20" class="icon" />
 				{{ t('integration_openai', 'This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080') }}
 			</p>
-			<div v-show="state.url === ''" class="line">
+			<div class="line">
 				<label for="openai-api-key">
 					<KeyIcon :size="20" class="icon" />
 					{{ t('integration_openai', 'OpenAI API key') }}
