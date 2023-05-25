@@ -8,6 +8,7 @@
     "OpenAI's Whisper Speech-To-Text" : "Whisper - převod řeči na text od OpenAI",
     "OpenAI integration" : "Napojení na OpenAI",
     "Integration of OpenAI's GPT-3 and DALL·E 2" : "Napojení na OpenAI GPT-3 a DALL·E 2",
+    "OpenAI integration provides a link reference provider to get\nOpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images." : "Napojení na OpenAI obsahuje poskytovatele pro referování na odkazy pro získávání návrhů textu z OpenAI (s mnoha modely, včetně GPT-3) a vytváření obrázků pomocí DALL·E 2.",
     "OpenAI API key" : "Klíč k aplikačnímu program. rozhraní služby OpenAI",
     "your API key" : "váš klíč k API",
     "You can create a free API key in your OpenAI account settings:" : "Klíč k API je možné si zdarma vytvořit v nastavení vašeho účtu u OpenAI:",
