@@ -220,6 +220,12 @@ export default {
 		submit() {
 			this.$emit('submit', this.resultUrl)
 		},
+		insertPrompt(prompt) {
+			this.prompts.unshift({
+				id: 0,
+				value: prompt,
+			})
+		},
 		generate() {
 			if (this.query === '') {
 				return
@@ -238,6 +244,7 @@ export default {
 						this.resultUrl = window.location.protocol + '//' + window.location.host
 							+ generateUrl('/apps/integration_openai/i/{hash}', { hash })
 						this.resolveResult()
+						this.insertPrompt(this.query)
 					} else {
 						this.error = response.data?.error ?? t('integration_openai', 'Unknown error')
 					}
