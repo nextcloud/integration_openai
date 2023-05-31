@@ -299,10 +299,12 @@ export default {
 			this.$emit('submit', this.result.trim())
 		},
 		insertPrompt(prompt) {
-			this.prompts.unshift({
-				id: 0,
-				value: prompt,
-			})
+			if (this.prompts.find(p => p.value === prompt) === undefined) {
+				this.prompts.unshift({
+					id: 0,
+					value: prompt,
+				})
+			}
 		},
 		generate() {
 			if (this.query === '') {

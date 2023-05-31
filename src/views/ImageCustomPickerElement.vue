@@ -21,7 +21,7 @@
 		<div v-if="reference === null || query === ''"
 			class="prompts">
 			<NcUserBubble v-for="p in prompts"
-				:key="p.id"
+				:key="p.id + p.value"
 				class="prompt-bubble"
 				:title="p.value"
 				:size="30"
@@ -221,10 +221,13 @@ export default {
 			this.$emit('submit', this.resultUrl)
 		},
 		insertPrompt(prompt) {
-			this.prompts.unshift({
-				id: 0,
-				value: prompt,
-			})
+			if (this.prompts.find(p => p.value === prompt) === undefined) {
+				console.debug('INSERT', prompt)
+				this.prompts.unshift({
+					id: 0,
+					value: prompt,
+				})
+			}
 		},
 		generate() {
 			if (this.query === '') {
