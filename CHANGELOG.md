@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.9 – 2023-05-31
+
+### Added
+
+- Allow using a custom service URL [#15](https://github.com/nextcloud/integration_openai/issues/15) [#18](https://github.com/nextcloud/integration_openai/issues/18) @julien-nc
+- New admin settings to toggle each feature [#15](https://github.com/nextcloud/integration_openai/issues/15) @julien-nc
+
+### Changed
+
+- Bump max Nextcloud version to 28 @julien-nc
+- Immediately update prompt history in chat/image picker components @julien-nc
+
 ## 1.0.8 – 2023-05-17
 
 ### Added
