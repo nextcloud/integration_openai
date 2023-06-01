@@ -23,6 +23,8 @@ OC.L10N.register(
     "Whisper transcription/translation with the Smart Picker" : "Přepis do textu / překlad pomocí Whisper s inteligentním výběrem",
     "Image generation with the Smart Picker" : "Vytváření obrázků s inteligentním výběrem",
     "Text generation with the Smart Picker" : "Vytváření textu s inteligentním výběrem",
+    "Translation provider (to translate Talk messages for example)" : "Poskytovatel překladů (například pro překládání zpráv v Talk)",
+    "Speech-to-text provider (to transcribe Talk recordings for example)" : "Poskytovatel převodu řeči na text (například pro přepis nahrávek z Talk)",
     "OpenAI admin options saved" : "Předvolby správy pro OpenAI uloženy",
     "Failed to save OpenAI admin options" : "Nepodařilo se uložit předvolby správy pro OpenAI",
     "OpenAI image generation" : "Vytváření obrázků pomocí OpenAI",
