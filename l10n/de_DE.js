@@ -53,7 +53,7 @@ OC.L10N.register(
     "by OpenAI" : "von OpenAI",
     "Choose a model" : "Ein Modell auswählen",
     "Regenerate" : "Neu erstellen",
-    "Failed to save OpenAI default model ID" : "Fehler beim Speichern der OpenAI-Standar-Modell-ID",
+    "Failed to save OpenAI default model ID" : "Fehler beim Speichern der OpenAI-Standard-Modell-ID",
     "OpenAI error" : "OpenAI-Fehler",
     "Unknown OpenAI API error" : "Unbekannter OpenAI-API-Fehler",
     "Prompt" : "Prompt",
@@ -71,7 +71,7 @@ OC.L10N.register(
     "Transcribe" : "Transkribieren",
     "Translate (only to English)" : "Übersetzen (nur ins Englische)",
     "by OpenAI with Whisper" : "mittels OpenAI mit Whisper",
-    "Translate" : "beim Übersetzen",
+    "Translate" : "Übersetzen",
     "Failed to get transcription/translation" : "Fehler beim Abrufen der Transkription/Übersetzung"
 },
 "nplurals=2; plural=(n != 1);");
