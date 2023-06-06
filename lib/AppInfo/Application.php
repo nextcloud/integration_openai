@@ -48,28 +48,23 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function register(IRegistrationContext $context): void {
-		$apiKey = $this->config->getAppValue(self::APP_ID, 'api_key');
-		$serviceUrl = $this->config->getAppValue(self::APP_ID, 'url');
-		// API key is only required when using OpenAI, all good with LocalAI
-		if ($apiKey !== '' || $serviceUrl !== '') {
-			$context->registerEventListener(RenderReferenceEvent::class, OpenAiReferenceListener::class);
-			if ($this->config->getAppValue(Application::APP_ID, 'text_completion_picker_enabled', '1') === '1') {
-				$context->registerReferenceProvider(ChatGptReferenceProvider::class);
-			}
-			if ($this->config->getAppValue(Application::APP_ID, 'image_picker_enabled', '1') === '1') {
-				$context->registerReferenceProvider(ImageReferenceProvider::class);
-			}
-			if ($this->config->getAppValue(Application::APP_ID, 'whisper_picker_enabled', '1') === '1') {
-				$context->registerReferenceProvider(WhisperReferenceProvider::class);
-			}
-			if ($this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
-				$context->registerTranslationProvider(TranslationProvider::class);
-			}
+		$context->registerEventListener(RenderReferenceEvent::class, OpenAiReferenceListener::class);
+		if ($this->config->getAppValue(Application::APP_ID, 'text_completion_picker_enabled', '1') === '1') {
+			$context->registerReferenceProvider(ChatGptReferenceProvider::class);
+		}
+		if ($this->config->getAppValue(Application::APP_ID, 'image_picker_enabled', '1') === '1') {
+			$context->registerReferenceProvider(ImageReferenceProvider::class);
+		}
+		if ($this->config->getAppValue(Application::APP_ID, 'whisper_picker_enabled', '1') === '1') {
+			$context->registerReferenceProvider(WhisperReferenceProvider::class);
+		}
+		if ($this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
+			$context->registerTranslationProvider(TranslationProvider::class);
+		}
 
-			if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '27.0.0', '>=')) {
-				if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
-					$context->registerSpeechToTextProvider(STTProvider::class);
-				}
+		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '27.0.0', '>=')) {
+			if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
+				$context->registerSpeechToTextProvider(STTProvider::class);
 			}
 		}
 	}

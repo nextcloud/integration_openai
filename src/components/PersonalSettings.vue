@@ -5,6 +5,10 @@
 			{{ t('integration_openai', 'OpenAI integration') }}
 		</h2>
 		<div id="openai-content">
+			<p v-if="state.isCustomService" class="settings-hint">
+				<InformationOutlineIcon :size="20" class="icon" />
+				{{ t('integration_openai', 'Your administrator defined a custom service address') }}
+			</p>
 			<p class="settings-hint">
 				<InformationOutlineIcon :size="20" class="icon" />
 				{{ t('integration_openai', 'Leave the API key empty to use the one defined by administrators') }}

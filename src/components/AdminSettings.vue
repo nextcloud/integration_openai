@@ -66,7 +66,7 @@
 					</NcButton>
 				</a>
 			</div>
-			<div v-if="configured">
+			<div>
 				<h3>
 					{{ t('integration_openai', 'Select which features you want to enable') }}
 				</h3>
