@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.10 – 2023-06-06
+
+### Changed
+
+- do not use OC functions/vars anymore @julien-nc
+
+### Fixed
+
+- App was not working if no admin api key is defined [#16](https://github.com/nextcloud/integration_openai/issues/16) @julien-nc
+
 ## 1.0.9 – 2023-05-31
 
 ### Added
