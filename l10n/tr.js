@@ -34,6 +34,7 @@ OC.L10N.register(
     "Generated image" : "Oluşturulan görsel",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "Uzak görsel alınamadı. OpenAI tarafından silinmiş olabilir.",
     "Direct image link" : "Doğrudan görsel bağlantısı",
+    "Your administrator defined a custom service address" : "Yöneticiniz bir özel hizmet adresi tanımlamış",
     "Leave the API key empty to use the one defined by administrators" : "Yöneticiler tarafından tanımlanmış bir anahtarın kullanılması için API anahtarını boş bırakın",
     "OpenAI options saved" : "OpenAI ayarları kaydedildi",
     "Failed to save OpenAI options" : "OpenAI ayarları kaydedilemedi",

@@ -34,6 +34,7 @@ OC.L10N.register(
     "Generated image" : "Imagem gerada",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "A imagem remota não pode ser encontrada. A OpenAI deve ter removido-a.",
     "Direct image link" : "Link direto para a imagem",
+    "Your administrator defined a custom service address" : "Seu administrador definiu um endereço de serviço personalizado",
     "Leave the API key empty to use the one defined by administrators" : "Deixe a chave API vazia para usar aquela definida pelos administradores",
     "OpenAI options saved" : "Opções do OpenAI salvas",
     "Failed to save OpenAI options" : "Falha ao salvar as opções do OpenAI",

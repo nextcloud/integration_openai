@@ -34,6 +34,7 @@ OC.L10N.register(
     "Generated image" : "已產生影像",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "無法擷取遠端影像。OpenAI 可能已將其刪除。",
     "Direct image link" : "直接影像連結",
+    "Your administrator defined a custom service address" : "您的管理員定義了自訂的服務位置",
     "Leave the API key empty to use the one defined by administrators" : "將 API 金鑰留空以使用管理員定義的",
     "OpenAI options saved" : "OpenAI 選項已儲存",
     "Failed to save OpenAI options" : "儲存 OpenAI 選項失敗",

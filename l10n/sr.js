@@ -34,6 +34,7 @@ OC.L10N.register(
     "Generated image" : "Генерисана слика",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "Не може да се добави удаљена слика. Можда ју је OpenAI обрисао.",
     "Direct image link" : "Директни линк на слику",
+    "Your administrator defined a custom service address" : "Ваш администратор је дефинисао произвољну адресу сервиса",
     "Leave the API key empty to use the one defined by administrators" : "Оставите поље за API кључ празно ако желите да се користи кључ који су дефинисали администратори",
     "OpenAI options saved" : "Сачуване су OpenAI опције",
     "Failed to save OpenAI options" : "Није успело чување OpenAI опција",

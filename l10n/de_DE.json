@@ -32,6 +32,7 @@
     "Generated image" : "Erstelltes Bild",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "Das Remote-Bild kann nicht abgerufen werden. OpenAI hat es möglicherweise gelöscht.",
     "Direct image link" : "Direkter Bildlink",
+    "Your administrator defined a custom service address" : "Ihre Administratorin hat eine benutzerdefinierte Dienstadresse definiert",
     "Leave the API key empty to use the one defined by administrators" : "API-Schlüssel leer lassen, um einen vond er Administration definierten Schlüssel zu verwenden",
     "OpenAI options saved" : "OpenAI-Einstellungen gespeichert",
     "Failed to save OpenAI options" : "Fehler beim Speichern der OpenAI-Einstellungen",

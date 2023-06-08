@@ -32,6 +32,7 @@
     "Generated image" : "Vytvořený obrázek",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "Obrázek se nepodařilo od protějšku získat. V OpenAI ho možná smazali.",
     "Direct image link" : "Přímý odkaz na obrázek",
+    "Your administrator defined a custom service address" : "Správce definoval jím určenou adresu služby",
     "Leave the API key empty to use the one defined by administrators" : "Pokud chcete využít klíč k API, definovaný správci, pak ho zde nevyplňujte",
     "OpenAI options saved" : "Předvolby pro OpenAI uloženy",
     "Failed to save OpenAI options" : "Nepodařilo se uložit předvolby pro OpenAI",
