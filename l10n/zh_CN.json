@@ -32,6 +32,7 @@
     "Generated image" : "已生成的图像",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "远程图像无法获取。OpenAI可能已经把它删除了。",
     "Direct image link" : "图片直链",
+    "Your administrator defined a custom service address" : "您的管理员定义了一个自定义服务地址",
     "Leave the API key empty to use the one defined by administrators" : "将API密钥留空以使用管理员定义的API密钥",
     "OpenAI options saved" : "已保存OpenAI选项",
     "Failed to save OpenAI options" : "保存OpenAI选项失败",
