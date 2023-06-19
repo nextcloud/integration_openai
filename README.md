@@ -7,8 +7,8 @@ This app includes 3 custom smart pickers for Nextcloud:
 
 It also implements
 
-* a Translation provider (using ChatGPT)
-* a SpeechToText provider (using Whisper)
+* A Translation provider (using ChatGPT)
+* A SpeechToText provider (using Whisper)
 
 Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted LocalAI instance.
 
@@ -18,7 +18,7 @@ Instead of connecting to the OpenAI API for these, you can also connect to a sel
 Negative:
 * the software for training and inference of this model is proprietary, limiting running it locally or training by yourself
 * the trained model is not freely available, so the model can not be run on-premises
-* the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
+* the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
 
 
 ### Rating for DALL·E via OpenAI API: 🔴
@@ -33,7 +33,7 @@ Negative:
 
 Positive:
 * the software for training and inferencing of this model is open source
-* the trained model is freely available, and thus can be ran on-premises
+* The trained model is freely available, and thus can run on-premise
 
 Negative:
 * the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
