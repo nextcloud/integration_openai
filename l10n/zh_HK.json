@@ -8,7 +8,6 @@
     "OpenAI's Whisper Speech-To-Text" : "OpenAI 的 Whisper 語音轉文本",
     "OpenAI integration" : "OpenAI 整合",
     "Integration of OpenAI's GPT-3 and DALL·E 2" : "OpenAI的GPT-3與DALL·E 2的整合",
-    "OpenAI integration provides a link reference provider to get\nOpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images." : "OpenAI 集成提供了一個鏈接參考提供程序來獲取\nOpenAI 文本預測（具有許多模型，包括 GPT-3）並生成 DALL·E 2 圖像。",
     "LocalAI URL (leave empty to use openai.com)" : "LocalAI URL（留空以使用 openai.com）",
     "example:" : "例子",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "從 Nextcloud 伺服器的角度來看，這應該是 LocalAI 站台的地址。 這可以是類似 http://localhost:8080 的區域網路 URL",

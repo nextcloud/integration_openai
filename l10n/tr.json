@@ -8,7 +8,6 @@
     "OpenAI's Whisper Speech-To-Text" : "OpenAI Whisper konuşmadan metne",
     "OpenAI integration" : "OpenAI bütünleştirmesi",
     "Integration of OpenAI's GPT-3 and DALL·E 2" : "OpenAI GPT-3 ve DALL·E 2 bütünleştirmesi",
-    "OpenAI integration provides a link reference provider to get\nOpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images." : "OpenAI bütünleştirmesi, OpenAI metin öngörüsü (GPT-3 ile birlikte birçok modelle) almak \nve DALL·E 2 görselleri oluşturmak için bir bağlantı referansı sağlar.",
     "LocalAI URL (leave empty to use openai.com)" : "LocalAI adresi (boş bırakılırsa openai.com kullanılır)",
     "example:" : "örnek:",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "Nextcloud sunucunuz için LocalAI kopyanızın adresi. http://localhost:8080 gibi bir bağlantı noktası olan yerel bir adres olabilir.",

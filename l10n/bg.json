@@ -8,7 +8,6 @@
     "OpenAI's Whisper Speech-To-Text" : "Whisper Speech-To-Text - система за автоматично разпознаване на реч на OpenAI's ",
     "OpenAI integration" : "OpenAI интеграция",
     "Integration of OpenAI's GPT-3 and DALL·E 2" : "Интеграция на системите на OpenAI - GPT-3 и DALL-E 2",
-    "OpenAI integration provides a link reference provider to get\nOpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images." : "Интеграцията на OpenAI осигурява доставчик на препратки за получаване на\nтекстови прогнози с помощта на ОpenAI (с много модели, включително GPT-3) и генериране на изображения чрез DALL-E 2.",
     "OpenAI API key" : "API ключ за OpenAI",
     "your API key" : "вашият API ключ",
     "You can create a free API key in your OpenAI account settings:" : "Можете да създадете безплатен API ключ в настройките на вашият профил в OpenAI:",

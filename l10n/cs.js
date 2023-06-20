@@ -10,7 +10,6 @@ OC.L10N.register(
     "OpenAI's Whisper Speech-To-Text" : "Whisper - převod řeči na text od OpenAI",
     "OpenAI integration" : "Napojení na OpenAI",
     "Integration of OpenAI's GPT-3 and DALL·E 2" : "Napojení na OpenAI GPT-3 a DALL·E 2",
-    "OpenAI integration provides a link reference provider to get\nOpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images." : "Napojení na OpenAI obsahuje poskytovatele pro referování na odkazy pro získávání návrhů textu z OpenAI (s mnoha modely, včetně GPT-3) a vytváření obrázků pomocí DALL·E 2.",
     "LocalAI URL (leave empty to use openai.com)" : "URL místní AI (pokud chcete použít openai.com, nevyplňujte)",
     "example:" : "příklad:",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "Toto by měla být adresa vámi využívané lokální instance AI z pohledu vámi využívaného Nextcloud serveru. Může se jednat o adresu v místní síti a port, jako http://localhost:8080",

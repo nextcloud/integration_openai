@@ -10,7 +10,6 @@ OC.L10N.register(
     "OpenAI's Whisper Speech-To-Text" : "OpenAI的Whisper语音转文本",
     "OpenAI integration" : "OpenAI集成",
     "Integration of OpenAI's GPT-3 and DALL·E 2" : "OpenAI的GPT-3和DALL·E 2集成",
-    "OpenAI integration provides a link reference provider to get\nOpenAI text prediction (with many models including GPT-3) and generate DALL·E 2 images." : "OpenAI集成提供了一个链接参考提供程序来获取\nOpenAI文本预测（具有许多模型，包括GPT-3）并生成DALL·E 2图像.",
     "LocalAI URL (leave empty to use openai.com)" : "LocalAI URL（留空以使用openai.com）",
     "example:" : "例子：",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "从您的Nextcloud服务器的角度来看，这应该是您的LocalAI实例地址。这可以是类似http://localhost:8080的本地网络URL",
