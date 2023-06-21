@@ -31,6 +31,7 @@
     "Generated image" : "Genererad bild",
     "The remote image cannot be fetched. OpenAI might have deleted it." : "Bilden kan inte hämtas. OpenAI kan ha tagit bort den.",
     "Direct image link" : "Direkt bildlänk",
+    "Your administrator defined a custom service address" : "Din administratör har definierat en anpassad service-adress",
     "Leave the API key empty to use the one defined by administrators" : "Lämna API-nyckeln tom för att använda den som definierats av administratörer",
     "OpenAI options saved" : "OpenAI-alternativ sparade",
     "Failed to save OpenAI options" : "Det gick inte att spara OpenAI-alternativ",
