@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "دالة HTTP  غير صحيحة",
     "Bad credentials" : "معلومات تسجيل الدخول غير صحيحة",
     "Connected accounts" : "حسابات مترابطة",
+    "Preview" : "مُعاينة",
     "Advanced options" : "الخيارات المتقدمة",
     "Send" : "إرسال",
     "Unknown error" : "خطأ غير معروف",
