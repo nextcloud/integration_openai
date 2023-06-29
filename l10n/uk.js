@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Bad HTTP method" : "Поганий метод HTTP",
     "Bad credentials" : "Погані облікові дані",
+    "Connected accounts" : "Підключені облікові записи",
     "Advanced options" : "Розширені налаштування",
     "Send" : "Надіслати",
     "Result" : "Результат",
