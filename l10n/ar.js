@@ -18,6 +18,7 @@ OC.L10N.register(
     "Preview" : "مُعاينة",
     "Advanced options" : "الخيارات المتقدمة",
     "Send" : "إرسال",
+    "Result" : "النتيجة",
     "Unknown error" : "خطأ غير معروف",
     "Translate" : "ترجم"
 },
