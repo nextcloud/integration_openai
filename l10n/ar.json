@@ -12,12 +12,22 @@
     "Text generation with the Smart Picker" : "إنشاء نص باستخدام أداة الانتقاء الذكية",
     "Translation provider (to translate Talk messages for example)" : "مزود الترجمة (لترجمة رسائل تطبيق توك \"Talk\"على سبيل المثال)",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "مزود تحويل الكلام إلى نص (لاستكتاب تسجيلات تطبيق توك \"Talk\"على سبيل المثال)",
+    "Loading image" : "تحميل صورة",
+    "Generated image" : "صورة مُولّدة",
+    "Direct image link" : "رابط صورة مباشر",
     "Your administrator defined a custom service address" : "حدد المسؤول الخاص بك عنوان خدمة مخصص",
     "Preview" : "مُعاينة",
+    "Show/hide advanced options" : "إظهار/إخفاء الخيارات المتقدمة",
     "Advanced options" : "الخيارات المتقدمة",
     "Send" : "إرسال",
+    "Regenerate" : "أعِد التوليد",
     "Result" : "النتيجة",
+    "AI image generation" : "توليد صور بال",
+    "Size of the generated images" : "حجم الصور المولّدة",
     "Unknown error" : "خطأ غير معروف",
+    "AI speech-to-text" : "تحويل الكلام إلى نص بالذكاء الصناعي AI speech-to-text",
+    "Transcribe" : "استكتاب Transcribe",
+    "Translate (only to English)" : "الترجمة (فقط إلى الانجليزية) Translate",
     "Translate" : "ترجم"
 },"pluralForm" :"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
 }
