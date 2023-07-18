@@ -24,7 +24,7 @@
 		<span class="title">
 			<OpenAiIcon :size="20" class="icon" />
 			<strong>
-				{{ t('integration_openai', 'OpenAI image generation') + ':' }}
+				{{ t('integration_openai', 'Image generation') + ':' }}
 			</strong>
 			&nbsp;
 			<span v-if="error">

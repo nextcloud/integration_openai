@@ -2,7 +2,7 @@
 	<div id="openai_prefs" class="section">
 		<h2>
 			<OpenAiIcon class="icon" />
-			{{ t('integration_openai', 'OpenAI integration') }}
+			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
 		</h2>
 		<div id="openai-content">
 			<p v-if="state.isCustomService" class="settings-hint">

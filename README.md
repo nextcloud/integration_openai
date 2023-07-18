@@ -1,13 +1,13 @@
 # OpenAI integration in Nextcloud
 
 This app includes 3 custom smart pickers for Nextcloud:
-* ChatGPT answers
-* DALL·E 2 images
+* ChatGPT-like answers
+* Image generation (with DALL·E 2 or LocalAI)
 * Whisper dictation
 
 It also implements
 
-* A Translation provider (using ChatGPT)
+* A Translation provider (using OpenAI's gpt-3.5-turbo)
 * A SpeechToText provider (using Whisper)
 
 Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance.
