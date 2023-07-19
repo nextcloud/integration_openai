@@ -1,60 +1,62 @@
 <template>
-	<div class="openai-picker-content">
-		<h2>
-			{{ t('integration_openai', 'AI speech-to-text') }}
-		</h2>
-		<a class="attribution"
-			target="_blank"
-			href="https://openai.com">
-			{{ poweredByTitle }}
-		</a>
-		<audio-recorder
-			class="recorder"
-			:attempts="1"
-			:time="120"
-			:show-download-button="true"
-			:show-upload-button="false"
-			:after-recording="onRecordEnd" />
-		<div class="form-wrapper">
-			<div class="line justified">
-				<div class="radios">
-					<NcCheckboxRadioSwitch
-						:button-variant="true"
-						:checked.sync="mode"
-						type="radio"
-						value="transcribe"
-						button-variant-grouped="horizontal"
-						name="mode">
-						{{ t('integration_openai', 'Transcribe') }}
-					</NcCheckboxRadioSwitch>
-					<NcCheckboxRadioSwitch
-						:button-variant="true"
-						:checked.sync="mode"
-						type="radio"
-						value="translate"
-						button-variant-grouped="horizontal"
-						name="mode">
-						{{ t('integration_openai', 'Translate (only to English)') }}
-					</NcCheckboxRadioSwitch>
+	<div class="openai-picker-content-wrapper">
+		<div class="openai-picker-content">
+			<h2>
+				{{ t('integration_openai', 'AI speech-to-text') }}
+			</h2>
+			<a class="attribution"
+				target="_blank"
+				href="https://openai.com">
+				{{ poweredByTitle }}
+			</a>
+			<audio-recorder
+				class="recorder"
+				:attempts="1"
+				:time="120"
+				:show-download-button="true"
+				:show-upload-button="false"
+				:after-recording="onRecordEnd" />
+			<div class="form-wrapper">
+				<div class="line justified">
+					<div class="radios">
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:checked.sync="mode"
+							type="radio"
+							value="transcribe"
+							button-variant-grouped="horizontal"
+							name="mode">
+							{{ t('integration_openai', 'Transcribe') }}
+						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:checked.sync="mode"
+							type="radio"
+							value="translate"
+							button-variant-grouped="horizontal"
+							name="mode">
+							{{ t('integration_openai', 'Translate (only to English)') }}
+						</NcCheckboxRadioSwitch>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="footer">
-			<span v-if="error" class="error">
-				{{ error }}
-			</span>
-			<NcButton
-				type="primary"
-				:aria-label="submitButtonLabel"
-				:disabled="loading || audio === null"
-				@click="onInputEnter">
-				<template #icon>
-					<NcLoadingIcon v-if="loading"
-						:size="20" />
-					<ArrowRightIcon v-else />
-				</template>
-				{{ submitButtonLabel }}
-			</NcButton>
+			<div class="footer">
+				<span v-if="error" class="error">
+					{{ error }}
+				</span>
+				<NcButton
+					type="primary"
+					:aria-label="submitButtonLabel"
+					:disabled="loading || audio === null"
+					@click="onInputEnter">
+					<template #icon>
+						<NcLoadingIcon v-if="loading"
+							:size="20" />
+						<ArrowRightIcon v-else />
+					</template>
+					{{ submitButtonLabel }}
+				</NcButton>
+			</div>
 		</div>
 	</div>
 </template>
@@ -174,8 +176,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.openai-picker-content {
+.openai-picker-content-wrapper {
 	width: 100%;
+}
+
+.openai-picker-content {
 	display: flex;
 	flex-direction: column;
 	align-items: center;

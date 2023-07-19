@@ -1,102 +1,104 @@
 <template>
-	<div class="dalle-picker-content">
-		<h2>
-			{{ t('integration_openai', 'AI image generation') }}
-		</h2>
-		<a class="attribution"
-			target="_blank"
-			href="https://openai.com/dall-e-2/">
-			{{ poweredByTitle }}
-		</a>
-		<div class="input-wrapper">
-			<NcTextField
-				ref="dalle-search-input"
-				:value.sync="query"
-				:label="inputPlaceholder"
-				:disabled="loading"
-				:show-trailing-button="!!query"
-				@keydown.enter="generate"
-				@trailing-button-click="query = ''" />
-		</div>
-		<div v-if="reference === null || query === ''"
-			class="prompts">
-			<NcUserBubble v-for="p in prompts"
-				:key="p.id + p.value"
-				class="prompt-bubble"
-				:title="p.value"
-				:size="30"
-				avatar-image="icon-history"
-				:display-name="p.value"
-				@click="query = p.value" />
-		</div>
-		<ImageReferenceWidget v-if="reference !== null"
-			:rich-object="reference.richObject"
-			orientation="horizontal" />
-		<div class="footer">
-			<NcButton class="advanced-button"
-				type="tertiary"
-				:aria-label="t('integration_openai', 'Show/hide advanced options')"
-				@click="showAdvanced = !showAdvanced">
-				<template #icon>
-					<component :is="showAdvancedIcon" />
-				</template>
-				{{ t('integration_openai', 'Advanced options') }}
-			</NcButton>
-			<NcButton
-				type="secondary"
-				:aria-label="t('integration_openai', 'Preview images with OpenAI')"
-				:disabled="loading || !query"
-				@click="generate">
-				{{ previewButtonLabel }}
-				<template #icon>
-					<NcLoadingIcon v-if="loading" />
-					<RefreshIcon v-else-if="resultUrl !== null" />
-					<EyeIcon v-else />
-				</template>
-			</NcButton>
-			<NcButton v-if="resultUrl !== null"
-				type="primary"
-				:aria-label="t('integration_openai', 'Submit the current preview')"
-				:disabled="loading"
-				@click="submit">
-				{{ t('integration_openai', 'Send') }}
-				<template #icon>
-					<ArrowRightIcon />
-				</template>
-			</NcButton>
-		</div>
-		<div v-show="showAdvanced" class="advanced">
-			<div class="line">
-				<label for="number">
-					{{ t('integration_openai', 'Number of images to generate (1-10)') }}
-				</label>
-				<div class="spacer" />
-				<input
-					id="number"
-					v-model="imageNumber"
-					type="number"
-					min="1"
-					max="10"
-					step="1">
+	<div class="dalle-picker-content-wrapper">
+		<div class="dalle-picker-content">
+			<h2>
+				{{ t('integration_openai', 'AI image generation') }}
+			</h2>
+			<a class="attribution"
+				target="_blank"
+				href="https://openai.com/dall-e-2/">
+				{{ poweredByTitle }}
+			</a>
+			<div class="input-wrapper">
+				<NcTextField
+					ref="dalle-search-input"
+					:value.sync="query"
+					:label="inputPlaceholder"
+					:disabled="loading"
+					:show-trailing-button="!!query"
+					@keydown.enter="generate"
+					@trailing-button-click="query = ''" />
 			</div>
-			<div class="line">
-				<label for="size">
-					{{ t('integration_openai', 'Size of the generated images') }}
-				</label>
-				<div class="spacer" />
-				<select
-					id="size"
-					v-model="imageSize">
-					<option value="256x256">
-						256x256 px
-					</option>
-					<option value="512x512">
-						512x512 px
-					</option>
-					<option value="1024x1024">
-						1024x1024 px
-					</option>
-				</select>
+			<div v-if="reference === null || query === ''"
+				class="prompts">
+				<NcUserBubble v-for="p in prompts"
+					:key="p.id + p.value"
+					class="prompt-bubble"
+					:title="p.value"
+					:size="30"
+					avatar-image="icon-history"
+					:display-name="p.value"
+					@click="query = p.value" />
+			</div>
+			<ImageReferenceWidget v-if="reference !== null"
+				:rich-object="reference.richObject"
+				orientation="horizontal" />
+			<div class="footer">
+				<NcButton class="advanced-button"
+					type="tertiary"
+					:aria-label="t('integration_openai', 'Show/hide advanced options')"
+					@click="showAdvanced = !showAdvanced">
+					<template #icon>
+						<component :is="showAdvancedIcon" />
+					</template>
+					{{ t('integration_openai', 'Advanced options') }}
+				</NcButton>
+				<NcButton
+					type="secondary"
+					:aria-label="t('integration_openai', 'Preview images with OpenAI')"
+					:disabled="loading || !query"
+					@click="generate">
+					{{ previewButtonLabel }}
+					<template #icon>
+						<NcLoadingIcon v-if="loading" />
+						<RefreshIcon v-else-if="resultUrl !== null" />
+						<EyeIcon v-else />
+					</template>
+				</NcButton>
+				<NcButton v-if="resultUrl !== null"
+					type="primary"
+					:aria-label="t('integration_openai', 'Submit the current preview')"
+					:disabled="loading"
+					@click="submit">
+					{{ t('integration_openai', 'Send') }}
+					<template #icon>
+						<ArrowRightIcon />
+					</template>
+				</NcButton>
+			</div>
+			<div v-show="showAdvanced" class="advanced">
+				<div class="line">
+					<label for="number">
+						{{ t('integration_openai', 'Number of images to generate (1-10)') }}
+					</label>
+					<div class="spacer" />
+					<input
+						id="number"
+						v-model="imageNumber"
+						type="number"
+						min="1"
+						max="10"
+						step="1">
+				</div>
+				<div class="line">
+					<label for="size">
+						{{ t('integration_openai', 'Size of the generated images') }}
+					</label>
+					<div class="spacer" />
+					<select
+						id="size"
+						v-model="imageSize">
+						<option value="256x256">
+							256x256 px
+						</option>
+						<option value="512x512">
+							512x512 px
+						</option>
+						<option value="1024x1024">
+							1024x1024 px
+						</option>
+					</select>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -288,8 +290,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.dalle-picker-content {
+.dalle-picker-content-wrapper {
 	width: 100%;
+}
+
+.dalle-picker-content {
 	display: flex;
 	flex-direction: column;
 	align-items: center;

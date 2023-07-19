@@ -2,7 +2,7 @@
 	<div id="openai_prefs" class="section">
 		<h2>
 			<OpenAiIcon class="icon" />
-			{{ t('integration_openai', 'OpenAI integration') }}
+			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
 		</h2>
 		<div id="openai-content">
 			<div class="line">
@@ -25,7 +25,7 @@
 			<div class="line">
 				<label for="openai-api-key">
 					<KeyIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'OpenAI API key') }}
+					{{ t('integration_openai', 'API key (optional with LocalAI)') }}
 				</label>
 				<input id="openai-api-key"
 					v-model="state.api_key"
@@ -37,7 +37,7 @@
 			</div>
 			<p v-show="state.url === ''" class="settings-hint">
 				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
+				{{ t('integration_openai', 'You can create an API key in your OpenAI account settings:') }}
 				&nbsp;
 				<a :href="apiKeyUrl" target="_blank" class="external">
 					{{ apiKeyUrl }}
@@ -56,8 +56,19 @@
 					:no-wrap="true"
 					input-id="openai-model-select"
 					@input="onModelSelected" />
-				<a :title="t('integration_openai', 'More information about OpenAI models')"
+				<a v-if="state.url === ''"
+					:title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
+					target="_blank">
+					<NcButton type="tertiary">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</a>
+				<a v-else
+					:title="t('integration_openai', 'More information about LocalAI models')"
+					href="https://localai.io/model-compatibility/index.html"
 					target="_blank">
 					<NcButton type="tertiary">
 						<template #icon>
@@ -168,7 +179,7 @@ export default {
 	},
 
 	mounted() {
-		if (this.state.api_key) {
+		if (this.configured) {
 			this.getModels()
 		}
 	},
@@ -210,7 +221,7 @@ export default {
 					url: this.state.url,
 				}).then(() => {
 					this.models = null
-					if (this.state.api_key) {
+					if (this.configured) {
 						this.getModels()
 					}
 				})
