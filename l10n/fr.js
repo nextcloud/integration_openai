@@ -4,8 +4,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Mauvaise méthode HTTP",
     "Bad credentials" : "Identifiants incorrects",
     "Connected accounts" : "Comptes connectés",
-    "OpenAI integration" : "Intégration OpenAI",
-    "OpenAI image generation" : "Génération d'image avec OpenAI",
     "Open image in a new tab" : "Ouvrir l'image dans un nouvel onglet",
     "Loading image" : "Chargement de l'image",
     "Generated image" : "Image générée",

@@ -4,7 +4,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Neustrezen način HTTP",
     "Bad credentials" : "Neustrezna poverila",
     "Connected accounts" : "Povezani računi",
-    "OpenAI integration" : "Združevalnik OpenAI",
     "your API key" : "vaš ključ API",
     "Preview" : "Predogled",
     "Advanced options" : "Napredne možnosti",
