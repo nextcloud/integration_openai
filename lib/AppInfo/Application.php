@@ -16,6 +16,7 @@ use OCA\OpenAi\Reference\WhisperReferenceProvider;
 use OCA\OpenAi\SpeechToText\STTProvider;
 use OCA\OpenAi\TextProcessing\FreePromptProvider;
 use OCA\OpenAi\TextProcessing\HeadlineProvider;
+use OCA\OpenAi\TextProcessing\ReformulateProvider;
 use OCA\OpenAi\TextProcessing\SummaryProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
@@ -68,6 +69,7 @@ class Application extends App implements IBootstrap {
 		$context->registerTextProcessingProvider(FreePromptProvider::class);
 		$context->registerTextProcessingProvider(SummaryProvider::class);
 		$context->registerTextProcessingProvider(HeadlineProvider::class);
+		$context->registerTextProcessingProvider(ReformulateProvider::class);
 
 		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '27.0.0', '>=')) {
 			if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
