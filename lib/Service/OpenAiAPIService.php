@@ -278,7 +278,7 @@ class OpenAiAPIService {
 
 	/**
 	 * Make an HTTP request to the OpenAI API
-	 * @param string $userId
+	 * @param string|null $userId
 	 * @param string $endPoint The path to reach
 	 * @param array $params Query parameters (key/val pairs)
 	 * @param string $method HTTP query method
@@ -286,7 +286,7 @@ class OpenAiAPIService {
 	 * @param int $timeout
 	 * @return array decoded request result or error
 	 */
-	public function request(string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, int $timeout = 60): array {
+	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, int $timeout = 60): array {
 		try {
 			$serviceUrl = $this->config->getAppValue(Application::APP_ID, 'url', Application::OPENAI_API_BASE_URL) ?: Application::OPENAI_API_BASE_URL;
 
@@ -300,7 +300,9 @@ class OpenAiAPIService {
 
 			// an API key is mandatory when using OpenAI
 			$adminApiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
-			$apiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key', $adminApiKey) ?: $adminApiKey;
+			$apiKey = $userId === null
+				? $adminApiKey
+				: ($this->config->getUserValue($userId, Application::APP_ID, 'api_key', $adminApiKey) ?: $adminApiKey);
 			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
 				return ['error' => 'An API key is required for api.openai.com'];
 			}
