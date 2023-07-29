@@ -8,6 +8,8 @@ OC.L10N.register(
     "Bad credentials" : "Nesprávné přihlašovací údaje",
     "Connected accounts" : "Propojené účty",
     "OpenAI's Whisper Speech-To-Text" : "Whisper - převod řeči na text od OpenAI",
+    "Reformulate" : "Přeformulovat",
+    "Formulate text in a different way." : "Formulovat text jinak.",
     "OpenAI and LocalAI integration" : "Napojení na OpenAI a LocalAI",
     "Integration of OpenAI and LocalAI services" : "Napojení na služby OpenAI a LocalAI",
     "LocalAI URL (leave empty to use openai.com)" : "URL místní AI (pokud chcete použít openai.com, nevyplňujte)",

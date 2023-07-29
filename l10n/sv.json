@@ -6,6 +6,8 @@
     "Bad credentials" : "Ogiltiga inloggningsuppgifter",
     "Connected accounts" : "Anslutna konton",
     "OpenAI's Whisper Speech-To-Text" : "OpenAI:s Whisper Tal-Till-Text",
+    "Reformulate" : "Omformulera",
+    "Formulate text in a different way." : "Formulera text på ett annat sätt.",
     "OpenAI and LocalAI integration" : "OpenAI och LocalAI integration",
     "Integration of OpenAI and LocalAI services" : "Integration av OpenAI och LocalAI-tjänster",
     "LocalAI URL (leave empty to use openai.com)" : "LokalAI URL (låt vara tomt för att använda openai.com)",
