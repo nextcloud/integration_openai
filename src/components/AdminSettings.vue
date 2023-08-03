@@ -207,6 +207,9 @@ export default {
 				})
 		},
 		onModelSelected(selected) {
+			if (selected === null) {
+				return
+			}
 			this.state.default_completion_model_id = selected.id
 			this.saveOptions({ default_completion_model_id: this.state.default_completion_model_id })
 		},
@@ -222,19 +225,24 @@ export default {
 				}).then(() => {
 					this.models = null
 					if (this.configured) {
-						this.getModels()
+						this.getModels().then(() => {
+							const selectedModelId = this.selectedModel?.id ?? ''
+							this.saveOptions({ default_completion_model_id: selectedModelId }, false)
+						})
 					}
 				})
 			}, 2000)()
 		},
-		saveOptions(values) {
+		saveOptions(values, notify = true) {
 			const req = {
 				values,
 			}
 			const url = generateUrl('/apps/integration_openai/admin-config')
 			return axios.put(url, req)
 				.then((response) => {
-					showSuccess(t('integration_openai', 'OpenAI admin options saved'))
+					if (notify) {
+						showSuccess(t('integration_openai', 'OpenAI admin options saved'))
+					}
 				})
 				.catch((error) => {
 					showError(
