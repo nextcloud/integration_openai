@@ -6,6 +6,7 @@ namespace OCA\OpenAi\TextProcessing;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IConfig;
+use OCP\IL10N;
 use OCP\TextProcessing\IProvider;
 use OCP\TextProcessing\SummaryTaskType;
 
@@ -14,11 +15,14 @@ class SummaryProvider implements IProvider {
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,
+		private IL10N $l10n,
 	) {
 	}
 
 	public function getName(): string {
-		return 'OpenAI/LocalAI integration';
+		return $this->openAiAPIService->isUsingOpenAi()
+			? $this->l10n->t('OpenAI integration')
+			: $this->l10n->t('LocalAI integration');
 	}
 
 	public function process(string $prompt): string {

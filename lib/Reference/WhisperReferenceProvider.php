@@ -22,6 +22,7 @@
 
 namespace OCA\OpenAi\Reference;
 
+use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OC\Collaboration\Reference\ReferenceManager;
 use OCA\OpenAi\AppInfo\Application;
@@ -34,10 +35,13 @@ class WhisperReferenceProvider extends ADiscoverableReferenceProvider  {
 
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_whisper';
 
-	public function __construct(private IL10N $l10n,
-								private IURLGenerator $urlGenerator,
-								private ReferenceManager $referenceManager,
-								?string $userId) {
+	public function __construct(
+		private IL10N $l10n,
+		private IURLGenerator $urlGenerator,
+		private ReferenceManager $referenceManager,
+		private OpenAiAPIService $openAiAPIService,
+		?string $userId
+	) {
 	}
 
 	/**
@@ -51,7 +55,9 @@ class WhisperReferenceProvider extends ADiscoverableReferenceProvider  {
 	 * @inheritDoc
 	 */
 	public function getTitle(): string {
-		return $this->l10n->t('AI speech-to-text (Whisper via OpenAI)');
+		return $this->openAiAPIService->isUsingOpenAi()
+			? $this->l10n->t('AI speech-to-text (Whisper via OpenAI)')
+			: $this->l10n->t('AI speech-to-text (Whisper via LocalAI)');
 	}
 
 	/**

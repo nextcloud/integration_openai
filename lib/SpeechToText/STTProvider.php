@@ -25,7 +25,9 @@ class STTProvider implements ISpeechToTextProvider {
 	 * @inheritDoc
 	 */
 	public function getName(): string {
-		return $this->l->t('OpenAI\'s Whisper Speech-To-Text');
+		return $this->openAiAPIService->isUsingOpenAi()
+			? $this->l->t('OpenAI\'s Whisper Speech-To-Text')
+			: $this->l->t('LocalAI\'s Whisper Speech-To-Text');
 	}
 
 	/**

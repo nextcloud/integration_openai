@@ -51,7 +51,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 	}
 
 	public function getName(): string {
-		return 'OpenAI/LocalAI';
+		return $this->openAiAPIService->isUsingOpenAi() ? 'OpenAI' : 'LocalAI';
 	}
 
 	public function getAvailableLanguages(): array {

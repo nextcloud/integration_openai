@@ -35,10 +35,12 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_image';
 
-	public function __construct(private OpenAiAPIService $openAiAPIService,
-								private IL10N $l10n,
-								private IURLGenerator $urlGenerator,
-								?string $userId) {
+	public function __construct(
+		private OpenAiAPIService $openAiAPIService,
+		private IL10N $l10n,
+		private IURLGenerator $urlGenerator,
+		?string $userId
+	) {
 	}
 
 	/**
@@ -52,7 +54,9 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider  {
 	 * @inheritDoc
 	 */
 	public function getTitle(): string {
-		return $this->l10n->t('AI image generation (by OpenAI Dall-E 2)');
+		return $this->openAiAPIService->isUsingOpenAi()
+			? $this->l10n->t('AI image generation (by OpenAI Dall-E 2)')
+			: $this->l10n->t('AI image generation (with LocalAI)');
 	}
 
 	/**

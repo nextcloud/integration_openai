@@ -52,6 +52,13 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isUsingOpenAi(): bool {
+		return $this->config->getAppValue(Application::APP_ID, 'url') === '';
+	}
+
+	/**
 	 * @param string $userId
 	 * @return array|string[]
 	 */

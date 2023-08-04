@@ -22,6 +22,7 @@
 
 namespace OCA\OpenAi\Reference;
 
+use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\Reference;
 use OC\Collaboration\Reference\ReferenceManager;
@@ -35,10 +36,13 @@ class ChatGptReferenceProvider extends ADiscoverableReferenceProvider  {
 
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_chatgpt_internal_link';
 
-	public function __construct(private IL10N $l10n,
-								private IURLGenerator $urlGenerator,
-								private ReferenceManager $referenceManager,
-								private ?string $userId) {
+	public function __construct(
+		private IL10N $l10n,
+		private IURLGenerator $urlGenerator,
+		private ReferenceManager $referenceManager,
+		private OpenAiAPIService $openAiAPIService,
+		private ?string $userId
+	) {
 	}
 
 	/**
@@ -52,7 +56,9 @@ class ChatGptReferenceProvider extends ADiscoverableReferenceProvider  {
 	 * @inheritDoc
 	 */
 	public function getTitle(): string {
-		return $this->l10n->t('ChatGPT-like text generation (by OpenAI)');
+		return $this->openAiAPIService->isUsingOpenAi()
+			? $this->l10n->t('ChatGPT-like text generation (by OpenAI)')
+			: $this->l10n->t('ChatGPT-like text generation (with LocalAI)');
 	}
 
 	/**
