@@ -16,6 +16,8 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -38,10 +40,9 @@ class OpenAiAPIController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @return DataResponse
 	 */
+	#[NoAdminRequired]
 	public function getModels(): DataResponse {
 		$response = $this->openAiAPIService->getModels($this->userId);
 		if (isset($response['error'])) {
@@ -52,12 +53,11 @@ class OpenAiAPIController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param int $type
 	 * @return DataResponse
 	 * @throws Exception
 	 */
+	#[NoAdminRequired]
 	public function getPromptHistory(int $type): DataResponse {
 		$response = $this->openAiAPIService->getPromptHistory($this->userId, $type);
 		if (isset($response['error'])) {
@@ -67,8 +67,6 @@ class OpenAiAPIController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string|null $model
@@ -76,6 +74,7 @@ class OpenAiAPIController extends Controller {
 	 * @return DataResponse
 	 * @throws Exception
 	 */
+	#[NoAdminRequired]
 	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse {
 		if ($model === null) {
 			$model = $this->openAiAPIService->getUserDefaultCompletionModelId($this->userId);
@@ -92,12 +91,11 @@ class OpenAiAPIController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param string $audioBase64
 	 * @param bool $translate
 	 * @return DataResponse
 	 */
+	#[NoAdminRequired]
 	public function transcribe(string $audioBase64, bool $translate = true): DataResponse {
 		$response = $this->openAiAPIService->transcribeBase64Mp3($this->userId, $audioBase64, $translate);
 		if (isset($response['error'])) {
@@ -107,14 +105,13 @@ class OpenAiAPIController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 *
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $size
 	 * @return DataResponse
 	 * @throws Exception
 	 */
+	#[NoAdminRequired]
 	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse {
 		$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
 		if (isset($response['error'])) {
@@ -124,9 +121,6 @@ class OpenAiAPIController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param string $hash
 	 * @param int $urlId
 	 * @return DataDisplayResponse
@@ -134,6 +128,8 @@ class OpenAiAPIController extends Controller {
 	 * @throws MultipleObjectsReturnedException
 	 * @throws Exception
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse {
 		$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
 		if ($image !== null && isset($image['body'], $image['headers'])) {
@@ -149,14 +145,13 @@ class OpenAiAPIController extends Controller {
 	}
 
 	/**
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
 	 * @param string $hash
 	 * @return TemplateResponse
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
 	public function getImageGenerationPage(string $hash): TemplateResponse {
 		$generationData = $this->openAiAPIService->getGenerationInfo($hash);
 		$this->initialStateService->provideInitialState('generation', $generationData);
