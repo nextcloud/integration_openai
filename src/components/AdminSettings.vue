@@ -204,7 +204,10 @@ export default {
 					this.models = response.data?.data
 					const defaultModelId = this.state.default_completion_model_id ?? response.data?.default_completion_model_id
 					const defaultModel = this.models.find(m => m.id === defaultModelId)
-					const modelToSelect = defaultModel ?? this.models[0] ?? null
+					const modelToSelect = defaultModel
+						?? this.models.find(m => m.id === 'gpt-3.5-turbo')
+						?? this.models[0]
+						?? null
 					if (modelToSelect) {
 						this.selectedModel = {
 							id: modelToSelect.id,
