@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.12 – 2023-08-04
+
+### Added
+
+- implement text processing providers (summarize, outline, free prompt and custom reformulate) @julien-nc
+- admin setting to choose the API request timeout @julien-nc
+
+### Fixed
+
+- fix scrolling in the picker components @julien-nc
+- allow usgin LocalAI without an API key @julien-nc
+- save new admin default llm model when switching between OpenAI and LocalAI @julien-nc
+
 ## 1.0.11 – 2023-07-12
 
 ### Added
