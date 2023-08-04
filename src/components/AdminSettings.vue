@@ -77,6 +77,16 @@
 					</NcButton>
 				</a>
 			</div>
+			<div class="line">
+				<label for="openai-api-timeout">
+					<TimerAlertOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Request timeout (seconds)') }}
+				</label>
+				<input id="openai-api-timeout"
+					v-model="state.request_timeout"
+					type="number"
+					@input="onInput(false)">
+			</div>
 			<div>
 				<h3>
 					{{ t('integration_openai', 'Select which features you want to enable') }}
@@ -112,6 +122,7 @@
 </template>
 
 <script>
+import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
@@ -137,6 +148,7 @@ export default {
 		KeyIcon,
 		EarthIcon,
 		InformationOutlineIcon,
+		TimerAlertOutlineIcon,
 		HelpCircleIcon,
 		NcButton,
 		NcSelect,
@@ -217,18 +229,21 @@ export default {
 			this.state[key] = newValue
 			this.saveOptions({ [key]: this.state[key] ? '1' : '0' })
 		},
-		onInput() {
+		onInput(getModels = true) {
 			delay(() => {
 				this.saveOptions({
 					api_key: this.state.api_key,
 					url: this.state.url,
+					request_timeout: this.state.request_timeout,
 				}).then(() => {
-					this.models = null
-					if (this.configured) {
-						this.getModels().then(() => {
-							const selectedModelId = this.selectedModel?.id ?? ''
-							this.saveOptions({ default_completion_model_id: selectedModelId }, false)
-						})
+					if (getModels) {
+						this.models = null
+						if (this.configured) {
+							this.getModels().then(() => {
+								const selectedModelId = this.selectedModel?.id ?? ''
+								this.saveOptions({ default_completion_model_id: selectedModelId }, false)
+							})
+						}
 					}
 				})
 			}, 2000)()

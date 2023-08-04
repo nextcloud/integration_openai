@@ -22,6 +22,7 @@ class Admin implements ISettings {
 		$apiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
 		$defaultAdminCompletionModelId = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 		$serviceUrl = $this->config->getAppValue(Application::APP_ID, 'url');
+		$requestTimeout = $this->config->getAppValue(Application::APP_ID, 'request_timeout', Application::OPENAI_DEFAULT_REQUEST_TIMEOUT) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
 
 		$whisperPickerEnabled = $this->config->getAppValue(Application::APP_ID, 'whisper_picker_enabled', '1') === '1';
 		$imagePickerEnabled = $this->config->getAppValue(Application::APP_ID, 'image_picker_enabled', '1') === '1';
@@ -30,6 +31,7 @@ class Admin implements ISettings {
 		$sttProviderEnabled = $this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
 
 		$adminConfig = [
+			'request_timeout' => $requestTimeout,
 			'url' => $serviceUrl,
 			'api_key' => $apiKey,
 			'default_completion_model_id' => $defaultAdminCompletionModelId,

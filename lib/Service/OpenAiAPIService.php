@@ -283,12 +283,13 @@ class OpenAiAPIService {
 	 * @param array $params Query parameters (key/val pairs)
 	 * @param string $method HTTP query method
 	 * @param string|null $contentType
-	 * @param int $timeout
 	 * @return array decoded request result or error
 	 */
-	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, int $timeout = 60): array {
+	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
 		try {
 			$serviceUrl = $this->config->getAppValue(Application::APP_ID, 'url', Application::OPENAI_API_BASE_URL) ?: Application::OPENAI_API_BASE_URL;
+			$timeout = $this->config->getAppValue(Application::APP_ID, 'request_timeout', Application::OPENAI_DEFAULT_REQUEST_TIMEOUT) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+			$timeout = (int) $timeout;
 
 			$url = $serviceUrl . '/v1/' . $endPoint;
 			$options = [
@@ -366,16 +367,16 @@ class OpenAiAPIService {
 			$responseBody = $e->getResponse()->getBody();
 			$parsedResponseBody = json_decode($responseBody, true);
 			if ($e->getResponse()->getStatusCode() === 404) {
-				$this->logger->debug('OpenAI API error : ' . $e->getMessage(), ['response_body' => $responseBody, 'app' => Application::APP_ID]);
+				$this->logger->debug('OpenAI API error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 			} else {
-				$this->logger->warning('OpenAI API error : ' . $e->getMessage(), ['response_body' => $responseBody, 'app' => Application::APP_ID]);
+				$this->logger->warning('OpenAI API error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 			}
 			return [
 				'error' => $e->getMessage(),
 				'body' => $parsedResponseBody,
 			];
 		} catch (Exception | Throwable $e) {
-			$this->logger->warning('OpenAI API error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			$this->logger->warning('OpenAI API error : ' . $e->getMessage(), ['exception' => $e]);
 			return ['error' => $e->getMessage()];
 		}
 	}
