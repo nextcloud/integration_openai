@@ -86,7 +86,6 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
         <developer>https://github.com/nextcloud/integration_openai</developer>
     </documentation>
     <category>integration</category>
-    <category>dashboard</category>
     <website>https://github.com/nextcloud/integration_openai</website>
     <bugs>https://github.com/nextcloud/integration_openai/issues</bugs>
     <screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot1.jpg</screenshot>
