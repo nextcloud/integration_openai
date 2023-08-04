@@ -9,6 +9,7 @@
 
 namespace OCA\OpenAi\AppInfo;
 
+use OCA\OpenAi\Capabilities;
 use OCA\OpenAi\Listener\OpenAiReferenceListener;
 use OCA\OpenAi\Reference\ChatGptReferenceProvider;
 use OCA\OpenAi\Reference\ImageReferenceProvider;
@@ -77,6 +78,7 @@ class Application extends App implements IBootstrap {
 				$context->registerSpeechToTextProvider(STTProvider::class);
 			}
 		}
+		$context->registerCapability(Capabilities::class);
 	}
 
 	public function boot(IBootContext $context): void {

@@ -6,7 +6,7 @@
 			</h2>
 			<a class="attribution"
 				target="_blank"
-				href="https://openai.com">
+				:href="poweredByUrl">
 				{{ poweredByTitle }}
 			</a>
 			<audio-recorder
@@ -100,7 +100,8 @@ export default {
 	data() {
 		return {
 			loading: false,
-			poweredByTitle: t('integration_openai', 'by OpenAI with Whisper'),
+			poweredByTitle: '',
+			poweredByUrl: '',
 			mode: 'transcribe',
 			audio: null,
 			error: null,
@@ -119,6 +120,13 @@ export default {
 	},
 
 	mounted() {
+		const capabilities = OC.getCapabilities()?.integration_openai
+		this.poweredByTitle = capabilities.uses_openai
+			? t('integration_openai', 'by OpenAI with Whisper')
+			: t('integration_openai', 'by LocalAI')
+		this.poweredByUrl = capabilities.uses_openai
+			? 'https://platform.openai.com/docs/models/whisper'
+			: 'https://localai.io/features/audio-to-text/'
 	},
 
 	methods: {

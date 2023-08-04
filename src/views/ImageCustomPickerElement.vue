@@ -6,7 +6,7 @@
 			</h2>
 			<a class="attribution"
 				target="_blank"
-				href="https://openai.com/dall-e-2/">
+				:href="poweredByUrl">
 				{{ poweredByTitle }}
 			</a>
 			<div class="input-wrapper">
@@ -158,7 +158,8 @@ export default {
 			resultUrl: null,
 			reference: null,
 			inputPlaceholder: t('integration_openai', 'cyberpunk pizza with pineapple, cats fighting with lightsabers'),
-			poweredByTitle: t('integration_openai', 'by OpenAI with DALL·E 2'),
+			poweredByTitle: '',
+			poweredByUrl: '',
 			showAdvanced: false,
 			imageNumber: 1,
 			imageSize: '1024x1024',
@@ -186,6 +187,14 @@ export default {
 		this.focusOnInput()
 		this.getPromptHistory()
 		this.getLastImageSize()
+
+		const capabilities = OC.getCapabilities()?.integration_openai
+		this.poweredByTitle = capabilities.uses_openai
+			? t('integration_openai', 'by OpenAI with DALL·E 2')
+			: t('integration_openai', 'by LocalAI')
+		this.poweredByUrl = capabilities.uses_openai
+			? 'https://openai.com/dall-e-2'
+			: 'https://localai.io/features/image-generation/'
 	},
 
 	methods: {

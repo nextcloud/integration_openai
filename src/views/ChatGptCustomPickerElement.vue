@@ -6,7 +6,7 @@
 			</h2>
 			<a class="attribution"
 				target="_blank"
-				href="https://openai.com">
+				:href="poweredByUrl">
 				{{ poweredByTitle }}
 			</a>
 			<div class="input-wrapper">
@@ -191,7 +191,8 @@ export default {
 			loading: false,
 			models: [],
 			inputPlaceholder: t('integration_openai', 'What is the matter with putting pineapple on pizza?'),
-			poweredByTitle: t('integration_openai', 'by OpenAI'),
+			poweredByTitle: '',
+			poweredByUrl: '',
 			modelPlaceholder: t('integration_openai', 'Choose a model'),
 			showAdvanced: false,
 			selectedModel: null,
@@ -237,6 +238,14 @@ export default {
 		this.focusOnInput()
 		this.getModels()
 		this.getPromptHistory()
+
+		const capabilities = OC.getCapabilities()?.integration_openai
+		this.poweredByTitle = capabilities.uses_openai
+			? t('integration_openai', 'by OpenAI')
+			: t('integration_openai', 'by LocalAI')
+		this.poweredByUrl = capabilities.uses_openai
+			? 'https://openai.com'
+			: 'https://localai.io/features/text-generation/'
 	},
 
 	methods: {
