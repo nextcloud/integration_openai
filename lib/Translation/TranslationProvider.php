@@ -30,6 +30,7 @@ use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\ICacheFactory;
+use OCP\IConfig;
 use OCP\L10N\IFactory;
 use OCP\Translation\IDetectLanguageProvider;
 use OCP\Translation\ITranslationProvider;
@@ -44,12 +45,13 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		private IFactory $l10nFactory,
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
+		private IConfig $config,
 		private ?string $userId
 	) {
 	}
 
 	public function getName(): string {
-		return 'OpenAI\'s ChatGpt 3.5';
+		return 'OpenAI/LocalAI';
 	}
 
 	public function getAvailableLanguages(): array {
@@ -83,7 +85,8 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 
 	public function detectLanguage(string $text): ?string {
 		$prompt = 'What language is this (answer with the language name only, in English): ' . $text;
-		$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, 'gpt-3.5-turbo', 100, false);
+		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
 		if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
 			$choice = $completion['choices'][0];
 			if (isset($choice['message'], $choice['message']['content'])) {
@@ -122,7 +125,8 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 				$this->logger->debug('OpenAI translation TO['.$toLanguage.']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $text;
 			}
-			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, 'gpt-3.5-turbo', 4000, false);
+			$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);
 			if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
 				$choice = $completion['choices'][0];
 				if (isset($choice['message'], $choice['message']['content'])) {

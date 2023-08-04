@@ -7,7 +7,7 @@ This app includes 3 custom smart pickers for Nextcloud:
 
 It also implements
 
-* A Translation provider (using OpenAI's gpt-3.5-turbo)
+* A Translation provider (using any available language model)
 * A SpeechToText provider (using Whisper)
 
 Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance.
