@@ -37,9 +37,9 @@ OC.L10N.register(
     "Model to use" : "Модел за използване",
     "Approximate maximum number of words to generate (tokens)" : "Приблизителен максимален брой думи за генериране (токени)",
     "What is the matter with putting pineapple on pizza?" : "Какъв е проблемът с добавянето на ананас върху пицата?",
-    "by OpenAI" : "от OpenAI",
     "Choose a model" : "Избор на модел",
     "Regenerate" : "Регенериране",
+    "by OpenAI" : "от OpenAI",
     "Failed to save OpenAI default model ID" : "Неуспешно записване на идентификатора на OpenAI модел по подразбиране",
     "OpenAI error" : "Грешка на OpenAI",
     "Unknown OpenAI API error" : "Неизвестна грешка на API на OpenAI",
@@ -57,8 +57,8 @@ OC.L10N.register(
     "AI speech-to-text" : "AI от реч към текст",
     "Transcribe" : "Транскрибиране",
     "Translate (only to English)" : "Превод (само на английски език)",
-    "by OpenAI with Whisper" : "от OpenAI с Whisper/приложение/",
     "Translate" : "Превод",
+    "by OpenAI with Whisper" : "от OpenAI с Whisper/приложение/",
     "Failed to get transcription/translation" : "Неуспешно получаване на транскрипция/превод"
 },
 "nplurals=2; plural=(n != 1);");

@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Bad credentials" : "Gölluð auðkenni",
     "Connected accounts" : "Tengdir aðgangar",
+    "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Preview" : "Forskoðun",
     "Advanced options" : "Ítarlegir valkostir",
     "Send" : "Senda",

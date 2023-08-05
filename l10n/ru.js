@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Неверный метод HTTP",
     "Bad credentials" : "Неверные учетные данные",
     "Connected accounts" : "Подключённые учётные записи",
+    "Request timeout (seconds)" : "Таймаут запроса (в секундах)",
     "Preview" : "Предварительный просмотр",
     "Advanced options" : "Дополнительные параметры",
     "Send" : "Отправить",

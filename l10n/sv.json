@@ -6,6 +6,7 @@
     "Bad credentials" : "Ogiltiga inloggningsuppgifter",
     "Connected accounts" : "Anslutna konton",
     "OpenAI's Whisper Speech-To-Text" : "OpenAI:s Whisper Tal-Till-Text",
+    "OpenAI integration" : "OpenAI-integration",
     "Reformulate" : "Omformulera",
     "Formulate text in a different way." : "Formulera text på ett annat sätt.",
     "OpenAI and LocalAI integration" : "OpenAI och LocalAI integration",
@@ -19,6 +20,7 @@
     "Default completion model to use" : "Standard kompletteringsmodell att använda",
     "More information about OpenAI models" : "Mer information om OpenAI-modeller",
     "More information about LocalAI models" : "Mer information om LocalAI-modeller",
+    "Request timeout (seconds)" : "Sekunder för anslutningsförsök",
     "Select which features you want to enable" : "Välj vilka funktioner du vill aktivera",
     "Whisper transcription/translation with the Smart Picker" : "Whisper transkription/översättning med Smart Picker",
     "Image generation with the Smart Picker" : "Bildgenerering med Smart Picker",
@@ -53,9 +55,9 @@
     "Model to use" : "Modell att använda",
     "Approximate maximum number of words to generate (tokens)" : "Ungefärligt maximalt antal ord att generera (tokens)",
     "What is the matter with putting pineapple on pizza?" : "Vad är grejen med att lägga ananas på pizza?",
-    "by OpenAI" : "av OpenAI",
     "Choose a model" : "Välj en modell",
     "Regenerate" : "Regenerera",
+    "by OpenAI" : "av OpenAI",
     "Failed to save OpenAI default model ID" : "Det gick inte att spara OpenAI standardmodell-ID",
     "OpenAI error" : "OpenAI-fel",
     "Unknown OpenAI API error" : "Okänt OpenAI API-fel",
@@ -73,8 +75,8 @@
     "AI speech-to-text" : "AI tal-till-text",
     "Transcribe" : "Transkribera",
     "Translate (only to English)" : "Översätt (endast till engelska)",
-    "by OpenAI with Whisper" : "av OpenAI med Whisper",
     "Translate" : "Översätt",
+    "by OpenAI with Whisper" : "av OpenAI med Whisper",
     "Failed to get transcription/translation" : "Det gick inte att hämta transkription/översättning"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

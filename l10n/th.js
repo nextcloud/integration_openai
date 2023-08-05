@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
     "Preview" : "ตัวอย่าง",
     "Advanced options" : "ตัวเลือกขั้นสูง",
     "Send" : "ส่ง",

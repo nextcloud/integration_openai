@@ -5,6 +5,7 @@ OC.L10N.register(
     "Bad credentials" : "Blogi prisijungimo duomenys",
     "Connected accounts" : "Prijungtos paskyros",
     "example:" : "pavyzdys:",
+    "Request timeout (seconds)" : "Prisijungimo laikas (sekundėmis)",
     "Preview" : "Peržiūra",
     "Preview content" : "Peržiūrėti turinį",
     "Show/hide advanced options" : "Rodyti/slėpti išplėstines parinktis",

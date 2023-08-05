@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Поганий метод HTTP",
     "Bad credentials" : "Погані облікові дані",
     "Connected accounts" : "Підключені облікові записи",
+    "Request timeout (seconds)" : "Час очікування запиту (секунди)",
     "Whisper transcription/translation with the Smart Picker" : "Транскрибування та переклад за допомогою асистенту вибору",
     "Image generation with the Smart Picker" : "Створення зображення за допомогою асистенту вибору",
     "Text generation with the Smart Picker" : "Створення тексту за допомогою асистенту вибору",

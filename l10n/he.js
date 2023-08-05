@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "שגיאה במתודת HTTP",
     "Bad credentials" : "פרטי גישה שגויים",
     "Connected accounts" : "חשבונות מקושרים",
+    "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Preview" : "תצוגה מקדימה",
     "Advanced options" : "אפשרויות מתקדמות",
     "Send" : "שליחה",

@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Bad HTTP method" : "Método HTTP incorreto",
     "Bad credentials" : "Credenciais inválidas",
+    "Request timeout (seconds)" : "Pedido expira (segundos)",
     "Preview" : "Pré-visualizar",
     "Advanced options" : "Opções avançadas",
     "Send" : "Enviar",

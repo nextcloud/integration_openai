@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
     "Connected accounts" : "Konektatutako kontuak",
+    "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
     "Loading image" : "Irudia kargatzen",
     "Generated image" : "Sortutako irudia",
     "Direct image link" : "Irudiaren esteka zuzena",

@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Pogrešna metoda HTTP-a",
     "Bad credentials" : "Pogrešne vjerodajnice",
     "Connected accounts" : "Povezani računi",
+    "Request timeout (seconds)" : "Istek zahtjeva (u sekundama)",
     "Advanced options" : "Napredne opcije",
     "Send" : "Pošaljite",
     "Result" : "Rezultat",

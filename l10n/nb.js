@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Bad HTTP method" : "HTTP-metode er feil",
     "Bad credentials" : "Påloggingsdetaljene er feil",
+    "Request timeout (seconds)" : "Tidsavbrudd for forespørsel (sekunder)",
     "Preview" : "Forhåndsvis",
     "Advanced options" : "Avanserte innstillinger",
     "Send" : "Send",

@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Zła metoda HTTP",
     "Bad credentials" : "Złe poświadczenia",
     "Connected accounts" : "Połączone konta",
+    "Request timeout (seconds)" : "Limit czasu żądania (sekundy)",
     "Preview" : "Podgląd",
     "Advanced options" : "Opcje zaawansowane",
     "Send" : "Wyślij",

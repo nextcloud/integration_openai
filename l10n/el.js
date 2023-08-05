@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Κακή μέθοδος HTTP",
     "Bad credentials" : "Εσφαλμένα διαπιστευτήρια",
     "Connected accounts" : "Συνδεδεμένοι λογαριασμοί",
+    "Request timeout (seconds)" : "Χρονικό όριο αιτήματος (δευτερόλεπτα)",
     "Preview" : "Προεπισκόπηση",
     "Advanced options" : "Επιλογές για προχωρημένους",
     "Result" : "Αποτέλεσμα",

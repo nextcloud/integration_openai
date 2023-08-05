@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Hibás HTTP metódus",
     "Bad credentials" : "Hibás hitelesítő adatok",
     "Connected accounts" : "Kapcsolt fiókok",
+    "Request timeout (seconds)" : "Kérés időtúllépése (másodpercben)",
     "Preview" : "Előnézet",
     "Advanced options" : "Speciális beállítások",
     "Send" : "Küldés",

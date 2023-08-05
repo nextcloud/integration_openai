@@ -55,9 +55,9 @@ OC.L10N.register(
     "Model to use" : "Model který použít",
     "Approximate maximum number of words to generate (tokens)" : "Přibližný nejvyšší umožněný počet slov, které vytvořit (tokeny)",
     "What is the matter with putting pineapple on pizza?" : "Jaký je smysl toho dávat ananas na pizzu?",
-    "by OpenAI" : "od OpenAI",
     "Choose a model" : "Zvolte model",
     "Regenerate" : "Znovu vytvořit",
+    "by OpenAI" : "od OpenAI",
     "Failed to save OpenAI default model ID" : "Nepodařilo se uložit identif. výchozího modelu OpenAI",
     "OpenAI error" : "Chyba OpenAI",
     "Unknown OpenAI API error" : "Neznámá chyba API OpenAI",
@@ -75,8 +75,8 @@ OC.L10N.register(
     "AI speech-to-text" : "řeč na text pomocí AI",
     "Transcribe" : "Přepsat do textu",
     "Translate (only to English)" : "Přeložit (pouze do angličtiny)",
-    "by OpenAI with Whisper" : "vytvořeno OpenAI (pomocí Whisper)",
     "Translate" : "Překládání",
+    "by OpenAI with Whisper" : "vytvořeno OpenAI (pomocí Whisper)",
     "Failed to get transcription/translation" : "Nepodařilo se získat přepis/překlad"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

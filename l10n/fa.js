@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Connected accounts" : "حساب‌های متصل",
+    "Request timeout (seconds)" : "درخواست زمان (ثانیه)",
     "Preview" : "پیش‌نمایش",
     "Advanced options" : "گزینه‌های پیش‌رفته",
     "Send" : "ارسال",
