@@ -1,6 +1,8 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Bad HTTP method" : "روش HTTP بد",
+    "Bad credentials" : "اعتبارنامه بد",
     "Connected accounts" : "حساب‌های متصل",
     "Request timeout (seconds)" : "درخواست زمان (ثانیه)",
     "Preview" : "پیش‌نمایش",
