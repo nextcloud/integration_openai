@@ -5,6 +5,8 @@ OC.L10N.register(
     "Bad credentials" : "Credencials dolentes",
     "Connected accounts" : "Comptes connectats",
     "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
+    "Loading image" : "Carregant imatge",
+    "Generated image" : "Imatge generada",
     "Preview" : "Previsualitza",
     "Advanced options" : "Paràmetres avançats",
     "Send" : "Envia",
