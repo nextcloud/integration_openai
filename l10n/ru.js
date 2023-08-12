@@ -5,6 +5,7 @@ OC.L10N.register(
     "Bad credentials" : "Неверные учетные данные",
     "Connected accounts" : "Подключённые учётные записи",
     "Request timeout (seconds)" : "Таймаут запроса (в секундах)",
+    "Select which features you want to enable" : "Выберите, какие функции вы хотите включить",
     "Preview" : "Предварительный просмотр",
     "Advanced options" : "Дополнительные параметры",
     "Send" : "Отправить",
