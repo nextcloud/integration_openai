@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.0.13 – 2023-08-21
+
+### Changed
+
+- try to select gpt-3.5 when default model is not found when getting model list
+- use selected default llm (in admin settings ) in the translation provider
+
+### Fixed
+
+- remove dashboard category in info.xml
+- dynamically change labels depending if OpenAi or LocalAi is used
+
 ## 1.0.12 – 2023-08-04
 
 ### Added
