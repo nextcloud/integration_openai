@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Ungültige HTTP-Methode",
     "Bad credentials" : "Falsche Anmeldeinformationen",
     "Connected accounts" : "Verbundene Konten",
+    "Request timeout (seconds)" : "Anfrage-Zeitüberschreitung (Sekunden)",
     "Preview" : "Vorschau",
     "Advanced options" : "Erweiterte Optionen",
     "Send" : "Senden",

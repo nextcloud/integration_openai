@@ -1,5 +1,6 @@
 { "translations": {
     "Connected accounts" : "Forbundne konti",
+    "Request timeout (seconds)" : "Anmodning timeout (sekunder)",
     "Preview" : "Forhåndsvisning",
     "Advanced options" : "Avancerede indstillinger",
     "Send" : "Send",
