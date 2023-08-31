@@ -5,6 +5,7 @@ OC.L10N.register(
     "Bad credentials" : "Kredentzial okerrak",
     "Connected accounts" : "Konektatutako kontuak",
     "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
+    "Select which features you want to enable" : "Hautatu zeintzuk ezaugarri gaitu nahi dituzun",
     "Loading image" : "Irudia kargatzen",
     "Generated image" : "Sortutako irudia",
     "Direct image link" : "Irudiaren esteka zuzena",
