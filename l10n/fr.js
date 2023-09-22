@@ -1,9 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "ChatGPT-like text generation (by OpenAI)" : "Génération de texte comme ChatGPT (par OpenAI)",
-    "AI image generation (by OpenAI Dall-E 2)" : "Génération d'image par IA (Par OpenAI Dall-E 2)",
-    "AI speech-to-text (Whisper via OpenAI)" : "Reconnaissance vocale par IA (Whisper via OpenAI)",
+    "ChatGPT-like text generation (by OpenAI)" : "Génération de texte de type ChatGPT (par OpenAI)",
+    "AI image generation (by OpenAI Dall-E 2)" : "Génération d'image par IA (par OpenAI Dall-E 2)",
+    "AI speech-to-text (Whisper via OpenAI)" : "Synthèse vocale par IA (Whisper via OpenAI)",
     "Bad HTTP method" : "Mauvaise méthode HTTP",
     "Bad credentials" : "Identifiants incorrects",
     "Connected accounts" : "Comptes connectés",
