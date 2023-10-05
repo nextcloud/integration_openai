@@ -6,6 +6,7 @@ OC.L10N.register(
     "Connected accounts" : "Подключённые учётные записи",
     "Request timeout (seconds)" : "Таймаут запроса (в секундах)",
     "Select which features you want to enable" : "Выберите, какие функции вы хотите включить",
+    "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)",
     "Preview" : "Предварительный просмотр",
     "Advanced options" : "Дополнительные параметры",
     "Send" : "Отправить",
