@@ -29,6 +29,7 @@
 				</label>
 				<input id="openai-api-key"
 					v-model="state.api_key"
+					autocomplete="off"
 					type="password"
 					:readonly="readonly"
 					:placeholder="t('integration_openai', 'your API key')"
