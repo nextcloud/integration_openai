@@ -86,6 +86,15 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * Clear prompt history for a prompt type
+	 * @param string $userId
+	 * @param int $type
+	 */
+	public function clearPromptHistory(string $userId, int $type): void {
+		$this->promptMapper->deleteUserPromptsByType($userId, $type);
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param int $n

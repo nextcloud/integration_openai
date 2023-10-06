@@ -24,6 +24,7 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\DB\Exception;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 
 use OCA\OpenAi\Service\OpenAiAPIService;
 
@@ -34,7 +35,8 @@ class OpenAiAPIController extends Controller {
 		IRequest                 $request,
 		private OpenAiAPIService $openAiAPIService,
 		private IInitialState    $initialStateService,
-		private ?string          $userId
+		private ?string          $userId,
+		private LoggerInterface  $logger,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -156,5 +158,33 @@ class OpenAiAPIController extends Controller {
 		$generationData = $this->openAiAPIService->getGenerationInfo($hash);
 		$this->initialStateService->provideInitialState('generation', $generationData);
 		return new TemplateResponse(Application::APP_ID, 'imageGenerationPage');
+	}
+
+	/**
+	 * @param bool|null $clearTextPrompts
+	 * @param bool|null $clearImagePrompts
+	 * @return DataResponse
+	 */
+	#[NoAdminRequired]
+	#[NoCSRFRequired]
+	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse {
+		$this->logger->warning('clearPromptHistory: ' . 'clearTextPrompts ' . strval($clearTextPrompts) . ' clearImagePrompts ' . strval($clearImagePrompts));
+		if ($clearTextPrompts === True) {			
+			try {
+				$this->openAiAPIService->clearPromptHistory($this->userId, Application::PROMPT_TYPE_TEXT);
+			} catch (Exception $e) {				
+				return new DataResponse(['error' => $e->getMessage()],Http::STATUS_BAD_REQUEST);
+			}			
+		}
+
+		if ($clearImagePrompts === True) {
+			try {
+				$this->openAiAPIService->clearPromptHistory($this->userId, Application::PROMPT_TYPE_IMAGE);
+			} catch (Exception $e) {				
+				return new DataResponse(['error' => $e->getMessage()],Http::STATUS_BAD_REQUEST);
+			}
+		}
+
+		return new DataResponse(['status' => 'success']);
 	}
 }

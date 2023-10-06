@@ -17,6 +17,7 @@ return [
 
 		['name' => 'openAiAPI#getModels', 'url' => '/models', 'verb' => 'GET'],
 		['name' => 'openAiAPI#getPromptHistory', 'url' => '/prompts', 'verb' => 'GET'],
+		['name' => 'openAiAPI#clearPromptHistory', 'url' => '/clear-prompt-history', 'verb' => 'POST'],
 		['name' => 'openAiAPI#createCompletion', 'url' => '/completions', 'verb' => 'POST'],
 		['name' => 'openAiAPI#createImage', 'url' => '/images/generations', 'verb' => 'POST'],
 		['name' => 'openAiAPI#transcribe', 'url' => '/audio/transcriptions', 'verb' => 'POST'],
