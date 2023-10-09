@@ -166,7 +166,6 @@ class OpenAiAPIController extends Controller {
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	#[NoCSRFRequired]
 	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse {
 		$this->logger->warning('clearPromptHistory: ' . 'clearTextPrompts ' . strval($clearTextPrompts) . ' clearImagePrompts ' . strval($clearImagePrompts));
 		if ($clearTextPrompts === True) {			
@@ -186,5 +185,27 @@ class OpenAiAPIController extends Controller {
 		}
 
 		return new DataResponse(['status' => 'success']);
+	}
+
+	/**
+	 * Get quota usage and limits
+	 * @return DataResponse
+	 */
+	#[NoAdminRequired]
+	public function getUserQuotaInfo(): DataResponse {
+		$info = $this->openAiAPIService->getUserQuotaInfo($this->userId);
+		
+		return new DataResponse($info);
+	}
+
+	/**
+	 * Get quota usage and limits for the whole instance
+	 * Admin only!
+	 * @return DataResponse
+	 */
+	public function getAdminQuotaInfo(): DataResponse {
+		$info = $this->openAiAPIService->getAdminQuotaInfo();
+		
+		return new DataResponse($info);
 	}
 }

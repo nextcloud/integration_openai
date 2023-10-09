@@ -29,18 +29,26 @@ class Admin implements ISettings {
 		$textPickerEnabled = $this->config->getAppValue(Application::APP_ID, 'text_completion_picker_enabled', '1') === '1';
 		$translationProviderEnabled = $this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
 		$sttProviderEnabled = $this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
+		
+		$maxGeneratedTokens = $this->config->getAppValue(Application::APP_ID, 'max_tokens', Application::DEFAULT_MAX_NUM_OF_TOKENS) ?: Application::DEFAULT_MAX_NUM_OF_TOKENS;
+		$quotaPeriod = $this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD) ?: Application::DEFAULT_QUOTA_PERIOD;
+		$quotas = json_decode($this->config->getAppValue(Application::APP_ID, 'quotas', json_encode(Application::DEFAULT_QUOTAS)) ?: json_encode(Application::DEFAULT_QUOTAS));
 
 		$adminConfig = [
 			'request_timeout' => $requestTimeout,
 			'url' => $serviceUrl,
 			'api_key' => $apiKey,
 			'default_completion_model_id' => $defaultAdminCompletionModelId,
+			'max_tokens' => $maxGeneratedTokens,
+			'quota_period' => $quotaPeriod,
+			'quotas' => $quotas,
 			'whisper_picker_enabled' => $whisperPickerEnabled,
 			'image_picker_enabled' => $imagePickerEnabled,
 			'text_completion_picker_enabled' => $textPickerEnabled,
 			'translation_provider_enabled' => $translationProviderEnabled,
 			'stt_provider_enabled' => $sttProviderEnabled,
 		];
+
 		$this->initialStateService->provideInitialState('admin-config', $adminConfig);
 
 		return new TemplateResponse(Application::APP_ID, 'adminSettings');

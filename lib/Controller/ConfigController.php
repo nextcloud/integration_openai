@@ -54,6 +54,12 @@ class ConfigController extends Controller {
 	 */
 	public function setAdminConfig(array $values): DataResponse {
 		foreach ($values as $key => $value) {
+
+			// Json encode quotas before writing to config
+			if ($key === 'quotas') {
+				$value = json_encode($value);
+			}
+
 			$this->config->setAppValue(Application::APP_ID, $key, $value);
 		}
 		return new DataResponse(1);

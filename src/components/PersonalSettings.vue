@@ -49,6 +49,35 @@
 					{{ t('integration_openai', 'Clear image prompts') }}
 				</button>
 			</div>
+			<div v-if="quotaInfo !== null" class="line">
+				<!-- Show quota info -->
+				<label>
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Quota usage info') }}
+				</label>
+				<!-- Loop through all quota types-->
+				<table class="quota-table">
+					<thead>
+						<tr>
+							<th width="120px">
+								{{ t('integration_openai', 'Quota type') }}
+							</th>
+							<th>{{ t('integration_openai', 'Usage') }}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="quota in quotaInfo.quota_usage" :key="quota.type">
+							<td>{{ t('integration_openai', capitalizedWord(quota.type)) }} </td>
+							<td v-if="quota.limit > 0">
+								{{ quota.used / quota.limit * 100 + ' %' }}
+							</td>
+							<td v-else>
+								{{ quota.used }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 </template>
@@ -84,6 +113,7 @@ export default {
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
+			quotaInfo: null,
 		}
 	},
 
@@ -94,6 +124,7 @@ export default {
 	},
 
 	mounted() {
+		this.loadQuotaInfo()
 	},
 
 	methods: {
@@ -103,6 +134,22 @@ export default {
 					api_key: this.state.api_key,
 				})
 			}, 2000)()
+		},
+		loadQuotaInfo() {
+			const url = generateUrl('/apps/integration_openai/quota-info')
+			return axios.get(url)
+				.then((response) => {
+					this.quotaInfo = response.data
+				})
+				.catch((error) => {
+					showError(
+						t('integration_openai', 'Failed to load quota info')
+						+ ': ' + error.response?.request?.responseText
+					)
+				})
+		},
+		capitalizedWord(word) {
+			return word.charAt(0).toUpperCase() + word.slice(1)
 		},
 		saveOptions(values) {
 			const req = {
@@ -170,6 +217,23 @@ export default {
 		}
 		> input {
 			width: 300px;
+		}
+		.spacer {
+			display: inline-block;
+			width: 36px;
+		}
+
+		.quota-table {
+			padding: 4px 8px 4px 8px;
+			border: 2px solid var(--color-border);
+			border-radius: var(--border-radius);
+			tbody {
+				opacity: 0.5;
+			}
+			th, td {
+				width: 200px;
+				text-align: left;
+			}
 		}
 	}
 

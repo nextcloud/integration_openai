@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Enable clearing of prompt history from personal settings page @MB-Finski
+
+### Fixed
+
+- Request no autocomplete for api key, which has caused issues for some users @MB-Finski
+
 ## 1.0.13 – 2023-08-21
 
 ### Changed

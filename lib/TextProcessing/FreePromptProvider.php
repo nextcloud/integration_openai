@@ -27,7 +27,7 @@ class FreePromptProvider implements IProvider {
 
 	public function process(string $prompt): string {
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-		$completion = $this->openAiAPIService->createChatCompletion(null, $prompt, 1, $adminModel, 100, false);
+		$completion = $this->openAiAPIService->createChatCompletion(null, $prompt, 1, $adminModel, INF, false);
 		if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
 			$choice = $completion['choices'][0];
 			if (isset($choice['message'], $choice['message']['content'])) {

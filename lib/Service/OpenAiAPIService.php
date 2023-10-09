@@ -19,6 +19,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\ImageGenerationMapper;
 use OCA\OpenAi\Db\ImageUrlMapper;
 use OCA\OpenAi\Db\PromptMapper;
+use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\Files\File;
@@ -46,6 +47,7 @@ class OpenAiAPIService {
 		private ImageGenerationMapper $imageGenerationMapper,
 		private ImageUrlMapper $imageUrlMapper,
 		private PromptMapper $promptMapper,
+		private QuotaUsageMapper $quotaUsageMapper,
 		IClientService $clientService
 	) {
 		$this->client = $clientService->newClient();
@@ -95,6 +97,94 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @param string $userId
+	 */
+	public function hasOwnOpenAiApiKey(string $userId): bool {
+		if(!$this->isUsingOpenAi()){
+			return false;
+		}
+
+		if($this->config->getUserValue($userId, Application::APP_ID, 'api_key') !== ''){
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Check whether quota is exceeded for a user
+	 * @param string $userId
+	 * @param int $type
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function isQuotaExceeded(string $userId, int $type): bool {
+		if(!array_key_exists($type, Application::QUOTA_TYPES)){
+			throw new Exception('Invalid quota type');
+		}
+
+		if($this->hasOwnOpenAiApiKey($userId)){
+			// User has specified own OpenAI API key, no quota limit:
+			return false;
+		}
+
+		// Get quota limits
+		$quota = intval(json_decode($this->config->getAppValue(Application::APP_ID, 'quotas', json_encode(Application::DEFAULT_QUOTAS)))[$type]->value);
+
+		if($quota === 0){
+			//  Unlimited quota:
+			return false;
+		}
+
+		$quotaPeriod = intval($this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD));
+		$quotaUsage= $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
+
+		return $quotaUsage >= $quota;
+	}
+
+	/**
+	 * @param string $userId
+	 * @return array
+	 */
+	public function getUserQuotaInfo(string $userId): array {
+		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit)
+		$quotas = $this->hasOwnOpenAiApiKey($userId) ?
+				Application::DEFAULT_QUOTAS :
+				json_decode($this->config->getAppValue(Application::APP_ID, 'quotas', json_encode(Application::DEFAULT_QUOTAS)));
+		// Get quota period
+		$quotaPeriod = intval($this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD));
+		// Get quota usage for each quota type:
+		$quotaInfo = [];
+		foreach (Application::QUOTA_TYPES as $quotaType => $quotaTypeName) {
+			$quotaInfo[$quotaType]['type'] = $quotaTypeName;
+			$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
+			$quotaInfo[$quotaType]['limit'] = intval($quotas[$quotaType]->value);
+		}
+
+		return [
+			'quota_usage' => $quotaInfo,
+			'period' => $quotaPeriod,
+		];
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getAdminQuotaInfo(): array {
+		// Get quota period
+		$quotaPeriod = intval($this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD));
+		// Get quota usage of all users for each quota type:
+		$quotaInfo = [];
+		foreach (Application::QUOTA_TYPES as $quotaType => $quotaTypeName) {
+			$quotaInfo[$quotaType]['type'] = $quotaTypeName;
+			$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $quotaPeriod);
+		}
+
+		return $quotaInfo;
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param int $n
@@ -106,19 +196,42 @@ class OpenAiAPIService {
 	 */
 	public function createCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
 									 bool $storePrompt = true): array {
+		
+		
+		$maxTokensLimit = intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', Application::DEFAULT_MAX_NUM_OF_TOKENS));		
+		if($maxTokens > $maxTokensLimit){
+			$maxTokens = $maxTokensLimit;
+		}
+		
 		$params = [
 			'model' => $model,
 			'prompt' => $prompt,
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
+
+
 		if ($userId !== null) {
 			$params['user'] = $userId;
-		}
-		if ($storePrompt) {
-			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
-		}
-		return $this->request($userId, 'completions', $params, 'POST');
+
+			if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)){
+				return ['error' => 'Quota exceeded'];
+			}
+
+			if ($storePrompt) {
+				$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+			}
+
+			$result = $this->request($userId, 'completions', $params, 'POST');
+
+			$usage = $result['usage']['total_tokens'];
+			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+
+		} else {
+			$result = $this->request($userId, 'completions', $params, 'POST');
+		} 
+
+		return $result;
 	}
 
 	/**
@@ -133,19 +246,40 @@ class OpenAiAPIService {
 	 */
 	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
 										 bool $storePrompt = true): array {
+		
+		$maxTokensLimit = intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', Application::DEFAULT_MAX_NUM_OF_TOKENS));
+		if($maxTokens > $maxTokensLimit){
+			$maxTokens = $maxTokensLimit;
+		}
+
 		$params = [
 			'model' => $model,
 			'messages' => [['role' => 'user', 'content' => $prompt ]],
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
+
 		if ($userId !== null) {
 			$params['user'] = $userId;
-		}
-		if ($storePrompt) {
-			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
-		}
-		return $this->request($userId, 'chat/completions', $params, 'POST');
+
+			if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)){
+				return ['error' => 'Quota exceeded'];
+			}
+
+			if ($storePrompt) {
+				$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+			}
+
+			$result = $this->request($userId, 'chat/completions', $params, 'POST');
+
+			$usage = $result['usage']['total_tokens'];
+			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+
+		} else {
+			$result = $this->request($userId, 'chat/completions', $params, 'POST');
+		} 
+
+		return $result;
 	}
 
 	/**

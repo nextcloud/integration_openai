@@ -39,6 +39,21 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_TRANSCRIPTION_MODEL_ID = 'whisper-1';
 	public const DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
+	public const DEFAULT_MAX_NUM_OF_TOKENS = 1000;
+	public const DEFAULT_QUOTA_PERIOD = 30;
+	
+	public const QUOTA_TYPE_TEXT = 0;
+	public const QUOTA_TYPE_IMAGE = 1;
+	
+	public const QUOTA_TYPES = [
+		self::QUOTA_TYPE_TEXT => 'text',
+		self::QUOTA_TYPE_IMAGE => 'image',
+	];
+	public const DEFAULT_QUOTAS = [
+		self::QUOTA_TYPE_TEXT => ['type' => self::QUOTA_TYPES[self::QUOTA_TYPE_TEXT], 'value' => 0], // 0 = unlimited
+		self::QUOTA_TYPE_IMAGE => ['type' => self::QUOTA_TYPES[self::QUOTA_TYPE_IMAGE], 'value' => 0], // 0 = unlimited
+	]; 
+	
 
 	public const PROMPT_TYPE_IMAGE = 0;
 	public const PROMPT_TYPE_TEXT = 1;

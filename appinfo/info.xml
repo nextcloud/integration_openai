@@ -97,6 +97,7 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
     </dependencies>
     <background-jobs>
 		<job>OCA\OpenAi\Cron\CleanupImageGenerations</job>
+        <job>OCA\OpenAi\Cron\CleanupQuotaDb</job>
 	</background-jobs>
 	<commands>
 		<command>OCA\OpenAi\Command\CleanupImageGenerations</command>
