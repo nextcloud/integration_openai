@@ -114,12 +114,16 @@ class OpenAiAPIService {
 
 	/**
 	 * Check whether quota is exceeded for a user
-	 * @param string $userId
+	 * @param string|null $userId
 	 * @param int $type
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function isQuotaExceeded(string $userId, int $type): bool {
+	public function isQuotaExceeded(?string $userId, int $type): bool {
+		if($userId === null){
+			return false;
+		}
+		
 		if(!array_key_exists($type, Application::QUOTA_TYPES)){
 			throw new Exception('Invalid quota type');
 		}
@@ -197,42 +201,36 @@ class OpenAiAPIService {
 	public function createCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
 									 bool $storePrompt = true): array {
 		
-		
-		$maxTokensLimit = intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', Application::DEFAULT_MAX_NUM_OF_TOKENS));		
-		if($maxTokens > $maxTokensLimit){
-			$maxTokens = $maxTokensLimit;
-		}
-		
-		$params = [
-			'model' => $model,
-			'prompt' => $prompt,
-			'max_tokens' => $maxTokens,
-			'n' => $n,
-		];
-
-
-		if ($userId !== null) {
-			$params['user'] = $userId;
-
-			if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)){
-				return ['error' => 'Quota exceeded'];
-			}
-
-			if ($storePrompt) {
-				$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
-			}
-
-			$result = $this->request($userId, 'completions', $params, 'POST');
-
-			$usage = $result['usage']['total_tokens'];
-			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
-
-		} else {
-			$result = $this->request($userId, 'completions', $params, 'POST');
-		} 
-
-		return $result;
+	if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)){
+		return ['error' => 'Text generation quota exceeded'];
+	}		
+	
+	$maxTokensLimit = intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', Application::DEFAULT_MAX_NUM_OF_TOKENS));
+	if($maxTokens > $maxTokensLimit){
+		$maxTokens = $maxTokensLimit;
 	}
+
+	$params = [
+		'model' => $model,
+		'messages' => [['role' => 'user', 'content' => $prompt ]],
+		'max_tokens' => $maxTokens,
+		'n' => $n,
+	];
+
+	$result = $this->request($userId, 'completions', $params, 'POST');
+
+	if (!isset($result['error']))
+	{
+		$usage = $result['usage']['total_tokens'];
+		$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+
+		if ($userId !== null && $storePrompt) {
+			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+		}
+	}
+	
+	return $result;
+}
 
 	/**
 	 * @param string|null $userId
@@ -246,6 +244,9 @@ class OpenAiAPIService {
 	 */
 	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
 										 bool $storePrompt = true): array {
+		if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)){
+			return ['error' => 'Text generation quota exceeded'];
+		}		
 		
 		$maxTokensLimit = intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', Application::DEFAULT_MAX_NUM_OF_TOKENS));
 		if($maxTokens > $maxTokensLimit){
@@ -259,26 +260,18 @@ class OpenAiAPIService {
 			'n' => $n,
 		];
 
-		if ($userId !== null) {
-			$params['user'] = $userId;
+		$result = $this->request($userId, 'chat/completions', $params, 'POST');
 
-			if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)){
-				return ['error' => 'Quota exceeded'];
-			}
-
-			if ($storePrompt) {
-				$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
-			}
-
-			$result = $this->request($userId, 'chat/completions', $params, 'POST');
-
+		if (!isset($result['error']))
+		{
 			$usage = $result['usage']['total_tokens'];
 			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
 
-		} else {
-			$result = $this->request($userId, 'chat/completions', $params, 'POST');
-		} 
-
+			if ($userId !== null && $storePrompt) {
+				$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+			}
+		}
+		
 		return $result;
 	}
 
@@ -325,15 +318,27 @@ class OpenAiAPIService {
 	 */
 	public function transcribe(?string $userId, string $audioFileContent, bool $translate = true,
 							   string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): array {
+		if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)){
+			return ['error' => 'Transcription usage quota exceeded'];
+		}
+		
 		$params = [
 			'model' => $model,
 			'file' => $audioFileContent,
-			'response_format' => 'json',
+			'response_format' => 'verbose_json', // Verbose needed for extraction of audio duration
 		];
 		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
 		$contentType = 'multipart/form-data';
 //		$contentType = 'application/x-www-form-urlencoded';
-		return $this->request($userId, $endpoint, $params, 'POST', $contentType);
+
+		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType);
+		if (isset($response['segments'])) {
+			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
+			// Duration no longer needed:
+			unset($response['segments']);
+			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+		}
+		return $response;
 	}
 
 	/**
@@ -345,6 +350,9 @@ class OpenAiAPIService {
 	 * @throws \OCP\DB\Exception
 	 */
 	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
+		if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)){
+			return ['error' => 'Image generation quota exceeded'];
+		}
 		$this->config->setUserValue($userId, Application::APP_ID, 'last_image_size', $size);
 		$params = [
 			'prompt' => $prompt,
@@ -362,6 +370,9 @@ class OpenAiAPIService {
 
 		if (isset($apiResponse['data']) && is_array($apiResponse['data'])) {
 			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_IMAGE, $userId, $prompt);
+
+			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_IMAGE, $n);
+
 			$urls = array_map(static function (array $result) {
 				return $result['url'] ?? null;
 			}, $apiResponse['data']);

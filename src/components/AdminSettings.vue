@@ -93,10 +93,20 @@
 					{{ t('integration_openai', 'Usage limits') }}
 				</h2>
 				<div class="line">
+					<!--Time period in days for the token usage-->
+					<label for="openai-api-quota-period">
+						{{ t('integration_openai', 'Quota enforcement time period (days)') }}
+					</label>
+					<input id="openai-api-quota-period"
+						v-model="state.quota_period"
+						type="number"
+						@input="onInput(false)">
+				</div>
+				<div class="line">
 					<!--Loop through all quota types and list an input for them on this line-->
 					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
 					<label for="openai-api-quotas">
-						{{ t('integration_openai', 'Usage quotas per time-window') }}
+						{{ t('integration_openai', 'Usage quotas (tokens/images) per time period') }}
 					</label>
 					<table class="quota-table">
 						<thead>
@@ -104,7 +114,7 @@
 								<th width="120px">
 									{{ t('integration_openai', 'Quota type') }}
 								</th>
-								<th>{{ t('integration_openai', 'Usage limit (tokens/images)') }}</th>
+								<th>{{ t('integration_openai', 'Per user quota / period') }}</th>
 								<th v-if="quotaInfo !== null">
 									{{ t('integration_openai', 'Current system-wide usage / period') }}
 								</th>
@@ -128,16 +138,6 @@
 							</tr>
 						</tbody>
 					</table>
-				</div>
-				<div class="line">
-					<!--Time period in days for the token usage-->
-					<label for="openai-api-quota-period">
-						{{ t('integration_openai', 'Quota enforcement time-period (days)') }}
-					</label>
-					<input id="openai-api-quota-period"
-						v-model="state.quota_period"
-						type="number"
-						@input="onInput(false)">
 				</div>
 				<div class="line">
 					<!--A input for max number of tokens to generate for a single request-->

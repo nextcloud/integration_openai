@@ -44,15 +44,27 @@ class Application extends App implements IBootstrap {
 	
 	public const QUOTA_TYPE_TEXT = 0;
 	public const QUOTA_TYPE_IMAGE = 1;
+	public const QUOTA_TYPE_TRANSCRIPTION = 2;
+
 	
 	public const QUOTA_TYPES = [
 		self::QUOTA_TYPE_TEXT => 'text',
 		self::QUOTA_TYPE_IMAGE => 'image',
+		self::QUOTA_TYPE_TRANSCRIPTION => 'transcription',
 	];
 	public const DEFAULT_QUOTAS = [
 		self::QUOTA_TYPE_TEXT => ['type' => self::QUOTA_TYPES[self::QUOTA_TYPE_TEXT], 'value' => 0], // 0 = unlimited
 		self::QUOTA_TYPE_IMAGE => ['type' => self::QUOTA_TYPES[self::QUOTA_TYPE_IMAGE], 'value' => 0], // 0 = unlimited
-	]; 
+		self::QUOTA_TYPE_TRANSCRIPTION => ['type' => self::QUOTA_TYPES[self::QUOTA_TYPE_TRANSCRIPTION], 'value' => 0], // 0 = unlimited
+
+	];
+
+	public const QUOTA_UNITS = [
+		self::QUOTA_TYPE_TEXT => 'tokens',
+		self::QUOTA_TYPE_IMAGE => 'images',
+		self::QUOTA_TYPE_TRANSCRIPTION => 'seconds',
+
+	];
 	
 
 	public const PROMPT_TYPE_IMAGE = 0;
