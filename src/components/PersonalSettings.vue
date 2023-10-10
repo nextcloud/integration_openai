@@ -16,7 +16,7 @@
 			<div class="line">
 				<label for="openai-api-key">
 					<KeyIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'OpenAI API key') }}
+					{{ t('integration_openai', 'API key') }}
 				</label>
 				<input id="openai-api-key"
 					v-model="state.api_key"
@@ -27,14 +27,16 @@
 					@input="onInput"
 					@focus="readonly = false">
 			</div>
-			<p class="settings-hint">
-				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
-				&nbsp;
-				<a :href="apiKeyUrl" target="_blank" class="external">
-					{{ apiKeyUrl }}
-				</a>
-			</p>
+			<div v-if="!state.isCustomService">
+				<p class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
+					&nbsp;
+					<a :href="apiKeyUrl" target="_blank" class="external">
+						{{ apiKeyUrl }}
+					</a>
+				</p>
+			</div>
 			<div class="line">
 				<label for="clear-prompt-history">
 					<DeleteIcon :size="20" class="icon" />
@@ -53,7 +55,7 @@
 				<!-- Show quota info -->
 				<label>
 					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'Quota usage info') }}
+					{{ t('integration_openai', 'Usage quota info') }}
 				</label>
 				<!-- Loop through all quota types-->
 				<table class="quota-table">
@@ -72,11 +74,17 @@
 								{{ quota.used / quota.limit * 100 + ' %' }}
 							</td>
 							<td v-else>
-								{{ quota.used }}
+								{{ t('integration_openai',quota.used + ' ' + quota.unit) }}
 							</td>
 						</tr>
 					</tbody>
 				</table>
+			</div>
+			<div v-if="!state.showQuotaRemovalInfo">
+				<p class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Specifying your own API key will allow unlimited usage') }}
+				</p>
 			</div>
 		</div>
 	</div>
@@ -114,6 +122,7 @@ export default {
 			readonly: true,
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
+			showQuotaRemovalInfo: false,
 		}
 	},
 
@@ -137,7 +146,7 @@ export default {
 		},
 		loadQuotaInfo() {
 			const url = generateUrl('/apps/integration_openai/quota-info')
-			return axios.get(url)
+			const retVal = axios.get(url)
 				.then((response) => {
 					this.quotaInfo = response.data
 				})
@@ -147,6 +156,16 @@ export default {
 						+ ': ' + error.response?.request?.responseText
 					)
 				})
+			// Loop through all quota types and check if any are limited by admin
+			// If so, show a hint that the user can provide their own api key to remove the limit
+			for (const quota of this.quotaInfo) {
+				if (quota.limit > 0) {
+					this.showQuotaRemovalInfo = true
+					break
+				}
+			}
+
+			return retVal
 		},
 		capitalizedWord(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)

@@ -16,6 +16,7 @@ class SummaryProvider implements IProvider {
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,
 		private IL10N $l10n,
+		private ?string $userId,
 	) {
 	}
 
@@ -30,7 +31,7 @@ class SummaryProvider implements IProvider {
 		// curl -H "content-type: application/json" -H "ocs-apirequest: true" -u user:pass http://localhost/dev/server/ocs/v2.php/textprocessing/schedule -d '{"input":"this is a short sentence to talk about food and weather and sport","type":"OCP\\TextProcessing\\SummaryTaskType","appId":"plopapp","identifier":"superidentifier"}' -X POST
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 		$prompt = 'Summarize the following text:' . "\n\n" . $prompt;
-		$completion = $this->openAiAPIService->createChatCompletion(null, $prompt, 1, $adminModel, 100, false);
+		$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
 		if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
 			$choice = $completion['choices'][0];
 			if (isset($choice['message'], $choice['message']['content'])) {

@@ -34,6 +34,16 @@ class Admin implements ISettings {
 		$quotaPeriod = $this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD) ?: Application::DEFAULT_QUOTA_PERIOD;
 		$quotas = json_decode($this->config->getAppValue(Application::APP_ID, 'quotas', json_encode(Application::DEFAULT_QUOTAS)) ?: json_encode(Application::DEFAULT_QUOTAS));
 
+		// Make sure all quota types are set in the json encoded app value
+		if(count($quotas) !== count(Application::QUOTA_TYPES)) {
+			foreach(Application::QUOTA_TYPES as $type => $typeName) {
+				if(!isset($quotas[$type])) {
+					$quotas[$type] = Application::DEFAULT_QUOTAS[$type];
+				}
+			}
+			$this->config->setAppValue(Application::APP_ID, 'quotas', json_encode($quotas));
+		}
+
 		$adminConfig = [
 			'request_timeout' => $requestTimeout,
 			'url' => $serviceUrl,

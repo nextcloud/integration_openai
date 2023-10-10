@@ -106,7 +106,7 @@
 					<!--Loop through all quota types and list an input for them on this line-->
 					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
 					<label for="openai-api-quotas">
-						{{ t('integration_openai', 'Usage quotas (tokens/images) per time period') }}
+						{{ t('integration_openai', 'Usage quotas per time period') }}
 					</label>
 					<table class="quota-table">
 						<thead>
@@ -114,7 +114,7 @@
 								<th width="120px">
 									{{ t('integration_openai', 'Quota type') }}
 								</th>
-								<th>{{ t('integration_openai', 'Per user quota / period') }}</th>
+								<th>{{ t('integration_openai', 'Per-user quota / period') }}</th>
 								<th v-if="quotaInfo !== null">
 									{{ t('integration_openai', 'Current system-wide usage / period') }}
 								</th>
@@ -128,9 +128,12 @@
 								<td>
 									<input :id="'openai-api-quota-' + quota.type"
 										v-model="quota.value"
-										:title="t('integration_openai', 'Limit for token/image generation for this quota type (0 for unlimited))')"
+										:title="t('integration_openai', 'A per-user limit for uasge of this API type (0 for unlimited))')"
 										type="number"
 										@input="onInput(false)">
+									<span v-if="quotaInfo !== null" class="text-cell">
+										{{ t('integration_openai', quotaInfo[index].unit) }}
+									</span>
 								</td>
 								<td v-if="quotaInfo !== null" class="text-cell">
 									{{ quotaInfo[index].used }}

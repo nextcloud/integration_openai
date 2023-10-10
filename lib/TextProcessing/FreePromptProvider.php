@@ -10,12 +10,14 @@ use OCP\IL10N;
 use OCP\TextProcessing\FreePromptTaskType;
 use OCP\TextProcessing\IProvider;
 
+
 class FreePromptProvider implements IProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,
 		private IL10N $l10n,
+		private ?string $userId,
 	) {
 	}
 
@@ -27,7 +29,8 @@ class FreePromptProvider implements IProvider {
 
 	public function process(string $prompt): string {
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-		$completion = $this->openAiAPIService->createChatCompletion(null, $prompt, 1, $adminModel, INF, false);
+		// Max tokens are limited later to max tokens specified in the admin settings so here we just request PHP_INT_MAX
+		$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
 		if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
 			$choice = $completion['choices'][0];
 			if (isset($choice['message'], $choice['message']['content'])) {

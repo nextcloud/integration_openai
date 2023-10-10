@@ -164,6 +164,7 @@ class OpenAiAPIService {
 			$quotaInfo[$quotaType]['type'] = $quotaTypeName;
 			$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
 			$quotaInfo[$quotaType]['limit'] = intval($quotas[$quotaType]->value);
+			$quotaInfo[$quotaType]['unit'] = Application::QUOTA_UNITS[$quotaType];
 		}
 
 		return [
@@ -183,6 +184,7 @@ class OpenAiAPIService {
 		foreach (Application::QUOTA_TYPES as $quotaType => $quotaTypeName) {
 			$quotaInfo[$quotaType]['type'] = $quotaTypeName;
 			$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $quotaPeriod);
+			$quotaInfo[$quotaType]['unit'] = Application::QUOTA_UNITS[$quotaType];
 		}
 
 		return $quotaInfo;
