@@ -9,6 +9,7 @@ OC.L10N.register(
     "Advanced options" : "Geavanceerde opties",
     "Send" : "Verzenden",
     "Result" : "Resultaat",
-    "Unknown error" : "Onbekende fout"
+    "Unknown error" : "Onbekende fout",
+    "Translate" : "Vertaal"
 },
 "nplurals=2; plural=(n != 1);");
