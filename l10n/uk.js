@@ -8,6 +8,7 @@ OC.L10N.register(
     "Whisper transcription/translation with the Smart Picker" : "Транскрибування та переклад за допомогою асистенту вибору",
     "Image generation with the Smart Picker" : "Створення зображення за допомогою асистенту вибору",
     "Text generation with the Smart Picker" : "Створення тексту за допомогою асистенту вибору",
+    "Preview" : "Попередній перегляд",
     "Advanced options" : "Розширені налаштування",
     "Send" : "Надіслати",
     "Result" : "Результат",
