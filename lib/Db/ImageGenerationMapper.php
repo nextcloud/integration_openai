@@ -163,6 +163,11 @@ class ImageGenerationMapper extends QBMapper {
 
 		/** @var ImageGeneration[] $generations */
 		$generations = $this->findEntities($qb);
+		$qb->resetQueryParts();
+
+		/** @var array[] $fileNames */
+		$fileNames = [];
+		$fileIds = [];
 		foreach ($generations as $generation) {
 			$this->imageUrlMapper->deleteImageGenerationUrls($generation->getId());
 		}
