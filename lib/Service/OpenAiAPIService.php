@@ -165,7 +165,7 @@ class OpenAiAPIService {
 	 * @throws GenericFileException
 	 */
 	public function transcribeFile(?string $userId, File $file, bool $translate = false,
-								   string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): string {
+                                                                  string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): string {
 		$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
 		if (!isset($transcriptionResponse['text'])) {
 			throw new Exception('Error transcribing file "' . $file->getName() . '": ' . json_encode($transcriptionResponse));
@@ -181,7 +181,7 @@ class OpenAiAPIService {
 	 * @return array|string[]
 	 */
 	public function transcribe(?string $userId, string $audioFileContent, bool $translate = true,
-							   string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): array {
+                                                          string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): array {
 		$params = [
 			'model' => $model,
 			'file' => $audioFileContent,
@@ -311,11 +311,24 @@ class OpenAiAPIService {
 			$apiKey = $userId === null
 				? $adminApiKey
 				: ($this->config->getUserValue($userId, Application::APP_ID, 'api_key', $adminApiKey) ?: $adminApiKey);
+
+			// We can also use basic authentication
+			$adminBasicUser = $this->config->getAppValue(Application::APP_ID, 'basic_user', '');
+			$adminBasicPassword = $this->config->getAppValue(Application::APP_ID, 'basic_password', '');
+			$basicUser = $userId === null
+				? $adminBasicUser
+				: ($this->config->getUserValue($userId, Application::APP_ID, 'basic_user', $adminBasicUser) ?: $adminBasicUser);
+			$basicPassword = $userId === null
+				? $adminBasicPassword
+				: ($this->config->getUserValue($userId, Application::APP_ID, 'basic_password', $adminBasicPassword) ?: $adminBasicPassword);
+
 			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
 				return ['error' => 'An API key is required for api.openai.com'];
 			}
 			if ($apiKey !== '') {
 				$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
+			} elseif ($basicUser !== '' and $basicPassword !== '') {
+				$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
 			}
 
 			if ($contentType === null) {
