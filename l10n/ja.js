@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad credentials" : "不正な資格情報",
     "Connected accounts" : "接続済みアカウント",
     "Request timeout (seconds)" : "リクエストがタイムアウトするまでの秒数",
+    "Image generation" : "画像の生成",
     "Preview" : "プレビュー",
     "Advanced options" : "詳細オプション",
     "Send" : "送信",
