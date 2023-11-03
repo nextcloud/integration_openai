@@ -33,7 +33,9 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-
+/**
+ * @implements QBMapper<QuotaUsage>
+ */
 class QuotaUsageMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'openai_quota_usage', QuotaUsage::class);
@@ -88,6 +90,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
+	 * @throws \RuntimeException
 	 */
 	public function getQuotaUnitsInTimePeriod(int $type, int $timePeriod): int {
 		$qb = $this->db->getQueryBuilder();
@@ -120,6 +123,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
+	 * @throws \RuntimeException
 	 */
 	public function getQuotaUnitsOfUserInTimePeriod(string $userId, int $type, int $timePeriod): int {
 		$qb = $this->db->getQueryBuilder();
@@ -174,6 +178,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param int $type
 	 * @return int
 	 * @throws Exception
+	 * @throws \RuntimeException
 	 */
 	public function getQuotaUnitsOfUser(string $userId, int $type): int {
 		$qb = $this->db->getQueryBuilder();
@@ -199,6 +204,9 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param int $units
 	 * @return QuotaUsage
 	 * @throws Exception
+	 * @throws \RuntimeException
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
 	 */
 	public function createQuotaUsage(string $userId, int $type, int $units): QuotaUsage {
 		$qb = $this->db->getQueryBuilder();
@@ -223,6 +231,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param string $userId
 	 * @return void
 	 * @throws Exception
+	 * @throws \RuntimeException
 	 */
 	public function deleteUserQuotaUsages(string $userId): void {
 		$qb = $this->db->getQueryBuilder();
@@ -240,6 +249,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param int $type
 	 * @return void
 	 * @throws Exception
+	 * @throws \RuntimeException
 	 */
 	public function deleteUserQuotaUsagesByType(string $userId, int $type): void {
 		$qb = $this->db->getQueryBuilder();
@@ -259,6 +269,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param int $type
 	 * @return void
 	 * @throws Exception
+	 * @throws \RuntimeException
 	 */
 	public function deleteQuotaUsagesByType(int $type): void {
 		$qb = $this->db->getQueryBuilder();
@@ -275,6 +286,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param int $timePeriod Time period in days
 	 * @return void
 	 * @throws Exception
+	 * @throws \RuntimeException
 	 */
 	public function cleanupQuotaUsages(int $timePeriod): void {
 		$qb = $this->db->getQueryBuilder();

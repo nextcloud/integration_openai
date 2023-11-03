@@ -115,6 +115,7 @@ class OpenAiAPIController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse {
+		
 		$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
 		if (isset($response['error'])) {
 			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
@@ -167,7 +168,7 @@ class OpenAiAPIController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse {
-		$this->logger->warning('clearPromptHistory: ' . 'clearTextPrompts ' . strval($clearTextPrompts) . ' clearImagePrompts ' . strval($clearImagePrompts));
+		$this->logger->debug('Clearing prompt history: ' . 'clearTextPrompts ' . strval($clearTextPrompts) . ' clearImagePrompts ' . strval($clearImagePrompts));
 		if ($clearTextPrompts === True) {			
 			try {
 				$this->openAiAPIService->clearPromptHistory($this->userId, Application::PROMPT_TYPE_TEXT);

@@ -31,6 +31,7 @@ use OCP\IL10N;
 use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 use OCP\Http\Client\IClientService;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -40,7 +41,6 @@ class OpenAiAPIService {
 	private IClient $client;
 
 	public function __construct(
-		string $appName,
 		private LoggerInterface $logger,
 		private IL10N $l10n,
 		private IConfig $config,
@@ -99,7 +99,7 @@ class OpenAiAPIService {
 	/**
 	 * @param string $userId
 	 */
-	public function hasOwnOpenAiApiKey(string $userId): bool {
+	private function hasOwnOpenAiApiKey(string $userId): bool {
 		if(!$this->isUsingOpenAi()){
 			return false;
 		}
@@ -142,8 +142,13 @@ class OpenAiAPIService {
 		}
 
 		$quotaPeriod = intval($this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD));
-		$quotaUsage= $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
-
+		
+		try {
+			$quotaUsage= $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
+		} catch (DoesNotExistException | MultipleObjectsReturnedException | Exception | RuntimeException $e) {
+			throw new Exception('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
+		}
+		
 		return $quotaUsage >= $quota;
 	}
 
@@ -152,7 +157,7 @@ class OpenAiAPIService {
 	 * @return array
 	 */
 	public function getUserQuotaInfo(string $userId): array {
-		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit)
+		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit, just supply default values as fillers)
 		$quotas = $this->hasOwnOpenAiApiKey($userId) ?
 				Application::DEFAULT_QUOTAS :
 				json_decode($this->config->getAppValue(Application::APP_ID, 'quotas', json_encode(Application::DEFAULT_QUOTAS)));
@@ -199,6 +204,7 @@ class OpenAiAPIService {
 	 * @param bool $storePrompt
 	 * @return array|string[]
 	 * @throws \OCP\DB\Exception
+	 * @throws Exception
 	 */
 	public function createCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
 									 bool $storePrompt = true): array {
@@ -243,6 +249,7 @@ class OpenAiAPIService {
 	 * @param bool $storePrompt
 	 * @return array|string[]
 	 * @throws \OCP\DB\Exception
+	 * @throws Exception
 	 */
 	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
 										 bool $storePrompt = true): array {
@@ -353,7 +360,7 @@ class OpenAiAPIService {
 	 */
 	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
 		if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)){
-			return ['error' => 'Image generation quota exceeded'];
+			return ['error' => $this->l10n->t('Image generation quota exceeded')];
 		}
 		$this->config->setUserValue($userId, Application::APP_ID, 'last_image_size', $size);
 		$params = [

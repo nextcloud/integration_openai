@@ -47,7 +47,7 @@ class CleanupQuotaDb extends TimedJob {
 		$this->quotaUsageMapper->cleanupQuotaUsages(
             max(intval($this->config->getAppValue(Application::APP_ID, 
                                                 'quota_period', 
-                                                Application::DEFAULT_QUOTA_PERIOD)),
+                                                strval(Application::DEFAULT_QUOTA_PERIOD))),
             Application::DEFAULT_QUOTA_PERIOD));
 		
 	}
