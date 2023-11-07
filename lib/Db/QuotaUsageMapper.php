@@ -209,22 +209,15 @@ class QuotaUsageMapper extends QBMapper {
 	 * @throws MultipleObjectsReturnedException
 	 */
 	public function createQuotaUsage(string $userId, int $type, int $units): QuotaUsage {
-		$qb = $this->db->getQueryBuilder();
-
-		$timeStamp = (new DateTime())->getTimestamp();
-
-		$qb->insert($this->getTableName())
-			->values([
-				'type' => $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT),
-				'user_id' => $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR),
-				'units' => $qb->createNamedParameter($units, IQueryBuilder::PARAM_INT),
-				'timestamp' => $qb->createNamedParameter($timeStamp, IQueryBuilder::PARAM_INT),
-			]);
-
-		$qb->executeStatement();
-		$qb->resetQueryParts();
-
-		return $this->getQuotaUsageOfUser((int)$qb->getLastInsertId(), $userId);
+		
+		$quotaUsage = new QuotaUsage;
+		$quotaUsage->setUserId($userId);
+		$quotaUsage->setType($type);
+		$quotaUsage->setUnits($units);
+		$quotaUsage->setTimestamp((new DateTime())->getTimestamp());
+		$insertedQuotaUsage = $this->insert($quotaUsage);
+		
+		return $insertedQuotaUsage;
 	}
 
 	/**
