@@ -31,6 +31,7 @@ use OCP\IL10N;
 use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 use OCP\Http\Client\IClientService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use RuntimeException;
 use Throwable;
 
@@ -48,6 +49,7 @@ class OpenAiAPIService {
 		private ImageUrlMapper $imageUrlMapper,
 		private PromptMapper $promptMapper,
 		private QuotaUsageMapper $quotaUsageMapper,
+		private OpenAiSettingsService $openAiSettingsService,
 		IClientService $clientService
 	) {
 		$this->client = $clientService->newClient();
@@ -57,7 +59,7 @@ class OpenAiAPIService {
 	 * @return bool
 	 */
 	public function isUsingOpenAi(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'url') === '';
+		return $this->openAiSettingsService->getServiceUrl() === '';
 	}
 
 	/**
@@ -66,15 +68,6 @@ class OpenAiAPIService {
 	 */
 	public function getModels(string $userId): array {
 		return $this->request($userId, 'models');
-	}
-
-	/**
-	 * @param string $userId
-	 * @return string
-	 */
-	public function getUserDefaultCompletionModelId(string $userId): string {
-		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-		return $this->config->getUserValue($userId, Application::APP_ID, 'default_completion_model_id', $adminModel) ?: $adminModel;
 	}
 
 	/**
@@ -104,7 +97,7 @@ class OpenAiAPIService {
 			return false;
 		}
 
-		if($this->config->getUserValue($userId, Application::APP_ID, 'api_key') !== ''){
+		if($this->openAiSettingsService->getUserApiKey($userId) !== ''){
 			return true;
 		}
 
@@ -124,7 +117,7 @@ class OpenAiAPIService {
 			return false;
 		}
 		
-		if(!array_key_exists($type, Application::QUOTA_TYPES)){
+		if(!array_key_exists($type, Application::DEFAULT_QUOTAS)){
 			throw new Exception('Invalid quota type');
 		}
 
@@ -134,14 +127,14 @@ class OpenAiAPIService {
 		}
 
 		// Get quota limits
-		$quota = intval(json_decode($this->config->getAppValue(Application::APP_ID, 'quotas', json_encode(Application::DEFAULT_QUOTAS)))[$type]->value);
+		$quota = $this->openAiSettingsService->getQuotas()[$type];
 
 		if($quota === 0){
 			//  Unlimited quota:
 			return false;
 		}
 
-		$quotaPeriod = intval($this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD));
+		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
 		
 		try {
 			$quotaUsage= $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
@@ -153,23 +146,55 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * Translate the quota type
+	 * @param int $type
+	 */
+	public function translatedQuotaType(int $type): string {
+		switch ($type) {
+			case Application::QUOTA_TYPE_TEXT:
+				return $this->l10n->t('Text generation');
+			case Application::QUOTA_TYPE_IMAGE:
+				return $this->l10n->t('Image generation');
+			case Application::QUOTA_TYPE_TRANSCRIPTION:
+				return $this->l10n->t('Audio transcription');
+			default:
+				return $this->l10n->t('Unknown');
+		}
+	}
+
+	/**
+	 * Get translated unit of quota type
+	 * @param int $type
+	 */
+	public function translatedQuotaUnit(int $type): string {
+		switch ($type) {
+			case Application::QUOTA_TYPE_TEXT:
+				return $this->l10n->t('tokens');
+			case Application::QUOTA_TYPE_IMAGE:
+				return $this->l10n->t('images');
+			case Application::QUOTA_TYPE_TRANSCRIPTION:
+				return $this->l10n->t('seconds');
+			default:
+				return $this->l10n->t('Unknown');
+		}
+	}
+
+	/**
 	 * @param string $userId
 	 * @return array
 	 */
 	public function getUserQuotaInfo(string $userId): array {
 		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit, just supply default values as fillers)
-		$quotas = $this->hasOwnOpenAiApiKey($userId) ?
-				Application::DEFAULT_QUOTAS :
-				json_decode($this->config->getAppValue(Application::APP_ID, 'quotas', json_encode(Application::DEFAULT_QUOTAS)));
+		$quotas = $this->hasOwnOpenAiApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->openAiSettingsService->getQuotas();
 		// Get quota period
-		$quotaPeriod = intval($this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD));
+		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
 		// Get quota usage for each quota type:
 		$quotaInfo = [];
-		foreach (Application::QUOTA_TYPES as $quotaType => $quotaTypeName) {
-			$quotaInfo[$quotaType]['type'] = $quotaTypeName;
+		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
+			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
 			$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
-			$quotaInfo[$quotaType]['limit'] = intval($quotas[$quotaType]->value);
-			$quotaInfo[$quotaType]['unit'] = Application::QUOTA_UNITS[$quotaType];
+			$quotaInfo[$quotaType]['limit'] = intval($quotas[$quotaType]);
+			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
 		}
 
 		return [
@@ -186,10 +211,10 @@ class OpenAiAPIService {
 		$quotaPeriod = intval($this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD));
 		// Get quota usage of all users for each quota type:
 		$quotaInfo = [];
-		foreach (Application::QUOTA_TYPES as $quotaType => $quotaTypeName) {
-			$quotaInfo[$quotaType]['type'] = $quotaTypeName;
+		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
+			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
 			$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $quotaPeriod);
-			$quotaInfo[$quotaType]['unit'] = Application::QUOTA_UNITS[$quotaType];
+			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
 		}
 
 		return $quotaInfo;

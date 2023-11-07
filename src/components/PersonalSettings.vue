@@ -80,7 +80,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div v-if="!state.showQuotaRemovalInfo">
+			<div v-if="!state.isCustomService">
 				<p class="settings-hint">
 					<InformationOutlineIcon :size="20" class="icon" />
 					{{ t('integration_openai', 'Specifying your own API key will allow unlimited usage') }}
@@ -146,7 +146,7 @@ export default {
 		},
 		loadQuotaInfo() {
 			const url = generateUrl('/apps/integration_openai/quota-info')
-			const retVal = axios.get(url)
+			axios.get(url)
 				.then((response) => {
 					this.quotaInfo = response.data
 				})
@@ -156,6 +156,9 @@ export default {
 						+ ': ' + error.response?.request?.responseText
 					)
 				})
+			if (this.quotaInfo === null) {
+				return
+			}
 			// Loop through all quota types and check if any are limited by admin
 			// If so, show a hint that the user can provide their own api key to remove the limit
 			for (const quota of this.quotaInfo) {
@@ -164,8 +167,6 @@ export default {
 					break
 				}
 			}
-
-			return retVal
 		},
 		capitalizedWord(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)

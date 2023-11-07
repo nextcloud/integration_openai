@@ -84,7 +84,7 @@
 					{{ t('integration_openai', 'Request timeout (seconds)') }}
 				</label>
 				<input id="openai-api-timeout"
-					v-model="state.request_timeout"
+					v-model.number="state.request_timeout"
 					type="number"
 					@input="onInput(false)">
 			</div>
@@ -98,7 +98,7 @@
 						{{ t('integration_openai', 'Quota enforcement time period (days)') }}
 					</label>
 					<input id="openai-api-quota-period"
-						v-model="state.quota_period"
+						v-model.number="state.quota_period"
 						type="number"
 						@input="onInput(false)">
 				</div>
@@ -120,14 +120,14 @@
 								</th>
 							</tr>
 						</thead>
-						<tbody>
-							<tr v-for="(quota,index) in state.quotas" :key="quota.type">
+						<tbody v-if="quotaInfo !== null">
+							<tr v-for="(_,index) in state.quotas" :key="index">
 								<td class="text-cell">
-									{{ t('integration_openai', capitalizedWord(quota.type)) }}
+									{{ quotaInfo[index].type }}
 								</td>
 								<td>
-									<input :id="'openai-api-quota-' + quota.type"
-										v-model="quota.value"
+									<input :id="'openai-api-quota-' + index"
+										v-model.number="state.quotas[index]"
 										:title="t('integration_openai', 'A per-user limit for uasge of this API type (0 for unlimited))')"
 										type="number"
 										@input="onInput(false)">
@@ -150,7 +150,7 @@
 						{{ t('integration_openai', 'Max new tokens per request') }}
 					</label>
 					<input id="openai-api-max-tokens"
-						v-model="state.max_tokens"
+						v-model.number="state.max_tokens"
 						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')"
 						type="number"
 						@input="onInput(false)">
@@ -397,6 +397,9 @@ export default {
 		> input {
 			width: 300px;
 		}
+		> input:invalid {
+			border-color: var(--color-error);
+		}
 		.spacer {
 			display: inline-block;
 			width: 32px;
@@ -411,7 +414,11 @@ export default {
 			th, td {
 				width: 300px;
 				text-align: left;
+				> input:invalid {
+					border-color: var(--color-error);
+				}
 			}
+
 		}
 	}
 

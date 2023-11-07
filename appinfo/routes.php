@@ -11,7 +11,7 @@
 
 return [
 	'routes' => [
-		['name' => 'config#setConfig', 'url' => '/config', 'verb' => 'PUT'],
+		['name' => 'config#setUserConfig', 'url' => '/config', 'verb' => 'PUT'],
 		['name' => 'config#setAdminConfig', 'url' => '/admin-config', 'verb' => 'PUT'],
 		['name' => 'config#getLastImageSize', 'url' => '/last-image-size', 'verb' => 'GET'],
 

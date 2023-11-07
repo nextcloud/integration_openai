@@ -27,6 +27,7 @@ use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 
 class OpenAiAPIController extends Controller {
 
@@ -34,6 +35,7 @@ class OpenAiAPIController extends Controller {
 		string                   $appName,
 		IRequest                 $request,
 		private OpenAiAPIService $openAiAPIService,
+		private OpenAiSettingsService $openAiSettingsService,
 		private IInitialState    $initialStateService,
 		private ?string          $userId,
 		private LoggerInterface  $logger,
@@ -50,7 +52,7 @@ class OpenAiAPIController extends Controller {
 		if (isset($response['error'])) {
 			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
 		}
-		$response['default_completion_model_id'] = $this->openAiAPIService->getUserDefaultCompletionModelId($this->userId);
+		$response['default_completion_model_id'] = $this->openAiSettingsService->getUserDefaultCompletionModelId($this->userId);
 		return new DataResponse($response);
 	}
 
@@ -79,7 +81,7 @@ class OpenAiAPIController extends Controller {
 	#[NoAdminRequired]
 	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse {
 		if ($model === null) {
-			$model = $this->openAiAPIService->getUserDefaultCompletionModelId($this->userId);
+			$model = $this->openAiSettingsService->getUserDefaultCompletionModelId($this->userId);
 		}
 		if (str_starts_with($model, 'gpt-')) {
 			$response = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, $n, $model, $maxTokens);
