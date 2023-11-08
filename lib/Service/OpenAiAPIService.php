@@ -59,7 +59,8 @@ class OpenAiAPIService {
 	 * @return bool
 	 */
 	public function isUsingOpenAi(): bool {
-		return $this->openAiSettingsService->getServiceUrl() === '';
+		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+		return $serviceUrl === '' || $$serviceUrl === Application::OPENAI_API_BASE_URL;
 	}
 
 	/**

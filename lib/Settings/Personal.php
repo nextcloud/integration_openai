@@ -24,7 +24,7 @@ class Personal implements ISettings {
 	public function getForm(): TemplateResponse {
 		$userApiKey = $this->openAiSettingsService->getUserApiKey($this->userId);
 		$adminServiceUrl = $this->openAiSettingsService->getServiceUrl();
-		$isCustomService = $adminServiceUrl !== Application::OPENAI_API_BASE_URL;
+		$isCustomService = $adminServiceUrl !== Application::OPENAI_API_BASE_URL && $adminServiceUrl !== '';
 
 		$state = [
 			'api_key' => $userApiKey,
