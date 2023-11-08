@@ -6,8 +6,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## 1.0.14 – 2023-11-03
-
 ### Added
 
 - Enable clearing of prompt history from personal settings page @MB-Finski

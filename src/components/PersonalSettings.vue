@@ -74,7 +74,7 @@
 								{{ Math.round(quota.used / quota.limit * 100) + ' %' }}
 							</td>
 							<td v-else>
-								{{ t('integration_openai',quota.used + ' ' + quota.unit) }}
+								{{ quota.used + ' ' + quota.unit }}
 							</td>
 						</tr>
 					</tbody>

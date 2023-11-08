@@ -132,7 +132,7 @@
 										type="number"
 										@input="onInput(false)">
 									<span v-if="quotaInfo !== null" class="text-cell">
-										{{ t('integration_openai', quotaInfo[index].unit) }}
+										{{ quotaInfo[index].unit }}
 									</span>
 								</td>
 								<td v-if="quotaInfo !== null" class="text-cell">
