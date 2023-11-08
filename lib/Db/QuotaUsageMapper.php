@@ -204,9 +204,6 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param int $units
 	 * @return QuotaUsage
 	 * @throws Exception
-	 * @throws \RuntimeException
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
 	 */
 	public function createQuotaUsage(string $userId, int $type, int $units): QuotaUsage {
 		
@@ -233,8 +230,7 @@ class QuotaUsageMapper extends QBMapper {
 				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
 			);
 		$qb->executeStatement();
-		$qb->resetQueryParts();
-	}
+		}
 
 	/**
 	 * Delete user prompts by type
@@ -254,7 +250,6 @@ class QuotaUsageMapper extends QBMapper {
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
 			);
 		$qb->executeStatement();
-		$qb->resetQueryParts();
 	}
 
 	/**
@@ -271,7 +266,6 @@ class QuotaUsageMapper extends QBMapper {
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
 			);
 		$qb->executeStatement();
-		$qb->resetQueryParts();
 	}
 
 	/**
@@ -290,6 +284,5 @@ class QuotaUsageMapper extends QBMapper {
 				$qb->expr()->lt('timestamp', $qb->createNamedParameter($periodStart, IQueryBuilder::PARAM_INT))
 			);
 		$qb->executeStatement();
-		$qb->resetQueryParts();
 	}
 }

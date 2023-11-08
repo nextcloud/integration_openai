@@ -71,7 +71,7 @@
 						<tr v-for="quota in quotaInfo.quota_usage" :key="quota.type">
 							<td>{{ t('integration_openai', capitalizedWord(quota.type)) }} </td>
 							<td v-if="quota.limit > 0">
-								{{ quota.used / quota.limit * 100 + ' %' }}
+								{{ Math.round(quota.used / quota.limit * 100) + ' %' }}
 							</td>
 							<td v-else>
 								{{ t('integration_openai',quota.used + ' ' + quota.unit) }}

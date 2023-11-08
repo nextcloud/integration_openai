@@ -22,23 +22,27 @@ use OCP\AppFramework\Http\DataDisplayResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
-use OCP\DB\Exception;
+use OCP\DB\Exception as DBException;
+use OCP\IL10N;
+use Exception;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 
-class OpenAiAPIController extends Controller {
+class OpenAiAPIController extends Controller
+{
 
 	public function __construct(
-		string                   $appName,
-		IRequest                 $request,
+		string $appName,
+		IRequest $request,
 		private OpenAiAPIService $openAiAPIService,
 		private OpenAiSettingsService $openAiSettingsService,
-		private IInitialState    $initialStateService,
-		private ?string          $userId,
-		private LoggerInterface  $logger,
+		private IInitialState $initialStateService,
+		private ?string $userId,
+		private LoggerInterface $logger,
+		private IL10N $l10n
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -47,11 +51,14 @@ class OpenAiAPIController extends Controller {
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function getModels(): DataResponse {
-		$response = $this->openAiAPIService->getModels($this->userId);
-		if (isset($response['error'])) {
-			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
+	public function getModels(): DataResponse
+	{
+		try {
+			$response = $this->openAiAPIService->getModels($this->userId);
+		} catch (Exception $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
+
 		$response['default_completion_model_id'] = $this->openAiSettingsService->getUserDefaultCompletionModelId($this->userId);
 		return new DataResponse($response);
 	}
@@ -59,14 +66,16 @@ class OpenAiAPIController extends Controller {
 	/**
 	 * @param int $type
 	 * @return DataResponse
-	 * @throws Exception
 	 */
 	#[NoAdminRequired]
-	public function getPromptHistory(int $type): DataResponse {
-		$response = $this->openAiAPIService->getPromptHistory($this->userId, $type);
-		if (isset($response['error'])) {
-			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
+	public function getPromptHistory(int $type): DataResponse
+	{
+		try {
+			$response = $this->openAiAPIService->getPromptHistory($this->userId, $type);
+		} catch (Exception $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
+
 		return new DataResponse($response);
 	}
 
@@ -76,21 +85,23 @@ class OpenAiAPIController extends Controller {
 	 * @param string|null $model
 	 * @param int $maxTokens
 	 * @return DataResponse
-	 * @throws Exception
 	 */
 	#[NoAdminRequired]
-	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse {
+	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse
+	{
 		if ($model === null) {
 			$model = $this->openAiSettingsService->getUserDefaultCompletionModelId($this->userId);
 		}
-		if (str_starts_with($model, 'gpt-')) {
-			$response = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, $n, $model, $maxTokens);
-		} else {
-			$response = $this->openAiAPIService->createCompletion($this->userId, $prompt, $n, $model, $maxTokens);
+		try {
+			if (str_starts_with($model, 'gpt-')) {
+				$response = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, $n, $model, $maxTokens);
+			} else {
+				$response = $this->openAiAPIService->createCompletion($this->userId, $prompt, $n, $model, $maxTokens);
+			}
+		} catch (Exception $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
-		if (isset($response['error'])) {
-			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
-		}
+
 		return new DataResponse($response);
 	}
 
@@ -100,27 +111,30 @@ class OpenAiAPIController extends Controller {
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function transcribe(string $audioBase64, bool $translate = true): DataResponse {
-		$response = $this->openAiAPIService->transcribeBase64Mp3($this->userId, $audioBase64, $translate);
-		if (isset($response['error'])) {
-			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
+	public function transcribe(string $audioBase64, bool $translate = true): DataResponse
+	{
+		try {
+			$response = $this->openAiAPIService->transcribeBase64Mp3($this->userId, $audioBase64, $translate);
+		} catch (Exception $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
-		return new DataResponse($response);
+
+		return new DataResponse(['text' => $response]);
 	}
 
 	/**
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $size
-	 * @return DataResponse
-	 * @throws Exception
 	 */
 	#[NoAdminRequired]
-	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse {
-		
-		$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
-		if (isset($response['error'])) {
-			return new DataResponse($response, Http::STATUS_BAD_REQUEST);
+	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse
+	{
+
+		try {
+			$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
+		} catch (Exception $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
 		}
 		return new DataResponse($response);
 	}
@@ -135,8 +149,14 @@ class OpenAiAPIController extends Controller {
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse {
-		$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
+	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse
+	{
+		try {
+			$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
+		} catch (Exception $e) {
+			return new DataDisplayResponse('', Http::STATUS_NOT_FOUND);
+		}
+
 		if ($image !== null && isset($image['body'], $image['headers'])) {
 			$response = new DataDisplayResponse(
 				$image['body'],
@@ -152,13 +172,16 @@ class OpenAiAPIController extends Controller {
 	/**
 	 * @param string $hash
 	 * @return TemplateResponse
-	 * @throws Exception
-	 * @throws MultipleObjectsReturnedException
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getImageGenerationPage(string $hash): TemplateResponse {
-		$generationData = $this->openAiAPIService->getGenerationInfo($hash);
+	public function getImageGenerationPage(string $hash): TemplateResponse
+	{
+		try {
+			$generationData = $this->openAiAPIService->getGenerationInfo($hash);
+		} catch (Exception $e) {
+			$generationData['error'] = $e->getMessage();
+		}
 		$this->initialStateService->provideInitialState('generation', $generationData);
 		return new TemplateResponse(Application::APP_ID, 'imageGenerationPage');
 	}
@@ -169,21 +192,22 @@ class OpenAiAPIController extends Controller {
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse {
+	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse
+	{
 		$this->logger->debug('Clearing prompt history: ' . 'clearTextPrompts ' . strval($clearTextPrompts) . ' clearImagePrompts ' . strval($clearImagePrompts));
-		if ($clearTextPrompts === True) {			
+		if ($clearTextPrompts === True) {
 			try {
 				$this->openAiAPIService->clearPromptHistory($this->userId, Application::PROMPT_TYPE_TEXT);
-			} catch (Exception $e) {				
-				return new DataResponse(['error' => $e->getMessage()],Http::STATUS_BAD_REQUEST);
-			}			
+			} catch (DBException $e) {
+				return new DataResponse($this->l10n->t('Unknown error while clearing prompt history'), Http::STATUS_BAD_REQUEST);
+			}
 		}
 
 		if ($clearImagePrompts === True) {
 			try {
 				$this->openAiAPIService->clearPromptHistory($this->userId, Application::PROMPT_TYPE_IMAGE);
-			} catch (Exception $e) {				
-				return new DataResponse(['error' => $e->getMessage()],Http::STATUS_BAD_REQUEST);
+			} catch (DBException $e) {
+				return new DataResponse($this->l10n->t('Unknown error while clearing prompt history'), Http::STATUS_BAD_REQUEST);
 			}
 		}
 
@@ -195,9 +219,10 @@ class OpenAiAPIController extends Controller {
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function getUserQuotaInfo(): DataResponse {
+	public function getUserQuotaInfo(): DataResponse
+	{
 		$info = $this->openAiAPIService->getUserQuotaInfo($this->userId);
-		
+
 		return new DataResponse($info);
 	}
 
@@ -206,9 +231,10 @@ class OpenAiAPIController extends Controller {
 	 * Admin only!
 	 * @return DataResponse
 	 */
-	public function getAdminQuotaInfo(): DataResponse {
+	public function getAdminQuotaInfo(): DataResponse
+	{
 		$info = $this->openAiAPIService->getAdminQuotaInfo();
-		
+
 		return new DataResponse($info);
 	}
 }

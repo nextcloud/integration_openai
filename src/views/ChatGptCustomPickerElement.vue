@@ -335,8 +335,8 @@ export default {
 			return axios.post(url, params)
 				.then((response) => {
 					const data = response.data
-					if (data.choices && data.choices.length && data.choices.length > 0) {
-						this.processCompletion(data.choices)
+					if (data && data.length && data.length > 0) {
+						this.processCompletion(data)
 						this.insertPrompt(this.query)
 					} else {
 						this.error = response.data.error
@@ -358,9 +358,7 @@ export default {
 				})
 		},
 		processCompletion(choices) {
-			const answers = this.selectedModel.id.startsWith('gpt-')
-				? choices.filter(c => !!c.message?.content).map(c => c.message?.content.replace(/^\s+|\s+$/g, ''))
-				: choices.filter(c => !!c.text).map(c => c.text.replace(/^\s+|\s+$/g, ''))
+			const answers = choices.map(c => c.replace(/^\s+|\s+$/g, ''))
 			if (answers.length > 0) {
 				if (answers.length === 1) {
 					this.result = this.includeQuery

@@ -9,6 +9,7 @@ use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextProcessing\FreePromptTaskType;
 use OCP\TextProcessing\IProvider;
+use Exception;
 
 
 class FreePromptProvider implements IProvider {
@@ -30,14 +31,15 @@ class FreePromptProvider implements IProvider {
 	public function process(string $prompt): string {
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 		// Max tokens are limited later to max tokens specified in the admin settings so here we just request PHP_INT_MAX
-		$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
-		if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
-			$choice = $completion['choices'][0];
-			if (isset($choice['message'], $choice['message']['content'])) {
-				return $choice['message']['content'];
-			}
+		try {
+			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
+		} catch (Exception $e) {
+			throw new Exception('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
-		throw new \Exception('No result in OpenAI/LocalAI response. ' . ($completion['error'] ?? ''));
+		if (count($completion) > 0)
+			return array_pop($completion);			
+
+		throw new Exception('No result in OpenAI/LocalAI response. ' . ($completion['error'] ?? ''));
 	}
 
 	public function getTaskType(): string {

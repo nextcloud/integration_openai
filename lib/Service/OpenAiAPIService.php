@@ -13,6 +13,7 @@ namespace OCA\OpenAi\Service;
 
 use DateTime;
 use Exception;
+use OCP\Db\Exception as DBException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use OCA\OpenAi\AppInfo\Application;
@@ -38,7 +39,8 @@ use Throwable;
 /**
  * Service to make requests to OpenAI REST API
  */
-class OpenAiAPIService {
+class OpenAiAPIService
+{
 	private IClient $client;
 
 	public function __construct(
@@ -58,46 +60,72 @@ class OpenAiAPIService {
 	/**
 	 * @return bool
 	 */
-	public function isUsingOpenAi(): bool {
+	public function isUsingOpenAi(): bool
+	{
 		return $this->openAiSettingsService->getServiceUrl() === '';
 	}
 
 	/**
 	 * @param string $userId
 	 * @return array|string[]
+	 * @throws Exception
 	 */
-	public function getModels(string $userId): array {
-		return $this->request($userId, 'models');
+	public function getModels(string $userId): array
+	{
+		$response = $this->request($userId, 'models');
+		if (!isset($response['data'])) {
+			if (isset($response['error']['message'])) {
+				$this->logger->warning('Error while retreiving models: ' . $response['error']['message']);
+				throw new Exception($this->l10n->t("Models api call error: ") . $response['error']['message']);
+			}
+			$this->logger->warning('Error retrieving models: ' . json_encode($response));
+			throw new Exception($this->l10n->t('Unknown models error'));
+		}
+		return $response;
 	}
 
 	/**
 	 * @param string $userId
 	 * @param int $type
 	 * @return array
-	 * @throws \OCP\DB\Exception
+	 * @throws Exception
 	 */
-	public function getPromptHistory(string $userId, int $type): array {
-		return $this->promptMapper->getPromptsOfUser($userId, $type);
+	public function getPromptHistory(string $userId, int $type): array
+	{
+		try {
+			return $this->promptMapper->getPromptsOfUser($userId, $type);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not retrieve prompt history for user: ' . $userId . ' and prompt type: ' . $type . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			throw new Exception($this->l10n->t('Unknown error while retrieving prompt history.'));
+		}
 	}
 
 	/**
 	 * Clear prompt history for a prompt type
 	 * @param string $userId
 	 * @param int $type
+	 * @throws Exception
 	 */
-	public function clearPromptHistory(string $userId, int $type): void {
-		$this->promptMapper->deleteUserPromptsByType($userId, $type);
+	public function clearPromptHistory(string $userId, int $type): void
+	{
+		try {
+			$this->promptMapper->deleteUserPromptsByType($userId, $type);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not clear prompt history for user: ' . $userId . ' and prompt type: ' . $type . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			throw new Exception($this->l10n->t('Unknown error while clearing prompt history.'));
+		}
 	}
 
 	/**
 	 * @param string $userId
 	 */
-	private function hasOwnOpenAiApiKey(string $userId): bool {
-		if(!$this->isUsingOpenAi()){
+	private function hasOwnOpenAiApiKey(string $userId): bool
+	{
+		if (!$this->isUsingOpenAi()) {
 			return false;
 		}
 
-		if($this->openAiSettingsService->getUserApiKey($userId) !== ''){
+		if ($this->openAiSettingsService->getUserApiKey($userId) !== '') {
 			return true;
 		}
 
@@ -112,16 +140,17 @@ class OpenAiAPIService {
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function isQuotaExceeded(?string $userId, int $type): bool {
-		if($userId === null){
+	public function isQuotaExceeded(?string $userId, int $type): bool
+	{
+		if ($userId === null) {
 			return false;
 		}
-		
-		if(!array_key_exists($type, Application::DEFAULT_QUOTAS)){
+
+		if (!array_key_exists($type, Application::DEFAULT_QUOTAS)) {
 			throw new Exception('Invalid quota type');
 		}
 
-		if($this->hasOwnOpenAiApiKey($userId)){
+		if ($this->hasOwnOpenAiApiKey($userId)) {
 			// User has specified own OpenAI API key, no quota limit:
 			return false;
 		}
@@ -129,19 +158,20 @@ class OpenAiAPIService {
 		// Get quota limits
 		$quota = $this->openAiSettingsService->getQuotas()[$type];
 
-		if($quota === 0){
+		if ($quota === 0) {
 			//  Unlimited quota:
 			return false;
 		}
 
 		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
-		
+
 		try {
-			$quotaUsage= $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
-		} catch (DoesNotExistException | MultipleObjectsReturnedException | Exception | RuntimeException $e) {
-			throw new Exception('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
+			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
+		} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
+			$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
+			throw new Exception('Could not retrieve quota usage.');
 		}
-		
+
 		return $quotaUsage >= $quota;
 	}
 
@@ -149,7 +179,8 @@ class OpenAiAPIService {
 	 * Translate the quota type
 	 * @param int $type
 	 */
-	public function translatedQuotaType(int $type): string {
+	public function translatedQuotaType(int $type): string
+	{
 		switch ($type) {
 			case Application::QUOTA_TYPE_TEXT:
 				return $this->l10n->t('Text generation');
@@ -166,7 +197,8 @@ class OpenAiAPIService {
 	 * Get translated unit of quota type
 	 * @param int $type
 	 */
-	public function translatedQuotaUnit(int $type): string {
+	public function translatedQuotaUnit(int $type): string
+	{
 		switch ($type) {
 			case Application::QUOTA_TYPE_TEXT:
 				return $this->l10n->t('tokens');
@@ -182,8 +214,10 @@ class OpenAiAPIService {
 	/**
 	 * @param string $userId
 	 * @return array
+	 * @throws Exception
 	 */
-	public function getUserQuotaInfo(string $userId): array {
+	public function getUserQuotaInfo(string $userId): array
+	{
 		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit, just supply default values as fillers)
 		$quotas = $this->hasOwnOpenAiApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->openAiSettingsService->getQuotas();
 		// Get quota period
@@ -192,7 +226,12 @@ class OpenAiAPIService {
 		$quotaInfo = [];
 		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
 			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
-			$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
+			try {
+				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
+			} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
+				$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.'));
+			}
 			$quotaInfo[$quotaType]['limit'] = intval($quotas[$quotaType]);
 			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
 		}
@@ -205,15 +244,23 @@ class OpenAiAPIService {
 
 	/**
 	 * @return array
+	 * @throws Exception
 	 */
-	public function getAdminQuotaInfo(): array {
+	public function getAdminQuotaInfo(): array
+	{
 		// Get quota period
-		$quotaPeriod = intval($this->config->getAppValue(Application::APP_ID, 'quota_period', Application::DEFAULT_QUOTA_PERIOD));
+		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
 		// Get quota usage of all users for each quota type:
 		$quotaInfo = [];
 		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
 			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
-			$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $quotaPeriod);
+			try {
+				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $quotaPeriod);
+			} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
+				$this->logger->warning('Could not retrieve quota usage for quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+				// We can pass detailed error info to the UI here since the user is an admin in any case:
+				throw new Exception('Could not retrieve quota usage: ' . $e->getMessage());
+			}
 			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
 		}
 
@@ -228,95 +275,149 @@ class OpenAiAPIService {
 	 * @param int $maxTokens
 	 * @param bool $storePrompt
 	 * @return array|string[]
-	 * @throws \OCP\DB\Exception
 	 * @throws Exception
 	 */
-	public function createCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
-									 bool $storePrompt = true): array {
-		
-	if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)){
-		return ['error' => 'Text generation quota exceeded'];
-	}		
-	
-	$maxTokensLimit = intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', Application::DEFAULT_MAX_NUM_OF_TOKENS));
-	if($maxTokens > $maxTokensLimit){
-		$maxTokens = $maxTokensLimit;
-	}
+	public function createCompletion(
+		?string $userId,
+		string $prompt,
+		int $n,
+		string $model,
+		int $maxTokens = 1000,
+		bool $storePrompt = true
+	): array {
 
-	$params = [
-		'model' => $model,
-		'messages' => [['role' => 'user', 'content' => $prompt ]],
-		'max_tokens' => $maxTokens,
-		'n' => $n,
-	];
-
-	$result = $this->request($userId, 'completions', $params, 'POST');
-
-	if (!isset($result['error']))
-	{
-		$usage = $result['usage']['total_tokens'];
-		$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
-
-		if ($userId !== null && $storePrompt) {
-			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
+			throw new Exception($this->l10n->t('Text generation quota exceeded'));
 		}
+
+		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
+		if ($maxTokens > $maxTokensLimit) {
+			$maxTokens = $maxTokensLimit;
+		}
+
+		$params = [
+			'model' => $model,
+			'messages' => [['role' => 'user', 'content' => $prompt]],
+			'max_tokens' => $maxTokens,
+			'n' => $n,
+		];
+
+		$response = $this->request($userId, 'completions', $params, 'POST');
+
+		if (!isset($response['choices'])) {
+			$this->logger->warning('Text generation error: ' . json_encode($response));
+			throw new Exception($this->l10n->t('Unknown text generation error'));
+		}
+
+		if (isset($response['usage'])) {
+			$usage = $response['usage']['total_tokens'];
+			try {
+				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			}
+
+			if ($userId !== null && $storePrompt) {
+				try {
+					$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+				} catch (DBException $e) {
+					$this->logger->warning('Could not store prompt for user: ' . $userId . ' and prompt: ' . $prompt . '. Error: ' . $e->getMessage());
+				}
+			}
+		}
+		$completions = [];
+
+		foreach ($response['choices'] as $choice) {
+			$completions[] = $choice['text'];
+		}
+
+		return $completions;
 	}
-	
-	return $result;
-}
 
 	/**
+	 * Returns an array of completions
+	 * 
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $model
 	 * @param int $maxTokens
 	 * @param bool $storePrompt
-	 * @return array|string[]
-	 * @throws \OCP\DB\Exception
+	 * @return string[]
 	 * @throws Exception
 	 */
-	public function createChatCompletion(?string $userId, string $prompt, int $n, string $model, int $maxTokens = 1000,
-										 bool $storePrompt = true): array {
-		if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)){
-			return ['error' => 'Text generation quota exceeded'];
-		}		
-		
-		$maxTokensLimit = intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', Application::DEFAULT_MAX_NUM_OF_TOKENS));
-		if($maxTokens > $maxTokensLimit){
+	public function createChatCompletion(
+		?string $userId,
+		string $prompt,
+		int $n,
+		string $model,
+		int $maxTokens = 1000,
+		bool $storePrompt = true
+	): array {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
+			throw new Exception($this->l10n->t('Text generation quota exceeded'));
+		}
+
+		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
+		if ($maxTokens > $maxTokensLimit) {
 			$maxTokens = $maxTokensLimit;
 		}
 
 		$params = [
 			'model' => $model,
-			'messages' => [['role' => 'user', 'content' => $prompt ]],
+			'messages' => [['role' => 'user', 'content' => $prompt]],
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
 
-		$result = $this->request($userId, 'chat/completions', $params, 'POST');
+		$response = $this->request($userId, 'chat/completions', $params, 'POST');
 
-		if (!isset($result['error']))
-		{
-			$usage = $result['usage']['total_tokens'];
-			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+		if (!isset($response['choices'])) {
+			$this->logger->warning('Text generation error: ' . json_encode($response));
+			throw new Exception($this->l10n->t('Unknown text generation error'));
+		}
+
+		if (isset($response['usage'])) {
+			$usage = $response['usage']['total_tokens'];
+
+			try {
+				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			}
+
 
 			if ($userId !== null && $storePrompt) {
-				$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+				try {
+					$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
+				} catch (DBException $e) {
+					$this->logger->warning('Could not store prompt for user: ' . $userId . ' and prompt: ' . $prompt . '. Error: ' . $e->getMessage());
+				}
+
 			}
 		}
-		
-		return $result;
+		$completions = [];
+
+		foreach ($response['choices'] as $choice) {
+			$completions[] = $choice['message']['content'];
+		}
+
+		return $completions;
 	}
 
 	/**
 	 * @param string|null $userId
 	 * @param string $audioBase64
 	 * @param bool $translate
-	 * @return array|string[]
+	 * @return string
+	 * @throws Exception
 	 */
-	public function transcribeBase64Mp3(?string $userId, string $audioBase64, bool $translate = true,
-										string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): array	{
+	public function transcribeBase64Mp3(
+		?string $userId,
+		string $audioBase64,
+		bool $translate = true,
+		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
+	): string {
 		return $this->transcribe(
 			$userId,
 			base64_decode(str_replace('data:audio/mp3;base64,', '', $audioBase64)),
@@ -330,15 +431,24 @@ class OpenAiAPIService {
 	 * @param File $file
 	 * @param bool $translate
 	 * @return string
-	 * @throws LockedException
-	 * @throws NotPermittedException
-	 * @throws GenericFileException
+	 * @throws Exception
 	 */
-	public function transcribeFile(?string $userId, File $file, bool $translate = false,
-								   string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): string {
-		$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
+	public function transcribeFile(
+		?string $userId,
+		File $file,
+		bool $translate = false,
+		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
+	): string {
+		try {
+			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
+		} catch (NotPermittedException | LockedException | GenericFileException $e) {
+			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			throw new Exception($this->l10n->t('Could not read audio file.'));
+		}
+
 		if (!isset($transcriptionResponse['text'])) {
-			throw new Exception('Error transcribing file "' . $file->getName() . '": ' . json_encode($transcriptionResponse));
+			$this->logger->warning('Audio file transcription error: ' . json_encode($transcriptionResponse));
+			throw new Exception($this->l10n->t('Unknown audio file trancription error'));
 		}
 		return $transcriptionResponse['text'];
 	}
@@ -348,31 +458,46 @@ class OpenAiAPIService {
 	 * @param string $audioFileContent
 	 * @param bool $translate
 	 * @param string $model
-	 * @return array|string[]
+	 * @return string
+	 * @throws Exception
 	 */
-	public function transcribe(?string $userId, string $audioFileContent, bool $translate = true,
-							   string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID): array {
-		if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)){
-			return ['error' => 'Transcription usage quota exceeded'];
+	public function transcribe(
+		?string $userId,
+		string $audioFileContent,
+		bool $translate = true,
+		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
+	): array {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
+			throw new Exception($this->l10n->t('Audio transcription quota exceeded'));
 		}
-		
+
 		$params = [
 			'model' => $model,
 			'file' => $audioFileContent,
-			'response_format' => 'verbose_json', // Verbose needed for extraction of audio duration
+			'response_format' => 'verbose_json',
+			// Verbose needed for extraction of audio duration
 		];
 		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
 		$contentType = 'multipart/form-data';
-//		$contentType = 'application/x-www-form-urlencoded';
 
 		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType);
+
+		if (!isset($response['text'])) {
+			$this->logger->warning('Audio transcription error: ' . json_encode($response));
+			throw new Exception($this->l10n->t('Unknown audio trancription error'));
+		}
+
+		// Extract audio duration from response and store it as quota usage:
 		if (isset($response['segments'])) {
 			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
-			// Duration no longer needed:
-			unset($response['segments']);
-			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+
+			try {
+				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			}
 		}
-		return $response;
+		return $response['text'];
 	}
 
 	/**
@@ -381,31 +506,53 @@ class OpenAiAPIService {
 	 * @param int $n
 	 * @param string $size
 	 * @return array|string[]
-	 * @throws \OCP\DB\Exception
+	 * @throws Exception
 	 */
-	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
-		if($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)){
-			return ['error' => $this->l10n->t('Image generation quota exceeded')];
+	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array
+	{
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
+			throw new Exception($this->l10n->t('Image generation quota exceeded'));
 		}
-		$this->config->setUserValue($userId, Application::APP_ID, 'last_image_size', $size);
+
+		if ($userId !== null) {
+			$this->openAiSettingsService->setLastImageSize($userId, $size);
+		}
+
 		$params = [
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => $n,
 			'response_format' => 'url',
 		];
+
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
+
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
-		if (isset($apiResponse['error'])) {
-			return $apiResponse;
-		}
 
-		if (isset($apiResponse['data']) && is_array($apiResponse['data'])) {
-			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_IMAGE, $userId, $prompt);
+		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
 
-			$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_IMAGE, $n);
+			if (isset($apiResponse['error']['message'])) {
+				$this->logger->warning('OpenAI image generation error: ' . $apiResponse['error']['message']);
+				throw new Exception($this->l10n->t("Image generation api call error: ") . $apiResponse['error']['message']);
+			}
+			$this->logger->warning('OpenAI image generation error: ' . json_encode($apiResponse));
+			throw new Exception($this->l10n->t('Unknown image generation error'));
+
+		} else {
+			try {
+				$this->promptMapper->createPrompt(Application::PROMPT_TYPE_IMAGE, $userId, $prompt);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not store prompt for user: ' . $userId . ' and prompt: ' . $prompt . '. Error: ' . $e->getMessage());
+			}
+
+			try {
+				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_IMAGE, $n);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			}
+
 
 			$urls = array_map(static function (array $result) {
 				return $result['url'] ?? null;
@@ -417,7 +564,13 @@ class OpenAiAPIService {
 			if (!empty($urls)) {
 				$hash = md5(implode('|', $urls));
 				$ts = (new DateTime())->getTimestamp();
-				$this->imageGenerationMapper->createImageGeneration($hash, $prompt, $ts, $urls);
+				try {
+					$this->imageGenerationMapper->createImageGeneration($hash, $prompt, $ts, $urls);
+				} catch (DBException $e) {
+					$this->logger->warning('Could not create image generation for hash: ' . $hash . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+					throw new Exception($this->l10n->t('Unknown image generation error'));
+				}
+
 				return ['hash' => $hash];
 			}
 		}
@@ -428,10 +581,10 @@ class OpenAiAPIService {
 	/**
 	 * @param string $hash
 	 * @return array|string[]
-	 * @throws MultipleObjectsReturnedException
-	 * @throws \OCP\DB\Exception
+	 * @throws Exception
 	 */
-	public function getGenerationInfo(string $hash): array {
+	public function getGenerationInfo(string $hash): array
+	{
 		try {
 			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
 			$imageUrls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
@@ -442,9 +595,11 @@ class OpenAiAPIService {
 				'urls' => $imageUrls,
 			];
 		} catch (DoesNotExistException $e) {
-			return [
-				'error' => 'notfound',
-			];
+			$this->logger->debug('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			throw new Exception($this->l10n->t('Image not generation found'));
+		} catch (Exception | DBException | MultipleObjectsReturnedException $e) {
+			$this->logger->debug('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			throw new Exception($this->l10n->t('Unknown image generation request error'));
 		}
 	}
 
@@ -452,11 +607,10 @@ class OpenAiAPIService {
 	 * @param string $hash
 	 * @param int $urlId
 	 * @return array|null
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
-	 * @throws \OCP\DB\Exception
+	 * @throws Exception
 	 */
-	public function getGenerationImage(string $hash, int $urlId): ?array {
+	public function getGenerationImage(string $hash, int $urlId): ?array
+	{
 		try {
 			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
 			$imageUrl = $this->imageUrlMapper->getImageUrlOfGeneration($imageGeneration->getId(), $urlId);
@@ -465,10 +619,13 @@ class OpenAiAPIService {
 				'body' => $imageResponse->getBody(),
 				'headers' => $imageResponse->getHeaders(),
 			];
-		} catch (Exception | Throwable $e) {
-			$this->logger->debug('OpenAI image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
+		} catch (DoesNotExistException $e) {
+			$this->logger->debug('Image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			throw new Exception($this->l10n->t('Image not found'));
+		} catch (Exception | DBException | MultipleObjectsReturnedException $e) {
+			$this->logger->debug('Image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			throw new Exception($this->l10n->t('Unknown image request error'));
 		}
-		return null;
 	}
 
 	/**
@@ -479,8 +636,10 @@ class OpenAiAPIService {
 	 * @param string $method HTTP query method
 	 * @param string|null $contentType
 	 * @return array decoded request result or error
+	 * @throws Exception
 	 */
-	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
+	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array
+	{
 		try {
 			$serviceUrl = $this->config->getAppValue(Application::APP_ID, 'url', Application::OPENAI_API_BASE_URL) ?: Application::OPENAI_API_BASE_URL;
 			$timeout = $this->config->getAppValue(Application::APP_ID, 'request_timeout', Application::OPENAI_DEFAULT_REQUEST_TIMEOUT) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
@@ -562,17 +721,14 @@ class OpenAiAPIService {
 			$responseBody = $e->getResponse()->getBody();
 			$parsedResponseBody = json_decode($responseBody, true);
 			if ($e->getResponse()->getStatusCode() === 404) {
-				$this->logger->debug('OpenAI API error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
+				$this->logger->debug('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 			} else {
-				$this->logger->warning('OpenAI API error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
+				$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 			}
-			return [
-				'error' => $e->getMessage(),
-				'body' => $parsedResponseBody,
-			];
+			throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message']);
 		} catch (Exception | Throwable $e) {
-			$this->logger->warning('OpenAI API error : ' . $e->getMessage(), ['exception' => $e]);
-			return ['error' => $e->getMessage()];
+			$this->logger->warning('API request error : ' . $e->getMessage(), ['exception' => $e]);
+			throw new Exception('Unknow api request error.');
 		}
 	}
 }

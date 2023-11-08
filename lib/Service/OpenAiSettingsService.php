@@ -297,7 +297,7 @@ class OpenAiSettingsService
     public function setServiceUrl(string $serviceUrl): void
     {
         // Validate input:
-        if (!filter_var($serviceUrl, FILTER_VALIDATE_URL)) {
+        if (!filter_var($serviceUrl, FILTER_VALIDATE_URL) && $serviceUrl !== '') {
             throw new Exception('Invalid service URL');
         }
         $this->config->setAppValue(Application::APP_ID, 'url', $serviceUrl);
@@ -441,5 +441,15 @@ class OpenAiSettingsService
     public function setSttProviderEnabled(bool $enabled): void
     {
         $this->config->setAppValue(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
+    }
+
+    /**
+     * @param string $userId
+     * @param string $imageSize
+     * @return void
+     */
+    public function setLastImageSize(string $userId, string $imageSize): void
+    {
+        $this->config->setUserValue($userId, Application::APP_ID, 'last_image_size', $imageSize);
     }
 }

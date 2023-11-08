@@ -179,7 +179,6 @@ class PromptMapper extends QBMapper {
 				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
 			);
 		$qb->executeStatement();
-		$qb->resetQueryParts();
 	}
 
 	/**
@@ -199,7 +198,6 @@ class PromptMapper extends QBMapper {
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
 			);
 		$qb->executeStatement();
-		$qb->resetQueryParts();
 	}
 
 	/**
@@ -246,7 +244,6 @@ class PromptMapper extends QBMapper {
 					$qb->expr()->lt('timestamp', $qb->createNamedParameter($firstPromptTsToKeep, IQueryBuilder::PARAM_INT))
 				);
 			$qb->executeStatement();
-			$qb->resetQueryParts();
 		}
 	}
 }

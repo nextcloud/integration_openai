@@ -105,7 +105,6 @@ class ImageUrlMapper extends QBMapper {
 				$qb->expr()->eq('generation_id', $qb->createNamedParameter($generationId, IQueryBuilder::PARAM_INT))
 			);
 		$qb->executeStatement();
-		$qb->resetQueryParts();
 	}
 
 	/**
