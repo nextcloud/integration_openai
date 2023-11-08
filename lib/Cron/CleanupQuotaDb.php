@@ -40,7 +40,7 @@ class CleanupQuotaDb extends TimedJob {
 		private IConfig $config
 	) {
 		parent::__construct($time);
-		$this->setInterval(60 * 60 * 1); // Daily
+		$this->setInterval(60 * 60 * 24); // Daily
 	}
 
 	protected function run($argument) {
