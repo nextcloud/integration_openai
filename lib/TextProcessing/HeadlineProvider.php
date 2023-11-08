@@ -1,18 +1,18 @@
 <?php
 
 declare(strict_types=1);
+
 namespace OCA\OpenAi\TextProcessing;
 
+use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextProcessing\HeadlineTaskType;
 use OCP\TextProcessing\IProvider;
-use Exception;
 
 class HeadlineProvider implements IProvider {
-
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,
@@ -36,8 +36,9 @@ class HeadlineProvider implements IProvider {
 		} catch (Exception $e) {
 			throw new Exception('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
-		if (count($completion) > 0)
-			return array_pop($completion);			
+		if (count($completion) > 0) {
+			return array_pop($completion);
+		}
 
 		throw new Exception('No result in OpenAI/LocalAI response. ' . ($completion['error'] ?? ''));
 	}

@@ -38,7 +38,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setTimestamp(int $timestamp)
  */
 class Prompt extends Entity implements \JsonSerializable {
-
 	/** @var string */
 	protected $userId;
 	/** @var int */

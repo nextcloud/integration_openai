@@ -7,12 +7,14 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
-        "nextcloud/coding-standard": "^1.1"
+        "php": "^7.4 || ^8.0"
     },
     "scripts": {
 		"lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"cs:fix": "php-cs-fixer fix"		
-	}
+	},
+    "require-dev": {
+        "nextcloud/coding-standard": "^1.1"
+    }
 }

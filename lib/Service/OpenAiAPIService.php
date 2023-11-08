@@ -13,7 +13,6 @@ namespace OCA\OpenAi\Service;
 
 use DateTime;
 use Exception;
-use OCP\Db\Exception as DBException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use OCA\OpenAi\AppInfo\Application;
@@ -23,24 +22,23 @@ use OCA\OpenAi\Db\PromptMapper;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+use OCP\Db\Exception as DBException;
 use OCP\Files\File;
 use OCP\Files\GenericFileException;
 use OCP\Files\NotPermittedException;
 use OCP\Http\Client\IClient;
+use OCP\Http\Client\IClientService;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
-use OCP\Http\Client\IClientService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 use RuntimeException;
 use Throwable;
 
 /**
  * Service to make requests to OpenAI REST API
  */
-class OpenAiAPIService
-{
+class OpenAiAPIService {
 	private IClient $client;
 
 	public function __construct(
@@ -60,8 +58,7 @@ class OpenAiAPIService
 	/**
 	 * @return bool
 	 */
-	public function isUsingOpenAi(): bool
-	{
+	public function isUsingOpenAi(): bool {
 		return $this->openAiSettingsService->getServiceUrl() === '';
 	}
 
@@ -70,8 +67,7 @@ class OpenAiAPIService
 	 * @return array|string[]
 	 * @throws Exception
 	 */
-	public function getModels(string $userId): array
-	{
+	public function getModels(string $userId): array {
 		$response = $this->request($userId, 'models');
 		if (!isset($response['data'])) {
 			if (isset($response['error']['message'])) {
@@ -90,8 +86,7 @@ class OpenAiAPIService
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getPromptHistory(string $userId, int $type): array
-	{
+	public function getPromptHistory(string $userId, int $type): array {
 		try {
 			return $this->promptMapper->getPromptsOfUser($userId, $type);
 		} catch (DBException $e) {
@@ -106,8 +101,7 @@ class OpenAiAPIService
 	 * @param int $type
 	 * @throws Exception
 	 */
-	public function clearPromptHistory(string $userId, int $type): void
-	{
+	public function clearPromptHistory(string $userId, int $type): void {
 		try {
 			$this->promptMapper->deleteUserPromptsByType($userId, $type);
 		} catch (DBException $e) {
@@ -119,8 +113,7 @@ class OpenAiAPIService
 	/**
 	 * @param string $userId
 	 */
-	private function hasOwnOpenAiApiKey(string $userId): bool
-	{
+	private function hasOwnOpenAiApiKey(string $userId): bool {
 		if (!$this->isUsingOpenAi()) {
 			return false;
 		}
@@ -140,8 +133,7 @@ class OpenAiAPIService
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function isQuotaExceeded(?string $userId, int $type): bool
-	{
+	public function isQuotaExceeded(?string $userId, int $type): bool {
 		if ($userId === null) {
 			return false;
 		}
@@ -179,8 +171,7 @@ class OpenAiAPIService
 	 * Translate the quota type
 	 * @param int $type
 	 */
-	public function translatedQuotaType(int $type): string
-	{
+	public function translatedQuotaType(int $type): string {
 		switch ($type) {
 			case Application::QUOTA_TYPE_TEXT:
 				return $this->l10n->t('Text generation');
@@ -197,8 +188,7 @@ class OpenAiAPIService
 	 * Get translated unit of quota type
 	 * @param int $type
 	 */
-	public function translatedQuotaUnit(int $type): string
-	{
+	public function translatedQuotaUnit(int $type): string {
 		switch ($type) {
 			case Application::QUOTA_TYPE_TEXT:
 				return $this->l10n->t('tokens');
@@ -216,8 +206,7 @@ class OpenAiAPIService
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getUserQuotaInfo(string $userId): array
-	{
+	public function getUserQuotaInfo(string $userId): array {
 		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit, just supply default values as fillers)
 		$quotas = $this->hasOwnOpenAiApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->openAiSettingsService->getQuotas();
 		// Get quota period
@@ -246,8 +235,7 @@ class OpenAiAPIService
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getAdminQuotaInfo(): array
-	{
+	public function getAdminQuotaInfo(): array {
 		// Get quota period
 		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
 		// Get quota usage of all users for each quota type:
@@ -336,7 +324,7 @@ class OpenAiAPIService
 
 	/**
 	 * Returns an array of completions
-	 * 
+	 *
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param int $n
@@ -508,8 +496,7 @@ class OpenAiAPIService
 	 * @return array|string[]
 	 * @throws Exception
 	 */
-	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array
-	{
+	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'));
 		}
@@ -583,8 +570,7 @@ class OpenAiAPIService
 	 * @return array|string[]
 	 * @throws Exception
 	 */
-	public function getGenerationInfo(string $hash): array
-	{
+	public function getGenerationInfo(string $hash): array {
 		try {
 			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
 			$imageUrls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
@@ -609,8 +595,7 @@ class OpenAiAPIService
 	 * @return array|null
 	 * @throws Exception
 	 */
-	public function getGenerationImage(string $hash, int $urlId): ?array
-	{
+	public function getGenerationImage(string $hash, int $urlId): ?array {
 		try {
 			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
 			$imageUrl = $this->imageUrlMapper->getImageUrlOfGeneration($imageGeneration->getId(), $urlId);
@@ -638,8 +623,7 @@ class OpenAiAPIService
 	 * @return array decoded request result or error
 	 * @throws Exception
 	 */
-	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array
-	{
+	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
 		try {
 			$serviceUrl = $this->config->getAppValue(Application::APP_ID, 'url', Application::OPENAI_API_BASE_URL) ?: Application::OPENAI_API_BASE_URL;
 			$timeout = $this->config->getAppValue(Application::APP_ID, 'request_timeout', Application::OPENAI_DEFAULT_REQUEST_TIMEOUT) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
@@ -700,11 +684,11 @@ class OpenAiAPIService
 
 			if ($method === 'GET') {
 				$response = $this->client->get($url, $options);
-			} else if ($method === 'POST') {
+			} elseif ($method === 'POST') {
 				$response = $this->client->post($url, $options);
-			} else if ($method === 'PUT') {
+			} elseif ($method === 'PUT') {
 				$response = $this->client->put($url, $options);
-			} else if ($method === 'DELETE') {
+			} elseif ($method === 'DELETE') {
 				$response = $this->client->delete($url, $options);
 			} else {
 				return ['error' => $this->l10n->t('Bad HTTP method')];

@@ -25,14 +25,15 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Db;
 
-use DateTime;
 use DateInterval;
+use DateTime;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+
 /**
  * @implements QBMapper<QuotaUsage>
  */
@@ -97,7 +98,7 @@ class QuotaUsageMapper extends QBMapper {
 
 		// Get a timestamp of the beginning of the time period
 		$periodStart = (new DateTime())->sub(new DateInterval('P' . $timePeriod . 'D'))->getTimestamp();
-		
+
 		// Get the sum of the units used in the time period
 		$qb->select($qb->createFunction('SUM(units)'))
 			->from($this->getTableName())
@@ -107,11 +108,11 @@ class QuotaUsageMapper extends QBMapper {
 			->andWhere(
 				$qb->expr()->gt('timestamp', $qb->createNamedParameter($periodStart, IQueryBuilder::PARAM_INT))
 			);
-		
+
 		// Execute the query and return the result
 		$result = (int)$qb->executeQuery()->fetchOne();
 		$qb->resetQueryParts();
-		
+
 		return $result;
 	}
 
@@ -130,7 +131,7 @@ class QuotaUsageMapper extends QBMapper {
 
 		// Get a timestamp of the beginning of the time period
 		$periodStart = (new DateTime())->sub(new DateInterval('P' . $timePeriod . 'D'))->getTimestamp();
-		
+
 		// Get the sum of the units used in the time period
 		$qb->select($qb->createFunction('SUM(units)'))
 			->from($this->getTableName())
@@ -143,11 +144,11 @@ class QuotaUsageMapper extends QBMapper {
 			->andWhere(
 				$qb->expr()->gt('timestamp', $qb->createNamedParameter($periodStart, IQueryBuilder::PARAM_INT))
 			);
-		
+
 		// Execute the query and return the result
 		$result = (int)$qb->executeQuery()->fetchOne();
 		$qb->resetQueryParts();
-		
+
 		return $result;
 	}
 
@@ -167,7 +168,7 @@ class QuotaUsageMapper extends QBMapper {
 			)->andWhere(
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
 			);
-		
+
 		$qb->orderBy('timestamp', 'DESC');
 
 		return $this->findEntities($qb);
@@ -194,7 +195,7 @@ class QuotaUsageMapper extends QBMapper {
 		// Execute the query and return the result
 		$result = (int)$qb->executeQuery()->fetchOne();
 		$qb->resetQueryParts();
-		
+
 		return $result;
 	}
 
@@ -206,14 +207,14 @@ class QuotaUsageMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function createQuotaUsage(string $userId, int $type, int $units): QuotaUsage {
-		
-		$quotaUsage = new QuotaUsage;
+
+		$quotaUsage = new QuotaUsage();
 		$quotaUsage->setUserId($userId);
 		$quotaUsage->setType($type);
 		$quotaUsage->setUnits($units);
 		$quotaUsage->setTimestamp((new DateTime())->getTimestamp());
 		$insertedQuotaUsage = $this->insert($quotaUsage);
-		
+
 		return $insertedQuotaUsage;
 	}
 
@@ -230,7 +231,7 @@ class QuotaUsageMapper extends QBMapper {
 				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
 			);
 		$qb->executeStatement();
-		}
+	}
 
 	/**
 	 * Delete user prompts by type

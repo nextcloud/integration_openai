@@ -36,7 +36,6 @@ use OCP\Migration\SimpleMigrationStep;
  * Auto-generated migration step: Please modify to your needs!
  */
 class Version010100Date20231008173034 extends SimpleMigrationStep {
-
 	/**
 	 * @param IOutput $output
 	 * @param Closure(): ISchemaWrapper $schemaClosure
@@ -70,7 +69,7 @@ class Version010100Date20231008173034 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('units', Types::INTEGER, [
 				'notnull' => true,
-			]);			
+			]);
 			$table->addColumn('timestamp', Types::INTEGER, [
 				'notnull' => true,
 			]);
@@ -78,7 +77,7 @@ class Version010100Date20231008173034 extends SimpleMigrationStep {
 			$table->addIndex(['user_id'], 'oai_quota_userid');
 			$table->addIndex(['type'], 'oai_quota_type');
 			$table->addIndex(['timestamp'], 'oai_quota_timestamp');
-			$table->addIndex(['type','timestamp'], 'oai_quota_type_ts');			
+			$table->addIndex(['type','timestamp'], 'oai_quota_type_ts');
 		}
 
 		return $schema;

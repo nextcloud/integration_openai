@@ -11,20 +11,19 @@
 
 namespace OCA\OpenAi\Controller;
 
-use OCP\AppFramework\Http\Attribute\NoAdminRequired;
-use OCP\IConfig;
-use OCP\IRequest;
-use OCP\AppFramework\Http\DataResponse;
+use Exception;
+use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 
-use OCA\OpenAi\AppInfo\Application;
+use OCP\AppFramework\Http\DataResponse;
+use OCP\IConfig;
+use OCP\IRequest;
 use OCP\PreConditionNotMetException;
-use Exception;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 
 class ConfigController extends Controller {
-
 	public function __construct(
 		string $appName,
 		IRequest $request,
@@ -64,7 +63,7 @@ class ConfigController extends Controller {
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
-		
+
 		return new DataResponse(1);
 	}
 

@@ -34,7 +34,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setUrl(string $url)
  */
 class ImageUrl extends Entity implements \JsonSerializable {
-
 	/** @var int */
 	protected $generationId;
 	/** @var string */

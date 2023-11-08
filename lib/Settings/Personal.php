@@ -1,15 +1,15 @@
 <?php
+
 namespace OCA\OpenAi\Settings;
 
+use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IConfig;
 use OCP\Settings\ISettings;
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 
 class Personal implements ISettings {
-
 	public function __construct(
 		private IConfig $config,
 		private IInitialState $initialStateService,

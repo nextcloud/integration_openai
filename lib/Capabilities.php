@@ -9,7 +9,6 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Capabilities\IPublicCapability;
 
 class Capabilities implements IPublicCapability {
-
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 	) {

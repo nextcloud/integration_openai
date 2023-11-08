@@ -27,19 +27,20 @@ namespace OCA\OpenAi\Db;
 
 use DateTime;
 use OCA\OpenAi\AppInfo\Application;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+
 use OCP\IDBConnection;
 
-use OCP\AppFramework\Db\DoesNotExistException;
-
 class ImageGenerationMapper extends QBMapper {
-
-	public function __construct(IDBConnection  $db,
-								private ImageUrlMapper $imageUrlMapper) {
+	public function __construct(
+		IDBConnection  $db,
+		private ImageUrlMapper $imageUrlMapper
+	) {
 		parent::__construct($db, 'openai_i_gen', ImageGeneration::class);
 	}
 

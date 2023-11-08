@@ -4,8 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "730e742e41c67142e642f840d597ef5f",
-    "packages": [
+    "content-hash": "c8c054df8a002223382485e318d3487d",
+    "packages": [],
+    "packages-dev": [
         {
             "name": "nextcloud/coding-standard",
             "version": "v1.1.1",
@@ -49,16 +50,16 @@
         },
         {
             "name": "php-cs-fixer/shim",
-            "version": "v3.37.1",
+            "version": "v3.38.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/shim.git",
-                "reference": "e1f64aca03848c60d6eca5ab0dfc8b9f9678cb27"
+                "reference": "2317318f4187904d6331e68ae730808b6c3ae98a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/e1f64aca03848c60d6eca5ab0dfc8b9f9678cb27",
-                "reference": "e1f64aca03848c60d6eca5ab0dfc8b9f9678cb27",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/2317318f4187904d6331e68ae730808b6c3ae98a",
+                "reference": "2317318f4187904d6331e68ae730808b6c3ae98a",
                 "shasum": ""
             },
             "require": {
@@ -95,12 +96,11 @@
             "description": "A tool to automatically fix PHP code style",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/shim/issues",
-                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.37.1"
+                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.38.0"
             },
-            "time": "2023-10-29T20:52:01+00:00"
+            "time": "2023-11-07T08:45:37+00:00"
         }
     ],
-    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],

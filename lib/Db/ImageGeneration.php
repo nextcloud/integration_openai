@@ -36,7 +36,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setLastUsedTimestamp(int $lastUsedTimestamp)
  */
 class ImageGeneration extends Entity implements \JsonSerializable {
-
 	/** @var string */
 	protected $hash;
 	/** @var string */

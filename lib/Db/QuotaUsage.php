@@ -37,9 +37,7 @@ use OCP\AppFramework\Db\Entity;
  * @method int getTimestamp()
  * @method void setTimestamp(int $timestamp)
  */
-class QuotaUsage extends Entity implements \JsonSerializable
-{
-
+class QuotaUsage extends Entity implements \JsonSerializable {
 	/** @var string */
 	protected $userId;
 	/** @var int */
@@ -49,8 +47,7 @@ class QuotaUsage extends Entity implements \JsonSerializable
 	/** @var int */
 	protected $timestamp;
 
-	public function __construct()
-	{
+	public function __construct() {
 		$this->addType('user_id', 'string');
 		$this->addType('type', 'integer');
 		$this->addType('units', 'integer');
@@ -58,8 +55,7 @@ class QuotaUsage extends Entity implements \JsonSerializable
 	}
 
 	#[\ReturnTypeWillChange]
-	public function jsonSerialize()
-	{
+	public function jsonSerialize() {
 		return [
 			'id' => $this->id,
 			'user_id' => $this->userId,

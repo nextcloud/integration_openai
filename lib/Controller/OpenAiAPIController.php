@@ -11,7 +11,10 @@
 
 namespace OCA\OpenAi\Controller;
 
+use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -24,16 +27,11 @@ use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\DB\Exception as DBException;
 use OCP\IL10N;
-use Exception;
+
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
-use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
-
-class OpenAiAPIController extends Controller
-{
-
+class OpenAiAPIController extends Controller {
 	public function __construct(
 		string $appName,
 		IRequest $request,
@@ -51,8 +49,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function getModels(): DataResponse
-	{
+	public function getModels(): DataResponse {
 		try {
 			$response = $this->openAiAPIService->getModels($this->userId);
 		} catch (Exception $e) {
@@ -68,8 +65,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function getPromptHistory(int $type): DataResponse
-	{
+	public function getPromptHistory(int $type): DataResponse {
 		try {
 			$response = $this->openAiAPIService->getPromptHistory($this->userId, $type);
 		} catch (Exception $e) {
@@ -87,8 +83,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse
-	{
+	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse {
 		if ($model === null) {
 			$model = $this->openAiSettingsService->getUserDefaultCompletionModelId($this->userId);
 		}
@@ -111,8 +106,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function transcribe(string $audioBase64, bool $translate = true): DataResponse
-	{
+	public function transcribe(string $audioBase64, bool $translate = true): DataResponse {
 		try {
 			$response = $this->openAiAPIService->transcribeBase64Mp3($this->userId, $audioBase64, $translate);
 		} catch (Exception $e) {
@@ -128,8 +122,7 @@ class OpenAiAPIController extends Controller
 	 * @param string $size
 	 */
 	#[NoAdminRequired]
-	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse
-	{
+	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse {
 
 		try {
 			$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
@@ -149,8 +142,7 @@ class OpenAiAPIController extends Controller
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse
-	{
+	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse {
 		try {
 			$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
 		} catch (Exception $e) {
@@ -175,8 +167,7 @@ class OpenAiAPIController extends Controller
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getImageGenerationPage(string $hash): TemplateResponse
-	{
+	public function getImageGenerationPage(string $hash): TemplateResponse {
 		try {
 			$generationData = $this->openAiAPIService->getGenerationInfo($hash);
 		} catch (Exception $e) {
@@ -192,10 +183,9 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse
-	{
+	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse {
 		$this->logger->debug('Clearing prompt history: ' . 'clearTextPrompts ' . strval($clearTextPrompts) . ' clearImagePrompts ' . strval($clearImagePrompts));
-		if ($clearTextPrompts === True) {
+		if ($clearTextPrompts === true) {
 			try {
 				$this->openAiAPIService->clearPromptHistory($this->userId, Application::PROMPT_TYPE_TEXT);
 			} catch (DBException $e) {
@@ -203,7 +193,7 @@ class OpenAiAPIController extends Controller
 			}
 		}
 
-		if ($clearImagePrompts === True) {
+		if ($clearImagePrompts === true) {
 			try {
 				$this->openAiAPIService->clearPromptHistory($this->userId, Application::PROMPT_TYPE_IMAGE);
 			} catch (DBException $e) {
@@ -219,8 +209,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function getUserQuotaInfo(): DataResponse
-	{
+	public function getUserQuotaInfo(): DataResponse {
 		$info = $this->openAiAPIService->getUserQuotaInfo($this->userId);
 
 		return new DataResponse($info);
@@ -231,8 +220,7 @@ class OpenAiAPIController extends Controller
 	 * Admin only!
 	 * @return DataResponse
 	 */
-	public function getAdminQuotaInfo(): DataResponse
-	{
+	public function getAdminQuotaInfo(): DataResponse {
 		$info = $this->openAiAPIService->getAdminQuotaInfo();
 
 		return new DataResponse($info);

@@ -23,7 +23,6 @@ declare(strict_types=1);
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 namespace OCA\OpenAi\Translation;
 
 use Exception;
@@ -39,7 +38,6 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class TranslationProvider implements ITranslationProvider, IDetectLanguageProvider {
-
 	public function __construct(
 		private ICacheFactory $cacheFactory,
 		private IFactory $l10nFactory,
@@ -73,8 +71,10 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 				}
 
 				$availableLanguages[] = new LanguageTuple(
-					$sourceLanguage['code'], $sourceLanguage['name'],
-					$targetLanguage['code'], $targetLanguage['name']
+					$sourceLanguage['code'],
+					$sourceLanguage['name'],
+					$targetLanguage['code'],
+					$targetLanguage['name']
 				);
 			}
 		}
