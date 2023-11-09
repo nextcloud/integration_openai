@@ -46,6 +46,7 @@ class CleanupQuotaDb extends TimedJob {
 	protected function run($argument) {
 		$this->logger->debug('Run cleanup job for OpenAI quota db');
 		$this->quotaUsageMapper->cleanupQuotaUsages(
+			// The mimimum period is limited to DEFAULT_QUOTA_PERIOD
 			max(
 				intval($this->config->getAppValue(
 					Application::APP_ID,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\OpenAi\TextProcessing;
 
 use Exception;
+use RuntimeException;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IConfig;
@@ -34,13 +35,13 @@ class HeadlineProvider implements IProvider {
 		try {
 			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
 		} catch (Exception $e) {
-			throw new Exception('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			throw new RunTimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
 			return array_pop($completion);
 		}
 
-		throw new Exception('No result in OpenAI/LocalAI response. ' . ($completion['error'] ?? ''));
+		throw new RunTimeException('No result in OpenAI/LocalAI response. ');
 	}
 
 	public function getTaskType(): string {
