@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 /**
- * @author Julien Veyssier <julien-nc@posteo.net>
- * @copyright Julien Veyssier 2022
+ * @author Sami Finnilä <sami.finnila@gmail.com>
+ * @copyright Sami Finnilä 2023
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -25,24 +25,38 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Cron;
 
-use OCA\OpenAi\Db\ImageGenerationMapper;
+use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
+use OCP\IConfig;
 use Psr\Log\LoggerInterface;
 
-class CleanupImageGenerations extends TimedJob {
+class CleanupQuotaDb extends TimedJob {
 	public function __construct(
 		ITimeFactory $time,
-		private ImageGenerationMapper $imageGenerationMapper,
-		private LoggerInterface $logger
+		private QuotaUsageMapper $quotaUsageMapper,
+		private LoggerInterface $logger,
+		private IConfig $config
 	) {
 		parent::__construct($time);
-		$this->setInterval(60 * 60 * 24);
+		$this->setInterval(60 * 60 * 24); // Daily
 	}
 
 	protected function run($argument) {
-		$this->logger->debug('Run cleanup job for OpenAI image generations');
-		$cleanedUp = $this->imageGenerationMapper->cleanupGenerations();
-		$this->logger->debug('Deleted ' . $cleanedUp . ' idle generations');
+		$this->logger->debug('Run cleanup job for OpenAI quota db');
+		$this->quotaUsageMapper->cleanupQuotaUsages(
+			// The mimimum period is limited to DEFAULT_QUOTA_PERIOD to not lose
+			// the stored quota usage data below this limit.
+			max(
+				intval($this->config->getAppValue(
+					Application::APP_ID,
+					'quota_period',
+					strval(Application::DEFAULT_QUOTA_PERIOD)
+				)),
+				Application::DEFAULT_QUOTA_PERIOD
+			)
+		);
+
 	}
 }

@@ -11,21 +11,23 @@
 
 namespace OCA\OpenAi\Controller;
 
+use Exception;
+use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
+
+use OCP\AppFramework\Http\DataResponse;
 use OCP\IConfig;
 use OCP\IRequest;
-use OCP\AppFramework\Http\DataResponse;
-use OCP\AppFramework\Controller;
-
-use OCA\OpenAi\AppInfo\Application;
 use OCP\PreConditionNotMetException;
 
 class ConfigController extends Controller {
-
 	public function __construct(
 		string $appName,
 		IRequest $request,
 		private IConfig $config,
+		private OpenAiSettingsService $openAiSettingsService,
 		private ?string $userId
 	) {
 		parent::__construct($appName, $request);
@@ -39,9 +41,11 @@ class ConfigController extends Controller {
 	 * @throws PreConditionNotMetException
 	 */
 	#[NoAdminRequired]
-	public function setConfig(array $values): DataResponse {
-		foreach ($values as $key => $value) {
-			$this->config->setUserValue($this->userId, Application::APP_ID, $key, $value);
+	public function setUserConfig(array $values): DataResponse {
+		try {
+			$this->openAiSettingsService->setUserConfig($this->userId, $values);
+		} catch (Exception $e) {
+			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
 		return new DataResponse(1);
 	}
@@ -53,9 +57,12 @@ class ConfigController extends Controller {
 	 * @return DataResponse
 	 */
 	public function setAdminConfig(array $values): DataResponse {
-		foreach ($values as $key => $value) {
-			$this->config->setAppValue(Application::APP_ID, $key, $value);
+		try {
+			$this->openAiSettingsService->setAdminConfig($values);
+		} catch (Exception $e) {
+			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
+
 		return new DataResponse(1);
 	}
 
@@ -63,7 +70,7 @@ class ConfigController extends Controller {
 	 * @return DataResponse
 	 */
 	public function getLastImageSize(): DataResponse {
-		$size = $this->config->getUserValue($this->userId, Application::APP_ID, 'last_image_size', Application::DEFAULT_IMAGE_SIZE);
+		$size = $this->openAiSettingsService->getLastImageSize($this->userId);
 		return new DataResponse($size);
 	}
 }

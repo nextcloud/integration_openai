@@ -29,6 +29,7 @@
 				</label>
 				<input id="openai-api-key"
 					v-model="state.api_key"
+					autocomplete="off"
 					type="password"
 					:readonly="readonly"
 					:placeholder="t('integration_openai', 'your API key')"
@@ -83,14 +84,82 @@
 					{{ t('integration_openai', 'Request timeout (seconds)') }}
 				</label>
 				<input id="openai-api-timeout"
-					v-model="state.request_timeout"
+					v-model.number="state.request_timeout"
 					type="number"
 					@input="onInput(false)">
 			</div>
 			<div>
-				<h3>
-					{{ t('integration_openai', 'Select which features you want to enable') }}
-				</h3>
+				<h2 class="mid-setting-heading">
+					{{ t('integration_openai', 'Usage limits') }}
+				</h2>
+				<div class="line">
+					<!--Time period in days for the token usage-->
+					<label for="openai-api-quota-period">
+						{{ t('integration_openai', 'Quota enforcement time period (days)') }}
+					</label>
+					<input id="openai-api-quota-period"
+						v-model.number="state.quota_period"
+						type="number"
+						@input="onInput(false)">
+				</div>
+				<div class="line">
+					<!--Loop through all quota types and list an input for them on this line-->
+					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
+					<label for="openai-api-quotas">
+						{{ t('integration_openai', 'Usage quotas per time period') }}
+					</label>
+					<table class="quota-table">
+						<thead>
+							<tr>
+								<th width="120px">
+									{{ t('integration_openai', 'Quota type') }}
+								</th>
+								<th>{{ t('integration_openai', 'Per-user quota / period') }}</th>
+								<th v-if="quotaInfo !== null">
+									{{ t('integration_openai', 'Current system-wide usage / period') }}
+								</th>
+							</tr>
+						</thead>
+						<tbody v-if="quotaInfo !== null">
+							<tr v-for="(_,index) in state.quotas" :key="index">
+								<td class="text-cell">
+									{{ quotaInfo[index].type }}
+								</td>
+								<td>
+									<input :id="'openai-api-quota-' + index"
+										v-model.number="state.quotas[index]"
+										:title="t('integration_openai', 'A per-user limit for uasge of this API type (0 for unlimited))')"
+										type="number"
+										@input="onInput(false)">
+									<span v-if="quotaInfo !== null" class="text-cell">
+										{{ quotaInfo[index].unit }}
+									</span>
+								</td>
+								<td v-if="quotaInfo !== null" class="text-cell">
+									{{ quotaInfo[index].used }}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="line">
+					<!--A input for max number of tokens to generate for a single request-->
+					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
+					<label for="openai-api-max-tokens">
+						<InformationOutlineIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'Max new tokens per request') }}
+					</label>
+					<input id="openai-api-max-tokens"
+						v-model.number="state.max_tokens"
+						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')"
+						type="number"
+						@input="onInput(false)">
+				</div>
+			</div>
+			<div>
+				<h2 class="mid-setting-heading">
+					{{ t('integration_openai', 'Select enabled features') }}
+				</h2>
 				<NcCheckboxRadioSwitch
 					:checked="state.whisper_picker_enabled"
 					@update:checked="onCheckboxChanged($event, 'whisper_picker_enabled')">
@@ -165,6 +234,7 @@ export default {
 			models: null,
 			selectedModel: null,
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
+			quotaInfo: null,
 		}
 	},
 
@@ -194,6 +264,7 @@ export default {
 		if (this.configured) {
 			this.getModels()
 		}
+		this.loadQuotaInfo()
 	},
 
 	methods: {
@@ -228,6 +299,22 @@ export default {
 			this.state.default_completion_model_id = selected.id
 			this.saveOptions({ default_completion_model_id: this.state.default_completion_model_id })
 		},
+		loadQuotaInfo() {
+			const url = generateUrl('/apps/integration_openai/admin-quota-info')
+			return axios.get(url)
+				.then((response) => {
+					this.quotaInfo = response.data
+				})
+				.catch((error) => {
+					showError(
+						t('integration_openai', 'Failed to load quota info')
+						+ ': ' + error.response?.request?.responseText
+					)
+				})
+		},
+		capitalizedWord(word) {
+			return word.charAt(0).toUpperCase() + word.slice(1)
+		},
 		onCheckboxChanged(newValue, key) {
 			this.state[key] = newValue
 			this.saveOptions({ [key]: this.state[key] ? '1' : '0' })
@@ -238,6 +325,9 @@ export default {
 					api_key: this.state.api_key,
 					url: this.state.url,
 					request_timeout: this.state.request_timeout,
+					max_tokens: this.state.max_tokens,
+					quota_period: this.state.quota_period,
+					quotas: this.state.quotas,
 				}).then(() => {
 					if (getModels) {
 						this.models = null
@@ -293,6 +383,11 @@ export default {
 		margin-right: 8px;
 	}
 
+	.mid-setting-heading {
+		margin-top: 32px;
+		text-decoration: underline;
+	}
+
 	.line {
 		> label {
 			width: 300px;
@@ -301,6 +396,29 @@ export default {
 		}
 		> input {
 			width: 300px;
+		}
+		> input:invalid {
+			border-color: var(--color-error);
+		}
+		.spacer {
+			display: inline-block;
+			width: 32px;
+		}
+		.quota-table {
+			padding: 4px 8px 4px 8px;
+			border: 2px solid var(--color-border);
+			border-radius: var(--border-radius);
+			.text-cell {
+				opacity: 0.5;
+			}
+			th, td {
+				width: 300px;
+				text-align: left;
+				> input:invalid {
+					border-color: var(--color-error);
+				}
+			}
+
 		}
 	}
 

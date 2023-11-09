@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 /**
- * @copyright Copyright (c) 2023, Julien Veyssier <julien-nc@posteo.net>
+ * @copyright Copyright (c) 2023, Sami Finnilä (sami.finnila@gmail.com)
  *
- * @author Julien Veyssier <julien-nc@posteo.net>
+ * @author Sami Finnilä <sami.finnila@gmail.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -28,28 +28,40 @@ namespace OCA\OpenAi\Db;
 use OCP\AppFramework\Db\Entity;
 
 /**
- * @method int getGenerationId()
- * @method void setGenerationId(int $generationId)
- * @method string getUrl()
- * @method void setUrl(string $url)
+ * @method string getUserId()
+ * @method void setUserId(string $userId)
+ * @method int getType()
+ * @method void setType(int $type)
+ * @method int getUnits()
+ * @method void setUnits(int $units)
+ * @method int getTimestamp()
+ * @method void setTimestamp(int $timestamp)
  */
-class ImageUrl extends Entity implements \JsonSerializable {
-	/** @var int */
-	protected $generationId;
+class QuotaUsage extends Entity implements \JsonSerializable {
 	/** @var string */
-	protected $url;
+	protected $userId;
+	/** @var int */
+	protected $type;
+	/** @var int */
+	protected $units;
+	/** @var int */
+	protected $timestamp;
 
 	public function __construct() {
-		$this->addType('generation_id', 'integer');
-		$this->addType('url', 'string');
+		$this->addType('user_id', 'string');
+		$this->addType('type', 'integer');
+		$this->addType('units', 'integer');
+		$this->addType('timestamp', 'integer');
 	}
 
 	#[\ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return [
 			'id' => $this->id,
-			'generation_id' => $this->generationId,
-			'url' => $this->url,
+			'user_id' => $this->userId,
+			'type' => $this->type,
+			'units' => $this->units,
+			'timestamp' => $this->timestamp,
 		];
 	}
 }

@@ -22,17 +22,16 @@
 
 namespace OCA\OpenAi\Reference;
 
-use OCA\OpenAi\Service\OpenAiAPIService;
-use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OC\Collaboration\Reference\ReferenceManager;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\OpenAiAPIService;
+use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
 use OCP\IL10N;
 
 use OCP\IURLGenerator;
 
-class WhisperReferenceProvider extends ADiscoverableReferenceProvider  {
-
+class WhisperReferenceProvider extends ADiscoverableReferenceProvider {
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_whisper';
 
 	public function __construct(
@@ -47,7 +46,7 @@ class WhisperReferenceProvider extends ADiscoverableReferenceProvider  {
 	/**
 	 * @inheritDoc
 	 */
-	public function getId(): string	{
+	public function getId(): string {
 		return 'openai-whisper';
 	}
 
@@ -63,7 +62,7 @@ class WhisperReferenceProvider extends ADiscoverableReferenceProvider  {
 	/**
 	 * @inheritDoc
 	 */
-	public function getOrder(): int	{
+	public function getOrder(): int {
 		return 10;
 	}
 
