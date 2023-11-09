@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OCA\OpenAi\TextProcessing;
 
 use Exception;
-use RuntimeException;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextProcessing\HeadlineTaskType;
 use OCP\TextProcessing\IProvider;
+use RuntimeException;
 
 class HeadlineProvider implements IProvider {
 	public function __construct(

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OCA\OpenAi\TextProcessing;
 
 use Exception;
-use RunTimeException;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextProcessing\FreePromptTaskType;
 use OCP\TextProcessing\IProvider;
+use RunTimeException;
 
 class FreePromptProvider implements IProvider {
 	public function __construct(

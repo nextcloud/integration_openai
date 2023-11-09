@@ -12,7 +12,6 @@
 namespace OCA\OpenAi\Controller;
 
 use Exception;
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;

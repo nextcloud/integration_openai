@@ -31,8 +31,7 @@ use OCP\IL10N;
 use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
-class OpenAiAPIController extends Controller
-{
+class OpenAiAPIController extends Controller {
 	public function __construct(
 		string $appName,
 		IRequest $request,
@@ -50,8 +49,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function getModels(): DataResponse
-	{
+	public function getModels(): DataResponse {
 		try {
 			$response = $this->openAiAPIService->getModels($this->userId);
 		} catch (Exception $e) {
@@ -68,8 +66,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function getPromptHistory(int $type): DataResponse
-	{
+	public function getPromptHistory(int $type): DataResponse {
 		try {
 			$response = $this->openAiAPIService->getPromptHistory($this->userId, $type);
 		} catch (Exception $e) {
@@ -88,8 +85,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse
-	{
+	public function createCompletion(string $prompt, int $n = 1, ?string $model = null, int $maxTokens = 1000): DataResponse {
 		if ($model === null) {
 			$model = $this->openAiSettingsService->getUserDefaultCompletionModelId($this->userId);
 		}
@@ -113,8 +109,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function transcribe(string $audioBase64, bool $translate = true): DataResponse
-	{
+	public function transcribe(string $audioBase64, bool $translate = true): DataResponse {
 		try {
 			$response = $this->openAiAPIService->transcribeBase64Mp3($this->userId, $audioBase64, $translate);
 		} catch (Exception $e) {
@@ -131,8 +126,7 @@ class OpenAiAPIController extends Controller
 	 * @param string $size
 	 */
 	#[NoAdminRequired]
-	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse
-	{
+	public function createImage(string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): DataResponse {
 
 		try {
 			$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
@@ -153,8 +147,7 @@ class OpenAiAPIController extends Controller
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse
-	{
+	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse {
 		try {
 			$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
 		} catch (Exception $e) {
@@ -180,8 +173,7 @@ class OpenAiAPIController extends Controller
 	 */
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	public function getImageGenerationPage(string $hash): TemplateResponse
-	{
+	public function getImageGenerationPage(string $hash): TemplateResponse {
 		try {
 			$generationData = $this->openAiAPIService->getGenerationInfo($hash);
 		} catch (Exception $e) {
@@ -197,8 +189,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse
-	{
+	public function clearPromptHistory(?bool $clearTextPrompts = null, ?bool $clearImagePrompts = null): DataResponse {
 		$this->logger->debug('Clearing prompt history: ' . 'clearTextPrompts ' . strval($clearTextPrompts) . ' clearImagePrompts ' . strval($clearImagePrompts));
 		if ($clearTextPrompts === true) {
 			try {
@@ -224,8 +215,7 @@ class OpenAiAPIController extends Controller
 	 * @return DataResponse
 	 */
 	#[NoAdminRequired]
-	public function getUserQuotaInfo(): DataResponse
-	{
+	public function getUserQuotaInfo(): DataResponse {
 		try {
 			$info = $this->openAiAPIService->getUserQuotaInfo($this->userId);
 		} catch (Exception $e) {
@@ -243,8 +233,7 @@ class OpenAiAPIController extends Controller
 	 * Admin only!
 	 * @return DataResponse
 	 */
-	public function getAdminQuotaInfo(): DataResponse
-	{
+	public function getAdminQuotaInfo(): DataResponse {
 		try {
 			$info = $this->openAiAPIService->getAdminQuotaInfo();
 		} catch (Exception $e) {
