@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Enable clearing of prompt history from personal settings page @MB-Finski
+- Enable limiting of api usage on per-user basis (user can use own API with OpenAI to bypass this) @MB-Finski
+- Expose token limit as admin setting for text generation @MB-Finski
+
+### Fixed
+
+- Request no autocomplete for api key (in addition to disabling the field), which has caused issues for some users @MB-Finski
+- Replace deprecated query() of IConfig in app container setup @MB-Finski
+
 ## 1.0.13 – 2023-08-21
 
 ### Changed

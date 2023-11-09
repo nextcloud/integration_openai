@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanupImageGenerations extends Command {
-
 	public function __construct(private ImageGenerationMapper $imageGenerationMapper) {
 		parent::__construct();
 	}

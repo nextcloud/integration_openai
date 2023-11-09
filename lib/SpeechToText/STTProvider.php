@@ -3,6 +3,7 @@
 declare(strict_types=1);
 // SPDX-FileCopyrightText: Julien Veyssier <julien-nc@posteo.net>
 // SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\OpenAi\SpeechToText;
 
 use OCA\OpenAi\Service\OpenAiAPIService;
@@ -12,7 +13,6 @@ use OCP\SpeechToText\ISpeechToTextProvider;
 use Psr\Log\LoggerInterface;
 
 class STTProvider implements ISpeechToTextProvider {
-
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,

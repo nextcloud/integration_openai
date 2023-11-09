@@ -179,7 +179,25 @@ class PromptMapper extends QBMapper {
 				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
 			);
 		$qb->executeStatement();
-		$qb->resetQueryParts();
+	}
+
+	/**
+	 * Delete user prompts by type
+	 * @param string $userId
+	 * @param int $type
+	 * @return void
+	 * @throws Exception
+	 */
+	public function deleteUserPromptsByType(string $userId, int $type): void {
+		$qb = $this->db->getQueryBuilder();
+		$qb->delete($this->getTableName())
+			->where(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
+			)
+			->andWhere(
+				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
+			);
+		$qb->executeStatement();
 	}
 
 	/**
@@ -226,7 +244,6 @@ class PromptMapper extends QBMapper {
 					$qb->expr()->lt('timestamp', $qb->createNamedParameter($firstPromptTsToKeep, IQueryBuilder::PARAM_INT))
 				);
 			$qb->executeStatement();
-			$qb->resetQueryParts();
 		}
 	}
 }

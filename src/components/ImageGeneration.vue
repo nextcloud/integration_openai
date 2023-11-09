@@ -97,7 +97,7 @@ export default {
 	computed: {
 		formattedError() {
 			if (this.error === 'notfound') {
-				return t('integration_openai', 'Image information was not found on the server. The data might have been cleaned up because the image has not been displayed during more than 10 days.')
+				return t('integration_openai', 'Image information was not found on the server. The data might have been cleaned up because the image has not been displayed for a long time.')
 			}
 			return '??'
 		},

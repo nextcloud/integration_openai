@@ -171,7 +171,7 @@ export default {
 							error.response?.data?.body?.error?.message
 							|| error.response?.data?.body?.error?.code
 							|| error.response?.data?.error
-							|| t('integration_openai', 'Unknown OpenAI API error')
+							|| t('integration_openai', 'Unknown API error')
 						)
 					)
 				})

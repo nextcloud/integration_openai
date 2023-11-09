@@ -16,54 +16,76 @@
 			<div class="line">
 				<label for="openai-api-key">
 					<KeyIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'OpenAI API key') }}
+					{{ t('integration_openai', 'API key') }}
 				</label>
 				<input id="openai-api-key"
 					v-model="state.api_key"
+					autocomplete="off"
 					type="password"
 					:readonly="readonly"
 					:placeholder="t('integration_openai', 'your API key')"
 					@input="onInput"
 					@focus="readonly = false">
 			</div>
-			<p class="settings-hint">
-				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
-				&nbsp;
-				<a :href="apiKeyUrl" target="_blank" class="external">
-					{{ apiKeyUrl }}
-				</a>
-			</p>
-			<div class="line">
-				<label for="basic-user">
-					<KeyIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'User for basic authentication (optional, can only be used with LocalAI)') }}
-				</label>
-				<input id="openai-basic-user"
-					v-model="state.basic_user"
-					type="text"
-					:readonly="readonly"
-					:placeholder="t('integration_openai', 'your Basic Auth user')"
-					@input="onInput"
-					@focus="readonly = false">
+			<div v-if="!state.isCustomService">
+				<p class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
+					&nbsp;
+					<a :href="apiKeyUrl" target="_blank" class="external">
+						{{ apiKeyUrl }}
+					</a>
+				</p>
 			</div>
 			<div class="line">
-				<label for="basic-password">
-					<KeyIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'Password for basic authentication (optional, can only be used with LocalAI)') }}
+				<label for="clear-prompt-history">
+					<DeleteIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Clear prompt history') }}
 				</label>
-				<input id="openai-basic-password"
-					v-model="state.basic_password"
-					type="password"
-					:readonly="readonly"
-					:placeholder="t('integration_openai', 'your Basic Auth password')"
-					@input="onInput"
-					@focus="readonly = false">
+				<button id="clear-text-prompt-history"
+					@click="clearPromptHistory(false,true)">
+					{{ t('integration_openai', 'Clear text prompts') }}
+				</button>
+				<button id="clear-image-prompt-history"
+					@click="clearPromptHistory(true,false)">
+					{{ t('integration_openai', 'Clear image prompts') }}
+				</button>
 			</div>
-			<p class="settings-hint">
-				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'Leave the basic auth settings empty to use the one defined by administrators') }}
-			</p>
+			<div v-if="quotaInfo !== null" class="line">
+				<!-- Show quota info -->
+				<label>
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Usage quota info') }}
+				</label>
+				<!-- Loop through all quota types-->
+				<table class="quota-table">
+					<thead>
+						<tr>
+							<th width="120px">
+								{{ t('integration_openai', 'Quota type') }}
+							</th>
+							<th>{{ t('integration_openai', 'Usage') }}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="quota in quotaInfo.quota_usage" :key="quota.type">
+							<td>{{ t('integration_openai', capitalizedWord(quota.type)) }} </td>
+							<td v-if="quota.limit > 0">
+								{{ Math.round(quota.used / quota.limit * 100) + ' %' }}
+							</td>
+							<td v-else>
+								{{ quota.used + ' ' + quota.unit }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div v-if="!state.isCustomService">
+				<p class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Specifying your own API key will allow unlimited usage') }}
+				</p>
+			</div>
 		</div>
 	</div>
 </template>
@@ -71,6 +93,7 @@
 <script>
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
+import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
@@ -87,6 +110,7 @@ export default {
 		OpenAiIcon,
 		KeyIcon,
 		InformationOutlineIcon,
+		DeleteIcon,
 	},
 
 	props: [],
@@ -97,6 +121,8 @@ export default {
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
+			quotaInfo: null,
+			showQuotaRemovalInfo: false,
 		}
 	},
 
@@ -107,6 +133,7 @@ export default {
 	},
 
 	mounted() {
+		this.loadQuotaInfo()
 	},
 
 	methods: {
@@ -118,6 +145,33 @@ export default {
 					basic_password: this.state.basic_password,
 				})
 			}, 2000)()
+		},
+		loadQuotaInfo() {
+			const url = generateUrl('/apps/integration_openai/quota-info')
+			axios.get(url)
+				.then((response) => {
+					this.quotaInfo = response.data
+				})
+				.catch((error) => {
+					showError(
+						t('integration_openai', 'Failed to load quota info')
+						+ ': ' + error.response?.request?.responseText
+					)
+				})
+			if (this.quotaInfo === null) {
+				return
+			}
+			// Loop through all quota types and check if any are limited by admin
+			// If so, show a hint that the user can provide their own api key to remove the limit
+			for (const quota of this.quotaInfo) {
+				if (quota.limit > 0) {
+					this.showQuotaRemovalInfo = true
+					break
+				}
+			}
+		},
+		capitalizedWord(word) {
+			return word.charAt(0).toUpperCase() + word.slice(1)
 		},
 		saveOptions(values) {
 			const req = {
@@ -135,6 +189,24 @@ export default {
 					)
 				})
 		},
+		clearPromptHistory(clearImages, clearText) {
+			const params = {
+				clearTextPrompts: clearImages,
+				clearImagePrompts: clearText,
+			}
+			const url = generateUrl('/apps/integration_openai/clear-prompt-history')
+			return axios.post(url, params)
+				.then((response) => {
+					showSuccess(t('integration_openai', 'Prompt history cleared'))
+				})
+				.catch((error) => {
+					showError(
+						t('integration_openai', 'Failed to clear prompt history')
+						+ ': ' + error.response?.request?.responseText
+					)
+				})
+		},
+
 	},
 }
 </script>
@@ -168,6 +240,27 @@ export default {
 		> input {
 			width: 300px;
 		}
+		.spacer {
+			display: inline-block;
+			width: 36px;
+		}
+
+		.quota-table {
+			padding: 4px 8px 4px 8px;
+			border: 2px solid var(--color-border);
+			border-radius: var(--border-radius);
+			tbody {
+				opacity: 0.5;
+			}
+			th, td {
+				width: 200px;
+				text-align: left;
+			}
+		}
+	}
+
+	button {
+		margin-right: 24px;
 	}
 }
 </style>

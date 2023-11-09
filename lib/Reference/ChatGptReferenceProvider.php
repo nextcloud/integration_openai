@@ -22,18 +22,17 @@
 
 namespace OCA\OpenAi\Reference;
 
-use OCA\OpenAi\Service\OpenAiAPIService;
-use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
-use OCP\Collaboration\Reference\Reference;
 use OC\Collaboration\Reference\ReferenceManager;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\OpenAiAPIService;
+use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
+use OCP\Collaboration\Reference\Reference;
 use OCP\IL10N;
 
 use OCP\IURLGenerator;
 
-class ChatGptReferenceProvider extends ADiscoverableReferenceProvider  {
-
+class ChatGptReferenceProvider extends ADiscoverableReferenceProvider {
 	private const RICH_OBJECT_TYPE = Application::APP_ID . '_chatgpt_internal_link';
 
 	public function __construct(
@@ -48,7 +47,7 @@ class ChatGptReferenceProvider extends ADiscoverableReferenceProvider  {
 	/**
 	 * @inheritDoc
 	 */
-	public function getId(): string	{
+	public function getId(): string {
 		return 'openai-chatgpt';
 	}
 
@@ -64,7 +63,7 @@ class ChatGptReferenceProvider extends ADiscoverableReferenceProvider  {
 	/**
 	 * @inheritDoc
 	 */
-	public function getOrder(): int	{
+	public function getOrder(): int {
 		return 10;
 	}
 

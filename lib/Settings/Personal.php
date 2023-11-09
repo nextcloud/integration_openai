@@ -1,17 +1,19 @@
 <?php
+
 namespace OCA\OpenAi\Settings;
 
+use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IConfig;
 use OCP\Settings\ISettings;
-use OCA\OpenAi\AppInfo\Application;
 
 class Personal implements ISettings {
-
 	public function __construct(
 		private IConfig $config,
 		private IInitialState $initialStateService,
+		private OpenAiSettingsService $openAiSettingsService,
 		private ?string $userId
 	) {
 	}
@@ -20,15 +22,15 @@ class Personal implements ISettings {
 	 * @return TemplateResponse
 	 */
 	public function getForm(): TemplateResponse {
-		$userApiKey = $this->config->getUserValue($this->userId, Application::APP_ID, 'api_key');
-		$adminServiceUrl = $this->config->getAppValue(Application::APP_ID, 'url', Application::OPENAI_API_BASE_URL) ?: Application::OPENAI_API_BASE_URL;
-		$isCustomService = $adminServiceUrl !== Application::OPENAI_API_BASE_URL;
+		$userApiKey = $this->openAiSettingsService->getUserApiKey($this->userId);
+		$adminServiceUrl = $this->openAiSettingsService->getServiceUrl();
+		$isCustomService = $adminServiceUrl !== Application::OPENAI_API_BASE_URL && $adminServiceUrl !== '';
 
-		$userConfig = [
+		$state = [
 			'api_key' => $userApiKey,
 			'isCustomService' => $isCustomService,
 		];
-		$this->initialStateService->provideInitialState('config', $userConfig);
+		$this->initialStateService->provideInitialState('config', $state);
 		return new TemplateResponse(Application::APP_ID, 'personalSettings');
 	}
 

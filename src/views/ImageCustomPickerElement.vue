@@ -45,7 +45,7 @@
 				</NcButton>
 				<NcButton
 					type="secondary"
-					:aria-label="t('integration_openai', 'Preview images with OpenAI')"
+					:aria-label="t('integration_openai', 'Preview images')"
 					:disabled="loading || !query"
 					@click="generate">
 					{{ previewButtonLabel }}
@@ -266,11 +266,11 @@ export default {
 				.catch((error) => {
 					console.error('OpenAI image request error', error)
 					showError(
-						t('integration_openai', 'OpenAI error') + ': '
+						t('integration_openai', 'API request error') + ': '
 							+ (error.response?.data?.body?.error?.message
 								|| error.response?.data?.body?.error?.code
 								|| error.response?.data?.error
-								|| t('integration_openai', 'Unknown OpenAI API error')
+								|| t('integration_openai', 'Unknown image API error')
 							)
 					)
 				})

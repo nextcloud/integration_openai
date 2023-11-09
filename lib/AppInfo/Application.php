@@ -20,16 +20,15 @@ use OCA\OpenAi\TextProcessing\HeadlineProvider;
 use OCA\OpenAi\TextProcessing\ReformulateProvider;
 use OCA\OpenAi\TextProcessing\SummaryProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
+use OCP\AppFramework\App;
+use OCP\AppFramework\Bootstrap\IBootContext;
+
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\IConfig;
 
-use OCP\AppFramework\App;
-use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\AppFramework\Bootstrap\IBootContext;
-use OCP\AppFramework\Bootstrap\IBootstrap;
-
 class Application extends App implements IBootstrap {
-
 	public const APP_ID = 'integration_openai';
 
 	public const OPENAI_API_BASE_URL = 'https://api.openai.com';
@@ -39,6 +38,19 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_TRANSCRIPTION_MODEL_ID = 'whisper-1';
 	public const DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
+	public const DEFAULT_MAX_NUM_OF_TOKENS = 1000;
+	public const DEFAULT_QUOTA_PERIOD = 30;
+
+	public const QUOTA_TYPE_TEXT = 0;
+	public const QUOTA_TYPE_IMAGE = 1;
+	public const QUOTA_TYPE_TRANSCRIPTION = 2;
+
+	public const DEFAULT_QUOTAS = [
+		self::QUOTA_TYPE_TEXT => 0, // 0 = unlimited
+		self::QUOTA_TYPE_IMAGE => 0, // 0 = unlimited
+		self::QUOTA_TYPE_TRANSCRIPTION => 0, // 0 = unlimited
+
+	];
 
 	public const PROMPT_TYPE_IMAGE = 0;
 	public const PROMPT_TYPE_TEXT = 1;
@@ -84,4 +96,3 @@ class Application extends App implements IBootstrap {
 	public function boot(IBootContext $context): void {
 	}
 }
-
