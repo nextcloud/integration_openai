@@ -29,6 +29,7 @@ use OCP\Files\NotPermittedException;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IConfig;
+use OCP\AppFramework\Http;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
@@ -38,7 +39,8 @@ use Throwable;
 /**
  * Service to make requests to OpenAI REST API
  */
-class OpenAiAPIService {
+class OpenAiAPIService
+{
 	private IClient $client;
 
 	public function __construct(
@@ -58,7 +60,8 @@ class OpenAiAPIService {
 	/**
 	 * @return bool
 	 */
-	public function isUsingOpenAi(): bool {
+	public function isUsingOpenAi(): bool
+	{
 		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
 		return $serviceUrl === '' || $$serviceUrl === Application::OPENAI_API_BASE_URL;
 	}
@@ -68,15 +71,12 @@ class OpenAiAPIService {
 	 * @return array|string[]
 	 * @throws Exception
 	 */
-	public function getModels(string $userId): array {
+	public function getModels(string $userId): array
+	{
 		$response = $this->request($userId, 'models');
 		if (!isset($response['data'])) {
-			if (isset($response['error']['message'])) {
-				$this->logger->warning('Error while retreiving models: ' . $response['error']['message']);
-				throw new Exception($this->l10n->t("Models api call error: ") . $response['error']['message']);
-			}
 			$this->logger->warning('Error retrieving models: ' . json_encode($response));
-			throw new Exception($this->l10n->t('Unknown models error'));
+			throw new Exception($this->l10n->t('Unknown models error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 		return $response;
 	}
@@ -87,12 +87,13 @@ class OpenAiAPIService {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getPromptHistory(string $userId, int $type): array {
+	public function getPromptHistory(string $userId, int $type): array
+	{
 		try {
 			return $this->promptMapper->getPromptsOfUser($userId, $type);
 		} catch (DBException $e) {
 			$this->logger->warning('Could not retrieve prompt history for user: ' . $userId . ' and prompt type: ' . $type . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Unknown error while retrieving prompt history.'));
+			throw new Exception($this->l10n->t('Unknown error while retrieving prompt history.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -102,19 +103,21 @@ class OpenAiAPIService {
 	 * @param int $type
 	 * @throws Exception
 	 */
-	public function clearPromptHistory(string $userId, int $type): void {
+	public function clearPromptHistory(string $userId, int $type): void
+	{
 		try {
 			$this->promptMapper->deleteUserPromptsByType($userId, $type);
 		} catch (DBException $e) {
 			$this->logger->warning('Could not clear prompt history for user: ' . $userId . ' and prompt type: ' . $type . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Unknown error while clearing prompt history.'));
+			throw new Exception($this->l10n->t('Unknown error while clearing prompt history.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	/**
 	 * @param string $userId
 	 */
-	private function hasOwnOpenAiApiKey(string $userId): bool {
+	private function hasOwnOpenAiApiKey(string $userId): bool
+	{
 		if (!$this->isUsingOpenAi()) {
 			return false;
 		}
@@ -134,13 +137,14 @@ class OpenAiAPIService {
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function isQuotaExceeded(?string $userId, int $type): bool {
+	public function isQuotaExceeded(?string $userId, int $type): bool
+	{
 		if ($userId === null) {
 			return false;
 		}
 
 		if (!array_key_exists($type, Application::DEFAULT_QUOTAS)) {
-			throw new Exception('Invalid quota type');
+			throw new Exception('Invalid quota type', Http::STATUS_BAD_REQUEST);
 		}
 
 		if ($this->hasOwnOpenAiApiKey($userId)) {
@@ -162,7 +166,7 @@ class OpenAiAPIService {
 			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
 		} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
 			$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
-			throw new Exception('Could not retrieve quota usage.');
+			throw new Exception('Could not retrieve quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
 		return $quotaUsage >= $quota;
@@ -172,7 +176,8 @@ class OpenAiAPIService {
 	 * Translate the quota type
 	 * @param int $type
 	 */
-	public function translatedQuotaType(int $type): string {
+	public function translatedQuotaType(int $type): string
+	{
 		switch ($type) {
 			case Application::QUOTA_TYPE_TEXT:
 				return $this->l10n->t('Text generation');
@@ -189,7 +194,8 @@ class OpenAiAPIService {
 	 * Get translated unit of quota type
 	 * @param int $type
 	 */
-	public function translatedQuotaUnit(int $type): string {
+	public function translatedQuotaUnit(int $type): string
+	{
 		switch ($type) {
 			case Application::QUOTA_TYPE_TEXT:
 				return $this->l10n->t('tokens');
@@ -207,7 +213,8 @@ class OpenAiAPIService {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getUserQuotaInfo(string $userId): array {
+	public function getUserQuotaInfo(string $userId): array
+	{
 		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit, just supply default values as fillers)
 		$quotas = $this->hasOwnOpenAiApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->openAiSettingsService->getQuotas();
 		// Get quota period
@@ -220,7 +227,7 @@ class OpenAiAPIService {
 				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
 			} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
 				$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.'));
+				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR));
 			}
 			$quotaInfo[$quotaType]['limit'] = intval($quotas[$quotaType]);
 			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
@@ -236,7 +243,8 @@ class OpenAiAPIService {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getAdminQuotaInfo(): array {
+	public function getAdminQuotaInfo(): array
+	{
 		// Get quota period
 		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
 		// Get quota usage of all users for each quota type:
@@ -248,7 +256,7 @@ class OpenAiAPIService {
 			} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
 				$this->logger->warning('Could not retrieve quota usage for quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 				// We can pass detailed error info to the UI here since the user is an admin in any case:
-				throw new Exception('Could not retrieve quota usage: ' . $e->getMessage());
+				throw new Exception('Could not retrieve quota usage: ' . $e->getMessage(), Http::STATUS_INTERNAL_SERVER_ERROR);
 			}
 			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
 		}
@@ -276,7 +284,7 @@ class OpenAiAPIService {
 	): array {
 
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
-			throw new Exception($this->l10n->t('Text generation quota exceeded'));
+			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
 		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
@@ -295,7 +303,7 @@ class OpenAiAPIService {
 
 		if (!isset($response['choices'])) {
 			$this->logger->warning('Text generation error: ' . json_encode($response));
-			throw new Exception($this->l10n->t('Unknown text generation error'));
+			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
 		if (isset($response['usage'])) {
@@ -344,7 +352,7 @@ class OpenAiAPIService {
 		bool $storePrompt = true
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
-			throw new Exception($this->l10n->t('Text generation quota exceeded'));
+			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
 		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
@@ -363,7 +371,7 @@ class OpenAiAPIService {
 
 		if (!isset($response['choices'])) {
 			$this->logger->warning('Text generation error: ' . json_encode($response));
-			throw new Exception($this->l10n->t('Unknown text generation error'));
+			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
 		if (isset($response['usage'])) {
@@ -432,12 +440,12 @@ class OpenAiAPIService {
 			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
 		} catch (NotPermittedException | LockedException | GenericFileException $e) {
 			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Could not read audio file.'));
+			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
 		if (!isset($transcriptionResponse['text'])) {
 			$this->logger->warning('Audio file transcription error: ' . json_encode($transcriptionResponse));
-			throw new Exception($this->l10n->t('Unknown audio file trancription error'));
+			throw new Exception($this->l10n->t('Unknown audio file trancription error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 		return $transcriptionResponse['text'];
 	}
@@ -457,7 +465,7 @@ class OpenAiAPIService {
 		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
-			throw new Exception($this->l10n->t('Audio transcription quota exceeded'));
+			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
 		$params = [
@@ -473,7 +481,7 @@ class OpenAiAPIService {
 
 		if (!isset($response['text'])) {
 			$this->logger->warning('Audio transcription error: ' . json_encode($response));
-			throw new Exception($this->l10n->t('Unknown audio trancription error'));
+			throw new Exception($this->l10n->t('Unknown audio trancription error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
 		// Extract audio duration from response and store it as quota usage:
@@ -497,9 +505,10 @@ class OpenAiAPIService {
 	 * @return array|string[]
 	 * @throws Exception
 	 */
-	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
+	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array
+	{
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
-			throw new Exception($this->l10n->t('Image generation quota exceeded'));
+			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
 		if ($userId !== null) {
@@ -520,13 +529,8 @@ class OpenAiAPIService {
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
 
 		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
-
-			if (isset($apiResponse['error']['message'])) {
-				$this->logger->warning('OpenAI image generation error: ' . $apiResponse['error']['message']);
-				throw new Exception($this->l10n->t("Image generation api call error: ") . $apiResponse['error']['message']);
-			}
 			$this->logger->warning('OpenAI image generation error: ' . json_encode($apiResponse));
-			throw new Exception($this->l10n->t('Unknown image generation error'));
+			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 
 		} else {
 			try {
@@ -556,7 +560,7 @@ class OpenAiAPIService {
 					$this->imageGenerationMapper->createImageGeneration($hash, $prompt, $ts, $urls);
 				} catch (DBException $e) {
 					$this->logger->warning('Could not create image generation for hash: ' . $hash . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-					throw new Exception($this->l10n->t('Unknown image generation error'));
+					throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 				}
 
 				return ['hash' => $hash];
@@ -571,7 +575,8 @@ class OpenAiAPIService {
 	 * @return array|string[]
 	 * @throws Exception
 	 */
-	public function getGenerationInfo(string $hash): array {
+	public function getGenerationInfo(string $hash): array
+	{
 		try {
 			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
 			$imageUrls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
@@ -583,10 +588,10 @@ class OpenAiAPIService {
 			];
 		} catch (DoesNotExistException $e) {
 			$this->logger->debug('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Image not generation found'));
+			throw new Exception($this->l10n->t('Image generation not found'), Http::STATUS_NOT_FOUND);
 		} catch (Exception | DBException | MultipleObjectsReturnedException $e) {
 			$this->logger->debug('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Unknown image generation request error'));
+			throw new Exception($this->l10n->t('Unknown image generation request error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -596,7 +601,8 @@ class OpenAiAPIService {
 	 * @return array|null
 	 * @throws Exception
 	 */
-	public function getGenerationImage(string $hash, int $urlId): ?array {
+	public function getGenerationImage(string $hash, int $urlId): ?array
+	{
 		try {
 			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
 			$imageUrl = $this->imageUrlMapper->getImageUrlOfGeneration($imageGeneration->getId(), $urlId);
@@ -607,10 +613,10 @@ class OpenAiAPIService {
 			];
 		} catch (DoesNotExistException $e) {
 			$this->logger->debug('Image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Image not found'));
+			throw new Exception($this->l10n->t('Image not found'), Http::STATUS_NOT_FOUND);
 		} catch (Exception | DBException | MultipleObjectsReturnedException $e) {
 			$this->logger->debug('Image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Unknown image request error'));
+			throw new Exception($this->l10n->t('Unknown image request error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -624,7 +630,8 @@ class OpenAiAPIService {
 	 * @return array decoded request result or error
 	 * @throws Exception
 	 */
-	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
+	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array
+	{
 		try {
 			$serviceUrl = $this->config->getAppValue(Application::APP_ID, 'url', Application::OPENAI_API_BASE_URL) ?: Application::OPENAI_API_BASE_URL;
 			$timeout = $this->config->getAppValue(Application::APP_ID, 'request_timeout', Application::OPENAI_DEFAULT_REQUEST_TIMEOUT) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
@@ -710,10 +717,10 @@ class OpenAiAPIService {
 			} else {
 				$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 			}
-			throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message']);
+			throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], $e->getCode());
 		} catch (Exception | Throwable $e) {
 			$this->logger->warning('API request error : ' . $e->getMessage(), ['exception' => $e]);
-			throw new Exception('Unknow api request error.');
+			throw new Exception($this->l10n->t('Unknow API request error.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 }

@@ -95,6 +95,14 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @param string $userId
+	 * @return string
+	 */
+	public function getLastImageSize(string $userId): string {
+		return $this->config->getUserValue($userId, Application::APP_ID, 'last_image_size', Application::DEFAULT_IMAGE_SIZE) ?: Application::DEFAULT_IMAGE_SIZE;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getMaxTokens(): int {

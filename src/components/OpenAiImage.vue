@@ -33,7 +33,7 @@
 			@load="isImageLoading = false"
 			@error="onError">
 		<span v-if="failed">
-			{{ t('integration_openai', 'The remote image cannot be fetched. OpenAI might have deleted it.') }}
+			{{ t('integration_openai', 'The remote image cannot be fetched. It may have been deleted due to not being viewed for a long time.') }}
 			<a :href="directLink" target="_blank" class="external">
 				{{ t('integration_openai', 'Direct image link') }}
 			</a>

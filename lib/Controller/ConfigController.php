@@ -71,7 +71,7 @@ class ConfigController extends Controller {
 	 * @return DataResponse
 	 */
 	public function getLastImageSize(): DataResponse {
-		$size = $this->config->getUserValue($this->userId, Application::APP_ID, 'last_image_size', Application::DEFAULT_IMAGE_SIZE);
+		$size = $this->openAiSettingsService->getLastImageSize($this->userId);
 		return new DataResponse($size);
 	}
 }

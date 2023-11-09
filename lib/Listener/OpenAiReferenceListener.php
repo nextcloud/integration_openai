@@ -23,6 +23,7 @@
 namespace OCA\OpenAi\Listener;
 
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\EventDispatcher\Event;
@@ -30,23 +31,26 @@ use OCP\EventDispatcher\IEventListener;
 use OCP\IConfig;
 use OCP\Util;
 
-class OpenAiReferenceListener implements IEventListener {
+class OpenAiReferenceListener implements IEventListener
+{
 	public function __construct(
 		private IConfig $config,
 		private IInitialState $initialState,
+		private OpenAiSettingsService $settingsService,
 	) {
 	}
 
-	public function handle(Event $event): void {
+	public function handle(Event $event): void
+	{
 		if (!$event instanceof RenderReferenceEvent) {
 			return;
 		}
 
-		$whisperPickerEnabled = $this->config->getAppValue(Application::APP_ID, 'whisper_picker_enabled', '1') === '1';
-		$imagePickerEnabled = $this->config->getAppValue(Application::APP_ID, 'image_picker_enabled', '1') === '1';
-		$textPickerEnabled = $this->config->getAppValue(Application::APP_ID, 'text_completion_picker_enabled', '1') === '1';
-		$translationProviderEnabled = $this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
-		$sttProviderEnabled = $this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
+		$whisperPickerEnabled = $this->settingsService->getWhisperPickerEnabled();
+		$imagePickerEnabled = $this->settingsService->getImagePickerEnabled();
+		$textPickerEnabled = $this->settingsService->getTextCompletionPickerEnabled();
+		$translationProviderEnabled = $this->settingsService->getTranslationProviderEnabled();
+		$sttProviderEnabled = $this->settingsService->getSttProviderEnabled();
 
 		$features = [
 			'whisper_picker_enabled' => $whisperPickerEnabled,

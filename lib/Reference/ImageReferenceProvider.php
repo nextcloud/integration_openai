@@ -28,6 +28,7 @@ use OCP\Collaboration\Reference\ADiscoverableReferenceProvider;
 use OCP\Collaboration\Reference\IReference;
 use OCP\Collaboration\Reference\Reference;
 use OCP\IL10N;
+use Exception;
 
 use OCP\IURLGenerator;
 
@@ -92,7 +93,11 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider {
 			}
 
 			$reference = new Reference($referenceText);
-			$richObjectInfo = $this->openAiAPIService->getGenerationInfo($hash);
+			try {
+				$richObjectInfo = $this->openAiAPIService->getGenerationInfo($hash);
+			} catch (Exception $e) {
+				return null;
+			}			
 			$reference->setRichObject(
 				self::RICH_OBJECT_TYPE,
 				$richObjectInfo,
