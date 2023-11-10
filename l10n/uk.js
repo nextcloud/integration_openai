@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Image generation" : "Створення зображення",
+    "Unknown" : "Невідомо",
+    "Image not found" : "Зображення відсутнє",
     "Bad HTTP method" : "Поганий метод HTTP",
     "Bad credentials" : "Погані облікові дані",
     "Connected accounts" : "Підключені облікові записи",
@@ -8,7 +11,7 @@ OC.L10N.register(
     "Whisper transcription/translation with the Smart Picker" : "Транскрибування та переклад за допомогою асистенту вибору",
     "Image generation with the Smart Picker" : "Створення зображення за допомогою асистенту вибору",
     "Text generation with the Smart Picker" : "Створення тексту за допомогою асистенту вибору",
-    "Image generation" : "Створення зображення",
+    "API key" : "ключ API",
     "Preview" : "Попередній перегляд",
     "Advanced options" : "Розширені налаштування",
     "Send" : "Надіслати",

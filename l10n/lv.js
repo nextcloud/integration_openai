@@ -1,6 +1,8 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Nezināms",
+    "API key" : "API atslēga",
     "Preview" : "Priekšskatīt",
     "Advanced options" : "Papildu opcijas",
     "Send" : "Sūtīt",

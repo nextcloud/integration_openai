@@ -1,9 +1,11 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Necunoscut",
     "Bad HTTP method" : "Metodă HTTP nepotrivită",
     "Bad credentials" : "Credențiale greșite",
     "Connected accounts" : "Conturile conectate",
+    "API key" : "Cheie API",
     "Preview" : "Previzualizare",
     "Advanced options" : "Opțiuni avansate",
     "Send" : "Trimite",

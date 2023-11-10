@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Óþekkt",
     "Bad credentials" : "Gölluð auðkenni",
     "Connected accounts" : "Tengdir aðgangar",
     "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",

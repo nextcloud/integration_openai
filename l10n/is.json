@@ -1,4 +1,5 @@
 { "translations": {
+    "Unknown" : "Óþekkt",
     "Bad credentials" : "Gölluð auðkenni",
     "Connected accounts" : "Tengdir aðgangar",
     "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",

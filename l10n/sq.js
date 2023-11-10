@@ -1,7 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "I panjohur",
     "Request timeout (seconds)" : "Kohë skadimi kërkese (sekonda)",
+    "API key" : "Kyç API",
     "Preview" : "Parapamje ",
     "Advanced options" : "Opsione të avancuara",
     "Send" : "Dërgo",
