@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.1.1 – 2023-11-10
+
+### Fixed
+
+- Error introduced in transcription for 1.1.0 @MB-Finski
+
 ## 1.1.0 – 2023-11-09
 
 ### Added
