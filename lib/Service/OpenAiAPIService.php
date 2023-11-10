@@ -432,11 +432,7 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		if (!isset($transcriptionResponse['text'])) {
-			$this->logger->warning('Audio file transcription error: ' . json_encode($transcriptionResponse));
-			throw new Exception($this->l10n->t('Unknown audio file trancription error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-		return $transcriptionResponse['text'];
+		return $transcriptionResponse;
 	}
 
 	/**
@@ -452,7 +448,7 @@ class OpenAiAPIService {
 		string $audioFileContent,
 		bool $translate = true,
 		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
-	): array {
+	): string {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
