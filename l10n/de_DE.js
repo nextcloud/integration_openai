@@ -8,6 +8,10 @@ OC.L10N.register(
     "AI speech-to-text (Whisper via OpenAI)" : "KI-Sprache-zu-Text (Whisper über OpenAI)",
     "AI speech-to-text (Whisper via LocalAI)" : "KI-Sprache-zu-Text  (Whisper über LocalAI)",
     "Image generation" : "Bilderstellung",
+    "Unknown" : "Unbekannt",
+    "seconds" : "Sekunden",
+    "Unknown image generation error" : "Unbekannter Fehler bei der Bildgenerierung",
+    "Image not found" : "Bild nicht gefunden",
     "Bad HTTP method" : "Ungültige HTTP-Methode",
     "Bad credentials" : "Falsche Anmeldeinformationen",
     "Connected accounts" : "Verbundene Konten",
@@ -42,6 +46,7 @@ OC.L10N.register(
     "Direct image link" : "Direkter Bildlink",
     "Your administrator defined a custom service address" : "Ihre Administration hat eine benutzerdefinierte Dienstadresse definiert",
     "Leave the API key empty to use the one defined by administrators" : "API-Schlüssel leer lassen, um den von der Administration definierten Schlüssel zu verwenden",
+    "API key" : "API-Schlüssel",
     "You can create a free API key in your OpenAI account settings:" : "Sie können in Ihren OpenAI-Kontoeinstellungen einen kostenlosen API-Schlüssel erstellen:",
     "OpenAI options saved" : "OpenAI-Einstellungen gespeichert",
     "Failed to save OpenAI options" : "Fehler beim Speichern der OpenAI-Einstellungen",
@@ -76,6 +81,7 @@ OC.L10N.register(
     "Translate (only to English)" : "Übersetzen (nur ins Englische)",
     "Translate" : "Übersetzen",
     "by OpenAI with Whisper" : "mittels OpenAI mit Whisper",
-    "Failed to get transcription/translation" : "Fehler beim Abrufen der Transkription/Übersetzung"
+    "Failed to get transcription/translation" : "Fehler beim Abrufen der Transkription/Übersetzung",
+    "Unknown API error" : "Unbekannter API-Fehler"
 },
 "nplurals=2; plural=(n != 1);");

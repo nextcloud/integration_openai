@@ -9,6 +9,7 @@ OC.L10N.register(
     "AI speech-to-text (Whisper via LocalAI)" : "AI konuşmadan metne (LocalAI ile Whisper)",
     "Image generation" : "Görsel oluşturma",
     "Unknown" : "Bilinmiyor",
+    "seconds" : "saniye",
     "Image not found" : "Görsel bulunamadı",
     "Bad HTTP method" : "HTTP yöntemi hatalı",
     "Bad credentials" : "Kimlik doğrulama bilgileri hatalı",

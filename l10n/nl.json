@@ -1,5 +1,6 @@
 { "translations": {
     "Unknown" : "Onbekend",
+    "seconds" : "seconden",
     "Image not found" : "Afbeelding niet gevonden",
     "Bad HTTP method" : "Foute HTTP methode",
     "Bad credentials" : "Foute inloggegevens",

@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Image generation" : "Створення зображення",
     "Unknown" : "Невідомо",
+    "seconds" : "секунд",
     "Image not found" : "Зображення відсутнє",
     "Bad HTTP method" : "Поганий метод HTTP",
     "Bad credentials" : "Погані облікові дані",

@@ -1,12 +1,16 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Tuntematon",
+    "seconds" : "sekuntia",
+    "Image not found" : "Kuvaa ei löytynyt",
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
     "Bad credentials" : "Virheelliset kirjautumistiedot",
     "Connected accounts" : "Yhdistetyt tilit",
     "OpenAI integration" : "OpenAI-integraatio",
     "your API key" : "API-avaimesi",
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
+    "API key" : "API-avain",
     "Preview" : "Esikatselu",
     "Preview content" : "Esikatsele sisältö",
     "Show/hide advanced options" : "Näytä/piilota lisäasetukset",

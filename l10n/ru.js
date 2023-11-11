@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown" : "Неизвестно",
+    "seconds" : "секунд",
     "Bad HTTP method" : "Неверный метод HTTP",
     "Bad credentials" : "Неверные учетные данные",
     "Connected accounts" : "Подключённые учётные записи",
@@ -9,6 +10,7 @@ OC.L10N.register(
     "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)",
     "API key" : "Ключ API",
     "Preview" : "Предварительный просмотр",
+    "Show/hide advanced options" : "Показать/скрыть дополнительные настройки",
     "Advanced options" : "Дополнительные параметры",
     "Send" : "Отправить",
     "Result" : "Результат",

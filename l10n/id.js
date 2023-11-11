@@ -2,10 +2,12 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown" : "Tidak diketahui",
+    "seconds" : "detik",
     "Bad HTTP method" : "Metode HTTP tidak benar",
     "Bad credentials" : "Kredensial tidak benar",
     "Connected accounts" : "Akun terhubung",
     "Request timeout (seconds)" : "Minta waktu habis (detik)",
+    "API key" : "Kunci API",
     "Preview" : "Pratinjau",
     "Advanced options" : "Opsi lanjutan",
     "Send" : "Kirim",

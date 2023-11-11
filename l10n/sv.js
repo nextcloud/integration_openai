@@ -9,6 +9,7 @@ OC.L10N.register(
     "AI speech-to-text (Whisper via LocalAI)" : "AI-tal-till-text (Whisper via LocalAI)",
     "Image generation" : "Bildgenerering",
     "Unknown" : "Okänd",
+    "seconds" : "sekunder",
     "Image not found" : "Bilden kunde inte hittas",
     "Bad HTTP method" : "Felaktig HTTP-metod",
     "Bad credentials" : "Ogiltiga inloggningsuppgifter",

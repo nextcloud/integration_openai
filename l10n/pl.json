@@ -1,5 +1,6 @@
 { "translations": {
     "Unknown" : "Nieznany",
+    "seconds" : "sekund",
     "Bad HTTP method" : "Zła metoda HTTP",
     "Bad credentials" : "Złe poświadczenia",
     "Connected accounts" : "Połączone konta",

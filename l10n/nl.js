@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown" : "Onbekend",
+    "seconds" : "seconden",
     "Image not found" : "Afbeelding niet gevonden",
     "Bad HTTP method" : "Foute HTTP methode",
     "Bad credentials" : "Foute inloggegevens",

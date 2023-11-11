@@ -8,6 +8,9 @@ OC.L10N.register(
     "AI speech-to-text (Whisper via OpenAI)" : "AI speech-to-text (Whisper via OpenAI)",
     "AI speech-to-text (Whisper via LocalAI)" : "AI speech-to-text (Whisper via LocalAI)",
     "Image generation" : "Image generation",
+    "Unknown" : "Unknown",
+    "seconds" : "seconds",
+    "Image not found" : "Image not found",
     "Bad HTTP method" : "Bad HTTP method",
     "Bad credentials" : "Bad credentials",
     "Connected accounts" : "Connected accounts",
@@ -42,6 +45,7 @@ OC.L10N.register(
     "Direct image link" : "Direct image link",
     "Your administrator defined a custom service address" : "Your administrator defined a custom service address",
     "Leave the API key empty to use the one defined by administrators" : "Leave the API key empty to use the one defined by administrators",
+    "API key" : "API key",
     "You can create a free API key in your OpenAI account settings:" : "You can create a free API key in your OpenAI account settings:",
     "OpenAI options saved" : "OpenAI options saved",
     "Failed to save OpenAI options" : "Failed to save OpenAI options",
@@ -76,6 +80,7 @@ OC.L10N.register(
     "Translate (only to English)" : "Translate (only to English)",
     "Translate" : "Translate",
     "by OpenAI with Whisper" : "by OpenAI with Whisper",
-    "Failed to get transcription/translation" : "Failed to get transcription/translation"
+    "Failed to get transcription/translation" : "Failed to get transcription/translation",
+    "Unknown API error" : "Unknown API error"
 },
 "nplurals=2; plural=(n != 1);");

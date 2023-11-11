@@ -9,6 +9,8 @@ OC.L10N.register(
     "AI speech-to-text (Whisper via LocalAI)" : "IA de voz para texto (Sussurro via LocalAI)",
     "Image generation" : "Geração de imagem",
     "Unknown" : "Desconhecido",
+    "seconds" : "segundos",
+    "Unknown image generation error" : "Erro desconhecido ao gerar imagem",
     "Image not found" : "Imagem não encontrada",
     "Bad HTTP method" : "Método HTTP incorreto",
     "Bad credentials" : "Credenciais inválidas",

@@ -8,6 +8,9 @@ OC.L10N.register(
     "AI speech-to-text (Whisper via OpenAI)" : "Řeč na text pomocí AI (Whisper prostřednictvím OpenAI",
     "AI speech-to-text (Whisper via LocalAI)" : "Převod řeči na text (Whisper pomocí LocalAI)",
     "Image generation" : "Vytváření obrázků",
+    "Unknown" : "Neznámé",
+    "seconds" : "sekund",
+    "Image not found" : "Obrázek nenalezen",
     "Bad HTTP method" : "Nesprávná HTTP metoda",
     "Bad credentials" : "Nesprávné přihlašovací údaje",
     "Connected accounts" : "Propojené účty",
@@ -42,6 +45,7 @@ OC.L10N.register(
     "Direct image link" : "Přímý odkaz na obrázek",
     "Your administrator defined a custom service address" : "Správce definoval jím určenou adresu služby",
     "Leave the API key empty to use the one defined by administrators" : "Pokud chcete využít klíč k API, definovaný správci, pak ho zde nevyplňujte",
+    "API key" : "Klíč k aplikačnímu program. rozhraní (API)",
     "You can create a free API key in your OpenAI account settings:" : "Klíč k API je možné si zdarma vytvořit v nastavení vašeho účtu u OpenAI:",
     "OpenAI options saved" : "Předvolby pro OpenAI uloženy",
     "Failed to save OpenAI options" : "Nepodařilo se uložit předvolby pro OpenAI",
@@ -76,6 +80,7 @@ OC.L10N.register(
     "Translate (only to English)" : "Přeložit (pouze do angličtiny)",
     "Translate" : "Překládání",
     "by OpenAI with Whisper" : "vytvořeno OpenAI (pomocí Whisper)",
-    "Failed to get transcription/translation" : "Nepodařilo se získat přepis/překlad"
+    "Failed to get transcription/translation" : "Nepodařilo se získat přepis/překlad",
+    "Unknown API error" : "Neznámá chyba aplikačního program. rozhraní"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

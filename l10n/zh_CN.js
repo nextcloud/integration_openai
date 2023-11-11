@@ -9,6 +9,7 @@ OC.L10N.register(
     "AI speech-to-text (Whisper via LocalAI)" : "AI语音转文本（由LocalAI Whisper提供）",
     "Image generation" : "图像生成",
     "Unknown" : "未知",
+    "seconds" : "秒",
     "Image not found" : "未找到图像",
     "Bad HTTP method" : "错误的HTTP方法",
     "Bad credentials" : "错误的凭据",

@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown" : "Neznano",
+    "seconds" : "sekunde",
     "Bad HTTP method" : "Neustrezen način HTTP",
     "Bad credentials" : "Neustrezna poverila",
     "Connected accounts" : "Povezani računi",

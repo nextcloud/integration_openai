@@ -1,10 +1,13 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "לא ידוע",
+    "seconds" : "שניות",
     "Bad HTTP method" : "שגיאה במתודת HTTP",
     "Bad credentials" : "פרטי גישה שגויים",
     "Connected accounts" : "חשבונות מקושרים",
     "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
+    "API key" : "מפתח API",
     "Preview" : "תצוגה מקדימה",
     "Advanced options" : "אפשרויות מתקדמות",
     "Send" : "שליחה",

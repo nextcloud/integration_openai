@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown" : "Непознат",
+    "seconds" : "секунди",
     "Bad credentials" : "Неточни акредитиви",
     "Connected accounts" : "Поврзани сметки",
     "API key" : "API key",

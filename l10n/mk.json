@@ -1,5 +1,6 @@
 { "translations": {
     "Unknown" : "Непознат",
+    "seconds" : "секунди",
     "Bad credentials" : "Неточни акредитиви",
     "Connected accounts" : "Поврзани сметки",
     "API key" : "API key",

@@ -1,5 +1,6 @@
 { "translations": {
     "Unknown" : "ไม่ทราบ",
+    "seconds" : "วินาที",
     "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
     "API key" : "รหัส API",
     "Preview" : "ตัวอย่าง",

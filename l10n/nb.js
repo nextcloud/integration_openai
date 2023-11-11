@@ -9,6 +9,7 @@ OC.L10N.register(
     "AI speech-to-text (Whisper via LocalAI)" : "AI tale-til-tekst (Whisper via LocalAI)",
     "Image generation" : "Bildegenerering",
     "Unknown" : "Ukjent",
+    "seconds" : "sekund",
     "Bad HTTP method" : "HTTP-metode er feil",
     "Bad credentials" : "Påloggingsdetaljene er feil",
     "Connected accounts" : "Tilknyttede kontoer",
