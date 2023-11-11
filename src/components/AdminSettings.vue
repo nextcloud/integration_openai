@@ -128,7 +128,7 @@
 								<td>
 									<input :id="'openai-api-quota-' + index"
 										v-model.number="state.quotas[index]"
-										:title="t('integration_openai', 'A per-user limit for uasge of this API type (0 for unlimited))')"
+										:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
 										type="number"
 										@input="onInput(false)">
 									<span v-if="quotaInfo !== null" class="text-cell">
