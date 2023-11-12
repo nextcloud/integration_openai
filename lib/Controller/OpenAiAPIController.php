@@ -94,8 +94,8 @@ class OpenAiAPIController extends Controller {
 		if (!$this->openAiAPIService->isUsingOpenAi()) {
 			if ($this->openAiSettingsService->getChatEndpointEnabled()) {
 				$useChat = true;
-			}			
-		} else if (str_starts_with($model,'gpt-')) {
+			}
+		} elseif (str_starts_with($model, 'gpt-')) {
 			$useChat = true;
 		}
 
