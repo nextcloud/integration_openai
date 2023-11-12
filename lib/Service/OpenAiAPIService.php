@@ -701,7 +701,7 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], $e->getCode());
 		} catch (Exception | Throwable $e) {
 			$this->logger->warning('API request error : ' . $e->getMessage(), ['exception' => $e]);
-			throw new Exception($this->l10n->t('Unknow API request error.'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			throw new Exception($this->l10n->t('Unknown API request error.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 }
