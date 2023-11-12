@@ -89,8 +89,18 @@ class OpenAiAPIController extends Controller {
 		if ($model === null) {
 			$model = $this->openAiSettingsService->getUserDefaultCompletionModelId($this->userId);
 		}
+
+		$useChat = false;
+		if (!$this->openAiAPIService->isUsingOpenAi()) {
+			if ($this->openAiSettingsService->getChatEndpointEnabled()) {
+				$useChat = true;
+			}			
+		} else if (str_starts_with($model,'gpt-')) {
+			$useChat = true;
+		}
+
 		try {
-			if (str_starts_with($model, 'gpt-')) {
+			if ($useChat) {
 				$response = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, $n, $model, $maxTokens);
 			} else {
 				$response = $this->openAiAPIService->createCompletion($this->userId, $prompt, $n, $model, $maxTokens);
