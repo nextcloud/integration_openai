@@ -283,11 +283,13 @@ class OpenAiAPIService {
 
 		$params = [
 			'model' => $model,
-			'messages' => [['role' => 'user', 'content' => $prompt]],
+			'prompt' => $prompt,
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
-
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
 		$response = $this->request($userId, 'completions', $params, 'POST');
 
 		if (!isset($response['choices'])) {
@@ -355,6 +357,9 @@ class OpenAiAPIService {
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
 
 		$response = $this->request($userId, 'chat/completions', $params, 'POST');
 
