@@ -14,7 +14,6 @@ OC.L10N.register(
     "Image not found" : "A kép nem található",
     "Bad HTTP method" : "Hibás HTTP metódus",
     "Bad credentials" : "Hibás hitelesítő adatok",
-    "Unknow API request error." : "Ismeretlen API kérés hiba",
     "Connected accounts" : "Kapcsolt fiókok",
     "OpenAI's Whisper Speech-To-Text" : "OpenAI Whisper beszédfelismerés",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI Whisper beszédfelismerés",
