@@ -43,11 +43,11 @@
 					{{ t('integration_openai', 'Clear prompt history') }}
 				</label>
 				<button id="clear-text-prompt-history"
-					@click="clearPromptHistory(false,true)">
+					@click="clearPromptHistory(true, false)">
 					{{ t('integration_openai', 'Clear text prompts') }}
 				</button>
 				<button id="clear-image-prompt-history"
-					@click="clearPromptHistory(true,false)">
+					@click="clearPromptHistory(false, true)">
 					{{ t('integration_openai', 'Clear image prompts') }}
 				</button>
 			</div>
