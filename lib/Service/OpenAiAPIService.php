@@ -300,7 +300,7 @@ class OpenAiAPIService {
 		if (isset($response['usage'])) {
 			$usage = $response['usage']['total_tokens'];
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -372,7 +372,7 @@ class OpenAiAPIService {
 			$usage = $response['usage']['total_tokens'];
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -479,7 +479,7 @@ class OpenAiAPIService {
 			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -529,7 +529,7 @@ class OpenAiAPIService {
 			}
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_IMAGE, $n);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
