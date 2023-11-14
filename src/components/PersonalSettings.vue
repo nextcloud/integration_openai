@@ -187,10 +187,10 @@ export default {
 					)
 				})
 		},
-		clearPromptHistory(clearImages, clearText) {
+		clearPromptHistory(clearText, clearImages) {
 			const params = {
-				clearTextPrompts: clearImages,
-				clearImagePrompts: clearText,
+				clearTextPrompts: clearText,
+				clearImagePrompts: clearImages,
 			}
 			const url = generateUrl('/apps/integration_openai/clear-prompt-history')
 			return axios.post(url, params)
