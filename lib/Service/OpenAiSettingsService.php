@@ -40,7 +40,8 @@ class OpenAiSettingsService {
 		'image_picker_enabled' => 'boolean',
 		'text_completion_picker_enabled' => 'boolean',
 		'translation_provider_enabled' => 'boolean',
-		'stt_provider_enabled' => 'boolean'
+		'stt_provider_enabled' => 'boolean',
+		'chat_endpoint_enabled' => 'boolean'
 	];
 
 	private const USER_CONFIG_TYPES = [
@@ -135,6 +136,13 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @return boolean
+	 */
+	public function getChatEndpointEnabled(): bool {
+		return $this->config->getAppValue(Application::APP_ID, 'chat_endpoint_enabled', '0') === '1';
+	}
+
+	/**
 	 * Get the admin config for the settings page
 	 * @return mixed[]
 	 */
@@ -154,7 +162,8 @@ class OpenAiSettingsService {
 			'image_picker_enabled' => $this->getImagePickerEnabled(),
 			'text_completion_picker_enabled' => $this->getTextCompletionPickerEnabled(),
 			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
-			'stt_provider_enabled' => $this->getSttProviderEnabled()
+			'stt_provider_enabled' => $this->getSttProviderEnabled(),
+			'chat_endpoint_enabled' => $this->getChatEndpointEnabled()
 		];
 	}
 
@@ -368,6 +377,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['stt_provider_enabled'])) {
 			$this->setSttProviderEnabled($adminConfig['stt_provider_enabled']);
 		}
+		if (isset($adminConfig['chat_endpoint_enabled'])) {
+			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
+		}
 
 	}
 
@@ -393,7 +405,6 @@ class OpenAiSettingsService {
 		}
 	}
 
-	// Setters and getters for missing settings
 	/**
 	 * @param bool $enabled
 	 * @return void
@@ -437,5 +448,12 @@ class OpenAiSettingsService {
 	 */
 	public function setLastImageSize(string $userId, string $imageSize): void {
 		$this->config->setUserValue($userId, Application::APP_ID, 'last_image_size', $imageSize);
+	}
+
+	/**
+	 * @param bool $enabled
+	 */
+	public function setChatEndpointEnabled(bool $enabled): void {
+		$this->config->setAppValue(Application::APP_ID, 'chat_endpoint_enabled', $enabled ? '1' : '0');
 	}
 }

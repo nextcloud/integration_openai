@@ -283,11 +283,13 @@ class OpenAiAPIService {
 
 		$params = [
 			'model' => $model,
-			'messages' => [['role' => 'user', 'content' => $prompt]],
+			'prompt' => $prompt,
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
-
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
 		$response = $this->request($userId, 'completions', $params, 'POST');
 
 		if (!isset($response['choices'])) {
@@ -298,7 +300,7 @@ class OpenAiAPIService {
 		if (isset($response['usage'])) {
 			$usage = $response['usage']['total_tokens'];
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -355,6 +357,9 @@ class OpenAiAPIService {
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
 
 		$response = $this->request($userId, 'chat/completions', $params, 'POST');
 
@@ -367,7 +372,7 @@ class OpenAiAPIService {
 			$usage = $response['usage']['total_tokens'];
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -474,7 +479,7 @@ class OpenAiAPIService {
 			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -524,7 +529,7 @@ class OpenAiAPIService {
 			}
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_IMAGE, $n);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}

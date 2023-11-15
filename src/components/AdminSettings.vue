@@ -22,6 +22,34 @@
 				<InformationOutlineIcon :size="20" class="icon" />
 				{{ t('integration_openai', 'This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080') }}
 			</p>
+			<div v-show="state.url !== ''" class="line">
+				<label>
+					<EarthIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Choose endpoint: ') }}
+				</label>
+				<input id="openai-chat-endpoint-yes"
+					v-model="state.chat_endpoint_enabled"
+					:value="true"
+					type="radio"
+					name="chat_endpoint"
+					@input="onInput">
+				<label for="openai-chat-endpoint-yes">
+					{{ t('integration_openai', 'Chat completions') }}
+				</label>
+				<input id="openai-chat-endpoint-no"
+					v-model="state.chat_endpoint_enabled"
+					:value="false"
+					type="radio"
+					name="chat_endpoint"
+					@input="onInput">
+				<label for="openai-chat-endpoint-no">
+					{{ t('integration_openai', 'Completions') }}
+				</label>
+			</div>
+			<p v-show="state.url !== ''" class="settings-hint">
+				<InformationOutlineIcon :size="20" class="icon" />
+				{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
+			</p>
 			<div class="line">
 				<label for="openai-api-key">
 					<KeyIcon :size="20" class="icon" />
@@ -324,6 +352,7 @@ export default {
 				this.saveOptions({
 					api_key: this.state.api_key,
 					url: this.state.url,
+					chat_endpoint_enabled: this.state.chat_endpoint_enabled,
 					request_timeout: this.state.request_timeout,
 					max_tokens: this.state.max_tokens,
 					quota_period: this.state.quota_period,
@@ -399,6 +428,9 @@ export default {
 		}
 		> input:invalid {
 			border-color: var(--color-error);
+		}
+		> input[type='radio'] {
+			width: auto;
 		}
 		.spacer {
 			display: inline-block;

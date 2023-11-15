@@ -43,11 +43,11 @@
 					{{ t('integration_openai', 'Clear prompt history') }}
 				</label>
 				<button id="clear-text-prompt-history"
-					@click="clearPromptHistory(false,true)">
+					@click="clearPromptHistory(true, false)">
 					{{ t('integration_openai', 'Clear text prompts') }}
 				</button>
 				<button id="clear-image-prompt-history"
-					@click="clearPromptHistory(true,false)">
+					@click="clearPromptHistory(false, true)">
 					{{ t('integration_openai', 'Clear image prompts') }}
 				</button>
 			</div>
@@ -187,10 +187,10 @@ export default {
 					)
 				})
 		},
-		clearPromptHistory(clearImages, clearText) {
+		clearPromptHistory(clearText, clearImages) {
 			const params = {
-				clearTextPrompts: clearImages,
-				clearImagePrompts: clearText,
+				clearTextPrompts: clearText,
+				clearImagePrompts: clearImages,
 			}
 			const url = generateUrl('/apps/integration_openai/clear-prompt-history')
 			return axios.post(url, params)
