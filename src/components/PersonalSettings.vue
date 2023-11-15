@@ -153,7 +153,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to load quota info')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 			if (this.quotaInfo === null) {
@@ -183,7 +183,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to save OpenAI options')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},
@@ -200,7 +200,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to clear prompt history')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},

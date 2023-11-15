@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.1.2 – 2023-11-15
+
+### Fixed
+
+- Error with params for the completion endpoint @MB-Finski
+
+### Added
+
+- Admin setting for choosing the endpoint when using LocalAI @MB-Finski
+
 ## 1.1.1 – 2023-11-10
 
 ### Fixed

@@ -307,7 +307,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to save default model ID')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},
@@ -355,7 +355,7 @@ export default {
 								|| error.response?.data?.body?.error?.code
 								|| error.response?.data?.error
 								|| t('integration_openai', 'Unknown OpenAI API error')
-							)
+							),
 					)
 				})
 				.then(() => {

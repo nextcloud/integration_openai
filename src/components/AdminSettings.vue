@@ -336,7 +336,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to load quota info')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},
@@ -384,7 +384,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to save OpenAI admin options')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},
