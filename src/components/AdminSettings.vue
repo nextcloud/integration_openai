@@ -89,7 +89,7 @@
 					:title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
 					target="_blank">
-					<NcButton type="tertiary">
+					<NcButton type="tertiary" aria-label="openai-info">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -99,7 +99,7 @@
 					:title="t('integration_openai', 'More information about LocalAI models')"
 					href="https://localai.io/model-compatibility/index.html"
 					target="_blank">
-					<NcButton type="tertiary">
+					<NcButton type="tertiary" aria-label="localai-info">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -345,7 +345,7 @@ export default {
 		},
 		onCheckboxChanged(newValue, key) {
 			this.state[key] = newValue
-			this.saveOptions({ [key]: this.state[key] ? '1' : '0' })
+			this.saveOptions({ [key]: this.state[key] })
 		},
 		onInput(getModels = true) {
 			delay(() => {
