@@ -38,6 +38,36 @@
 				</p>
 			</div>
 			<div class="line">
+				<label for="basic-user">
+					<KeyIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'User for basic authentication (optional, can only be used with LocalAI)') }}
+				</label>
+				<input id="openai-basic-user"
+					v-model="state.basic_user"
+					type="text"
+					:readonly="readonly"
+					:placeholder="t('integration_openai', 'your Basic Auth user')"
+					@input="onInput"
+					@focus="readonly = false">
+			</div>
+			<div class="line">
+				<label for="basic-password">
+					<KeyIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Password for basic authentication (optional, can only be used with LocalAI)') }}
+				</label>
+				<input id="openai-basic-password"
+					v-model="state.basic_password"
+					type="password"
+					:readonly="readonly"
+					:placeholder="t('integration_openai', 'your Basic Auth password')"
+					@input="onInput"
+					@focus="readonly = false">
+			</div>
+			<p class="settings-hint">
+				<InformationOutlineIcon :size="20" class="icon" />
+				{{ t('integration_openai', 'Leave the basic auth settings empty to use the one defined by administrators') }}
+			</p>
+			<div class="line">
 				<label for="clear-prompt-history">
 					<DeleteIcon :size="20" class="icon" />
 					{{ t('integration_openai', 'Clear prompt history') }}
