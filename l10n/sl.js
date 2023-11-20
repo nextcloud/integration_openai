@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Neznano",
     "seconds" : "sekunde",
+    "Image not found" : "Slike ni mogoče najti",
     "Bad HTTP method" : "Neustrezen način HTTP",
     "Bad credentials" : "Neustrezna poverila",
     "Connected accounts" : "Povezani računi",

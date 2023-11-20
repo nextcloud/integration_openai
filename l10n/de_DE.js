@@ -19,7 +19,7 @@ OC.L10N.register(
     "images" : "Bilder",
     "seconds" : "Sekunden",
     "Unknown error while retrieving quota usage." : "Unbekannter Fehler beim Abrufen der Kontingentnutzung.",
-    "Text generation quota exceeded" : "Das Kontingent für die Textgenerierung wurde überschritten",
+    "Text generation quota exceeded" : "Das Kontingent für die Texterstellung wurde überschritten",
     "Unknown text generation error" : "Unbekannter Fehler bei der Textgenerierung",
     "Could not read audio file." : "Audio-Datei kontte nicht gelesen werden.",
     "Audio transcription quota exceeded" : "Das Kontingent für Audiotranskription überschritten",
