@@ -43,7 +43,8 @@ class OpenAiSettingsService {
 		'stt_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
-		'basic_password' => 'string'
+		'basic_password' => 'string',
+		'use_basic_auth' => 'boolean'
 	];
 
 	private const USER_CONFIG_TYPES = [
@@ -185,6 +186,13 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @return boolean
+	 */
+	public function getUseBasicAuth(): bool {
+		return $this->config->getAppValue(Application::APP_ID, 'use_basic_auth', '0') === '1';
+	}
+
+	/**
 	 * Get the admin config for the settings page
 	 * @return mixed[]
 	 */
@@ -207,7 +215,8 @@ class OpenAiSettingsService {
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
-			'basic_password' => $this->getAdminBasicPassword()
+			'basic_password' => $this->getAdminBasicPassword(),
+			'use_basic_auth' => $this->getUseBasicAuth()
 		];
 	}
 
@@ -216,11 +225,14 @@ class OpenAiSettingsService {
 	 * @return string[]
 	 */
 	public function getUserConfig(string $userId): array {
+		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::OPENAI_API_BASE_URL;
 		return [
 			'api_key' => $this->getUserApiKey($userId),
-			'default_completion_model_id' => $this->getUserDefaultCompletionModelId($userId),
 			'basic_user' => $this->getUserBasicUser($userId, false),
-			'basic_password' => $this->getUserBasicPassword($userId, false)
+			'basic_password' => $this->getUserBasicPassword($userId, false),
+			'use_basic_auth' => $this->getUseBasicAuth(),
+			'is_custom_service' => $isCustomService, 
+
 		];
 	}
 
@@ -407,6 +419,14 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @param bool $useBasicAuth
+	 * @return void
+	 */
+	public function setUseBasicAuth(bool $useBasicAuth): void {
+		$this->config->setAppValue(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
+	}
+
+	/**
 	 * Set the admin config for the settings page
 	 * @param mixed[] $config
 	 * @return void
@@ -465,6 +485,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['basic_password'])) {
 			$this->setAdminBasicPassword($adminConfig['basic_password']);
+		}
+		if (isset($adminConfig['use_basic_auth'])) {
+			$this->setUseBasicAuth($adminConfig['use_basic_auth']);
 		}
 	}
 

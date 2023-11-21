@@ -22,14 +22,10 @@ class Personal implements ISettings {
 	 * @return TemplateResponse
 	 */
 	public function getForm(): TemplateResponse {
-		$userApiKey = $this->openAiSettingsService->getUserApiKey($this->userId);
-		$adminServiceUrl = $this->openAiSettingsService->getServiceUrl();
-		$isCustomService = $adminServiceUrl !== Application::OPENAI_API_BASE_URL && $adminServiceUrl !== '';
-
-		$state = [
-			'api_key' => $userApiKey,
-			'isCustomService' => $isCustomService,
-		];
+		if ($this->userId === null) {
+			return new TemplateResponse(Application::APP_ID, 'personalSettings');
+		}
+		$state = $this->openAiSettingsService->getUserConfig($this->userId);
 		$this->initialStateService->provideInitialState('config', $state);
 		return new TemplateResponse(Application::APP_ID, 'personalSettings');
 	}

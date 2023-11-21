@@ -620,6 +620,10 @@ class OpenAiAPIService {
 	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
 		try {
 			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+			if ($serviceUrl === '') {
+				$serviceUrl = Application::OPENAI_API_BASE_URL;
+			}
+			
 			$timeout = $this->openAiSettingsService->getRequestTimeout();
 			$timeout = (int) $timeout;
 
@@ -641,10 +645,17 @@ class OpenAiAPIService {
 			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
 				return ['error' => 'An API key is required for api.openai.com'];
 			}
-			if ($apiKey !== '') {
-				$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
-			} elseif ($basicUser !== '' and $basicPassword !== '') {
-				$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
+
+			$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
+
+			if ($this->isUsingOpenAi() || !$useBasicAuth) {
+				if ($apiKey !== '') {
+					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
+				}				
+			} elseif ($useBasicAuth) {
+				if ($basicUser !== '' && $basicPassword !== '') {
+					$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);	
+				}				
 			}
 
 			if ($contentType === null) {
