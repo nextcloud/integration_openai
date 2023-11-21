@@ -271,7 +271,7 @@ export default {
 								|| error.response?.data?.body?.error?.code
 								|| error.response?.data?.error
 								|| t('integration_openai', 'Unknown image API error')
-							)
+							),
 					)
 				})
 				.then(() => {

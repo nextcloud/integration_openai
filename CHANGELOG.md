@@ -6,16 +6,35 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.1.2 – 2023-11-15
+
+### Fixed
+
+- Error with params for the completion endpoint @MB-Finski
+
+### Added
+
+- Admin setting for choosing the endpoint when using LocalAI @MB-Finski
+
+## 1.1.1 – 2023-11-10
+
+### Fixed
+
+- Error introduced in transcription for 1.1.0 @MB-Finski
+
+## 1.1.0 – 2023-11-09
+
 ### Added
 
 - Enable clearing of prompt history from personal settings page @MB-Finski
-- Enable limiting of api usage on per-user basis (user can use own API with OpenAI to bypass this) @MB-Finski
+- Enable limiting of api usage on per-user basis (user can use an own API key to bypass this) @MB-Finski
 - Expose token limit as admin setting for text generation @MB-Finski
 
 ### Fixed
 
 - Request no autocomplete for api key (in addition to disabling the field), which has caused issues for some users @MB-Finski
 - Replace deprecated query() of IConfig in app container setup @MB-Finski
+- Rewrite error handling logic, use proper http error codes @MB-Finski
 
 ## 1.0.13 – 2023-08-21
 

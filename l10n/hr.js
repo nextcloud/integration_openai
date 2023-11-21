@@ -1,10 +1,13 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Nepoznata pogreška",
+    "seconds" : "sekunda",
     "Bad HTTP method" : "Pogrešna metoda HTTP-a",
     "Bad credentials" : "Pogrešne vjerodajnice",
     "Connected accounts" : "Povezani računi",
     "Request timeout (seconds)" : "Istek zahtjeva (u sekundama)",
+    "API key" : "Ključ API-ja",
     "Advanced options" : "Napredne opcije",
     "Send" : "Pošaljite",
     "Result" : "Rezultat",

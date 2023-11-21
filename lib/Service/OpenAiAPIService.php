@@ -61,7 +61,7 @@ class OpenAiAPIService {
 	 */
 	public function isUsingOpenAi(): bool {
 		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		return $serviceUrl === '' || $$serviceUrl === Application::OPENAI_API_BASE_URL;
+		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 	}
 
 	/**
@@ -283,11 +283,13 @@ class OpenAiAPIService {
 
 		$params = [
 			'model' => $model,
-			'messages' => [['role' => 'user', 'content' => $prompt]],
+			'prompt' => $prompt,
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
-
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
 		$response = $this->request($userId, 'completions', $params, 'POST');
 
 		if (!isset($response['choices'])) {
@@ -298,7 +300,7 @@ class OpenAiAPIService {
 		if (isset($response['usage'])) {
 			$usage = $response['usage']['total_tokens'];
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -355,6 +357,9 @@ class OpenAiAPIService {
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
 
 		$response = $this->request($userId, 'chat/completions', $params, 'POST');
 
@@ -367,7 +372,7 @@ class OpenAiAPIService {
 			$usage = $response['usage']['total_tokens'];
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TEXT, $usage);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -432,11 +437,7 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		if (!isset($transcriptionResponse['text'])) {
-			$this->logger->warning('Audio file transcription error: ' . json_encode($transcriptionResponse));
-			throw new Exception($this->l10n->t('Unknown audio file trancription error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-		return $transcriptionResponse['text'];
+		return $transcriptionResponse;
 	}
 
 	/**
@@ -452,7 +453,7 @@ class OpenAiAPIService {
 		string $audioFileContent,
 		bool $translate = true,
 		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
-	): array {
+	): string {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
@@ -478,7 +479,7 @@ class OpenAiAPIService {
 			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -528,7 +529,7 @@ class OpenAiAPIService {
 			}
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId, Application::QUOTA_TYPE_IMAGE, $n);
+				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -718,7 +719,7 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], $e->getCode());
 		} catch (Exception | Throwable $e) {
 			$this->logger->warning('API request error : ' . $e->getMessage(), ['exception' => $e]);
-			throw new Exception($this->l10n->t('Unknow API request error.'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			throw new Exception($this->l10n->t('Unknown API request error.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 }

@@ -1,6 +1,8 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Үл танигдах зүйл",
+    "seconds" : "секунд",
     "Preview" : "шалгах",
     "Advanced options" : "Бусад сонголтууд",
     "Send" : "илгээх",

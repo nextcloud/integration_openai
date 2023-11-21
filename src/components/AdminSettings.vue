@@ -22,6 +22,34 @@
 				<InformationOutlineIcon :size="20" class="icon" />
 				{{ t('integration_openai', 'This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080') }}
 			</p>
+			<div v-show="state.url !== ''" class="line">
+				<label>
+					<EarthIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Choose endpoint: ') }}
+				</label>
+				<input id="openai-chat-endpoint-yes"
+					v-model="state.chat_endpoint_enabled"
+					:value="true"
+					type="radio"
+					name="chat_endpoint"
+					@input="onInput">
+				<label for="openai-chat-endpoint-yes">
+					{{ t('integration_openai', 'Chat completions') }}
+				</label>
+				<input id="openai-chat-endpoint-no"
+					v-model="state.chat_endpoint_enabled"
+					:value="false"
+					type="radio"
+					name="chat_endpoint"
+					@input="onInput">
+				<label for="openai-chat-endpoint-no">
+					{{ t('integration_openai', 'Completions') }}
+				</label>
+			</div>
+			<p v-show="state.url !== ''" class="settings-hint">
+				<InformationOutlineIcon :size="20" class="icon" />
+				{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
+			</p>
 			<div class="line">
 				<label for="openai-api-key">
 					<KeyIcon :size="20" class="icon" />
@@ -87,7 +115,7 @@
 					:title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
 					target="_blank">
-					<NcButton type="tertiary">
+					<NcButton type="tertiary" aria-label="openai-info">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -97,7 +125,7 @@
 					:title="t('integration_openai', 'More information about LocalAI models')"
 					href="https://localai.io/model-compatibility/index.html"
 					target="_blank">
-					<NcButton type="tertiary">
+					<NcButton type="tertiary" aria-label="localai-info">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -154,7 +182,7 @@
 								<td>
 									<input :id="'openai-api-quota-' + index"
 										v-model.number="state.quotas[index]"
-										:title="t('integration_openai', 'A per-user limit for uasge of this API type (0 for unlimited))')"
+										:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
 										type="number"
 										@input="onInput(false)">
 									<span v-if="quotaInfo !== null" class="text-cell">
@@ -334,7 +362,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to load quota info')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},
@@ -343,7 +371,7 @@ export default {
 		},
 		onCheckboxChanged(newValue, key) {
 			this.state[key] = newValue
-			this.saveOptions({ [key]: this.state[key] ? '1' : '0' })
+			this.saveOptions({ [key]: this.state[key] })
 		},
 		onInput(getModels = true) {
 			delay(() => {
@@ -352,6 +380,7 @@ export default {
 					basic_user: this.state.basic_user,
 					basic_password: this.state.basic_password,
 					url: this.state.url,
+					chat_endpoint_enabled: this.state.chat_endpoint_enabled,
 					request_timeout: this.state.request_timeout,
 					max_tokens: this.state.max_tokens,
 					quota_period: this.state.quota_period,
@@ -383,7 +412,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to save OpenAI admin options')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},
@@ -427,6 +456,9 @@ export default {
 		}
 		> input:invalid {
 			border-color: var(--color-error);
+		}
+		> input[type='radio'] {
+			width: auto;
 		}
 		.spacer {
 			display: inline-block;

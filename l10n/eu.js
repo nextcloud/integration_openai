@@ -1,14 +1,16 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Ezezaguna",
+    "seconds" : "duela segundu batzuk",
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
     "Connected accounts" : "Konektatutako kontuak",
     "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
-    "Select which features you want to enable" : "Hautatu zeintzuk ezaugarri gaitu nahi dituzun",
     "Loading image" : "Irudia kargatzen",
     "Generated image" : "Sortutako irudia",
     "Direct image link" : "Irudiaren esteka zuzena",
+    "API key" : "APIaren gakoa",
     "Preview" : "Aurrebista",
     "Show/hide advanced options" : "Erakutsi/ezkutatu aukera aurreratuak",
     "Advanced options" : "Ezarpen aurreratuak",

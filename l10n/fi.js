@@ -1,13 +1,16 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Tuntematon",
+    "seconds" : "sekuntia",
+    "Image not found" : "Kuvaa ei löytynyt",
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
     "Bad credentials" : "Virheelliset kirjautumistiedot",
     "Connected accounts" : "Yhdistetyt tilit",
     "OpenAI integration" : "OpenAI-integraatio",
     "your API key" : "API-avaimesi",
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
-    "OpenAI API key" : "OpenAI:n API-avain",
+    "API key" : "API-avain",
     "Preview" : "Esikatselu",
     "Preview content" : "Esikatsele sisältö",
     "Show/hide advanced options" : "Näytä/piilota lisäasetukset",
@@ -15,9 +18,9 @@ OC.L10N.register(
     "Send" : "Lähetä",
     "Model to use" : "Käytettävä malli",
     "Choose a model" : "Valitse malli",
-    "OpenAI error" : "OpenAI-virhe",
     "Result" : "Tulos",
     "Unknown error" : "Tuntematon virhe",
-    "Translate" : "Käännä"
+    "Translate" : "Käännä",
+    "Unknown API error" : "Tuntematon API-virhe"
 },
 "nplurals=2; plural=(n != 1);");

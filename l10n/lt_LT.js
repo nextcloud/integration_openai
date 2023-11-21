@@ -1,11 +1,14 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Nežinoma",
+    "seconds" : "sekundes",
     "Bad HTTP method" : "Blogas HTTP metodas",
     "Bad credentials" : "Blogi prisijungimo duomenys",
     "Connected accounts" : "Prijungtos paskyros",
     "example:" : "pavyzdys:",
     "Request timeout (seconds)" : "Prisijungimo laikas (sekundėmis)",
+    "API key" : "API raktas",
     "Preview" : "Peržiūra",
     "Preview content" : "Peržiūrėti turinį",
     "Show/hide advanced options" : "Rodyti/slėpti išplėstines parinktis",

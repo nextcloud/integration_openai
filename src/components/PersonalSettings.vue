@@ -73,11 +73,11 @@
 					{{ t('integration_openai', 'Clear prompt history') }}
 				</label>
 				<button id="clear-text-prompt-history"
-					@click="clearPromptHistory(false,true)">
+					@click="clearPromptHistory(true, false)">
 					{{ t('integration_openai', 'Clear text prompts') }}
 				</button>
 				<button id="clear-image-prompt-history"
-					@click="clearPromptHistory(true,false)">
+					@click="clearPromptHistory(false, true)">
 					{{ t('integration_openai', 'Clear image prompts') }}
 				</button>
 			</div>
@@ -185,7 +185,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to load quota info')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 			if (this.quotaInfo === null) {
@@ -215,14 +215,14 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to save OpenAI options')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},
-		clearPromptHistory(clearImages, clearText) {
+		clearPromptHistory(clearText, clearImages) {
 			const params = {
-				clearTextPrompts: clearImages,
-				clearImagePrompts: clearText,
+				clearTextPrompts: clearText,
+				clearImagePrompts: clearImages,
 			}
 			const url = generateUrl('/apps/integration_openai/clear-prompt-history')
 			return axios.post(url, params)
@@ -232,7 +232,7 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to clear prompt history')
-						+ ': ' + error.response?.request?.responseText
+						+ ': ' + error.response?.request?.responseText,
 					)
 				})
 		},

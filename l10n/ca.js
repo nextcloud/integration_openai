@@ -1,13 +1,15 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "Desconegut",
+    "seconds" : "segons",
     "Bad HTTP method" : "Mètode HTTP incorrecte",
     "Bad credentials" : "Credencials dolentes",
     "Connected accounts" : "Comptes connectats",
     "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
-    "Select which features you want to enable" : "Seleccioneu quines funcions voleu activar",
     "Loading image" : "Carregant imatge",
     "Generated image" : "Imatge generada",
+    "API key" : "Clau de l'API",
     "Preview" : "Previsualitza",
     "Advanced options" : "Paràmetres avançats",
     "Send" : "Envia",

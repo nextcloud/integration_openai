@@ -1,7 +1,10 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown" : "ไม่ทราบ",
+    "seconds" : "วินาที",
     "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
+    "API key" : "รหัส API",
     "Preview" : "ตัวอย่าง",
     "Advanced options" : "ตัวเลือกขั้นสูง",
     "Send" : "ส่ง",

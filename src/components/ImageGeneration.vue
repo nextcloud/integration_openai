@@ -110,7 +110,7 @@ export default {
 		getProxiedImageUrl(urlId) {
 			return generateUrl(
 				'/apps/integration_openai/images/generations/{hash}/{urlId}',
-				{ hash: this.hash, urlId }
+				{ hash: this.hash, urlId },
 			)
 		},
 	},
