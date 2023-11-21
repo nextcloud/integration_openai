@@ -86,6 +86,36 @@
 					{{ t('integration_openai', 'Specifying your own API key will allow unlimited usage') }}
 				</p>
 			</div>
+			<div v-if="state.isCustomService" class="line">
+				<label for="basic-user">
+					<KeyIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'User for basic authentication') }}
+				</label>
+				<input id="openai-basic-user"
+					v-model="state.basic_user"
+					type="text"
+					:readonly="readonly"
+					:placeholder="t('integration_openai', 'your Basic Auth user')"
+					@input="onInput"
+					@focus="readonly = false">
+			</div>
+			<div v-if="state.isCustomService" class="line">
+				<label for="basic-password">
+					<KeyIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Password for basic authentication') }}
+				</label>
+				<input id="openai-basic-password"
+					v-model="state.basic_password"
+					type="password"
+					:readonly="readonly"
+					:placeholder="t('integration_openai', 'your Basic Auth password')"
+					@input="onInput"
+					@focus="readonly = false">
+			</div>
+			<p v-if="state.isCustomService" class="settings-hint">
+				<InformationOutlineIcon :size="20" class="icon" />
+				{{ t('integration_openai', 'Leave the basic auth settings empty to use the one defined by administrators') }}
+			</p>
 		</div>
 	</div>
 </template>
@@ -141,6 +171,8 @@ export default {
 			delay(() => {
 				this.saveOptions({
 					api_key: this.state.api_key,
+					basic_user: this.state.basic_user,
+					basic_password: this.state.basic_password,
 				})
 			}, 2000)()
 		},
