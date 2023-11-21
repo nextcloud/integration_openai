@@ -619,8 +619,8 @@ class OpenAiAPIService {
 	 */
 	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
 		try {
-			$serviceUrl = $this->config->getAppValue(Application::APP_ID, 'url', Application::OPENAI_API_BASE_URL) ?: Application::OPENAI_API_BASE_URL;
-			$timeout = $this->config->getAppValue(Application::APP_ID, 'request_timeout', Application::OPENAI_DEFAULT_REQUEST_TIMEOUT) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+			$timeout = $this->openAiSettingsService->getRequestTimeout();
 			$timeout = (int) $timeout;
 
 			$url = $serviceUrl . '/v1/' . $endPoint;
@@ -632,20 +632,11 @@ class OpenAiAPIService {
 			];
 
 			// an API key is mandatory when using OpenAI
-			$adminApiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
-			$apiKey = $userId === null
-				? $adminApiKey
-				: ($this->config->getUserValue($userId, Application::APP_ID, 'api_key', $adminApiKey) ?: $adminApiKey);
+			$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
 
 			// We can also use basic authentication
-			$adminBasicUser = $this->config->getAppValue(Application::APP_ID, 'basic_user', '');
-			$adminBasicPassword = $this->config->getAppValue(Application::APP_ID, 'basic_password', '');
-			$basicUser = $userId === null
-				? $adminBasicUser
-				: ($this->config->getUserValue($userId, Application::APP_ID, 'basic_user', $adminBasicUser) ?: $adminBasicUser);
-			$basicPassword = $userId === null
-				? $adminBasicPassword
-				: ($this->config->getUserValue($userId, Application::APP_ID, 'basic_password', $adminBasicPassword) ?: $adminBasicPassword);
+			$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
+			$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
 
 			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
 				return ['error' => 'An API key is required for api.openai.com'];
@@ -716,7 +707,11 @@ class OpenAiAPIService {
 			} else {
 				$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 			}
-			throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], $e->getCode());
+			if (isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])) {
+				throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], $e->getCode());
+			} else {
+				throw new Exception($this->l10n->t('API request error: ') . $e->getMessage(), $e->getCode());
+			}
 		} catch (Exception | Throwable $e) {
 			$this->logger->warning('API request error : ' . $e->getMessage(), ['exception' => $e]);
 			throw new Exception($this->l10n->t('Unknown API request error.'), Http::STATUS_INTERNAL_SERVER_ERROR);
