@@ -49,7 +49,9 @@ class OpenAiSettingsService {
 
 	private const USER_CONFIG_TYPES = [
 		'api_key' => 'string',
-		'default_completion_model_id' => 'string'
+		'default_completion_model_id' => 'string',
+		'basic_user' => 'string',
+		'basic_password' => 'string',
 	];
 
 
@@ -231,7 +233,7 @@ class OpenAiSettingsService {
 			'basic_user' => $this->getUserBasicUser($userId, false),
 			'basic_password' => $this->getUserBasicPassword($userId, false),
 			'use_basic_auth' => $this->getUseBasicAuth(),
-			'is_custom_service' => $isCustomService, 
+			'is_custom_service' => $isCustomService,
 
 		];
 	}

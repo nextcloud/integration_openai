@@ -651,11 +651,11 @@ class OpenAiAPIService {
 			if ($this->isUsingOpenAi() || !$useBasicAuth) {
 				if ($apiKey !== '') {
 					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
-				}				
+				}
 			} elseif ($useBasicAuth) {
 				if ($basicUser !== '' && $basicPassword !== '') {
-					$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);	
-				}				
+					$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
+				}
 			}
 
 			if ($contentType === null) {
