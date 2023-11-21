@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Necunoscut",
     "seconds" : "secunde",
+    "Image not found" : "Imaginea indisponibilă",
     "Bad HTTP method" : "Metodă HTTP nepotrivită",
     "Bad credentials" : "Credențiale greșite",
     "Connected accounts" : "Conturile conectate",
