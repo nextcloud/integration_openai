@@ -41,12 +41,17 @@ class OpenAiSettingsService {
 		'text_completion_picker_enabled' => 'boolean',
 		'translation_provider_enabled' => 'boolean',
 		'stt_provider_enabled' => 'boolean',
-		'chat_endpoint_enabled' => 'boolean'
+		'chat_endpoint_enabled' => 'boolean',
+		'basic_user' => 'string',
+		'basic_password' => 'string',
+		'use_basic_auth' => 'boolean'
 	];
 
 	private const USER_CONFIG_TYPES = [
 		'api_key' => 'string',
-		'default_completion_model_id' => 'string'
+		'default_completion_model_id' => 'string',
+		'basic_user' => 'string',
+		'basic_password' => 'string',
 	];
 
 
@@ -65,12 +70,14 @@ class OpenAiSettingsService {
 	}
 
 	/**
-	 * @param string $userId
+	 * SIC! Does not fall back on the admin api by default
+	 * @param null|string $userId
+	 * @param boolean $fallBackOnAdminValue
 	 * @return string
 	 */
-	public function getUserApiKey(string $userId): string {
-		// SIC! Do not fall back on the admin api key if the user has not set their own api key
-		$userApiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key', '') ?: '';
+	public function getUserApiKey(?string $userId, bool $fallBackOnAdminValue = false): string {
+		$fallBackApiKey = $fallBackOnAdminValue ? $this->getAdminApiKey() : '';
+		$userApiKey = $userId === null ? $fallBackApiKey : ($this->config->getUserValue($userId, Application::APP_ID, 'api_key', $fallBackApiKey) ?: $fallBackApiKey);
 		return $userApiKey;
 	}
 
@@ -143,6 +150,51 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @param string|null $userId
+	 * @param bool $fallBackOnAdminValue
+	 * @return string
+	 */
+	public function getUserBasicUser(?string $userId, bool $fallBackOnAdminValue = true): string {
+		$fallBackBasicUser = $fallBackOnAdminValue ? $this->config->getAppValue(Application::APP_ID, 'basic_user', '') : '';
+		$basicUser = $userId === null ? $fallBackBasicUser : ($this->config->getUserValue($userId, Application::APP_ID, 'basic_user', $fallBackBasicUser) ?: $fallBackBasicUser);
+		return $basicUser;
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @param bool $fallBackOnAdminValue
+	 * @return string
+	 */
+	public function getUserBasicPassword(?string $userId, bool $fallBackOnAdminValue = true): string {
+		$fallBackBasicPassword = $fallBackOnAdminValue ? $this->config->getAppValue(Application::APP_ID, 'basic_password', '') : '';
+		$basicPassword = $userId === null ? $fallBackBasicPassword : ($this->config->getUserValue($userId, Application::APP_ID, 'basic_password', $fallBackBasicPassword) ?: $fallBackBasicPassword);
+		return $basicPassword;
+	}
+
+	/**
+	 * Get admin basic user
+	 * @return string
+	 */
+	public function getAdminBasicUser(): string {
+		return $this->config->getAppValue(Application::APP_ID, 'basic_user', '');
+	}
+
+	/**
+	 * Get admin basic password
+	 * @return string
+	 */
+	public function getAdminBasicPassword(): string {
+		return $this->config->getAppValue(Application::APP_ID, 'basic_password', '');
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getUseBasicAuth(): bool {
+		return $this->config->getAppValue(Application::APP_ID, 'use_basic_auth', '0') === '1';
+	}
+
+	/**
 	 * Get the admin config for the settings page
 	 * @return mixed[]
 	 */
@@ -163,7 +215,10 @@ class OpenAiSettingsService {
 			'text_completion_picker_enabled' => $this->getTextCompletionPickerEnabled(),
 			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
-			'chat_endpoint_enabled' => $this->getChatEndpointEnabled()
+			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
+			'basic_user' => $this->getAdminBasicUser(),
+			'basic_password' => $this->getAdminBasicPassword(),
+			'use_basic_auth' => $this->getUseBasicAuth()
 		];
 	}
 
@@ -172,9 +227,14 @@ class OpenAiSettingsService {
 	 * @return string[]
 	 */
 	public function getUserConfig(string $userId): array {
+		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::OPENAI_API_BASE_URL;
 		return [
 			'api_key' => $this->getUserApiKey($userId),
-			'default_completion_model_id' => $this->getUserDefaultCompletionModelId($userId)
+			'basic_user' => $this->getUserBasicUser($userId, false),
+			'basic_password' => $this->getUserBasicPassword($userId, false),
+			'use_basic_auth' => $this->getUseBasicAuth(),
+			'is_custom_service' => $isCustomService,
+
 		];
 	}
 
@@ -327,6 +387,48 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @param string $basicUser
+	 * @return void
+	 */
+	public function setAdminBasicUser(string $basicUser): void {
+		$this->config->setAppValue(Application::APP_ID, 'basic_user', $basicUser);
+	}
+
+	/**
+	 * @param string $basicPassword
+	 * @return void
+	 */
+	public function setAdminBasicPassword(string $basicPassword): void {
+		$this->config->setAppValue(Application::APP_ID, 'basic_password', $basicPassword);
+	}
+
+	/**
+	 * @param string $userId
+	 * @param string $basicUser
+	 * @return void
+	 */
+	public function setUserBasicUser(string $userId, string $basicUser): void {
+		$this->config->setUserValue($userId, Application::APP_ID, 'basic_user', $basicUser);
+	}
+
+	/**
+	 * @param string $userId
+	 * @param string $basicPassword
+	 * @return void
+	 */
+	public function setUserBasicPassword(string $userId, string $basicPassword): void {
+		$this->config->setUserValue($userId, Application::APP_ID, 'basic_password', $basicPassword);
+	}
+
+	/**
+	 * @param bool $useBasicAuth
+	 * @return void
+	 */
+	public function setUseBasicAuth(bool $useBasicAuth): void {
+		$this->config->setAppValue(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
+	}
+
+	/**
 	 * Set the admin config for the settings page
 	 * @param mixed[] $config
 	 * @return void
@@ -380,7 +482,15 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
 		}
-
+		if (isset($adminConfig['basic_user'])) {
+			$this->setAdminBasicUser($adminConfig['basic_user']);
+		}
+		if (isset($adminConfig['basic_password'])) {
+			$this->setAdminBasicPassword($adminConfig['basic_password']);
+		}
+		if (isset($adminConfig['use_basic_auth'])) {
+			$this->setUseBasicAuth($adminConfig['use_basic_auth']);
+		}
 	}
 
 	/**
@@ -402,6 +512,12 @@ class OpenAiSettingsService {
 		}
 		if (isset($userConfig['default_completion_model_id'])) {
 			$this->setUserDefaultCompletionModelId($userId, $userConfig['default_completion_model_id']);
+		}
+		if (isset($userConfig['basic_user'])) {
+			$this->setUserBasicUser($userId, $userConfig['basic_user']);
+		}
+		if (isset($userConfig['basic_password'])) {
+			$this->setUserBasicPassword($userId, $userConfig['basic_password']);
 		}
 	}
 

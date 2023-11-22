@@ -5,37 +5,71 @@
 			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
 		</h2>
 		<div id="openai-content">
-			<p v-if="state.isCustomService" class="settings-hint">
+			<p v-if="state.is_custom_service" class="settings-hint">
 				<InformationOutlineIcon :size="20" class="icon" />
 				{{ t('integration_openai', 'Your administrator defined a custom service address') }}
 			</p>
-			<p class="settings-hint">
-				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'Leave the API key empty to use the one defined by administrators') }}
-			</p>
-			<div class="line">
-				<label for="openai-api-key">
-					<KeyIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'API key') }}
-				</label>
-				<input id="openai-api-key"
-					v-model="state.api_key"
-					autocomplete="off"
-					type="password"
-					:readonly="readonly"
-					:placeholder="t('integration_openai', 'your API key')"
-					@input="onInput"
-					@focus="readonly = false">
-			</div>
-			<div v-if="!state.isCustomService">
+			<div v-if="!state.is_custom_service || !state.use_basic_auth">
 				<p class="settings-hint">
 					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
-					&nbsp;
-					<a :href="apiKeyUrl" target="_blank" class="external">
-						{{ apiKeyUrl }}
-					</a>
+					{{ t('integration_openai', 'Leave the API key empty to use the one defined by administrators') }}
 				</p>
+				<div class="line">
+					<label for="openai-api-key">
+						<KeyIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'API key') }}
+					</label>
+					<input id="openai-api-key"
+						v-model="state.api_key"
+						autocomplete="off"
+						type="password"
+						:readonly="readonly"
+						:placeholder="t('integration_openai', 'your API key')"
+						@input="onInput"
+						@focus="readonly = false">
+				</div>
+				<div v-if="!state.is_custom_service">
+					<p class="settings-hint">
+						<InformationOutlineIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
+						&nbsp;
+						<a :href="apiKeyUrl" target="_blank" class="external">
+							{{ apiKeyUrl }}
+						</a>
+					</p>
+				</div>
+			</div>
+			<div v-else>
+				<p class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Leave the username and password empty to use the ones defined by your administrator') }}
+				</p>
+				<div class="line">
+					<label for="basic-user">
+						<KeyIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'Username') }}
+					</label>
+					<input id="openai-basic-user"
+						v-model="state.basic_user"
+						type="text"
+						:readonly="readonly"
+						:placeholder="t('integration_openai', 'your Basic Auth user')"
+						@input="onInput"
+						@focus="readonly = false">
+				</div>
+				<div class="line">
+					<label for="basic-password">
+						<KeyIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'Password') }}
+					</label>
+					<input id="openai-basic-password"
+						v-model="state.basic_password"
+						type="password"
+						:readonly="readonly"
+						:placeholder="t('integration_openai', 'your Basic Auth password')"
+						@input="onInput"
+						@focus="readonly = false">
+				</div>
 			</div>
 			<div class="line">
 				<label for="clear-prompt-history">
@@ -80,7 +114,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div v-if="!state.isCustomService">
+			<div v-if="!state.is_custom_service">
 				<p class="settings-hint">
 					<InformationOutlineIcon :size="20" class="icon" />
 					{{ t('integration_openai', 'Specifying your own API key will allow unlimited usage') }}
@@ -141,6 +175,8 @@ export default {
 			delay(() => {
 				this.saveOptions({
 					api_key: this.state.api_key,
+					basic_user: this.state.basic_user,
+					basic_password: this.state.basic_password,
 				})
 			}, 2000)()
 		},

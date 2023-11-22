@@ -5,116 +5,176 @@
 			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
 		</h2>
 		<div id="openai-content">
-			<div class="line">
-				<label for="openai-url">
-					<EarthIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'LocalAI URL (leave empty to use openai.com)') }}
-				</label>
-				<input id="openai-url"
-					v-model="state.url"
-					type="text"
-					:readonly="readonly"
-					:placeholder="t('integration_openai', 'example:') + ' http://localhost:8080'"
-					@input="onInput"
-					@focus="readonly = false">
+			<div>
+				<div class="line">
+					<label for="openai-url">
+						<EarthIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'LocalAI URL (leave empty to use openai.com)') }}
+					</label>
+					<input id="openai-url"
+						v-model="state.url"
+						type="text"
+						:readonly="readonly"
+						:placeholder="t('integration_openai', 'example:') + ' http://localhost:8080'"
+						@input="onInput"
+						@focus="readonly = false">
+				</div>
+				<p class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080') }}
+				</p>
+				<div v-show="state.url !== ''" class="line">
+					<label>
+						<EarthIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'Choose endpoint: ') }}
+					</label>
+					<input id="openai-chat-endpoint-yes"
+						v-model="state.chat_endpoint_enabled"
+						:value="true"
+						type="radio"
+						name="chat_endpoint"
+						@input="onInput">
+					<label for="openai-chat-endpoint-yes">
+						{{ t('integration_openai', 'Chat completions') }}
+					</label>
+					<input id="openai-chat-endpoint-no"
+						v-model="state.chat_endpoint_enabled"
+						:value="false"
+						type="radio"
+						name="chat_endpoint"
+						@input="onInput">
+					<label for="openai-chat-endpoint-no">
+						{{ t('integration_openai', 'Completions') }}
+					</label>
+				</div>
+				<p v-show="state.url !== ''" class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
+				</p>
+				<div v-if="models"
+					class="line">
+					<label for="size">
+						{{ t('integration_openai', 'Default completion model to use') }}
+					</label>
+					<div class="spacer" />
+					<NcSelect
+						v-model="selectedModel"
+						class="model-select"
+						:options="formattedModels"
+						:no-wrap="true"
+						input-id="openai-model-select"
+						@input="onModelSelected" />
+					<a v-if="state.url === ''"
+						:title="t('integration_openai', 'More information about OpenAI models')"
+						href="https://beta.openai.com/docs/models"
+						target="_blank">
+						<NcButton type="tertiary" aria-label="openai-info">
+							<template #icon>
+								<HelpCircleIcon />
+							</template>
+						</NcButton>
+					</a>
+					<a v-else
+						:title="t('integration_openai', 'More information about LocalAI models')"
+						href="https://localai.io/model-compatibility/index.html"
+						target="_blank">
+						<NcButton type="tertiary" aria-label="localai-info">
+							<template #icon>
+								<HelpCircleIcon />
+							</template>
+						</NcButton>
+					</a>
+				</div>
+				<div class="line">
+					<label for="openai-api-timeout">
+						<TimerAlertOutlineIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'Request timeout (seconds)') }}
+					</label>
+					<input id="openai-api-timeout"
+						v-model.number="state.request_timeout"
+						type="number"
+						@input="onInput(false)">
+				</div>
 			</div>
-			<p class="settings-hint">
-				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080') }}
-			</p>
-			<div v-show="state.url !== ''" class="line">
-				<label>
-					<EarthIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'Choose endpoint: ') }}
-				</label>
-				<input id="openai-chat-endpoint-yes"
-					v-model="state.chat_endpoint_enabled"
-					:value="true"
-					type="radio"
-					name="chat_endpoint"
-					@input="onInput">
-				<label for="openai-chat-endpoint-yes">
-					{{ t('integration_openai', 'Chat completions') }}
-				</label>
-				<input id="openai-chat-endpoint-no"
-					v-model="state.chat_endpoint_enabled"
-					:value="false"
-					type="radio"
-					name="chat_endpoint"
-					@input="onInput">
-				<label for="openai-chat-endpoint-no">
-					{{ t('integration_openai', 'Completions') }}
-				</label>
-			</div>
-			<p v-show="state.url !== ''" class="settings-hint">
-				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
-			</p>
-			<div class="line">
-				<label for="openai-api-key">
-					<KeyIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'API key (optional with LocalAI)') }}
-				</label>
-				<input id="openai-api-key"
-					v-model="state.api_key"
-					autocomplete="off"
-					type="password"
-					:readonly="readonly"
-					:placeholder="t('integration_openai', 'your API key')"
-					@input="onInput"
-					@focus="readonly = false">
-			</div>
-			<p v-show="state.url === ''" class="settings-hint">
-				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'You can create an API key in your OpenAI account settings:') }}
-				&nbsp;
-				<a :href="apiKeyUrl" target="_blank" class="external">
-					{{ apiKeyUrl }}
-				</a>
-			</p>
-			<div v-if="models"
-				class="line">
-				<label for="size">
-					{{ t('integration_openai', 'Default completion model to use') }}
-				</label>
-				<div class="spacer" />
-				<NcSelect
-					v-model="selectedModel"
-					class="model-select"
-					:options="formattedModels"
-					:no-wrap="true"
-					input-id="openai-model-select"
-					@input="onModelSelected" />
-				<a v-if="state.url === ''"
-					:title="t('integration_openai', 'More information about OpenAI models')"
-					href="https://beta.openai.com/docs/models"
-					target="_blank">
-					<NcButton type="tertiary" aria-label="openai-info">
-						<template #icon>
-							<HelpCircleIcon />
-						</template>
-					</NcButton>
-				</a>
-				<a v-else
-					:title="t('integration_openai', 'More information about LocalAI models')"
-					href="https://localai.io/model-compatibility/index.html"
-					target="_blank">
-					<NcButton type="tertiary" aria-label="localai-info">
-						<template #icon>
-							<HelpCircleIcon />
-						</template>
-					</NcButton>
-				</a>
-			</div>
-			<div class="line">
-				<label for="openai-api-timeout">
-					<TimerAlertOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'Request timeout (seconds)') }}
-				</label>
-				<input id="openai-api-timeout"
-					v-model.number="state.request_timeout"
-					type="number"
-					@input="onInput(false)">
+			<div>
+				<h2 class="mid-setting-heading">
+					{{ t('integration_openai', 'Authentication') }}
+				</h2>
+				<div v-show="state.url !== ''" class="line">
+					<label>
+						{{ t('integration_openai', 'Authentication method') }}
+					</label>
+					<input id="openai-auth-method-key"
+						v-model="state.use_basic_auth"
+						:value="false"
+						type="radio"
+						name="auth_method"
+						@input="onInput">
+					<label for="openai-auth-method-key">
+						{{ t('integration_openai', 'API key') }}
+					</label>
+					<input id="openai-auth-method-basic"
+						v-model="state.use_basic_auth"
+						:value="true"
+						type="radio"
+						name="auth_method"
+						@input="onInput">
+					<label for="openai-auth-method-basic">
+						{{ t('integration_openai', 'Basic Authentication') }}
+					</label>
+				</div>
+				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
+					<label for="openai-api-key">
+						<KeyIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'API key (optional with LocalAI)') }}
+					</label>
+					<input id="openai-api-key"
+						v-model="state.api_key"
+						autocomplete="off"
+						type="password"
+						:readonly="readonly"
+						:placeholder="t('integration_openai', 'your API key')"
+						@input="onInput"
+						@focus="readonly = false">
+				</div>
+				<p v-show="state.url === ''" class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings:') }}
+					&nbsp;
+					<a :href="apiKeyUrl" target="_blank" class="external">
+						{{ apiKeyUrl }}
+					</a>
+				</p>
+				<div v-show="state.url !== '' && state.use_basic_auth">
+					<div class="line">
+						<label for="basic-user">
+							<KeyIcon :size="20" class="icon" />
+							{{ t('integration_openai', 'Username') }}
+						</label>
+						<input id="openai-basic-user"
+							v-model="state.basic_user"
+							autocomplete="off"
+							type="text"
+							:readonly="readonly"
+							:placeholder="t('integration_openai', 'your Basic Auth user')"
+							@input="onInput"
+							@focus="readonly = false">
+					</div>
+					<div class="line">
+						<label for="basic-password">
+							<KeyIcon :size="20" class="icon" />
+							{{ t('integration_openai', 'Password') }}
+						</label>
+						<input id="openai-basic-password"
+							v-model="state.basic_password"
+							autocomplete="off"
+							type="password"
+							:readonly="readonly"
+							:placeholder="t('integration_openai', 'your Basic Auth password')"
+							@input="onInput"
+							@focus="readonly = false">
+					</div>
+				</div>
 			</div>
 			<div>
 				<h2 class="mid-setting-heading">
@@ -268,7 +328,7 @@ export default {
 
 	computed: {
 		configured() {
-			return !!this.state.url || !!this.state.api_key
+			return !!this.state.url || !!this.state.api_key || !!this.state.basic_user || !!this.state.basic_password
 		},
 		formattedModels() {
 			if (this.models) {
@@ -350,7 +410,10 @@ export default {
 		onInput(getModels = true) {
 			delay(() => {
 				this.saveOptions({
+					use_basic_auth: this.state.use_basic_auth,
 					api_key: this.state.api_key,
+					basic_user: this.state.basic_user,
+					basic_password: this.state.basic_password,
 					url: this.state.url,
 					chat_endpoint_enabled: this.state.chat_endpoint_enabled,
 					request_timeout: this.state.request_timeout,
