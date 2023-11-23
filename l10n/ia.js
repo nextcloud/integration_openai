@@ -3,7 +3,10 @@ OC.L10N.register(
     {
     "Unknown" : "Incognite",
     "seconds" : "secundas",
+    "Authentication" : "Authentication",
+    "Authentication method" : "Methodo de authentication",
     "API key" : "Clave API",
+    "Username" : "Nomine de usator",
     "Preview" : "Previsualisar",
     "Advanced options" : "Optiones avantiate",
     "Send" : "Inviar",

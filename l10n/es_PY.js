@@ -2,7 +2,10 @@ OC.L10N.register(
     "integration_openai",
     {
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
+    "Authentication" : "Autenticación",
+    "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
+    "Username" : "Usuario",
     "Preview" : "Previsualizar",
     "Advanced options" : "Opciones avanzadas",
     "Send" : "Enviar",

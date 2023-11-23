@@ -3,7 +3,10 @@ OC.L10N.register(
     {
     "Unknown" : "Nezināms",
     "seconds" : "sekundes",
+    "Authentication" : "Autentifikācija",
+    "Authentication method" : "Autentifikācijas metode",
     "API key" : "API atslēga",
+    "Username" : "Lietotājvārds",
     "Preview" : "Priekšskatīt",
     "Advanced options" : "Papildu opcijas",
     "Send" : "Sūtīt",

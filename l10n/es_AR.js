@@ -4,6 +4,8 @@ OC.L10N.register(
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
+    "Authentication" : "Autenticación",
+    "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
     "Preview" : "Vista previa",
     "Advanced options" : "Opciones avanzadas",

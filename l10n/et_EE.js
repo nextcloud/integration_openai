@@ -3,7 +3,10 @@ OC.L10N.register(
     {
     "Unknown" : "Teadmata",
     "seconds" : "sekundit",
+    "Authentication" : "Autentimine",
+    "Authentication method" : "Autentimise meetod",
     "API key" : "API võti",
+    "Username" : "Kasutajanimi",
     "Preview" : "Eelvaade",
     "Advanced options" : "Täpsemad valikud",
     "Send" : "Saada",
