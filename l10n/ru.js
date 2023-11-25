@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Неизвестно",
     "seconds" : "секунд",
+    "Image not found" : "Изображение не найдено",
     "Bad HTTP method" : "Неверный метод HTTP",
     "Bad credentials" : "Неверные учетные данные",
     "Connected accounts" : "Подключённые учётные записи",

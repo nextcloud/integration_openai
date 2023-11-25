@@ -101,7 +101,7 @@
     "OpenAI options saved" : "OpenAI-Einstellungen gespeichert",
     "Failed to save OpenAI options" : "Fehler beim Speichern der OpenAI-Einstellungen",
     "Prompt history cleared" : "Eingabeverlauf gelöscht",
-    "Failed to clear prompt history" : "Der Verlauf der Eingabeaufforderungen konnte nicht gelöscht werden",
+    "Failed to clear prompt history" : "Der Eingabeverlauf konnte nicht gelöscht werden",
     "ChatGPT-like text generation" : "ChatGPT-ähnliche Texterstellung",
     "Preview" : "Vorschau",
     "Preview content" : "Vorschau des Inhalts",
