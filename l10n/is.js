@@ -12,6 +12,7 @@ OC.L10N.register(
     "Authentication method" : "Auðkenningarmáti",
     "API key" : "API-lykill",
     "Username" : "Notandanafn",
+    "Password" : "Lykilorð",
     "Preview" : "Forskoðun",
     "Advanced options" : "Ítarlegir valkostir",
     "Send" : "Senda",
