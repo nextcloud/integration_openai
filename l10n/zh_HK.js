@@ -7,6 +7,7 @@ OC.L10N.register(
     "AI image generation (with LocalAI)" : "人工智能圖像生成（使用 LocalAI）",
     "AI speech-to-text (Whisper via OpenAI)" : "AI 語音轉文本（Whisper 通過 OpenAI）",
     "AI speech-to-text (Whisper via LocalAI)" : "AI 語音轉文本（Whisper 通過 LocalAI）",
+    "Text generation" : "產生文字",
     "Image generation" : "圖像產生",
     "Unknown" : "不詳",
     "seconds" : "秒",
