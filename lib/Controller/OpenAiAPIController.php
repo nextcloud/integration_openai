@@ -232,9 +232,7 @@ class OpenAiAPIController extends Controller {
 			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
-
-
-
+		
 		return new DataResponse($info);
 	}
 

@@ -4,6 +4,10 @@
         {
             "name": "Julien Veyssier",
             "email": "julien-nc@posteo.net"
+        },
+        {
+            "name": "Sami Finnilä",
+            "email": "sami.finnila@gmail.com"
         }
     ],
     "require": {
@@ -12,9 +16,14 @@
     "scripts": {
 		"lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
-		"cs:fix": "php-cs-fixer fix"		
+		"cs:fix": "php-cs-fixer fix",
+        "test:unit": "phpunit --config tests/phpunit.xml"
 	},
     "require-dev": {
-        "nextcloud/coding-standard": "^1.1"
+        "nextcloud/coding-standard": "^1.1",
+        "psalm/phar": "^5.16",
+        "nextcloud/ocp": "dev-master",
+        "symfony/console": "^6.4",
+        "phpunit/phpunit": "^10.4"
     }
 }

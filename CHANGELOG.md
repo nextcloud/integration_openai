@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Optional Basic authentication for self-hosted (LocalAI) API wrapper services @mickenordin
+- A comprehensive set of php-unit tests for speeding up development and preventing bugs creeping in @MB-Finski
 
 ## 1.1.2 – 2023-11-15
 

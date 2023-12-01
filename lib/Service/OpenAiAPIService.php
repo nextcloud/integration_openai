@@ -133,6 +133,7 @@ class OpenAiAPIService {
 	 */
 	public function isQuotaExceeded(?string $userId, int $type): bool {
 		if ($userId === null) {
+			$this->logger->warning('Cannot check quota for anonymous user', ['app' => Application::APP_ID]);
 			return false;
 		}
 
@@ -506,6 +507,7 @@ class OpenAiAPIService {
 
 		$params = [
 			'prompt' => $prompt,
+			'model' => 'dall-e-3',
 			'size' => $size,
 			'n' => $n,
 			'response_format' => 'url',
@@ -578,7 +580,7 @@ class OpenAiAPIService {
 			$this->logger->debug('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			throw new Exception($this->l10n->t('Image generation not found'), Http::STATUS_NOT_FOUND);
 		} catch (Exception | DBException | MultipleObjectsReturnedException $e) {
-			$this->logger->debug('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			$this->logger->error('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			throw new Exception($this->l10n->t('Unknown image generation request error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
