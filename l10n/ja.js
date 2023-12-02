@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown error while clearing prompt history" : "チャット履歴のクリア中にエラーが発生しました",
+    "ChatGPT-like text generation (by OpenAI)" : "ChatGPTのようなテキスト生成(OpenAIを使用)",
+    "ChatGPT-like text generation (with LocalAI)" : "ChatGPTのようなテキスト生成(LocalAIを使用)",
     "Image generation" : "画像の生成",
     "Unknown" : "不明",
     "seconds" : "秒",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Image generation" : "Generazione di immagini",
     "Unknown" : "Sconosciuto",
     "seconds" : "secondi",
     "Image not found" : "Immagine non trovata",
