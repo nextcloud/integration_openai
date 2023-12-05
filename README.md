@@ -2,7 +2,7 @@
 
 This app includes 3 custom smart pickers for Nextcloud:
 * ChatGPT-like answers
-* Image generation (with DALL·E 3 or LocalAI)
+* Image generation (with DALL·E 2 or LocalAI)
 * Whisper dictation
 
 It also implements

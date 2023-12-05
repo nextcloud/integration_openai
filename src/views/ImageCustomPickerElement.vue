@@ -190,7 +190,7 @@ export default {
 
 		const capabilities = OC.getCapabilities()?.integration_openai
 		this.poweredByTitle = capabilities.uses_openai
-			? t('integration_openai', 'by OpenAI with DALL·E 3')
+			? t('integration_openai', 'by OpenAI with DALL·E 2')
 			: t('integration_openai', 'by LocalAI')
 		this.poweredByUrl = capabilities.uses_openai
 			? 'https://openai.com/dall-e-2'

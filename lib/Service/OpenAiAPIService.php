@@ -507,7 +507,7 @@ class OpenAiAPIService {
 
 		$params = [
 			'prompt' => $prompt,
-			'model' => 'dall-e-3',
+			'model' => 'dall-e-2',
 			'size' => $size,
 			'n' => $n,
 			'response_format' => 'url',

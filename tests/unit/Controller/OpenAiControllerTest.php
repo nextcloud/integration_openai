@@ -389,7 +389,7 @@ class OpenAiControllerTest extends TestCase
 		  
 		$url = self::OPENAI_API_BASE . 'images/generations';
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json']];
-		$options['body'] = json_encode(['prompt' => $prompt,'model' => 'dall-e-3', 'size' => Application::DEFAULT_IMAGE_SIZE, 'n' => $n, 'response_format' => 'url', 'user' => self::TEST_USER1]);
+		$options['body'] = json_encode(['prompt' => $prompt,'model' => 'dall-e-2', 'size' => Application::DEFAULT_IMAGE_SIZE, 'n' => $n, 'response_format' => 'url', 'user' => self::TEST_USER1]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
