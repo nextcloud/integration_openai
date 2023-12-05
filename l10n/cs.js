@@ -41,8 +41,6 @@ OC.L10N.register(
     "LocalAI integration" : "Napojení na LocalAI",
     "Reformulate" : "Přeformulovat",
     "Formulate text in a different way." : "Formulovat text jinak.",
-    "OpenAI and LocalAI integration" : "Napojení na OpenAI a LocalAI",
-    "Integration of OpenAI and LocalAI services" : "Napojení na služby OpenAI a LocalAI",
     "LocalAI URL (leave empty to use openai.com)" : "URL místní AI (pokud chcete použít openai.com, nevyplňujte)",
     "example:" : "příklad:",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "Toto by měla být adresa vámi využívané lokální instance AI z pohledu vámi využívaného Nextcloud serveru. Může se jednat o adresu v místní síti a port, jako http://localhost:8080",

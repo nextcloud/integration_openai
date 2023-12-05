@@ -18,8 +18,6 @@
     "LocalAI integration" : "LocalAI integration",
     "Reformulate" : "Reformulate",
     "Formulate text in a different way." : "Formulate text in a different way.",
-    "OpenAI and LocalAI integration" : "OpenAI and LocalAI integration",
-    "Integration of OpenAI and LocalAI services" : "Integration of OpenAI and LocalAI services",
     "LocalAI URL (leave empty to use openai.com)" : "LocalAI URL (leave empty to use openai.com)",
     "example:" : "example:",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080",

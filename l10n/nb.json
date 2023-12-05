@@ -17,8 +17,6 @@
     "LocalAI integration" : "LocalAI-integrasjon",
     "Reformulate" : "Reformulere",
     "Formulate text in a different way." : "Formuler tekst på en annen måte.",
-    "OpenAI and LocalAI integration" : "OpenAI og LocalAI integrasjon",
-    "Integration of OpenAI and LocalAI services" : "Integrasjon av OpenAI og LocalAI tjenester",
     "LocalAI URL (leave empty to use openai.com)" : "LocalAI URL (la stå tomt for å bruke openai.com)",
     "example:" : "eksempel:",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "Dette bør være adressen til LocalAI-forekomsten fra Nextcloud-serverens synspunkt. Dette kan være en lokal adresse med en port som http://localhost:8080",

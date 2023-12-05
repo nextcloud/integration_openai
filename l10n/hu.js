@@ -21,8 +21,6 @@ OC.L10N.register(
     "LocalAI integration" : "LocalAI integráció",
     "Reformulate" : "Átfogalmazás",
     "Formulate text in a different way." : "Szöveg átformázása.",
-    "OpenAI and LocalAI integration" : "OpenAI és LocalAI integráció",
-    "Integration of OpenAI and LocalAI services" : "OpenAI és LocalAI szolgáltatások integrációja",
     "LocalAI URL (leave empty to use openai.com)" : "LocalAI URL (hagyja üresen, ha az openai.com-ot kívánja használni)",
     "example:" : "példa:",
     "Default completion model to use" : "Alapértelmezett kiegészítési modell kiválasztása",

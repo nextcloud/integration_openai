@@ -22,7 +22,6 @@
     "Image not found" : "画像が見つかりません",
     "Bad credentials" : "不正な資格情報",
     "Connected accounts" : "接続済みアカウント",
-    "Integration of OpenAI and LocalAI services" : "OpenAIとLocalAIサービスを統合",
     "example:" : "例: ",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "Nextcloudサーバーから見たLocalAIインスタンスのアドレスです。これは http://localhost:8080 のようなポートを持つローカルアドレスでもかまいません。",
     "Choose endpoint: " : "エンドポイントを選択してください:",
