@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.1.3 – 2023-11-15
+
 ### Added
 
 - Optional Basic authentication for self-hosted (LocalAI) API wrapper services @mickenordin
