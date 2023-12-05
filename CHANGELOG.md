@@ -6,7 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## 1.1.3 – 2023-11-15
+## 1.1.4 – 2023-12-05
+
+### Fixed
+
+- An attempt at fixing info.xml parsing in the app store
+
+## 1.1.3 – 2023-12-05
 
 ### Added
 
