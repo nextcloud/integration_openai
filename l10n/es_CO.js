@@ -6,6 +6,7 @@ OC.L10N.register(
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
+    "Username" : "Usuario",
     "Preview" : "Previsualizar",
     "Advanced options" : "Opciones avanzadas",
     "Send" : "Enviar",

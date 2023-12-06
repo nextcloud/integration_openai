@@ -15,6 +15,8 @@
     "LocalAI integration" : "Ενσωμάτωση LocalAI",
     "Reformulate" : "Αναδιατύπωση",
     "Formulate text in a different way." : "Διατυπώστε το κείμενο με διαφορετικό τρόπο.",
+    "OpenAI and LocalAI integration" : "Ενσωμάτωση OpenAI και LocalAI",
+    "Integration of OpenAI and LocalAI services" : "Ενσωμάτωση υπηρεσιών OpenAI και LocalAI",
     "LocalAI URL (leave empty to use openai.com)" : "LocalAI URL (αφήστε κενό για να χρησιμοποιήσετε το openai.com)",
     "example:" : "παράδειγμα:",
     "More information about OpenAI models" : "Περισσότερες πληροφορίες σχετικά με τα μοντέλα OpenAI",

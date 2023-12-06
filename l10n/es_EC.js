@@ -12,6 +12,8 @@ OC.L10N.register(
     "Connected accounts" : "Cuentas conectadas",
     "OpenAI's Whisper Speech-To-Text" : "Whisper de OpenAI para conversión de voz a texto",
     "OpenAI integration" : "Integración de OpenAI",
+    "OpenAI and LocalAI integration" : "Integración de OpenAI y LocalAI",
+    "Integration of OpenAI and LocalAI services" : "Integración de los servicios de OpenAI y LocalAI",
     "LocalAI URL (leave empty to use openai.com)" : "URL de LocalAI (dejar en blanco para usar openai.com)",
     "example:" : "ejemplo:",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "Esta debería ser la dirección de tu instancia de LocalAI desde el punto de vista de tu servidor de Nextcloud. Puede ser una dirección local con un puerto como http://localhost:8080",

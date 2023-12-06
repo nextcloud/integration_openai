@@ -29,6 +29,8 @@ OC.L10N.register(
     "LocalAI integration" : "LocalAI集成",
     "Reformulate" : "重新构思",
     "Formulate text in a different way." : "以不同的方法构思文字",
+    "OpenAI and LocalAI integration" : "OpenAI和LocalAI集成",
+    "Integration of OpenAI and LocalAI services" : "OpenAI和LocalAI服务集成",
     "LocalAI URL (leave empty to use openai.com)" : "LocalAI URL（留空以使用openai.com）",
     "example:" : "例子：",
     "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "从您的Nextcloud服务器的角度来看，这应该是您的LocalAI实例地址。这可以是类似http://localhost:8080的本地网络URL",
