@@ -71,7 +71,7 @@ Negative:
 
 Positive:
 * the software for training and inferencing of this model is open source
-* the trained model is freely available, and thus can be ran on-premises 
+* the trained model is freely available, and thus can be ran on-premises
 
 Negative:
 * the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
@@ -93,7 +93,7 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
     <screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot3.jpg</screenshot>
     <screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot4.jpg</screenshot>
     <dependencies>
-        <nextcloud min-version="27.1.0" max-version="28"/>
+        <nextcloud min-version="28" max-version="29"/>
     </dependencies>
     <background-jobs>
 		<job>OCA\OpenAi\Cron\CleanupImageGenerations</job>

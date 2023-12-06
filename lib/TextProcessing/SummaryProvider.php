@@ -9,11 +9,12 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IConfig;
 use OCP\IL10N;
-use OCP\TextProcessing\IProvider;
+use OCP\TextProcessing\IProviderWithExpectedRuntime;
+use OCP\TextProcessing\IProviderWithUserId;
 use OCP\TextProcessing\SummaryTaskType;
 use RuntimeException;
 
-class SummaryProvider implements IProvider {
+class SummaryProvider implements IProviderWithExpectedRuntime, IProviderWithUserId {
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,
@@ -49,5 +50,15 @@ class SummaryProvider implements IProvider {
 
 	public function getTaskType(): string {
 		return SummaryTaskType::class;
+	}
+
+	public function getExpectedRuntime(): int {
+		return $this->openAiAPIService->isUsingOpenAi()
+			? 10
+			: 60 * 5;
+	}
+
+	public function setUserId(?string $userId): void {
+		$this->userId = $userId;
 	}
 }
