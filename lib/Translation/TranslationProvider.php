@@ -92,10 +92,10 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 100, false);				
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
 			}
 		} catch (Exception $e) {
-			throw new RuntimeException('Failed to detect language for input' , 0, $e);
+			throw new RuntimeException('Failed to detect language for input', 0, $e);
 		}
 		
 		if (count($completion) > 0) {
@@ -138,7 +138,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);				
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);
 			}
 						
 			if (count($completion) > 0) {

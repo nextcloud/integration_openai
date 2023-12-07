@@ -510,8 +510,7 @@ class OpenAiAPIService {
 			'size' => $size,
 		];
 
-		if ($this->isUsingOpenAi())
-		{
+		if ($this->isUsingOpenAi()) {
 			$params['model'] = 'dall-e-2';
 			$params['n'] = $n;
 			$params['response_format'] = 'url';

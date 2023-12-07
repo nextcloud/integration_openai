@@ -40,7 +40,7 @@ class SummaryProvider implements IProvider {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);				
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
 			}
 		} catch (Exception $e) {
 			throw new RunTimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());

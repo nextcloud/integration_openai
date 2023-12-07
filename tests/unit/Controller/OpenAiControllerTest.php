@@ -1,4 +1,5 @@
 <?php
+
 // SPDX-FileCopyrightText: Sami Finnilä <sami.finnila@nextcloud.com>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -13,26 +14,23 @@ namespace OCA\OpenAi\Tests\Controller;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Controller\OpenAiAPIController;
-use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Db\PromptMapper;
-use OCA\OpenAi\Db\GenerationMapper;
 use OCA\OpenAi\Db\ImageGenerationMapper;
 use OCA\OpenAi\Db\ImageUrlMapper;
+use OCA\OpenAi\Db\PromptMapper;
 use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
-use OCP\AppFramework\Http\DataResponse;
+use OCP\Http\Client\IClientService;
 use OCP\IConfig;
 use Test\TestCase;
-use OCP\Http\Client\IClientService;
 
 /**
  * @group DB
  */
-class OpenAiControllerTest extends TestCase
-{
-	const APP_NAME = 'integration_openai';
-	const TEST_USER1 = 'testuser';
-	const OPENAI_API_BASE = 'https://api.openai.com/v1/';
+class OpenAiControllerTest extends TestCase {
+	public const APP_NAME = 'integration_openai';
+	public const TEST_USER1 = 'testuser';
+	public const OPENAI_API_BASE = 'https://api.openai.com/v1/';
 
 	private $openAiApiController;
 	private $openAiApiService;
@@ -40,16 +38,14 @@ class OpenAiControllerTest extends TestCase
 	private $iClient;
 	private $quotaUsageMapper;
 
-	public static function setUpBeforeClass(): void
-	{
+	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
 		$backend = new \Test\Util\User\Dummy();
 		$backend->createUser(self::TEST_USER1, self::TEST_USER1);
 		\OC::$server->get(\OCP\IUserManager::class)->registerBackend($backend);
 	}
 
-	protected function setUp(): void
-	{
+	protected function setUp(): void {
 		parent::setUp();
 
 		$this->loginAsUser(self::TEST_USER1);
@@ -89,8 +85,7 @@ class OpenAiControllerTest extends TestCase
 		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
 	}
 
-	public static function tearDownAfterClass(): void
-	{
+	public static function tearDownAfterClass(): void {
 		$promptMapper = \OC::$server->get(PromptMapper::class);
 		$promptMapper->deleteUserPrompts(self::TEST_USER1);
 		// Delete quota usage for test user
@@ -112,8 +107,7 @@ class OpenAiControllerTest extends TestCase
 	}
 
 
-	public function testGetModels()
-	{
+	public function testGetModels() {
 		$this->openAiSettingsService->setServiceUrl('');
 		$response = '{
             "object": "list",
@@ -158,8 +152,7 @@ class OpenAiControllerTest extends TestCase
 		$this->assertArrayHasKey('default_completion_model_id', $response->getData());
 	}
 
-	public function testCreateCompletionWithOpenAi(bool $clearQuota = true)
-	{
+	public function testCreateCompletionWithOpenAi(bool $clearQuota = true) {
 		$this->openAiSettingsService->setServiceUrl('');
 		$prompt = 'This is a test prompt';
 		$n = 1;
@@ -204,12 +197,12 @@ class OpenAiControllerTest extends TestCase
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
 		$this->assertEquals(42, $usage);
 		// Clear quota usage
-		if ($clearQuota)
+		if ($clearQuota) {
 			$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		}
 	}
 
-	public function testCreateChatCompletionWithOpenAi()
-	{
+	public function testCreateChatCompletionWithOpenAi() {
 		$this->openAiSettingsService->setServiceUrl('');
 		$prompt = 'This is a test prompt';
 		$n = 1;
@@ -261,8 +254,7 @@ class OpenAiControllerTest extends TestCase
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
-	public function testTranscribe(bool $clearQuota = true)
-	{
+	public function testTranscribe(bool $clearQuota = true) {
 		$this->openAiSettingsService->setServiceUrl('');
 		$audioStringDecoded = bin2hex(random_bytes(32));
 		$audioString = 'data:audio/mp3;base64,' . base64_encode($audioStringDecoded);
@@ -362,8 +354,9 @@ class OpenAiControllerTest extends TestCase
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TRANSCRIPTION);
 		$this->assertEquals(10, $usage);
 		// Clear quota usage
-		if ($clearQuota)
+		if ($clearQuota) {
 			$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		}
 	}
 
 	public function testImageGenerationWithOpenAi(bool $clearQuota = true) {
@@ -415,12 +408,12 @@ class OpenAiControllerTest extends TestCase
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_IMAGE);
 		$this->assertEquals(2, $usage);
 		// Clear quota usage
-		if ($clearQuota)
+		if ($clearQuota) {
 			$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		}
 	}
 
-	public function testCreateCompletionWithLocalAi()
-	{
+	public function testCreateCompletionWithLocalAi() {
 		$prompt = 'This is a test prompt';
 		$n = 1;
 		$maxTokens = 42;
@@ -476,8 +469,7 @@ class OpenAiControllerTest extends TestCase
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
-	public function testCreateChatCompletionWithLocalAi()
-	{
+	public function testCreateChatCompletionWithLocalAi() {
 		$prompt = 'This is a test prompt';
 		$n = 1;
 		$maxTokens = 42;
@@ -536,8 +528,7 @@ class OpenAiControllerTest extends TestCase
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
-	public function testCreateChatCompletionWithLocalAiAndBasicAuth()
-	{
+	public function testCreateChatCompletionWithLocalAiAndBasicAuth() {
 		$prompt = 'This is a test prompt';
 		$n = 1;
 		$maxTokens = 42;
@@ -546,8 +537,8 @@ class OpenAiControllerTest extends TestCase
 		$this->openAiSettingsService->setServiceUrl($url_base);
 		$this->openAiSettingsService->setUseBasicAuth(true);
 		$this->openAiSettingsService->setChatEndpointEnabled(true);
-		$this->openAiSettingsService->setUserBasicUser(self::TEST_USER1,'testuser');
-		$this->openAiSettingsService->setUserBasicPassword(self::TEST_USER1,'testpassword');
+		$this->openAiSettingsService->setUserBasicUser(self::TEST_USER1, 'testuser');
+		$this->openAiSettingsService->setUserBasicPassword(self::TEST_USER1, 'testpassword');
 
 		$prompt = 'This is a test prompt';
 		$n = 1;
@@ -598,10 +589,9 @@ class OpenAiControllerTest extends TestCase
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
-	public function testExceedingTextQuota()
-	{
+	public function testExceedingTextQuota() {
 		$this->openAiSettingsService->setServiceUrl('');
-		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1,'This is a PHPUnit test API key');
+		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
 		
 		$prompt = 'This is a test prompt';
 		$n = 1;
@@ -622,7 +612,7 @@ class OpenAiControllerTest extends TestCase
 		$this->assertFalse($result);
 		
 		// Disable the private api key for the user:
-		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1,'');
+		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, '');
 
 		// Check if quota is exceeded for user:
 		$result = $this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
@@ -634,10 +624,9 @@ class OpenAiControllerTest extends TestCase
 		$this->assertArrayHasKey('error', $response->getData());
 	}
 
-	public function testExceedingTranscribeQuota()
-	{
+	public function testExceedingTranscribeQuota() {
 		$this->openAiSettingsService->setServiceUrl('');
-		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1,'This is a PHPUnit test API key');
+		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
 
 		$quotas = $this->openAiSettingsService->getQuotas();
 		foreach ($quotas as $key => $value) {
@@ -654,7 +643,7 @@ class OpenAiControllerTest extends TestCase
 		$this->assertFalse($result);
 
 		// Disable the private api key for the user:
-		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1,'');
+		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, '');
 
 		// Check if quota is exceeded for user:
 		$result = $this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TRANSCRIPTION);
@@ -666,10 +655,9 @@ class OpenAiControllerTest extends TestCase
 		$this->assertArrayHasKey('error', $response->getData());
 	}
 
-	public function testExceedingImageGenerationQuota()
-	{
+	public function testExceedingImageGenerationQuota() {
 		$this->openAiSettingsService->setServiceUrl('');
-		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1,'This is a PHPUnit test API key');
+		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
 
 		$quotas = $this->openAiSettingsService->getQuotas();
 		foreach ($quotas as $key => $value) {
@@ -687,7 +675,7 @@ class OpenAiControllerTest extends TestCase
 		$this->assertFalse($result);
 
 		// Disable the private api key for the user:
-		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1,'');
+		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, '');
 
 		// Check if quota is exceeded for user:
 		$result = $this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_IMAGE);
