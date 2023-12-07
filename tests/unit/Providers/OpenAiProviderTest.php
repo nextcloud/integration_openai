@@ -93,7 +93,8 @@ class OpenAiProviderTest extends TestCase
             $this->openAiApiService,
             \OC::$server->get(IConfig::class),
             $this->createMock(\OCP\IL10N::class),
-            self::TEST_USER1);
+            self::TEST_USER1,
+            $this->openAiSettingsService);
 
         $prompt = 'This is a test prompt';
         $n = 1;
@@ -148,7 +149,8 @@ class OpenAiProviderTest extends TestCase
             $this->openAiApiService,
             \OC::$server->get(IConfig::class),
             $this->createMock(\OCP\IL10N::class),
-            self::TEST_USER1);
+            self::TEST_USER1,
+            $this->openAiSettingsService);
 
         $prompt = 'This is a test prompt';
         $n = 1;
@@ -203,7 +205,8 @@ class OpenAiProviderTest extends TestCase
             $this->openAiApiService,
             \OC::$server->get(IConfig::class),
             $this->createMock(\OCP\IL10N::class),
-            self::TEST_USER1);
+            self::TEST_USER1,
+            $this->openAiSettingsService);
 
         $prompt = 'This is a test prompt';
         $n = 1;
@@ -258,7 +261,8 @@ class OpenAiProviderTest extends TestCase
             $this->openAiApiService,
             \OC::$server->get(IConfig::class),
             $this->createMock(\OCP\IL10N::class),
-            self::TEST_USER1);
+            self::TEST_USER1,
+            $this->openAiSettingsService);
 
         $prompt = 'This is a test prompt';
         $n = 1;
@@ -315,7 +319,8 @@ class OpenAiProviderTest extends TestCase
             $this->openAiApiService,
             $this->createMock(\Psr\Log\LoggerInterface::class),
             \OC::$server->get(IConfig::class),            
-            self::TEST_USER1);
+            self::TEST_USER1,
+            $this->openAiSettingsService);
 
         $prompt = 'This is a test prompt';
         $n = 1;

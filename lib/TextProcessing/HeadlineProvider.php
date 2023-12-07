@@ -7,6 +7,7 @@ namespace OCA\OpenAi\TextProcessing;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextProcessing\HeadlineTaskType;
@@ -19,6 +20,7 @@ class HeadlineProvider implements IProvider {
 		private IConfig $config,
 		private IL10N $l10n,
 		private ?string $userId,
+		private OpenAiSettingsService $openAiSettingsService,
 	) {
 	}
 
@@ -33,7 +35,11 @@ class HeadlineProvider implements IProvider {
 		$prompt = 'Give me the headline of the following text:' . "\n\n" . $prompt;
 		// Max tokens are limited later to max tokens specified in the admin settings so here we just request PHP_INT_MAX
 		try {
-			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
+			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
+			} else {
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);				
+			}
 		} catch (Exception $e) {
 			throw new RunTimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}

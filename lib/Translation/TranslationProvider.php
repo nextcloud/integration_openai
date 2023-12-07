@@ -28,6 +28,7 @@ namespace OCA\OpenAi\Translation;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\ICacheFactory;
 use OCP\IConfig;
 use OCP\L10N\IFactory;
@@ -44,7 +45,8 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
 		private IConfig $config,
-		private ?string $userId
+		private ?string $userId,
+		private OpenAiSettingsService $openAiSettingsService,
 	) {
 	}
 
@@ -87,7 +89,11 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		$prompt = 'What language is this (answer with the language name only, in English): ' . $text;
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 		try {
-			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
+			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
+			} else {
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 100, false);				
+			}
 		} catch (Exception $e) {
 			throw new RuntimeException('Failed to detect language for input' , 0, $e);
 		}
@@ -129,7 +135,11 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 			}
 			$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 			
-			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);
+			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);
+			} else {
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);				
+			}
 						
 			if (count($completion) > 0) {
 				return array_pop($completion);
