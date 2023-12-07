@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Neznámy",
     "seconds" : "sekúnd",
+    "Image not found" : "Obrázok nenájdený",
     "Bad HTTP method" : "Zlá metóda HTTP",
     "Bad credentials" : "Nesprávne prihlasovacie údaje",
     "Connected accounts" : "Prepojené účty",

@@ -58,7 +58,7 @@ OC.L10N.register(
     "Authentication" : "Authentifizierung",
     "Authentication method" : "Authentifizierungsmethode",
     "API key" : "API-Schlüssel",
-    "Basic Authentication" : "Basis-Autentifizierung",
+    "Basic Authentication" : "Basis-Authentifizierung",
     "API key (optional with LocalAI)" : "API-Schlüssel (optional mit LocalAI)",
     "your API key" : "Ihr API-Schlüssel",
     "You can create an API key in your OpenAI account settings:" : "Sie können einen API-Schlüssel in Ihren OpenAI-Kontoeinstellungen erstellen:",
