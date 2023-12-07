@@ -67,7 +67,7 @@
 				</NcButton>
 			</div>
 			<div v-show="showAdvanced" class="advanced">
-				<div class="line">
+				<div v-if="usesOpenAi" class="line">
 					<label for="number">
 						{{ t('integration_openai', 'Number of images to generate (1-10)') }}
 					</label>
@@ -94,7 +94,7 @@
 						<option value="512x512">
 							512x512 px
 						</option>
-						<option value="1024x1024">
+						<option v-if="usesOpenAi" value="1024x1024">
 							1024x1024 px
 						</option>
 					</select>
@@ -164,6 +164,7 @@ export default {
 			imageNumber: 1,
 			imageSize: '1024x1024',
 			prompts: null,
+			usesOpenAi: true,
 		}
 	},
 
@@ -189,10 +190,11 @@ export default {
 		this.getLastImageSize()
 
 		const capabilities = OC.getCapabilities()?.integration_openai
-		this.poweredByTitle = capabilities.uses_openai
+		this.usesOpenAi = capabilities.uses_openai
+		this.poweredByTitle = this.usesOpenAi
 			? t('integration_openai', 'by OpenAI with DALL·E 2')
 			: t('integration_openai', 'by LocalAI')
-		this.poweredByUrl = capabilities.uses_openai
+		this.poweredByUrl = this.usesOpenAi
 			? 'https://openai.com/dall-e-2'
 			: 'https://localai.io/features/image-generation/'
 	},
@@ -222,7 +224,11 @@ export default {
 			const url = generateUrl('/apps/integration_openai/last-image-size')
 			return axios.get(url)
 				.then((response) => {
-					this.imageSize = response.data
+					if (!this.usesOpenAi && response.data === '1024x1024') {
+						this.imageSize = '512x512'
+					} else {
+						this.imageSize = response.data
+					}
 				})
 				.catch((error) => {
 					console.error(error)

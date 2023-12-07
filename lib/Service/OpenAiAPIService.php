@@ -507,16 +507,20 @@ class OpenAiAPIService {
 
 		$params = [
 			'prompt' => $prompt,
-			'model' => 'dall-e-2',
 			'size' => $size,
-			'n' => $n,
-			'response_format' => 'url',
 		];
 
-		if ($userId !== null) {
-			$params['user'] = $userId;
-		}
+		if ($this->isUsingOpenAi())
+		{
+			$params['model'] = 'dall-e-2';
+			$params['n'] = $n;
+			$params['response_format'] = 'url';
 
+			if ($userId !== null) {
+				$params['user'] = $userId;
+			}
+		}
+		
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
 
 		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {

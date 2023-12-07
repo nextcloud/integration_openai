@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix image generation with LocalAI (the endpoint is no longer fully OpenAI compatible) @MB-Finski
+
 ## 1.1.4 – 2023-12-05
 
 ### Fixed
