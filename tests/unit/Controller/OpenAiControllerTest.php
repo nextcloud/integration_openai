@@ -24,6 +24,7 @@ use OCP\Http\Client\IClientService;
 use OCP\IConfig;
 use Test\TestCase;
 
+
 /**
  * @group DB
  */
@@ -87,10 +88,19 @@ class OpenAiControllerTest extends TestCase {
 
 	public static function tearDownAfterClass(): void {
 		$promptMapper = \OC::$server->get(PromptMapper::class);
-		$promptMapper->deleteUserPrompts(self::TEST_USER1);
+		try {
+			$promptMapper->deleteUserPrompts(self::TEST_USER1);
+		} catch (\OCP\Db\Exception | \Exception | \Throwable $e) {
+			// Ignore
+		}
+		
 		// Delete quota usage for test user
 		$quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
-		$quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		try {
+			$quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		} catch (\OCP\Db\Exception | \RuntimeException | \Exception | \Throwable $e) {
+			// Ignore
+		}
 		// Reset settings
 		$settingsService = \OC::$server->get(OpenAiSettingsService::class);
 		$settingsService->setServiceUrl('');

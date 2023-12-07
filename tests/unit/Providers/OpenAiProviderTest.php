@@ -77,9 +77,25 @@ class OpenAiProviderTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass(): void {
+		$promptMapper = \OC::$server->get(PromptMapper::class);
+		try {
+			$promptMapper->deleteUserPrompts(self::TEST_USER1);
+		} catch (\OCP\Db\Exception | \Exception | \Throwable $e) {
+			// Ignore
+		}
+		
+		// Delete quota usage for test user
+		$quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
+		try {
+			$quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		} catch (\OCP\Db\Exception | \RuntimeException | \Exception | \Throwable $e) {
+			// Ignore
+		}
+		
 		$backend = new \Test\Util\User\Dummy();
 		$backend->deleteUser(self::TEST_USER1);
 		\OC::$server->get(\OCP\IUserManager::class)->removeBackend($backend);
+
 		parent::tearDownAfterClass();
 	}
 
