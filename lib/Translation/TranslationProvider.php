@@ -86,13 +86,16 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 	public function detectLanguage(string $text): ?string {
 		$prompt = 'What language is this (answer with the language name only, in English): ' . $text;
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-		$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
-		if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
-			$choice = $completion['choices'][0];
-			if (isset($choice['message'], $choice['message']['content'])) {
-				return $choice['message']['content'];
-			}
+		try {
+			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
+		} catch (Exception $e) {
+			throw new RuntimeException('Failed to detect language for input' , 0, $e);
 		}
+		
+		if (count($completion) > 0) {
+			return array_pop($completion);
+		}
+		
 		return null;
 	}
 
@@ -126,18 +129,13 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $text;
 			}
 			$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+			
 			$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);
-			if (isset($completion['choices']) && is_array($completion['choices']) && count($completion['choices']) > 0) {
-				$choice = $completion['choices'][0];
-				if (isset($choice['message'], $choice['message']['content'])) {
-					$translation = $choice['message']['content'];
-					$cache->set($cacheKey, $translation, 3600);
-					return $translation;
-				}
+						
+			if (count($completion) > 0) {
+				return array_pop($completion);
 			}
-			if (isset($choice['body']['error']['message'])) {
-				throw new Exception($choice['body']['error']['message']);
-			}
+	
 		} catch (Exception $e) {
 			throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage}", 0, $e);
 		}
