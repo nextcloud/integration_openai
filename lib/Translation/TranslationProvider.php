@@ -95,7 +95,6 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		if (count($completion) > 0) {
 			return array_pop($completion);
 		}
-		
 		return null;
 	}
 

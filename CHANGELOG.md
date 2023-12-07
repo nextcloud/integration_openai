@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- Fix image generation with LocalAI (the endpoint is no longer fully OpenAI compatible) @MB-Finski
+- Fix image generation with LocalAI (with LocalAi 2.0 the endpoint is no longer fully OpenAI compatible) @MB-Finski
+- Fix translation provider @MB-Finski
+- Add php-unit tests for providers @MB-Finski
 
 ## 1.1.4 – 2023-12-05
 
