@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Ezezaguna",
     "seconds" : "duela segundu batzuk",
+    "Image not found" : "Ez da irudia aurkitu",
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
     "Connected accounts" : "Konektatutako kontuak",

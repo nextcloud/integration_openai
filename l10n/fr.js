@@ -67,6 +67,7 @@ OC.L10N.register(
     "Preview content" : "Prévisualiser le contenu",
     "Show/hide advanced options" : "Afficher/masquer les options avancées",
     "Advanced options" : "Options avancées",
+    "Submit generated text" : "Envoyer le texte généré",
     "Send" : "Envoyer",
     "Include the prompt in the result" : "Inclure l'invite dans le résultat",
     "How many results to generate" : "Nombre de résultats à générer",
