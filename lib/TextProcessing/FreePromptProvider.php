@@ -11,10 +11,11 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextProcessing\FreePromptTaskType;
-use OCP\TextProcessing\IProvider;
+use OCP\TextProcessing\IProviderWithExpectedRuntime;
+use OCP\TextProcessing\IProviderWithUserId;
 use RunTimeException;
 
-class FreePromptProvider implements IProvider {
+class FreePromptProvider implements IProviderWithExpectedRuntime, IProviderWithUserId {
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,
@@ -51,5 +52,15 @@ class FreePromptProvider implements IProvider {
 
 	public function getTaskType(): string {
 		return FreePromptTaskType::class;
+	}
+
+	public function getExpectedRuntime(): int {
+		return $this->openAiAPIService->isUsingOpenAi()
+			? 10
+			: 60 * 5;
+	}
+
+	public function setUserId(?string $userId): void {
+		$this->userId = $userId;
 	}
 }
