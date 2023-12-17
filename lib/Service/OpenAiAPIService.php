@@ -663,6 +663,10 @@ class OpenAiAPIService {
 				}
 			}
 
+			if (!$this->isUsingOpenAi()) {
+				$options["nextcloud"]["allow_local_address"] = true;
+			}
+			
 			if ($contentType === null) {
 				$options['headers']['Content-Type'] = 'application/json';
 			} elseif ($contentType === 'multipart/form-data') {
