@@ -664,7 +664,7 @@ class OpenAiAPIService {
 			}
 
 			if (!$this->isUsingOpenAi()) {
-				$options["nextcloud"]["allow_local_address"] = true;
+				$options['nextcloud']['allow_local_address'] = true;
 			}
 			
 			if ($contentType === null) {
