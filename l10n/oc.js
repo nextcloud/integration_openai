@@ -11,6 +11,7 @@ OC.L10N.register(
     "Preview" : "Apercebut",
     "Advanced options" : "Opcions avançadas",
     "Send" : "Enviar",
-    "Unknown error" : "Error desconeguda"
+    "Unknown error" : "Error desconeguda",
+    "Translate" : "Tradurre"
 },
 "nplurals=2; plural=(n > 1);");
