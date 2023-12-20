@@ -493,16 +493,12 @@ class OpenAiAPIService {
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $size
-	 * @return array|string[]
+	 * @return array
 	 * @throws Exception
 	 */
-	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
+	public function requestImageCreation(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
-		}
-
-		if ($userId !== null) {
-			$this->openAiSettingsService->setLastImageSize($userId, $size);
 		}
 
 		$params = [
@@ -519,46 +515,62 @@ class OpenAiAPIService {
 				$params['user'] = $userId;
 			}
 		}
-		
+
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
 
 		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
-			$this->logger->warning('OpenAI image generation error: ' . json_encode($apiResponse));
+			$this->logger->warning('OpenAI image generation error', ['api_response' => $apiResponse]);
 			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 
 		} else {
-			try {
-				$this->promptMapper->createPrompt(Application::PROMPT_TYPE_IMAGE, $userId, $prompt);
-			} catch (DBException $e) {
-				$this->logger->warning('Could not store prompt for user: ' . $userId . ' and prompt: ' . $prompt . '. Error: ' . $e->getMessage());
-			}
-
 			try {
 				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
+		}
+		return $apiResponse;
+	}
 
+	/**
+	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param int $n
+	 * @param string $size
+	 * @return array|string[]
+	 * @throws Exception
+	 */
+	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
+		if ($userId !== null) {
+			$this->openAiSettingsService->setLastImageSize($userId, $size);
+		}
 
-			$urls = array_map(static function (array $result) {
-				return $result['url'] ?? null;
-			}, $apiResponse['data']);
-			$urls = array_filter($urls, static function (?string $url) {
-				return $url !== null;
-			});
-			$urls = array_values($urls);
-			if (!empty($urls)) {
-				$hash = md5(implode('|', $urls));
-				$ts = (new DateTime())->getTimestamp();
-				try {
-					$this->imageGenerationMapper->createImageGeneration($hash, $prompt, $ts, $urls);
-				} catch (DBException $e) {
-					$this->logger->warning('Could not create image generation for hash: ' . $hash . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-					throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-				}
+		$apiResponse = $this->requestImageCreation($userId, $prompt, $n, $size);
 
-				return ['hash' => $hash];
+		try {
+			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_IMAGE, $userId, $prompt);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not store prompt for user: ' . $userId . ' and prompt: ' . $prompt . '. Error: ' . $e->getMessage());
+		}
+
+		$urls = array_map(static function (array $result) {
+			return $result['url'] ?? null;
+		}, $apiResponse['data']);
+		$urls = array_filter($urls, static function (?string $url) {
+			return $url !== null;
+		});
+		$urls = array_values($urls);
+		if (!empty($urls)) {
+			$hash = md5(implode('|', $urls));
+			$ts = (new DateTime())->getTimestamp();
+			try {
+				$this->imageGenerationMapper->createImageGeneration($hash, $prompt, $ts, $urls);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create image generation for hash: ' . $hash . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+				throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 			}
+
+			return ['hash' => $hash];
 		}
 
 		return $apiResponse;
@@ -628,7 +640,7 @@ class OpenAiAPIService {
 			if ($serviceUrl === '') {
 				$serviceUrl = Application::OPENAI_API_BASE_URL;
 			}
-			
+
 			$timeout = $this->openAiSettingsService->getRequestTimeout();
 			$timeout = (int) $timeout;
 
