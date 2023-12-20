@@ -19,6 +19,7 @@ use OCA\OpenAi\TextProcessing\FreePromptProvider;
 use OCA\OpenAi\TextProcessing\HeadlineProvider;
 use OCA\OpenAi\TextProcessing\ReformulateProvider;
 use OCA\OpenAi\TextProcessing\SummaryProvider;
+use OCA\OpenAi\TextToImage\TextToImageProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -84,6 +85,7 @@ class Application extends App implements IBootstrap {
 		$context->registerTextProcessingProvider(SummaryProvider::class);
 		$context->registerTextProcessingProvider(HeadlineProvider::class);
 		$context->registerTextProcessingProvider(ReformulateProvider::class);
+		$context->registerTextToImageProvider(TextToImageProvider::class);
 
 		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '27.0.0', '>=')) {
 			if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
