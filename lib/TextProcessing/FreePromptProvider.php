@@ -50,7 +50,7 @@ class FreePromptProvider implements IProviderWithExpectedRuntime, IProviderWithU
 			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 			return array_pop($completion);
 		}
-		
+
 		throw new RunTimeException('No result in OpenAI/LocalAI response.');
 	}
 
