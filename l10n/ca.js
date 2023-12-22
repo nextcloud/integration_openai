@@ -1,8 +1,10 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Image generation" : "Generació d'imatges",
     "Unknown" : "Desconegut",
     "seconds" : "segons",
+    "Image not found" : "Imatge no trobada",
     "Bad HTTP method" : "Mètode HTTP incorrecte",
     "Bad credentials" : "Credencials dolentes",
     "Connected accounts" : "Comptes connectats",
