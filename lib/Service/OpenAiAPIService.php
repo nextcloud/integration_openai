@@ -625,6 +625,54 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getExpTextProcessingTime(): int {
+		return $this->isUsingOpenAi()
+			? intval($this->config->getAppValue(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME)))
+			: intval($this->config->getAppValue(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME)));
+	}
+
+	/**
+	 * @param int $runtime
+	 * @return void
+	 */
+	public function updateExpTextProcessingTime(int $runtime): void {
+		$oldTime = $this->getExpTextProcessingTime();
+		$newTime = intval((1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime);
+
+		if ($this->isUsingOpenAi()) {
+			$this->config->setAppValue(Application::APP_ID, 'openai_text_generation_time', strval($newTime));
+		} else {
+			$this->config->setAppValue(Application::APP_ID, 'localai_text_generation_time', strval($newTime));
+		}
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getExpImgProcessingTime(): int {
+		return $this->isUsingOpenAi()
+			? intval($this->config->getAppValue(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME)))
+			: intval($this->config->getAppValue(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME)));
+	}
+
+	/**
+	 * @param int $runtime
+	 * @return void
+	 */
+	public function updateExpImgProcessingTime(int $runtime): void {
+		$oldTime = $this->getExpImgProcessingTime();
+		$newTime = intval((1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime);
+
+		if ($this->isUsingOpenAi()) {
+			$this->config->setAppValue(Application::APP_ID, 'openai_image_generation_time', strval($newTime));
+		} else {
+			$this->config->setAppValue(Application::APP_ID, 'localai_image_generation_time', strval($newTime));
+		}
+	}
+
+	/**
 	 * Make an HTTP request to the OpenAI API
 	 * @param string|null $userId
 	 * @param string $endPoint The path to reach

@@ -30,17 +30,6 @@ class ReformulateProvider implements IProviderWithExpectedRuntime, IProviderWith
 			: $this->l10n->t('LocalAI integration');
 	}
 
-	private function updateExpectedRuntime(int $runtime): void {
-		$oldTime = $this->getExpectedRuntime();
-		$newTime = intval((1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime);
-
-		if ($this->openAiAPIService->isUsingOpenAi()) {
-			$this->config->setAppValue(Application::APP_ID, 'openai_text_generation_time', strval($newTime));
-		} else {
-			$this->config->setAppValue(Application::APP_ID, 'localai_text_generation_time', strval($newTime));
-		}
-	}
-
 	public function process(string $prompt): string {
 		$startTime = time();
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
@@ -57,7 +46,7 @@ class ReformulateProvider implements IProviderWithExpectedRuntime, IProviderWith
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
-			$this->updateExpectedRuntime($endTime - $startTime);
+			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 			return array_pop($completion);
 		}
 
@@ -69,9 +58,7 @@ class ReformulateProvider implements IProviderWithExpectedRuntime, IProviderWith
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? intval($this->config->getAppValue(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME)))
-			: intval($this->config->getAppValue(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME)));
+		return $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
 	public function setUserId(?string $userId): void {

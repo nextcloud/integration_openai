@@ -38,17 +38,6 @@ class TextToImageProvider implements IProvider {
 			: $this->l->t('LocalAI\'s stable diffusion Text-To-Image');
 	}
 
-	private function updateExpectedRuntime(int $runtime): void {
-		$oldTime = $this->getExpectedRuntime();
-		$newTime = intval((1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime);
-
-		if ($this->openAiAPIService->isUsingOpenAi()) {
-			$this->config->setAppValue(Application::APP_ID, 'openai_image_generation_time', strval($newTime));
-		} else {
-			$this->config->setAppValue(Application::APP_ID, 'localai_image_generation_time', strval($newTime));
-		}
-	}
-
 	/**
 	 * @inheritDoc
 	 */
@@ -79,7 +68,7 @@ class TextToImageProvider implements IProvider {
 				$i++;
 			}
 			$endTime = time();
-			$this->updateExpectedRuntime(($endTime - $startTime) / count($resources));
+			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
 		} catch(\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new \RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
@@ -90,8 +79,6 @@ class TextToImageProvider implements IProvider {
 	 * @inheritDoc
 	 */
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? intval($this->config->getAppValue(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME)))
-			: intval($this->config->getAppValue(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME)));
+		return $this->openAiAPIService->getExpImgProcessingTime();
 	}
 }
