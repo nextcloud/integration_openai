@@ -31,7 +31,19 @@ class SummaryProvider implements IProviderWithExpectedRuntime, IProviderWithUser
 			: $this->l10n->t('LocalAI integration');
 	}
 
+	private function updateExpectedRuntime(int $runtime): void {
+		$oldTime = $this->getExpectedRuntime();
+		$newTime = intval((1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime);
+
+		if ($this->openAiAPIService->isUsingOpenAi()) {
+			$this->config->setAppValue(Application::APP_ID, 'openai_text_generation_time', strval($newTime));
+		} else {
+			$this->config->setAppValue(Application::APP_ID, 'localai_text_generation_time', strval($newTime));
+		}
+	}
+
 	public function process(string $prompt): string {
+		$startTime = time();
 		// to try it out:
 		// curl -H "content-type: application/json" -H "ocs-apirequest: true" -u user:pass http://localhost/dev/server/ocs/v2.php/textprocessing/schedule -d '{"input":"this is a short sentence to talk about food and weather and sport","type":"OCP\\TextProcessing\\SummaryTaskType","appId":"plopapp","identifier":"superidentifier"}' -X POST
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
@@ -47,6 +59,8 @@ class SummaryProvider implements IProviderWithExpectedRuntime, IProviderWithUser
 			throw new RunTimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
+			$endTime = time();
+			$this->updateExpectedRuntime($endTime - $startTime);
 			return array_pop($completion);
 		}
 
@@ -60,8 +74,8 @@ class SummaryProvider implements IProviderWithExpectedRuntime, IProviderWithUser
 
 	public function getExpectedRuntime(): int {
 		return $this->openAiAPIService->isUsingOpenAi()
-			? 10
-			: 60 * 5;
+			? intval($this->config->getAppValue(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME)))
+			: intval($this->config->getAppValue(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME)));
 	}
 
 	public function setUserId(?string $userId): void {

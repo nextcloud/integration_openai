@@ -30,7 +30,19 @@ class ReformulateProvider implements IProviderWithExpectedRuntime, IProviderWith
 			: $this->l10n->t('LocalAI integration');
 	}
 
+	private function updateExpectedRuntime(int $runtime): void {
+		$oldTime = $this->getExpectedRuntime();
+		$newTime = intval((1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime);
+
+		if ($this->openAiAPIService->isUsingOpenAi()) {
+			$this->config->setAppValue(Application::APP_ID, 'openai_text_generation_time', strval($newTime));
+		} else {
+			$this->config->setAppValue(Application::APP_ID, 'localai_text_generation_time', strval($newTime));
+		}
+	}
+
 	public function process(string $prompt): string {
+		$startTime = time();
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 		$prompt = 'Reformulate the following text:' . "\n\n" . $prompt;
 		// Max tokens are limited later to max tokens specified in the admin settings so here we just request PHP_INT_MAX
@@ -44,6 +56,8 @@ class ReformulateProvider implements IProviderWithExpectedRuntime, IProviderWith
 			throw new RunTimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
+			$endTime = time();
+			$this->updateExpectedRuntime($endTime - $startTime);
 			return array_pop($completion);
 		}
 
@@ -56,8 +70,8 @@ class ReformulateProvider implements IProviderWithExpectedRuntime, IProviderWith
 
 	public function getExpectedRuntime(): int {
 		return $this->openAiAPIService->isUsingOpenAi()
-			? 10
-			: 60 * 5;
+			? intval($this->config->getAppValue(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME)))
+			: intval($this->config->getAppValue(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME)));
 	}
 
 	public function setUserId(?string $userId): void {
