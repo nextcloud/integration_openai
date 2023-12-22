@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.2.0 – 2023-12-22
+
+### Fixed
+
+- Support new OCP API with expected runtime for text processing providers @julien-nc
+- Calculate expected provider runtimes according to past observed runtimes @MB-Finski
+- Specify allow_local_remote_servers in the request options so that it's no longer needed in config.php @jkellerer
+- Improve unit test cleanup @MB-Finski
+
+### Added
+
+- Implement a text-to-image provider @julien-nc
+
 ## 1.1.5 – 2023-12-07
 
 ### Fixed
