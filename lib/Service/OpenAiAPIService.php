@@ -639,12 +639,12 @@ class OpenAiAPIService {
 	 */
 	public function updateExpTextProcessingTime(int $runtime): void {
 		$oldTime = $this->getExpTextProcessingTime();
-		$newTime = intval((1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime);
+		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
 
 		if ($this->isUsingOpenAi()) {
-			$this->config->setAppValue(Application::APP_ID, 'openai_text_generation_time', strval($newTime));
+			$this->config->setAppValue(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)));
 		} else {
-			$this->config->setAppValue(Application::APP_ID, 'localai_text_generation_time', strval($newTime));
+			$this->config->setAppValue(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)));
 		}
 	}
 
@@ -663,12 +663,12 @@ class OpenAiAPIService {
 	 */
 	public function updateExpImgProcessingTime(int $runtime): void {
 		$oldTime = $this->getExpImgProcessingTime();
-		$newTime = intval((1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime);
+		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
 
 		if ($this->isUsingOpenAi()) {
-			$this->config->setAppValue(Application::APP_ID, 'openai_image_generation_time', strval($newTime));
+			$this->config->setAppValue(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)));
 		} else {
-			$this->config->setAppValue(Application::APP_ID, 'localai_image_generation_time', strval($newTime));
+			$this->config->setAppValue(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)));
 		}
 	}
 
