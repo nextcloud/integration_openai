@@ -42,6 +42,12 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_MAX_NUM_OF_TOKENS = 1000;
 	public const DEFAULT_QUOTA_PERIOD = 30;
 
+	public const DEFAULT_OPENAI_TEXT_GENERATION_TIME = 10; // seconds
+	public const DEFAULT_LOCALAI_TEXT_GENERATION_TIME = 60; // seconds
+	public const DEFAULT_OPENAI_IMAGE_GENERATION_TIME = 20; // seconds
+	public const DEFAULT_LOCALAI_IMAGE_GENERATION_TIME = 90; // seconds
+	public const EXPECTED_RUNTIME_LOWPASS_FACTOR = 0.1;
+
 	public const QUOTA_TYPE_TEXT = 0;
 	public const QUOTA_TYPE_IMAGE = 1;
 	public const QUOTA_TYPE_TRANSCRIPTION = 2;

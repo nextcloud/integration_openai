@@ -9,6 +9,7 @@ namespace OCA\OpenAi\TextToImage;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Http\Client\IClientService;
+use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextToImage\IProvider;
 use Psr\Log\LoggerInterface;
@@ -20,6 +21,7 @@ class TextToImageProvider implements IProvider {
 		private IL10N $l,
 		private IClientService $clientService,
 		private ?string $userId,
+		private IConfig $config,
 	) {
 	}
 
@@ -40,6 +42,7 @@ class TextToImageProvider implements IProvider {
 	 * @inheritDoc
 	 */
 	public function generate(string $prompt, array $resources): void {
+		$startTime = time();
 		try {
 			$apiResponse = $this->openAiAPIService->requestImageCreation($this->userId, $prompt, count($resources));
 			$urls = array_map(static function (array $result) {
@@ -64,6 +67,8 @@ class TextToImageProvider implements IProvider {
 				}
 				$i++;
 			}
+			$endTime = time();
+			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
 		} catch(\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new \RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
@@ -74,8 +79,6 @@ class TextToImageProvider implements IProvider {
 	 * @inheritDoc
 	 */
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? 30
-			: 5 * 60;
+		return $this->openAiAPIService->getExpImgProcessingTime();
 	}
 }

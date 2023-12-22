@@ -32,6 +32,7 @@ class HeadlineProvider implements IProviderWithExpectedRuntime, IProviderWithUse
 	}
 
 	public function process(string $prompt): string {
+		$startTime = time();
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 		$prompt = 'Give me the headline of the following text:' . "\n\n" . $prompt;
 		// Max tokens are limited later to max tokens specified in the admin settings so here we just request PHP_INT_MAX
@@ -45,6 +46,8 @@ class HeadlineProvider implements IProviderWithExpectedRuntime, IProviderWithUse
 			throw new RunTimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
+			$endTime = time();
+			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 			return array_pop($completion);
 		}
 
@@ -56,9 +59,7 @@ class HeadlineProvider implements IProviderWithExpectedRuntime, IProviderWithUse
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? 10
-			: 60 * 5;
+		return $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
 	public function setUserId(?string $userId): void {

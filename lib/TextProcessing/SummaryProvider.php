@@ -32,6 +32,7 @@ class SummaryProvider implements IProviderWithExpectedRuntime, IProviderWithUser
 	}
 
 	public function process(string $prompt): string {
+		$startTime = time();
 		// to try it out:
 		// curl -H "content-type: application/json" -H "ocs-apirequest: true" -u user:pass http://localhost/dev/server/ocs/v2.php/textprocessing/schedule -d '{"input":"this is a short sentence to talk about food and weather and sport","type":"OCP\\TextProcessing\\SummaryTaskType","appId":"plopapp","identifier":"superidentifier"}' -X POST
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
@@ -47,6 +48,8 @@ class SummaryProvider implements IProviderWithExpectedRuntime, IProviderWithUser
 			throw new RunTimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
+			$endTime = time();
+			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 			return array_pop($completion);
 		}
 
@@ -59,9 +62,7 @@ class SummaryProvider implements IProviderWithExpectedRuntime, IProviderWithUser
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? 10
-			: 60 * 5;
+		return $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
 	public function setUserId(?string $userId): void {

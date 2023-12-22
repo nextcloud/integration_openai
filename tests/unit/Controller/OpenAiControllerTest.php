@@ -24,7 +24,6 @@ use OCP\Http\Client\IClientService;
 use OCP\IConfig;
 use Test\TestCase;
 
-
 /**
  * @group DB
  */
