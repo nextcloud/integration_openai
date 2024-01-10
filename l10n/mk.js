@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Непознат",
     "seconds" : "секунди",
+    "Image not found" : "Сликата не е пронајдена",
     "Bad credentials" : "Неточни акредитиви",
     "Connected accounts" : "Поврзани сметки",
     "Authentication" : "Автентикација",
