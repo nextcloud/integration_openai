@@ -5,10 +5,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="bootstrap.php" timeoutForSmallTests="900" timeoutForMediumTests="900" timeoutForLargeTests="900" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
   <coverage>
-    <include>
-      <directory suffix=".php">../appinfo</directory>
-      <directory suffix=".php">../lib</directory>
-    </include>
     <report>
       <clover outputFile="./clover.xml"/>
     </report>
@@ -20,4 +16,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   <logging>
     <!-- and this is where your report will be written -->
   </logging>
+  <source>
+    <include>
+      <directory suffix=".php">../appinfo</directory>
+      <directory suffix=".php">../lib</directory>
+    </include>
+  </source>
 </phpunit>

@@ -459,7 +459,7 @@ class OpenAiControllerTest extends TestCase {
 		$url = $url_base . '/v1/completions';
 		$options = [
 			'nextcloud' => ['allow_local_address' => true],
-			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 
+			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
 			'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json'],
 		];
 		$options['body'] = json_encode(['model' => 'test_model', 'prompt' => $prompt, 'max_tokens' => $maxTokens, 'n' => $n, 'user' => self::TEST_USER1]);
@@ -522,7 +522,7 @@ class OpenAiControllerTest extends TestCase {
 		$url = $url_base . '/v1/chat/completions';
 		$options = [
 			'nextcloud' => ['allow_local_address' => true],
-			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 
+			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
 			'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json'],
 		];
 		$options['body'] = json_encode(['model' => 'test_model', 'messages' => [['role' => 'user', 'content' => $prompt]], 'max_tokens' => $maxTokens, 'n' => $n, 'user' => self::TEST_USER1]);
@@ -587,7 +587,7 @@ class OpenAiControllerTest extends TestCase {
 		$url = $url_base . '/v1/chat/completions';
 		$options = [
 			'nextcloud' => ['allow_local_address' => true],
-			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 
+			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
 			'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Basic ' . base64_encode('testuser:testpassword'), 'Content-Type' => 'application/json'],
 		];
 		$options['body'] = json_encode(['model' => 'test_model', 'messages' => [['role' => 'user', 'content' => $prompt]], 'max_tokens' => $maxTokens, 'n' => $n, 'user' => self::TEST_USER1]);
