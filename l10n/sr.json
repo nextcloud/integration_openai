@@ -112,7 +112,7 @@
     "Preview text generation" : "Прегледај генерисање текста",
     "Submit generated text" : "Предај генерисани текст",
     "Send" : "Пошаљи",
-    "Include the prompt in the result" : "Укључи захетв у резултату",
+    "Include the prompt in the result" : "Укључи захетев у резултат",
     "How many results to generate" : "Колико резултата треба да се генерише",
     "Model to use" : "Модел који ће да се користи",
     "Approximate maximum number of words to generate (tokens)" : "Приближан максимални број речи (жетона) који ће да се генерише",
