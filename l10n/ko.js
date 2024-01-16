@@ -13,6 +13,7 @@ OC.L10N.register(
     "API key" : "API 키",
     "Username" : "사용자 이름",
     "Password" : "암호",
+    "Preview" : "미리 보기",
     "Advanced options" : "고급 설정",
     "Send" : "전송",
     "Result" : "결과",
