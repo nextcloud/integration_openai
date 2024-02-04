@@ -10,6 +10,7 @@ OC.L10N.register(
     "Image generation" : "Bildegenerering",
     "Unknown" : "Ukjent",
     "seconds" : "sekund",
+    "Image not found" : "Bilde ikke funnet",
     "Bad HTTP method" : "HTTP-metode er feil",
     "Bad credentials" : "Påloggingsdetaljene er feil",
     "Connected accounts" : "Tilknyttede kontoer",
