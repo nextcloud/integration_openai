@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Unknown error while retrieving prompt history." : "Unbekannter Fehler beim Abrufen des Eingabeaufforderungsverlaufs.",
     "Image generation" : "Bilderstellung",
     "Unknown" : "Unbekannt",
     "seconds" : "Sekunden",
