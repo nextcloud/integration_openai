@@ -56,7 +56,6 @@
 					<label for="size">
 						{{ t('integration_openai', 'Default completion model to use') }}
 					</label>
-					<div class="spacer" />
 					<NcSelect
 						v-model="selectedModel"
 						class="model-select"
@@ -494,10 +493,6 @@ export default {
 		}
 		> input[type='radio'] {
 			width: auto;
-		}
-		.spacer {
-			display: inline-block;
-			width: 32px;
 		}
 		.quota-table {
 			padding: 4px 8px 4px 8px;
