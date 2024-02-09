@@ -7,9 +7,12 @@ OC.L10N.register(
     "AI image generation (with LocalAI)" : "AI-bildegenerering (med LocalAI)",
     "AI speech-to-text (Whisper via OpenAI)" : "AI tale-til-tekst (Whisper via OpenAI)",
     "AI speech-to-text (Whisper via LocalAI)" : "AI tale-til-tekst (Whisper via LocalAI)",
+    "Unknown error while retrieving prompt history." : "Ukjent feil under henting av anmodningshistorikk.",
     "Image generation" : "Bildegenerering",
+    "Audio transcription" : "Lydtranskripsjon",
     "Unknown" : "Ukjent",
     "seconds" : "sekund",
+    "Unknown image generation error" : "Ukjent feil ved bildegenerering",
     "Image not found" : "Bilde ikke funnet",
     "Bad HTTP method" : "HTTP-metode er feil",
     "Bad credentials" : "Påloggingsdetaljene er feil",
@@ -85,6 +88,7 @@ OC.L10N.register(
     "Translate (only to English)" : "Oversett (bare til engelsk)",
     "Translate" : "Oversette",
     "by OpenAI with Whisper" : "av OpenAI med Whisper",
-    "Failed to get transcription/translation" : "Kunne ikke hente transkripsjon/oversettelse"
+    "Failed to get transcription/translation" : "Kunne ikke hente transkripsjon/oversettelse",
+    "Unknown API error" : "Ukjent API-feil"
 },
 "nplurals=2; plural=(n != 1);");
