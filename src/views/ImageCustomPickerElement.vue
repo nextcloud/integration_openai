@@ -13,7 +13,8 @@
 				<NcTextField
 					ref="dalle-search-input"
 					:value.sync="query"
-					:label="inputPlaceholder"
+					:placeholder="inputPlaceholder"
+					:label="t('integration_openai', 'Enter a prompt')"
 					:disabled="loading"
 					:show-trailing-button="!!query"
 					@keydown.enter="generate"
