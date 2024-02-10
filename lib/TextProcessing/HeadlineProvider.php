@@ -14,7 +14,10 @@ use OCP\TextProcessing\HeadlineTaskType;
 use OCP\TextProcessing\IProviderWithExpectedRuntime;
 use OCP\TextProcessing\IProviderWithUserId;
 use RuntimeException;
-
+/**
+ * @template-implements IProviderWithExpectedRuntime<HeadlineTaskType>
+ * @template-implements IProviderWithUserId<HeadlineTaskType>
+ */
 class HeadlineProvider implements IProviderWithExpectedRuntime, IProviderWithUserId {
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,

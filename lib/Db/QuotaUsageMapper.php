@@ -35,7 +35,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 /**
- * @implements QBMapper<QuotaUsage>
+ * @extends QBMapper<QuotaUsage>
  */
 class QuotaUsageMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {

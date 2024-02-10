@@ -13,8 +13,12 @@ use OCP\IL10N;
 use OCP\TextProcessing\FreePromptTaskType;
 use OCP\TextProcessing\IProviderWithExpectedRuntime;
 use OCP\TextProcessing\IProviderWithUserId;
-use RunTimeException;
+use RuntimeException;
 
+/**
+ * @template-implements IProviderWithExpectedRuntime<FreePromptTaskType>
+ * @template-implements IProviderWithUserId<FreePromptTaskType>
+ */
 class FreePromptProvider implements IProviderWithExpectedRuntime, IProviderWithUserId {
 	
 	public function __construct(
@@ -43,7 +47,7 @@ class FreePromptProvider implements IProviderWithExpectedRuntime, IProviderWithU
 				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
 			}
 		} catch (Exception $e) {
-			throw new RunTimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
@@ -51,7 +55,7 @@ class FreePromptProvider implements IProviderWithExpectedRuntime, IProviderWithU
 			return array_pop($completion);
 		}
 
-		throw new RunTimeException('No result in OpenAI/LocalAI response.');
+		throw new RuntimeException('No result in OpenAI/LocalAI response.');
 	}
 
 	public function getTaskType(): string {

@@ -224,7 +224,7 @@ class OpenAiSettingsService {
 
 	/**
 	 * Get the user config for the settings page
-	 * @return string[]
+	 * @return array{api_key: string, basic_password: string, basic_user: string, is_custom_service: bool, use_basic_auth: bool}
 	 */
 	public function getUserConfig(string $userId): array {
 		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::OPENAI_API_BASE_URL;
@@ -361,7 +361,7 @@ class OpenAiSettingsService {
 	public function setRequestTimeout(int $requestTimeout): void {
 		// Validate input:
 		$requestTimeout = max(1, $requestTimeout);
-		$this->config->setAppValue(Application::APP_ID, 'request_timeout', $requestTimeout);
+		$this->config->setAppValue(Application::APP_ID, 'request_timeout', strval($requestTimeout));
 	}
 
 	/**
@@ -372,18 +372,18 @@ class OpenAiSettingsService {
 	public function setMaxTokens(int $maxTokens): void {
 		// Validate input:
 		$maxTokens = max(100, $maxTokens);
-		$this->config->setAppValue(Application::APP_ID, 'max_tokens', $maxTokens);
+		$this->config->setAppValue(Application::APP_ID, 'max_tokens', strval($maxTokens));
 	}
 
 	/**
 	 * Setter for quotaPeriod; minimum is 1 day
-	 * @param string $quotaPeriod
+	 * @param int $quotaPeriod
 	 * @return void
 	 */
 	public function setQuotaPeriod(int $quotaPeriod): void {
 		// Validate input:
 		$quotaPeriod = max(1, $quotaPeriod);
-		$this->config->setAppValue(Application::APP_ID, 'quota_period', $quotaPeriod);
+		$this->config->setAppValue(Application::APP_ID, 'quota_period', strval($quotaPeriod));
 	}
 
 	/**

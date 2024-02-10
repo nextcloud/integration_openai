@@ -19,6 +19,7 @@
 		"cs:check": "php-cs-fixer fix --dry-run --diff",
 		"cs:fix": "php-cs-fixer fix",
 		"test:unit": "phpunit --config tests/phpunit.xml",
+		"psalm": "psalm.phar --no-cache",
 		"post-install-cmd": [
 			"@composer bin all install --ansi",
 			"composer dump-autoload"

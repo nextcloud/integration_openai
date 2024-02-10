@@ -39,7 +39,7 @@ class WhisperReferenceProvider extends ADiscoverableReferenceProvider {
 		private IURLGenerator $urlGenerator,
 		private ReferenceManager $referenceManager,
 		private OpenAiAPIService $openAiAPIService,
-		?string $userId
+		private ?string $userId
 	) {
 	}
 

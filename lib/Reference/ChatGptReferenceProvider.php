@@ -115,7 +115,7 @@ class ChatGptReferenceProvider extends ADiscoverableReferenceProvider {
 
 	/**
 	 * @param string $url
-	 * @return array|null
+	 * @return null|string
 	 */
 	private function getCompletionId(string $url): ?string {
 		preg_match('/\/c\/([0-9a-z]+)$/i', $url, $matches);

@@ -35,7 +35,9 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 
 use OCP\IDBConnection;
-
+/**
+ * @extends QBMapper<ImageGeneration>
+ */
 class ImageGenerationMapper extends QBMapper {
 	public function __construct(
 		IDBConnection  $db,

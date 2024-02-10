@@ -34,7 +34,9 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
-
+/**
+ * @extends QBMapper<ImageUrl>
+ */
 class ImageUrlMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'openai_i_url', ImageUrl::class);
@@ -42,7 +44,7 @@ class ImageUrlMapper extends QBMapper {
 
 	/**
 	 * @param int $generationId
-	 * @return array|Entity
+	 * @return array<ImageUrl>
 	 * @throws Exception
 	 */
 	public function getImageUrlsOfGeneration(int $generationId): array {
