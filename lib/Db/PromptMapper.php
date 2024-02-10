@@ -33,6 +33,7 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+
 /**
  * @extends QBMapper<Prompt>
  */

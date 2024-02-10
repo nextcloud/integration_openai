@@ -13,6 +13,7 @@ use OCP\IL10N;
 use OCP\TextProcessing\IProviderWithExpectedRuntime;
 use OCP\TextProcessing\IProviderWithUserId;
 use RuntimeException;
+
 /**
  * @template-implements IProviderWithExpectedRuntime<ReformulateTaskType>
  * @template-implements IProviderWithUserId<ReformulateTaskType>

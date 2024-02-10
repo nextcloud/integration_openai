@@ -28,12 +28,12 @@ namespace OCA\OpenAi\Db;
 use DateTime;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+
 /**
  * @extends QBMapper<ImageUrl>
  */
