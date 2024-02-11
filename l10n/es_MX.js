@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
+    "Image not found" : "Imagen no encontrada",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
