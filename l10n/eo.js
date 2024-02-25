@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Nekonata",
     "seconds" : "sekundoj",
+    "Image not found" : "Bildo ne trovita",
     "Request timeout (seconds)" : "Eltempiĝo (sekundoj)",
     "Authentication" : "Aŭtentigo",
     "Authentication method" : "Aŭtentiga metodo",
