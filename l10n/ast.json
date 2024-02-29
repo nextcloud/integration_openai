@@ -1,0 +1,11 @@
+{ "translations": {
+    "Image generation" : "Xeneración d'imáxenes",
+    "Unknown" : "Desconocí­u",
+    "seconds" : "segundos",
+    "Authentication" : "Autenticación",
+    "Username" : "Nome d'usuariu",
+    "Password" : "Contraseña",
+    "OpenAI options saved" : "Guardáronse les opciones d'OpenAI",
+    "Unknown error" : "Error desconocíu"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
