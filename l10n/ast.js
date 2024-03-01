@@ -4,6 +4,7 @@ OC.L10N.register(
     "Image generation" : "Xeneración d'imáxenes",
     "Unknown" : "Desconocí­u",
     "seconds" : "segundos",
+    "Image not found" : "Nun s'atopó la imaxe",
     "Authentication" : "Autenticación",
     "Username" : "Nome d'usuariu",
     "Password" : "Contraseña",
