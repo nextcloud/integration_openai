@@ -7,6 +7,7 @@ OC.L10N.register(
     "Unknown image generation error" : "Error de la xeneración d'imáxenes desconocíu",
     "Image not found" : "Nun s'atopó la imaxe",
     "Authentication" : "Autenticación",
+    "API key" : "Clave de l'API",
     "Username" : "Nome d'usuariu",
     "Password" : "Contraseña",
     "Generated image" : "Imaxe xenerada",

@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "ไม่ทราบ",
     "seconds" : "วินาที",
+    "Image not found" : "ไม่พบรูปภาพ",
     "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
     "Authentication" : "การตรวจสอบสิทธิ์",
     "Authentication method" : "วิธีการตรวจสอบความถูกต้อง",
