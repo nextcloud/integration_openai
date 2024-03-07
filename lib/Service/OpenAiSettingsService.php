@@ -447,6 +447,9 @@ class OpenAiSettingsService {
 			$this->setRequestTimeout($adminConfig['request_timeout']);
 		}
 		if (isset($adminConfig['url'])) {
+			if (str_ends_with($adminConfig['url'], '/')) {
+				$adminConfig['url'] = substr($adminConfig['url'], 0, -1) ?: $adminConfig['url'];
+			}
 			$this->setServiceUrl($adminConfig['url']);
 		}
 		if (isset($adminConfig['api_key'])) {
