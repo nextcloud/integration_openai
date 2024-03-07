@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <psalm
-	errorBaseline="tests/psalm-baseline.xml"
 	errorLevel="4"
 	findUnusedBaselineEntry="true"
 	findUnusedCode="false"
@@ -37,11 +36,5 @@
 				<referencedClass name="Doctrine\DBAL\Schema\Table" />
 			</errorLevel>
 		</UndefinedDocblockClass>
-		<InvalidClass>
-			<errorLevel type="suppress">
-				<referencedClass name="OCP\Db\Exception" />
-				<referencedClass name="OCP\AppFramework\Db\QBMapper" />
-			</errorLevel>
-		</InvalidClass>
 	</issueHandlers>
 </psalm>
