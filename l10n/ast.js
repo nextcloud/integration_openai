@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Image generation" : "Xeneración d'imáxenes",
+    "Audio transcription" : "Trescripción del audiu",
     "Unknown" : "Desconocí­u",
     "seconds" : "segundos",
     "Unknown image generation error" : "Error de la xeneración d'imáxenes desconocíu",
@@ -19,6 +20,7 @@ OC.L10N.register(
     "Result" : "Resultáu",
     "AI image generation" : "Xeneración d'imáxenes per IA",
     "Unknown error" : "Error desconocíu",
-    "Transcribe" : "Trescribir"
+    "Transcribe" : "Trescribir",
+    "Translate" : "Traducir"
 },
 "nplurals=2; plural=(n != 1);");
