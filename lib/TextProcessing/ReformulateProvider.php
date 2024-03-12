@@ -14,6 +14,10 @@ use OCP\TextProcessing\IProviderWithExpectedRuntime;
 use OCP\TextProcessing\IProviderWithUserId;
 use RuntimeException;
 
+/**
+ * @template-implements IProviderWithExpectedRuntime<ReformulateTaskType>
+ * @template-implements IProviderWithUserId<ReformulateTaskType>
+ */
 class ReformulateProvider implements IProviderWithExpectedRuntime, IProviderWithUserId {
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,

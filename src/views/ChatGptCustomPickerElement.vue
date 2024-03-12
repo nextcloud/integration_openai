@@ -13,7 +13,8 @@
 				<NcTextField
 					ref="chatgpt-search-input"
 					:value.sync="query"
-					:label="inputPlaceholder"
+					:placeholder="inputPlaceholder"
+					:label="t('integration_openai', 'Enter a prompt')"
 					:disabled="loading"
 					:show-trailing-button="!!query"
 					@keydown.enter="generate"
@@ -115,7 +116,8 @@
 						v-model="selectedModel"
 						class="model-select"
 						:options="formattedModels"
-						input-id="openai-completion-model-select" />
+						input-id="openai-completion-model-select"
+						:label-outside="true" />
 				</div>
 				<div class="line">
 					<label for="max-tokens">
@@ -421,7 +423,9 @@ export default {
 		}
 		.editable-preview {
 			width: 100% !important;
-			max-height: 300px !important;
+			:deep(.rich-contenteditable__input) {
+				max-height: 300px !important;
+			}
 		}
 	}
 

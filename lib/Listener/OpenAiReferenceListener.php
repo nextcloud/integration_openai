@@ -31,6 +31,9 @@ use OCP\EventDispatcher\IEventListener;
 use OCP\IConfig;
 use OCP\Util;
 
+/**
+ * @implements IEventListener<RenderReferenceEvent>
+ */
 class OpenAiReferenceListener implements IEventListener {
 	public function __construct(
 		private IConfig $config,

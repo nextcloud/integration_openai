@@ -218,7 +218,7 @@ class OpenAiAPIService {
 				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
 			} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
 				$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR));
+				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 			}
 			$quotaInfo[$quotaType]['limit'] = intval($quotas[$quotaType]);
 			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
@@ -690,8 +690,7 @@ class OpenAiAPIService {
 			}
 
 			$timeout = $this->openAiSettingsService->getRequestTimeout();
-			$timeout = (int) $timeout;
-
+			
 			$url = $serviceUrl . '/v1/' . $endPoint;
 			$options = [
 				'timeout' => $timeout,
@@ -717,7 +716,7 @@ class OpenAiAPIService {
 				if ($apiKey !== '') {
 					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
 				}
-			} elseif ($useBasicAuth) {
+			} else {
 				if ($basicUser !== '' && $basicPassword !== '') {
 					$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
 				}
@@ -788,9 +787,9 @@ class OpenAiAPIService {
 				$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 			}
 			if (isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])) {
-				throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], $e->getCode());
+				throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], intval($e->getCode()));
 			} else {
-				throw new Exception($this->l10n->t('API request error: ') . $e->getMessage(), $e->getCode());
+				throw new Exception($this->l10n->t('API request error: ') . $e->getMessage(), intval($e->getCode()));
 			}
 		} catch (Exception | Throwable $e) {
 			$this->logger->warning('API request error : ' . $e->getMessage(), ['exception' => $e]);

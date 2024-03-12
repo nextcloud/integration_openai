@@ -53,7 +53,7 @@ class OpenAiAPIController extends Controller {
 		try {
 			$response = $this->openAiAPIService->getModels($this->userId);
 		} catch (Exception $e) {
-			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
+			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
 
@@ -70,7 +70,7 @@ class OpenAiAPIController extends Controller {
 		try {
 			$response = $this->openAiAPIService->getPromptHistory($this->userId, $type);
 		} catch (Exception $e) {
-			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
+			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
 
@@ -107,7 +107,7 @@ class OpenAiAPIController extends Controller {
 			}
 		} catch (Exception $e) {
 			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
-			return new DataResponse(['error' => $e->getMessage()], $code);
+			return new DataResponse(['error' => $e->getMessage()], intval($code));
 		}
 
 		return new DataResponse($response);
@@ -123,7 +123,7 @@ class OpenAiAPIController extends Controller {
 		try {
 			$response = $this->openAiAPIService->transcribeBase64Mp3($this->userId, $audioBase64, $translate);
 		} catch (Exception $e) {
-			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
+			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
 
@@ -141,7 +141,7 @@ class OpenAiAPIController extends Controller {
 		try {
 			$response = $this->openAiAPIService->createImage($this->userId, $prompt, $n, $size);
 		} catch (Exception $e) {
-			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
+			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
 		return new DataResponse($response);
@@ -161,7 +161,7 @@ class OpenAiAPIController extends Controller {
 		try {
 			$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
 		} catch (Exception $e) {
-			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
+			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataDisplayResponse('', $code);
 		}
 
@@ -229,7 +229,7 @@ class OpenAiAPIController extends Controller {
 		try {
 			$info = $this->openAiAPIService->getUserQuotaInfo($this->userId);
 		} catch (Exception $e) {
-			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
+			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
 		
@@ -245,7 +245,7 @@ class OpenAiAPIController extends Controller {
 		try {
 			$info = $this->openAiAPIService->getAdminQuotaInfo();
 		} catch (Exception $e) {
-			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : $e->getCode();
+			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
 

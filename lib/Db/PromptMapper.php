@@ -34,6 +34,9 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+/**
+ * @extends QBMapper<Prompt>
+ */
 class PromptMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'openai_prompts', Prompt::class);

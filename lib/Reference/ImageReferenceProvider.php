@@ -110,7 +110,7 @@ class ImageReferenceProvider extends ADiscoverableReferenceProvider {
 
 	/**
 	 * @param string $url
-	 * @return array|null
+	 * @return null|string
 	 */
 	private function getImageGenerationHash(string $url): ?string {
 		$start = $this->urlGenerator->getAbsoluteURL('/apps/' . Application::APP_ID);

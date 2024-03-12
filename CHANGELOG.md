@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove unnecessary spacing in admin settings @st3iny
+
 ## 1.2.0 – 2023-12-22
 
 ### Fixed
