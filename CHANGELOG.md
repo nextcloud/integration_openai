@@ -4,11 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 1.2.1 – 2024-03-13
+
+### Changed
+
+- chore: update workflows from templates @skjnldsv
+- Update node, npm, nextcloud/vue @MB-Finski
+- Update all node deps @kyteinsky
 
 ### Fixed
 
 - Remove unnecessary spacing in admin settings @st3iny
+- Fix psalm errors @MB-Finski
+- Trim suffixed / in base url @kyteinsky
+
+### Added
+
+- Use composer bin for dev dependencies @MB-Finski
+- Add psalm and lint workflows, cs:fix @MB-Finski
+- Add psalm config @MB-Finski
+
 
 ## 1.2.0 – 2023-12-22
 
