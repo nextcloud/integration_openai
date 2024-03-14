@@ -107,6 +107,7 @@ OC.L10N.register(
     "Prompt history cleared" : "Histórico de prompts apagado",
     "Failed to clear prompt history" : "Falha ao limpar o histórico de prompts",
     "ChatGPT-like text generation" : "Geração de texto como o Chat-GPT",
+    "Enter a prompt" : "Insira um prompt",
     "Preview" : "Visualizar",
     "Preview content" : "Previsualizar conteúdo",
     "Show/hide advanced options" : "Exibir/Esconder opçòes avançadas",

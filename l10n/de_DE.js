@@ -107,6 +107,7 @@ OC.L10N.register(
     "Prompt history cleared" : "Eingabeverlauf gelöscht",
     "Failed to clear prompt history" : "Der Eingabeverlauf konnte nicht gelöscht werden",
     "ChatGPT-like text generation" : "ChatGPT-ähnliche Texterstellung",
+    "Enter a prompt" : "Eingabeaufforderung eingeben",
     "Preview" : "Vorschau",
     "Preview content" : "Vorschau des Inhalts",
     "Show/hide advanced options" : "Erweiterte Optionen anzeigen/ausblenden",

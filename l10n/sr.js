@@ -107,6 +107,7 @@ OC.L10N.register(
     "Prompt history cleared" : "Историја захтева је обрисана",
     "Failed to clear prompt history" : "Није успело брисање историје захтева",
     "ChatGPT-like text generation" : "Генерисање текста као са ChatGPT",
+    "Enter a prompt" : "Унесите захтев",
     "Preview" : "Преглед",
     "Preview content" : "Прегледај садржај",
     "Show/hide advanced options" : "Прикажи/сакриј напредне опције",

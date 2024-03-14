@@ -107,6 +107,7 @@ OC.L10N.register(
     "Prompt history cleared" : "السجل التاريخي للمحث تمّ محوه",
     "Failed to clear prompt history" : "تعذّر محو السجل التاريخي للمحث",
     "ChatGPT-like text generation" : "توليد نص مماثل لـ ChatGPT",
+    "Enter a prompt" : "أدخِل طلباً",
     "Preview" : "مُعاينة",
     "Preview content" : "معاينة المحتوى",
     "Show/hide advanced options" : "إظهار/إخفاء الخيارات المتقدمة",

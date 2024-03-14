@@ -107,6 +107,7 @@ OC.L10N.register(
     "Prompt history cleared" : "Ledeteksthistorikk tømt",
     "Failed to clear prompt history" : "Tømming av ledeteksthistorikk feilet",
     "ChatGPT-like text generation" : "ChatGPT-lignende tekstgenerering",
+    "Enter a prompt" : "Skriv inn en ledetekst",
     "Preview" : "Forhåndsvis",
     "Preview content" : "Forhåndsvis innhold",
     "Show/hide advanced options" : "Vis/skjul avanserte alternativer",
