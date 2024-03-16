@@ -77,6 +77,17 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 
 ## 🔧 Configuration
 
-### Admin settings
+### Admin settings: connected accounts
 
-There is a "Connected accounts" **admin** settings section to set your OpenAI API key.
+There is a "Connected accounts" **admin** settings section to set your OpenAI API key. This is also where you can connect to a Local AI instance.
+
+![connected accounts settings for AI](https://github.com/nextcloud/integration_openai/assets/551757/2dfdf097-604c-42a7-aee5-4981bf0b13e0)
+
+### Admin settings: Artificial Intelligence
+
+In the Artificial Intelligence section you can then proceed to configure each of the AI functions and choose from the options you configured.
+![configure AI options](https://github.com/nextcloud/integration_openai/assets/551757/a6a78fa6-3598-4e17-90b2-0f7548df3ab6)
+
+## User settings: Artificial Intelligence
+
+Users can choose to disable the Nextcloud Assistant.
