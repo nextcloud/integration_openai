@@ -107,6 +107,7 @@ OC.L10N.register(
     "Prompt history cleared" : "已清除提示歷史紀錄",
     "Failed to clear prompt history" : "清除提示歷史紀錄失敗",
     "ChatGPT-like text generation" : "類似 ChatGPT 的文本生成",
+    "Enter a prompt" : "輸入提示",
     "Preview" : "預覽",
     "Preview content" : "預覽內容",
     "Show/hide advanced options" : "顯示/隱藏進階選項",
