@@ -601,16 +601,19 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @param string|null $userId
 	 * @param string $hash
 	 * @param int $urlId
 	 * @return array|null
 	 * @throws Exception
 	 */
-	public function getGenerationImage(string $hash, int $urlId): ?array {
+	public function getGenerationImage(?string $userId, string $hash, int $urlId): ?array {
 		try {
 			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
 			$imageUrl = $this->imageUrlMapper->getImageUrlOfGeneration($imageGeneration->getId(), $urlId);
-			$imageResponse = $this->client->get($imageUrl->getUrl());
+
+			$requestOptions = $this->getImageRequestOptions($userId);
+			$imageResponse = $this->client->get($imageUrl->getUrl(), $requestOptions);
 			return [
 				'body' => $imageResponse->getBody(),
 				'headers' => $imageResponse->getHeaders(),
@@ -622,6 +625,30 @@ class OpenAiAPIService {
 			$this->logger->debug('Image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			throw new Exception($this->l10n->t('Unknown image request error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @return array
+	 */
+	public function getImageRequestOptions(?string $userId): array {
+		$timeout = $this->openAiSettingsService->getRequestTimeout();
+		$requestOptions = [
+			'timeout' => $timeout,
+			'headers' => [
+				'User-Agent' => 'Nextcloud OpenAI/LocalAI integration',
+			],
+		];
+
+		$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
+		if ($useBasicAuth) {
+			$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
+			$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
+			if ($basicUser !== '' && $basicPassword !== '') {
+				$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
+			}
+		}
+		return $requestOptions;
 	}
 
 	/**
@@ -690,12 +717,12 @@ class OpenAiAPIService {
 			}
 
 			$timeout = $this->openAiSettingsService->getRequestTimeout();
-			
+
 			$url = $serviceUrl . '/v1/' . $endPoint;
 			$options = [
 				'timeout' => $timeout,
 				'headers' => [
-					'User-Agent' => 'Nextcloud OpenAI integration',
+					'User-Agent' => 'Nextcloud OpenAI/LocalAI integration',
 				],
 			];
 
@@ -725,7 +752,7 @@ class OpenAiAPIService {
 			if (!$this->isUsingOpenAi()) {
 				$options['nextcloud']['allow_local_address'] = true;
 			}
-			
+
 			if ($contentType === null) {
 				$options['headers']['Content-Type'] = 'application/json';
 			} elseif ($contentType === 'multipart/form-data') {
