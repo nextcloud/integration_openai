@@ -8,9 +8,7 @@ namespace OCA\OpenAi\TextToImage;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Http\Client\IClientService;
-use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextToImage\IProvider;
 use Psr\Log\LoggerInterface;
@@ -18,12 +16,10 @@ use Psr\Log\LoggerInterface;
 class TextToImageProvider implements IProvider {
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private LoggerInterface $logger,
 		private IL10N $l,
 		private IClientService $clientService,
 		private ?string $userId,
-		private IConfig $config,
 	) {
 	}
 

@@ -5,7 +5,7 @@
 	<summary>Integration of OpenAI and LocalAI services</summary>
 	<description><![CDATA[
 ⚠️ The smart pickers have been removed from this app
-as they are not included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
+as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
 
 This app implements:
 

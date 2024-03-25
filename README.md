@@ -1,7 +1,7 @@
 # OpenAI integration in Nextcloud
 
 :warning: The smart pickers have been removed from this app
-as they are not included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
+as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
 
 This app implements:
 
