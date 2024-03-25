@@ -641,7 +641,7 @@ class OpenAiAPIService {
 		];
 
 		$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
-		if ($useBasicAuth) {
+		if ($useBasicAuth && !$this->isUsingOpenAi()) {
 			$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
 			$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
 			if ($basicUser !== '' && $basicPassword !== '') {
