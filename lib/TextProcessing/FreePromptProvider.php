@@ -20,7 +20,7 @@ use RuntimeException;
  * @template-implements IProviderWithUserId<FreePromptTaskType>
  */
 class FreePromptProvider implements IProviderWithExpectedRuntime, IProviderWithUserId {
-	
+
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,

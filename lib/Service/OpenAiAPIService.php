@@ -636,7 +636,7 @@ class OpenAiAPIService {
 		$requestOptions = [
 			'timeout' => $timeout,
 			'headers' => [
-				'User-Agent' => 'Nextcloud OpenAI/LocalAI integration',
+				'User-Agent' => Application::USER_AGENT,
 			],
 		];
 
@@ -722,7 +722,7 @@ class OpenAiAPIService {
 			$options = [
 				'timeout' => $timeout,
 				'headers' => [
-					'User-Agent' => 'Nextcloud OpenAI/LocalAI integration',
+					'User-Agent' => Application::USER_AGENT,
 				],
 			];
 

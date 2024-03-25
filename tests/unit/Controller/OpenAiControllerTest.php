@@ -31,6 +31,7 @@ class OpenAiControllerTest extends TestCase {
 	public const APP_NAME = 'integration_openai';
 	public const TEST_USER1 = 'testuser';
 	public const OPENAI_API_BASE = 'https://api.openai.com/v1/';
+	public const AUTHORIZATION_HEADER = 'Bearer This is a PHPUnit test API key';
 
 	private $openAiApiController;
 	private $openAiApiService;
@@ -92,7 +93,7 @@ class OpenAiControllerTest extends TestCase {
 		} catch (\OCP\Db\Exception | \Exception | \Throwable $e) {
 			// Ignore
 		}
-		
+
 		// Delete quota usage for test user
 		$quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
 		try {
@@ -143,7 +144,7 @@ class OpenAiControllerTest extends TestCase {
           }';
 
 		$url = self::OPENAI_API_BASE . 'models';
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
@@ -188,7 +189,7 @@ class OpenAiControllerTest extends TestCase {
           }';
 
 		$url = self::OPENAI_API_BASE . 'completions';
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode(['model' => 'test_model', 'prompt' => $prompt, 'max_tokens' => $maxTokens, 'n' => $n, 'user' => self::TEST_USER1]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -242,7 +243,7 @@ class OpenAiControllerTest extends TestCase {
 		  }';
 
 		$url = self::OPENAI_API_BASE . 'chat/completions';
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode(['model' => $model, 'messages' => [['role' => 'user', 'content' => $prompt]], 'max_tokens' => $maxTokens, 'n' => $n, 'user' => self::TEST_USER1]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -331,7 +332,7 @@ class OpenAiControllerTest extends TestCase {
 		}';
 
 		$url = self::OPENAI_API_BASE . 'audio/translations';
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key']];
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER]];
 		$options['multipart'] = [
 			[
 				'name' => 'model',
@@ -388,9 +389,9 @@ class OpenAiControllerTest extends TestCase {
 			  }
 			]
 		  }';
-		  
+
 		$url = self::OPENAI_API_BASE . 'images/generations';
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode(['prompt' => $prompt,'size' => Application::DEFAULT_IMAGE_SIZE,'model' => 'dall-e-2', 'n' => $n, 'response_format' => 'url', 'user' => self::TEST_USER1]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -460,7 +461,7 @@ class OpenAiControllerTest extends TestCase {
 		$options = [
 			'nextcloud' => ['allow_local_address' => true],
 			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
-			'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json'],
+			'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json'],
 		];
 		$options['body'] = json_encode(['model' => 'test_model', 'prompt' => $prompt, 'max_tokens' => $maxTokens, 'n' => $n, 'user' => self::TEST_USER1]);
 
@@ -523,7 +524,7 @@ class OpenAiControllerTest extends TestCase {
 		$options = [
 			'nextcloud' => ['allow_local_address' => true],
 			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
-			'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Bearer This is a PHPUnit test API key', 'Content-Type' => 'application/json'],
+			'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json'],
 		];
 		$options['body'] = json_encode(['model' => 'test_model', 'messages' => [['role' => 'user', 'content' => $prompt]], 'max_tokens' => $maxTokens, 'n' => $n, 'user' => self::TEST_USER1]);
 
@@ -588,7 +589,7 @@ class OpenAiControllerTest extends TestCase {
 		$options = [
 			'nextcloud' => ['allow_local_address' => true],
 			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
-			'headers' => ['User-Agent' => 'Nextcloud OpenAI integration', 'Authorization' => 'Basic ' . base64_encode('testuser:testpassword'), 'Content-Type' => 'application/json'],
+			'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => 'Basic ' . base64_encode('testuser:testpassword'), 'Content-Type' => 'application/json'],
 		];
 		$options['body'] = json_encode(['model' => 'test_model', 'messages' => [['role' => 'user', 'content' => $prompt]], 'max_tokens' => $maxTokens, 'n' => $n, 'user' => self::TEST_USER1]);
 
@@ -613,7 +614,7 @@ class OpenAiControllerTest extends TestCase {
 	public function testExceedingTextQuota() {
 		$this->openAiSettingsService->setServiceUrl('');
 		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
-		
+
 		$prompt = 'This is a test prompt';
 		$n = 1;
 		$maxTokens = 42;
@@ -627,11 +628,11 @@ class OpenAiControllerTest extends TestCase {
 		$this->openAiSettingsService->setQuotas($quotas);
 
 		$this->testCreateCompletionWithOpenAi(false);
-		
+
 		// Before we disable the user specific api key, we should be able to exceed the quota
 		$result = $this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
 		$this->assertFalse($result);
-		
+
 		// Disable the private api key for the user:
 		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, '');
 
@@ -658,7 +659,7 @@ class OpenAiControllerTest extends TestCase {
 		$this->openAiSettingsService->setQuotas($quotas);
 
 		$this->testTranscribe(false);
-		
+
 		// Before we disable the user specific api key, we should be able to exceed the quota
 		$result = $this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TRANSCRIPTION);
 		$this->assertFalse($result);
@@ -706,7 +707,5 @@ class OpenAiControllerTest extends TestCase {
 		$response = $this->openAiApiController->createImage('This is a test prompt', 1, Application::DEFAULT_IMAGE_SIZE);
 		$this->assertEquals(429, $response->getStatus());
 		$this->assertArrayHasKey('error', $response->getData());
-		
 	}
-
 }
