@@ -10,10 +10,6 @@
 namespace OCA\OpenAi\AppInfo;
 
 use OCA\OpenAi\Capabilities;
-use OCA\OpenAi\Listener\OpenAiReferenceListener;
-use OCA\OpenAi\Reference\ChatGptReferenceProvider;
-use OCA\OpenAi\Reference\ImageReferenceProvider;
-use OCA\OpenAi\Reference\WhisperReferenceProvider;
 use OCA\OpenAi\SpeechToText\STTProvider;
 use OCA\OpenAi\TextProcessing\FreePromptProvider;
 use OCA\OpenAi\TextProcessing\HeadlineProvider;
@@ -26,7 +22,6 @@ use OCP\AppFramework\Bootstrap\IBootContext;
 
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\Collaboration\Reference\RenderReferenceEvent;
 use OCP\IConfig;
 
 class Application extends App implements IBootstrap {
@@ -74,18 +69,11 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function register(IRegistrationContext $context): void {
-		$context->registerEventListener(RenderReferenceEvent::class, OpenAiReferenceListener::class);
-		if ($this->config->getAppValue(Application::APP_ID, 'text_completion_picker_enabled', '1') === '1') {
-			$context->registerReferenceProvider(ChatGptReferenceProvider::class);
-		}
-		if ($this->config->getAppValue(Application::APP_ID, 'image_picker_enabled', '1') === '1') {
-			$context->registerReferenceProvider(ImageReferenceProvider::class);
-		}
-		if ($this->config->getAppValue(Application::APP_ID, 'whisper_picker_enabled', '1') === '1') {
-			$context->registerReferenceProvider(WhisperReferenceProvider::class);
-		}
 		if ($this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
 			$context->registerTranslationProvider(TranslationProvider::class);
+		}
+		if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
+			$context->registerSpeechToTextProvider(STTProvider::class);
 		}
 
 		$context->registerTextProcessingProvider(FreePromptProvider::class);
@@ -94,11 +82,6 @@ class Application extends App implements IBootstrap {
 		$context->registerTextProcessingProvider(ReformulateProvider::class);
 		$context->registerTextToImageProvider(TextToImageProvider::class);
 
-		if (version_compare($this->config->getSystemValueString('version', '0.0.0'), '27.0.0', '>=')) {
-			if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
-				$context->registerSpeechToTextProvider(STTProvider::class);
-			}
-		}
 		$context->registerCapability(Capabilities::class);
 	}
 

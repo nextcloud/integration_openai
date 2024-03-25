@@ -42,9 +42,9 @@ class FreePromptProvider implements IProviderWithExpectedRuntime, IProviderWithU
 		// Max tokens are limited later to max tokens specified in the admin settings so here we just request PHP_INT_MAX
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX, false);
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, PHP_INT_MAX);
 			}
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());

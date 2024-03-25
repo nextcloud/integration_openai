@@ -6,11 +6,10 @@ namespace OCA\OpenAi\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
-use OCP\DB\Types;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
-class Version010005Date20230419172934 extends SimpleMigrationStep {
+class Version020000Date20240325142435 extends SimpleMigrationStep {
 	/**
 	 * @param IOutput $output
 	 * @param Closure $schemaClosure The `\Closure` returns a `ISchemaWrapper`
@@ -28,32 +27,30 @@ class Version010005Date20230419172934 extends SimpleMigrationStep {
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
+		$schemaChanged = false;
 
-		if (!$schema->hasTable('openai_prompts')) {
-			$table = $schema->createTable('openai_prompts');
-			$table->addColumn('id', Types::BIGINT, [
-				'autoincrement' => true,
-				'notnull' => true,
-			]);
-			$table->addColumn('user_id', Types::STRING, [
-				'notnull' => true,
-				'length' => 64,
-			]);
-			$table->addColumn('type', Types::INTEGER, [
-				'notnull' => true,
-			]);
-			$table->addColumn('value', Types::STRING, [
-				'notnull' => true,
-				'length' => 1000,
-			]);
-			$table->addColumn('timestamp', Types::INTEGER, [
-				'notnull' => true,
-			]);
-			$table->setPrimaryKey(['id']);
-			$table->addIndex(['user_id'], 'openai_prompt_userid');
+		if ($schema->hasTable('openai_prompts')) {
+			$table = $schema->getTable('openai_prompts');
+			$table->dropIndex('openai_prompt_userid');
+			$schema->dropTable('openai_prompts');
+			$schemaChanged = true;
 		}
 
-		return $schema;
+		if ($schema->hasTable('openai_i_gen')) {
+			$table = $schema->getTable('openai_i_gen');
+			$table->dropIndex('openai_i_gen_hash');
+			$schema->dropTable('openai_i_gen');
+			$schemaChanged = true;
+		}
+
+		if ($schema->hasTable('openai_i_url')) {
+			$table = $schema->getTable('openai_i_url');
+			$table->dropIndex('openai_i_url_gen_id');
+			$schema->dropTable('openai_i_url');
+			$schemaChanged = true;
+		}
+
+		return $schemaChanged ? $schema : null;
 	}
 
 	/**

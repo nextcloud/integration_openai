@@ -6,12 +6,10 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
-use OCP\IConfig;
 use OCP\Settings\ISettings;
 
 class Personal implements ISettings {
 	public function __construct(
-		private IConfig $config,
 		private IInitialState $initialStateService,
 		private OpenAiSettingsService $openAiSettingsService,
 		private ?string $userId
@@ -25,8 +23,8 @@ class Personal implements ISettings {
 		if ($this->userId === null) {
 			return new TemplateResponse(Application::APP_ID, 'personalSettings');
 		}
-		$state = $this->openAiSettingsService->getUserConfig($this->userId);
-		$this->initialStateService->provideInitialState('config', $state);
+		$userConfig = $this->openAiSettingsService->getUserConfig($this->userId);
+		$this->initialStateService->provideInitialState('config', $userConfig);
 		return new TemplateResponse(Application::APP_ID, 'personalSettings');
 	}
 

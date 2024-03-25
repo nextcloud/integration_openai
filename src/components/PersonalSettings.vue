@@ -71,20 +71,6 @@
 						@focus="readonly = false">
 				</div>
 			</div>
-			<div class="line">
-				<label for="clear-prompt-history">
-					<DeleteIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'Clear prompt history') }}
-				</label>
-				<button id="clear-text-prompt-history"
-					@click="clearPromptHistory(true, false)">
-					{{ t('integration_openai', 'Clear text prompts') }}
-				</button>
-				<button id="clear-image-prompt-history"
-					@click="clearPromptHistory(false, true)">
-					{{ t('integration_openai', 'Clear image prompts') }}
-				</button>
-			</div>
 			<div v-if="quotaInfo !== null" class="line">
 				<!-- Show quota info -->
 				<label>
@@ -127,7 +113,6 @@
 <script>
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
-import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
@@ -144,7 +129,6 @@ export default {
 		OpenAiIcon,
 		KeyIcon,
 		InformationOutlineIcon,
-		DeleteIcon,
 	},
 
 	props: [],
@@ -223,24 +207,6 @@ export default {
 					)
 				})
 		},
-		clearPromptHistory(clearText, clearImages) {
-			const params = {
-				clearTextPrompts: clearText,
-				clearImagePrompts: clearImages,
-			}
-			const url = generateUrl('/apps/integration_openai/clear-prompt-history')
-			return axios.post(url, params)
-				.then((response) => {
-					showSuccess(t('integration_openai', 'Prompt history cleared'))
-				})
-				.catch((error) => {
-					showError(
-						t('integration_openai', 'Failed to clear prompt history')
-						+ ': ' + error.response?.request?.responseText,
-					)
-				})
-		},
-
 	},
 }
 </script>

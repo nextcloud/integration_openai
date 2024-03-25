@@ -36,9 +36,6 @@ class OpenAiSettingsService {
 		'max_tokens' => 'integer',
 		'quota_period' => 'integer',
 		'quotas' => 'array',
-		'whisper_picker_enabled' => 'boolean',
-		'image_picker_enabled' => 'boolean',
-		'text_completion_picker_enabled' => 'boolean',
 		'translation_provider_enabled' => 'boolean',
 		'stt_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
@@ -100,14 +97,6 @@ class OpenAiSettingsService {
 	 */
 	public function getRequestTimeout(): int {
 		return intval($this->config->getAppValue(Application::APP_ID, 'request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT))) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
-	}
-
-	/**
-	 * @param string $userId
-	 * @return string
-	 */
-	public function getLastImageSize(string $userId): string {
-		return $this->config->getUserValue($userId, Application::APP_ID, 'last_image_size', Application::DEFAULT_IMAGE_SIZE) ?: Application::DEFAULT_IMAGE_SIZE;
 	}
 
 	/**
@@ -210,9 +199,6 @@ class OpenAiSettingsService {
 			// Updated to get quota period
 			'quotas' => $this->getQuotas(),
 			// Get quotas from the config value and return it
-			'whisper_picker_enabled' => $this->getWhisperPickerEnabled(),
-			'image_picker_enabled' => $this->getImagePickerEnabled(),
-			'text_completion_picker_enabled' => $this->getTextCompletionPickerEnabled(),
 			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
@@ -238,24 +224,6 @@ class OpenAiSettingsService {
 		];
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function getWhisperPickerEnabled(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'whisper_picker_enabled', '1') === '1';
-	}
-	/**
-	 * @return bool
-	 */
-	public function getImagePickerEnabled(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'image_picker_enabled', '1') === '1';
-	}
-	/**
-	 * @return bool
-	 */
-	public function getTextCompletionPickerEnabled(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'text_completion_picker_enabled', '1') === '1';
-	}
 	/**
 	 * @return bool
 	 */
@@ -467,15 +435,6 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['quotas'])) {
 			$this->setQuotas($adminConfig['quotas']);
 		}
-		if (isset($adminConfig['whisper_picker_enabled'])) {
-			$this->setWhisperPickerEnabled($adminConfig['whisper_picker_enabled']);
-		}
-		if (isset($adminConfig['image_picker_enabled'])) {
-			$this->setImagePickerEnabled($adminConfig['image_picker_enabled']);
-		}
-		if (isset($adminConfig['text_completion_picker_enabled'])) {
-			$this->setTextCompletionPickerEnabled($adminConfig['text_completion_picker_enabled']);
-		}
 		if (isset($adminConfig['translation_provider_enabled'])) {
 			$this->setTranslationProviderEnabled($adminConfig['translation_provider_enabled']);
 		}
@@ -528,27 +487,6 @@ class OpenAiSettingsService {
 	 * @param bool $enabled
 	 * @return void
 	 */
-	public function setWhisperPickerEnabled(bool $enabled): void {
-		$this->config->setAppValue(Application::APP_ID, 'whisper_picker_enabled', $enabled ? '1' : '0');
-	}
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setImagePickerEnabled(bool $enabled): void {
-		$this->config->setAppValue(Application::APP_ID, 'image_picker_enabled', $enabled ? '1' : '0');
-	}
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setTextCompletionPickerEnabled(bool $enabled): void {
-		$this->config->setAppValue(Application::APP_ID, 'text_completion_picker_enabled', $enabled ? '1' : '0');
-	}
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
 	public function setTranslationProviderEnabled(bool $enabled): void {
 		$this->config->setAppValue(Application::APP_ID, 'translation_provider_enabled', $enabled ? '1' : '0');
 	}
@@ -558,15 +496,6 @@ class OpenAiSettingsService {
 	 */
 	public function setSttProviderEnabled(bool $enabled): void {
 		$this->config->setAppValue(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param string $userId
-	 * @param string $imageSize
-	 * @return void
-	 */
-	public function setLastImageSize(string $userId, string $imageSize): void {
-		$this->config->setUserValue($userId, Application::APP_ID, 'last_image_size', $imageSize);
 	}
 
 	/**

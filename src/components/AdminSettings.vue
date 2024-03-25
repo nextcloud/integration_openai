@@ -248,21 +248,6 @@
 					{{ t('integration_openai', 'Select enabled features') }}
 				</h2>
 				<NcCheckboxRadioSwitch
-					:checked="state.whisper_picker_enabled"
-					@update:checked="onCheckboxChanged($event, 'whisper_picker_enabled')">
-					{{ t('integration_openai', 'Whisper transcription/translation with the Smart Picker') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:checked="state.image_picker_enabled"
-					@update:checked="onCheckboxChanged($event, 'image_picker_enabled')">
-					{{ t('integration_openai', 'Image generation with the Smart Picker') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:checked="state.text_completion_picker_enabled"
-					@update:checked="onCheckboxChanged($event, 'text_completion_picker_enabled')">
-					{{ t('integration_openai', 'Text generation with the Smart Picker') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
 					:checked="state.translation_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'translation_provider_enabled')">
 					{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
