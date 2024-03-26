@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation" : "Testuen sorpena",
+    "Image generation" : "Irudien sorpena",
+    "Audio transcription" : "Audioen transkripzioa",
     "Unknown" : "Ezezaguna",
     "seconds" : "duela segundu batzuk",
     "Image not found" : "Ez da irudia aurkitu",
@@ -21,13 +24,16 @@ OC.L10N.register(
     "Advanced options" : "Ezarpen aurreratuak",
     "Send" : "Bidali",
     "Regenerate" : "Berriro sortu",
+    "Prompt" : "Galdera",
     "Result" : "Emaitza",
+    "Result {index}" : "Emaitza {index}",
     "AI image generation" : "IA irudi sorpena",
     "Size of the generated images" : "Sortutako irudien tamaina",
     "Unknown error" : "Errore ezezaguna",
     "AI speech-to-text" : "IA ahotsetik testura",
     "Transcribe" : "Transkribatu",
     "Translate (only to English)" : "Itzuli (ingelesera soilik)",
-    "Translate" : "Itzuli"
+    "Translate" : "Itzuli",
+    "Unknown API error" : "API errore ezezaguna"
 },
 "nplurals=2; plural=(n != 1);");

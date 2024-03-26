@@ -107,6 +107,7 @@ OC.L10N.register(
     "Prompt history cleared" : "Soru geçmişi temizlendi",
     "Failed to clear prompt history" : "Soru geçmişi temizlenemedi",
     "ChatGPT-like text generation" : "ChatGPT benzeri metin oluşturma",
+    "Enter a prompt" : "Bir soru yazın",
     "Preview" : "Ön izleme",
     "Preview content" : "İçerik ön izlemesi",
     "Show/hide advanced options" : "Gelişmiş ayarları görüntüle/gizle",
