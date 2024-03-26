@@ -1,12 +1,11 @@
 # OpenAI integration in Nextcloud
 
-This app includes 3 custom smart pickers for Nextcloud:
-* ChatGPT-like answers
-* Image generation (with DALL·E 2 or LocalAI)
-* Whisper dictation
+:warning: The smart pickers have been removed from this app
+as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
 
-It also implements
+This app implements:
 
+* Text generation providers: Free prompt, Summarize, Headline and Reformulate (using any available language model)
 * A Translation provider (using any available language model)
 * A SpeechToText provider (using Whisper)
 
@@ -79,4 +78,10 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 
 ### Admin settings
 
-There is a "Connected accounts" **admin** settings section to set your OpenAI API key.
+There is a "Connected accounts" **admin** settings section to set a global OpenAI API key or LocalAI credentials for the Nextcloud instance.
+It is also possible to configure default models and quota settings.
+
+### Personal settings
+
+There is a "Connected accounts" **personal** settings section to let users set their personal OpenAI API key or LocalAI credentials.
+Users can also see their quota information there.

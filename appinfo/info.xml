@@ -4,13 +4,12 @@
 	<name>OpenAI and LocalAI integration</name>
 	<summary>Integration of OpenAI and LocalAI services</summary>
 	<description><![CDATA[
-This app includes 3 custom smart pickers for Nextcloud:
-* ChatGPT-like answers
-* Image generation (with DALL·E 2 or LocalAI)
-* Whisper dictation
+⚠️ The smart pickers have been removed from this app
+as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
 
-It also implements
+This app implements:
 
+* Text generation providers: Free prompt, Summarize, Headline and Reformulate (using any available language model)
 * A Translation provider (using any available language model)
 * A SpeechToText provider (using Whisper)
 
@@ -78,7 +77,7 @@ Negative:
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
 ]]>	</description>
-	<version>1.2.1</version>
+	<version>2.0.0</version>
 	<licence>agpl</licence>
 	<author>Julien Veyssier</author>
 	<namespace>OpenAi</namespace>
@@ -96,12 +95,8 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 		<nextcloud min-version="28" max-version="29"/>
 	</dependencies>
 	<background-jobs>
-		<job>OCA\OpenAi\Cron\CleanupImageGenerations</job>
 		<job>OCA\OpenAi\Cron\CleanupQuotaDb</job>
 	</background-jobs>
-	<commands>
-		<command>OCA\OpenAi\Command\CleanupImageGenerations</command>
-	</commands>
 	<settings>
 		<admin>OCA\OpenAi\Settings\Admin</admin>
 		<admin-section>OCA\OpenAi\Settings\AdminSection</admin-section>

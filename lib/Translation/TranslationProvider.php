@@ -90,14 +90,14 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 100);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 100, false);
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 100);
 			}
 		} catch (Exception $e) {
 			throw new RuntimeException('Failed to detect language for input', 0, $e);
 		}
-		
+
 		if (count($completion) > 0) {
 			return array_pop($completion);
 		}
@@ -134,17 +134,17 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $text;
 			}
 			$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-			
+
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, 4000);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 4000, false);
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 4000);
 			}
-						
+
 			if (count($completion) > 0) {
 				return array_pop($completion);
 			}
-	
+
 		} catch (Exception $e) {
 			throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage}", 0, $e);
 		}

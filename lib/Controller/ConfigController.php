@@ -18,7 +18,6 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 
 use OCP\AppFramework\Http\DataResponse;
-use OCP\IConfig;
 use OCP\IRequest;
 use OCP\PreConditionNotMetException;
 
@@ -26,7 +25,6 @@ class ConfigController extends Controller {
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		private IConfig $config,
 		private OpenAiSettingsService $openAiSettingsService,
 		private ?string $userId
 	) {
@@ -64,13 +62,5 @@ class ConfigController extends Controller {
 		}
 
 		return new DataResponse(1);
-	}
-
-	/**
-	 * @return DataResponse
-	 */
-	public function getLastImageSize(): DataResponse {
-		$size = $this->openAiSettingsService->getLastImageSize($this->userId);
-		return new DataResponse($size);
 	}
 }

@@ -11,14 +11,10 @@
 
 namespace OCA\OpenAi\Service;
 
-use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Db\ImageGenerationMapper;
-use OCA\OpenAi\Db\ImageUrlMapper;
-use OCA\OpenAi\Db\PromptMapper;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
@@ -37,7 +33,7 @@ use RuntimeException;
 use Throwable;
 
 /**
- * Service to make requests to OpenAI REST API
+ * Service to make requests to OpenAI/LocalAI REST API
  */
 class OpenAiAPIService {
 	private IClient $client;
@@ -46,9 +42,6 @@ class OpenAiAPIService {
 		private LoggerInterface $logger,
 		private IL10N $l10n,
 		private IConfig $config,
-		private ImageGenerationMapper $imageGenerationMapper,
-		private ImageUrlMapper $imageUrlMapper,
-		private PromptMapper $promptMapper,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
 		IClientService $clientService
@@ -80,36 +73,6 @@ class OpenAiAPIService {
 
 	/**
 	 * @param string $userId
-	 * @param int $type
-	 * @return array
-	 * @throws Exception
-	 */
-	public function getPromptHistory(string $userId, int $type): array {
-		try {
-			return $this->promptMapper->getPromptsOfUser($userId, $type);
-		} catch (DBException $e) {
-			$this->logger->warning('Could not retrieve prompt history for user: ' . $userId . ' and prompt type: ' . $type . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Unknown error while retrieving prompt history.'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	/**
-	 * Clear prompt history for a prompt type
-	 * @param string $userId
-	 * @param int $type
-	 * @throws Exception
-	 */
-	public function clearPromptHistory(string $userId, int $type): void {
-		try {
-			$this->promptMapper->deleteUserPromptsByType($userId, $type);
-		} catch (DBException $e) {
-			$this->logger->warning('Could not clear prompt history for user: ' . $userId . ' and prompt type: ' . $type . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Unknown error while clearing prompt history.'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	/**
-	 * @param string $userId
 	 */
 	private function hasOwnOpenAiApiKey(string $userId): bool {
 		if (!$this->isUsingOpenAi()) {
@@ -123,9 +86,9 @@ class OpenAiAPIService {
 		return false;
 	}
 
-
 	/**
 	 * Check whether quota is exceeded for a user
+	 *
 	 * @param string|null $userId
 	 * @param int $type
 	 * @return bool
@@ -168,6 +131,7 @@ class OpenAiAPIService {
 
 	/**
 	 * Translate the quota type
+	 *
 	 * @param int $type
 	 */
 	public function translatedQuotaType(int $type): string {
@@ -185,6 +149,7 @@ class OpenAiAPIService {
 
 	/**
 	 * Get translated unit of quota type
+	 *
 	 * @param int $type
 	 */
 	public function translatedQuotaUnit(int $type): string {
@@ -260,7 +225,6 @@ class OpenAiAPIService {
 	 * @param int $n
 	 * @param string $model
 	 * @param int $maxTokens
-	 * @param bool $storePrompt
 	 * @return array|string[]
 	 * @throws Exception
 	 */
@@ -270,7 +234,6 @@ class OpenAiAPIService {
 		int $n,
 		string $model,
 		int $maxTokens = 1000,
-		bool $storePrompt = true
 	): array {
 
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
@@ -305,14 +268,6 @@ class OpenAiAPIService {
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
-
-			if ($userId !== null && $storePrompt) {
-				try {
-					$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
-				} catch (DBException $e) {
-					$this->logger->warning('Could not store prompt for user: ' . $userId . ' and prompt: ' . $prompt . '. Error: ' . $e->getMessage());
-				}
-			}
 		}
 		$completions = [];
 
@@ -331,7 +286,6 @@ class OpenAiAPIService {
 	 * @param int $n
 	 * @param string $model
 	 * @param int $maxTokens
-	 * @param bool $storePrompt
 	 * @return string[]
 	 * @throws Exception
 	 */
@@ -341,7 +295,6 @@ class OpenAiAPIService {
 		int $n,
 		string $model,
 		int $maxTokens = 1000,
-		bool $storePrompt = true
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -376,16 +329,6 @@ class OpenAiAPIService {
 				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			}
-
-
-			if ($userId !== null && $storePrompt) {
-				try {
-					$this->promptMapper->createPrompt(Application::PROMPT_TYPE_TEXT, $userId, $prompt);
-				} catch (DBException $e) {
-					$this->logger->warning('Could not store prompt for user: ' . $userId . ' and prompt: ' . $prompt . '. Error: ' . $e->getMessage());
-				}
-
 			}
 		}
 		$completions = [];
@@ -530,101 +473,6 @@ class OpenAiAPIService {
 			}
 		}
 		return $apiResponse;
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param string $prompt
-	 * @param int $n
-	 * @param string $size
-	 * @return array|string[]
-	 * @throws Exception
-	 */
-	public function createImage(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
-		if ($userId !== null) {
-			$this->openAiSettingsService->setLastImageSize($userId, $size);
-		}
-
-		$apiResponse = $this->requestImageCreation($userId, $prompt, $n, $size);
-
-		try {
-			$this->promptMapper->createPrompt(Application::PROMPT_TYPE_IMAGE, $userId, $prompt);
-		} catch (DBException $e) {
-			$this->logger->warning('Could not store prompt for user: ' . $userId . ' and prompt: ' . $prompt . '. Error: ' . $e->getMessage());
-		}
-
-		$urls = array_map(static function (array $result) {
-			return $result['url'] ?? null;
-		}, $apiResponse['data']);
-		$urls = array_filter($urls, static function (?string $url) {
-			return $url !== null;
-		});
-		$urls = array_values($urls);
-		if (!empty($urls)) {
-			$hash = md5(implode('|', $urls));
-			$ts = (new DateTime())->getTimestamp();
-			try {
-				$this->imageGenerationMapper->createImageGeneration($hash, $prompt, $ts, $urls);
-			} catch (DBException $e) {
-				$this->logger->warning('Could not create image generation for hash: ' . $hash . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-				throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-			}
-
-			return ['hash' => $hash];
-		}
-
-		return $apiResponse;
-	}
-
-	/**
-	 * @param string $hash
-	 * @return array|string[]
-	 * @throws Exception
-	 */
-	public function getGenerationInfo(string $hash): array {
-		try {
-			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
-			$imageUrls = $this->imageUrlMapper->getImageUrlsOfGeneration($imageGeneration->getId());
-			$this->imageGenerationMapper->touchImageGeneration($imageGeneration->getId());
-			return [
-				'hash' => $hash,
-				'prompt' => $imageGeneration->getPrompt(),
-				'urls' => $imageUrls,
-			];
-		} catch (DoesNotExistException $e) {
-			$this->logger->debug('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Image generation not found'), Http::STATUS_NOT_FOUND);
-		} catch (Exception | DBException | MultipleObjectsReturnedException $e) {
-			$this->logger->error('Image generation info request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Unknown image generation request error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param string $hash
-	 * @param int $urlId
-	 * @return array|null
-	 * @throws Exception
-	 */
-	public function getGenerationImage(?string $userId, string $hash, int $urlId): ?array {
-		try {
-			$imageGeneration = $this->imageGenerationMapper->getImageGenerationFromHash($hash);
-			$imageUrl = $this->imageUrlMapper->getImageUrlOfGeneration($imageGeneration->getId(), $urlId);
-
-			$requestOptions = $this->getImageRequestOptions($userId);
-			$imageResponse = $this->client->get($imageUrl->getUrl(), $requestOptions);
-			return [
-				'body' => $imageResponse->getBody(),
-				'headers' => $imageResponse->getHeaders(),
-			];
-		} catch (DoesNotExistException $e) {
-			$this->logger->debug('Image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Image not found'), Http::STATUS_NOT_FOUND);
-		} catch (Exception | DBException | MultipleObjectsReturnedException $e) {
-			$this->logger->debug('Image request error : ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Unknown image request error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
 	}
 
 	/**

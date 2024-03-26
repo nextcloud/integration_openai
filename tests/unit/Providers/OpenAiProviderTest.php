@@ -9,12 +9,9 @@
  * actual openAI/LocalAI api calls, but rather mocks them.
  */
 
-namespace OCA\OpenAi\Tests\Unit\Translation;
+namespace OCA\OpenAi\Tests\Unit\Provider;
 
 use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Db\ImageGenerationMapper;
-use OCA\OpenAi\Db\ImageUrlMapper;
-use OCA\OpenAi\Db\PromptMapper;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -23,8 +20,10 @@ use OCA\OpenAi\TextProcessing\HeadlineProvider;
 use OCA\OpenAi\TextProcessing\ReformulateProvider;
 use OCA\OpenAi\TextProcessing\SummaryProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
+use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IConfig;
+use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
 
 /**
@@ -36,10 +35,13 @@ class OpenAiProviderTest extends TestCase {
 	public const OPENAI_API_BASE = 'https://api.openai.com/v1/';
 	public const AUTHORIZATION_HEADER = 'Bearer This is a PHPUnit test API key';
 
-	private $openAiApiService;
-	private $openAiSettingsService;
+	private OpenAiAPIService $openAiApiService;
+	private OpenAiSettingsService $openAiSettingsService;
+	/**
+	 * @var MockObject|IClient
+	 */
 	private $iClient;
-	private $quotaUsageMapper;
+	private QuotaUsageMapper $quotaUsageMapper;
 
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
@@ -59,16 +61,13 @@ class OpenAiProviderTest extends TestCase {
 
 		// We'll hijack the client service and subsequently iClient to return a mock response from the OpenAI API
 		$clientService = $this->createMock(IClientService::class);
-		$this->iClient = $this->createMock(\OCP\Http\Client\IClient::class);
+		$this->iClient = $this->createMock(IClient::class);
 		$clientService->method('newClient')->willReturn($this->iClient);
 
 		$this->openAiApiService = new OpenAiAPIService(
 			\OC::$server->get(\Psr\Log\LoggerInterface::class),
 			$this->createMock(\OCP\IL10N::class),
 			\OC::$server->get(IConfig::class),
-			\OC::$server->get(ImageGenerationMapper::class),
-			\OC::$server->get(ImageUrlMapper::class),
-			\OC::$server->get(PromptMapper::class),
 			\OC::$server->get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$clientService,
@@ -78,13 +77,6 @@ class OpenAiProviderTest extends TestCase {
 	}
 
 	public static function tearDownAfterClass(): void {
-		$promptMapper = \OC::$server->get(PromptMapper::class);
-		try {
-			$promptMapper->deleteUserPrompts(self::TEST_USER1);
-		} catch (\OCP\Db\Exception | \Exception | \Throwable $e) {
-			// Ignore
-		}
-
 		// Delete quota usage for test user
 		$quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
 		try {
