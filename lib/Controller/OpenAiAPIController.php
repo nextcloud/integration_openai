@@ -159,7 +159,7 @@ class OpenAiAPIController extends Controller {
 	#[NoCSRFRequired]
 	public function getImageGenerationContent(string $hash, int $urlId): DataDisplayResponse {
 		try {
-			$image = $this->openAiAPIService->getGenerationImage($hash, $urlId);
+			$image = $this->openAiAPIService->getGenerationImage($this->userId, $hash, $urlId);
 		} catch (Exception $e) {
 			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataDisplayResponse('', $code);
@@ -232,7 +232,7 @@ class OpenAiAPIController extends Controller {
 			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
-		
+
 		return new DataResponse($info);
 	}
 
