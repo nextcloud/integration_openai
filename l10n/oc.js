@@ -7,11 +7,6 @@ OC.L10N.register(
     "Connected accounts" : "Comptes connectats",
     "Authentication" : "Autentificacion",
     "Username" : "Nom d'utilizaire",
-    "Password" : "Senhal",
-    "Preview" : "Apercebut",
-    "Advanced options" : "Opcions avançadas",
-    "Send" : "Enviar",
-    "Unknown error" : "Error desconeguda",
-    "Translate" : "Tradurre"
+    "Password" : "Senhal"
 },
 "nplurals=2; plural=(n > 1);");

@@ -2,7 +2,6 @@
     "Image generation" : "Generovanie obrázka",
     "Unknown" : "Neznámy",
     "seconds" : "sekúnd",
-    "Image not found" : "Obrázok nenájdený",
     "Bad HTTP method" : "Zlá metóda HTTP",
     "Bad credentials" : "Nesprávne prihlasovacie údaje",
     "Connected accounts" : "Prepojené účty",
@@ -11,13 +10,6 @@
     "Authentication method" : "Autentifikačná metóda",
     "API key" : "API kľúč",
     "Username" : "Užívateľské meno",
-    "Password" : "Heslo",
-    "Preview" : "Náhľad",
-    "Advanced options" : "Pokročilé možnosti",
-    "Send" : "Odoslať",
-    "Result" : "Výsledok",
-    "Unknown error" : "Neznáma chyba",
-    "Translate" : "Preložiť",
-    "Unknown API error" : "Neznáma chyba API"
+    "Password" : "Heslo"
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);"
 }

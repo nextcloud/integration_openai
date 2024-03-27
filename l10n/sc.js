@@ -4,7 +4,6 @@ OC.L10N.register(
     "Image generation" : "Generatzione de immàgines",
     "Unknown" : "Disconnotu",
     "seconds" : "segundos",
-    "Image not found" : "Immàgine no agatada",
     "Bad HTTP method" : "Mètodu HTTP no bàlidu",
     "Bad credentials" : "Credentziales non bàlidas",
     "Connected accounts" : "Contos connètidos",
@@ -13,10 +12,6 @@ OC.L10N.register(
     "Authentication method" : "Mètodu de autenticatzione",
     "API key" : "Crae API",
     "Username" : "Nùmene utente",
-    "Password" : "Crae",
-    "Advanced options" : "Sèberos avantzados",
-    "Result" : "Resurtadu",
-    "Unknown error" : "Errore disconnotu",
-    "Translate" : "Borta"
+    "Password" : "Crae"
 },
 "nplurals=2; plural=(n != 1);");

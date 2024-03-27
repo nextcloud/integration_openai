@@ -11,11 +11,6 @@ OC.L10N.register(
     "Authentication method" : "Metode otentikasi",
     "API key" : "Kunci API",
     "Username" : "Username",
-    "Password" : "Kata sandi",
-    "Preview" : "Pratinjau",
-    "Advanced options" : "Opsi lanjutan",
-    "Send" : "Kirim",
-    "Unknown error" : "Kesalahan tidak diketahui",
-    "Translate" : "Terjemahkan"
+    "Password" : "Kata sandi"
 },
 "nplurals=1; plural=0;");

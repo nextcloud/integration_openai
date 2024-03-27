@@ -6,11 +6,6 @@ OC.L10N.register(
     "Authentication" : "Autentimine",
     "Authentication method" : "Autentimise meetod",
     "API key" : "API võti",
-    "Username" : "Kasutajanimi",
-    "Preview" : "Eelvaade",
-    "Advanced options" : "Täpsemad valikud",
-    "Send" : "Saada",
-    "Unknown error" : "Tundmatu viga",
-    "Translate" : "Tõlgi"
+    "Username" : "Kasutajanimi"
 },
 "nplurals=2; plural=(n != 1);");

@@ -5,11 +5,6 @@
     "Connected accounts" : "Comptes connectats",
     "Authentication" : "Autentificacion",
     "Username" : "Nom d'utilizaire",
-    "Password" : "Senhal",
-    "Preview" : "Apercebut",
-    "Advanced options" : "Opcions avançadas",
-    "Send" : "Enviar",
-    "Unknown error" : "Error desconeguda",
-    "Translate" : "Tradurre"
+    "Password" : "Senhal"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

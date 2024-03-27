@@ -4,11 +4,6 @@ OC.L10N.register(
     "Unknown" : "Үл танигдах зүйл",
     "seconds" : "секунд",
     "Username" : "Хэрэглэгчийн нэр",
-    "Password" : "нууц үг",
-    "Preview" : "шалгах",
-    "Advanced options" : "Бусад сонголтууд",
-    "Send" : "илгээх",
-    "Unknown error" : "үл мэдэгдэх алдаа",
-    "Translate" : "Орчуулга"
+    "Password" : "нууц үг"
 },
 "nplurals=2; plural=(n != 1);");

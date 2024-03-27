@@ -1,11 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown error while retrieving prompt history." : "Unbekannter Fehler beim Abrufen des Eingabeaufforderungsverlaufs.",
     "Image generation" : "Bilderstellung",
     "Unknown" : "Unbekannt",
     "seconds" : "Sekunden",
-    "Image not found" : "Bild nicht gefunden",
     "Bad HTTP method" : "Ungültige HTTP-Methode",
     "Bad credentials" : "Falsche Anmeldeinformationen",
     "Connected accounts" : "Verbundene Konten",
@@ -14,22 +12,6 @@ OC.L10N.register(
     "Authentication method" : "Authentifizierungsmethode",
     "API key" : "API-Schlüssel",
     "Username" : "Benutzername",
-    "Password" : "Passwort",
-    "Loading image" : "Lade Bild",
-    "Generated image" : "Erstelltes Bild",
-    "Direct image link" : "Direkter Bildlink",
-    "Preview" : "Vorschau",
-    "Show/hide advanced options" : "Erweiterte Optionen anzeigen/ausblenden",
-    "Advanced options" : "Erweiterte Optionen",
-    "Send" : "Senden",
-    "Regenerate" : "Neu erstellen",
-    "Result" : "Ergebnis",
-    "AI image generation" : "KI-Bilderstellung",
-    "Size of the generated images" : "Größe der erstellten Bilder",
-    "Unknown error" : "Unbekannter Fehler",
-    "AI speech-to-text" : "KI Sprache-zu-text",
-    "Transcribe" : "Transkribieren",
-    "Translate (only to English)" : "Übersetzen (nur ins Englische)",
-    "Translate" : "Übersetzen"
+    "Password" : "Passwort"
 },
 "nplurals=2; plural=(n != 1);");

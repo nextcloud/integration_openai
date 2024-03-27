@@ -3,7 +3,6 @@ OC.L10N.register(
     {
     "Unknown" : "Tuntematon",
     "seconds" : "sekuntia",
-    "Image not found" : "Kuvaa ei löytynyt",
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
     "Bad credentials" : "Virheelliset kirjautumistiedot",
     "Connected accounts" : "Yhdistetyt tilit",
@@ -14,17 +13,6 @@ OC.L10N.register(
     "API key" : "API-avain",
     "your API key" : "API-avaimesi",
     "Username" : "Käyttäjätunnus",
-    "Password" : "Salasana",
-    "Preview" : "Esikatselu",
-    "Preview content" : "Esikatsele sisältö",
-    "Show/hide advanced options" : "Näytä/piilota lisäasetukset",
-    "Advanced options" : "Lisävalinnat",
-    "Send" : "Lähetä",
-    "Model to use" : "Käytettävä malli",
-    "Choose a model" : "Valitse malli",
-    "Result" : "Tulos",
-    "Unknown error" : "Tuntematon virhe",
-    "Translate" : "Käännä",
-    "Unknown API error" : "Tuntematon API-virhe"
+    "Password" : "Salasana"
 },
 "nplurals=2; plural=(n != 1);");

@@ -2,7 +2,6 @@
     "Image generation" : "Generatzione de immàgines",
     "Unknown" : "Disconnotu",
     "seconds" : "segundos",
-    "Image not found" : "Immàgine no agatada",
     "Bad HTTP method" : "Mètodu HTTP no bàlidu",
     "Bad credentials" : "Credentziales non bàlidas",
     "Connected accounts" : "Contos connètidos",
@@ -11,10 +10,6 @@
     "Authentication method" : "Mètodu de autenticatzione",
     "API key" : "Crae API",
     "Username" : "Nùmene utente",
-    "Password" : "Crae",
-    "Advanced options" : "Sèberos avantzados",
-    "Result" : "Resurtadu",
-    "Unknown error" : "Errore disconnotu",
-    "Translate" : "Borta"
+    "Password" : "Crae"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

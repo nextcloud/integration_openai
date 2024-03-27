@@ -8,11 +8,6 @@ OC.L10N.register(
     "Authentication" : "Xác thực",
     "Authentication method" : "Phương thức xác thực",
     "Username" : "Tên đăng nhập",
-    "Password" : "Mật khẩu",
-    "Preview" : "Xem trước",
-    "Advanced options" : "Tùy chọn nâng cao",
-    "Send" : "Gửi",
-    "Unknown error" : "Lỗi không xác định",
-    "Translate" : "Dịch"
+    "Password" : "Mật khẩu"
 },
 "nplurals=1; plural=0;");

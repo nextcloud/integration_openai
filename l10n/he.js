@@ -11,12 +11,6 @@ OC.L10N.register(
     "Authentication method" : "שיטת אימות",
     "API key" : "מפתח API",
     "Username" : "שם משתמש",
-    "Password" : "ססמה",
-    "Preview" : "תצוגה מקדימה",
-    "Advanced options" : "אפשרויות מתקדמות",
-    "Send" : "שליחה",
-    "Result" : "תוצאה",
-    "Unknown error" : "שגיאה בלתי ידועה",
-    "Translate" : "תרגום"
+    "Password" : "ססמה"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

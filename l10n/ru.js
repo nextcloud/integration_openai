@@ -3,7 +3,6 @@ OC.L10N.register(
     {
     "Unknown" : "Неизвестно",
     "seconds" : "секунд",
-    "Image not found" : "Изображение не найдено",
     "Bad HTTP method" : "Неверный метод HTTP",
     "Bad credentials" : "Неверные учетные данные",
     "Connected accounts" : "Подключённые учётные записи",
@@ -13,16 +12,6 @@ OC.L10N.register(
     "API key" : "Ключ API",
     "Username" : "Имя пользователя",
     "Password" : "Пароль",
-    "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)",
-    "Preview" : "Предварительный просмотр",
-    "Show/hide advanced options" : "Показать/скрыть дополнительные настройки",
-    "Advanced options" : "Дополнительные параметры",
-    "Send" : "Отправить",
-    "Result" : "Результат",
-    "Unknown error" : "Неизвестная ошибка",
-    "Transcribe" : "Транскрибировать",
-    "Translate" : "Помочь с переводом",
-    "Failed to get transcription/translation" : "Не удалось получить транскрипцию/перевод",
-    "Unknown API error" : "Неизвестная ошибка API"
+    "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");
