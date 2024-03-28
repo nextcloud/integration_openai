@@ -1,0 +1,7 @@
+{ "translations": {
+    "Unknown" : "Ukjend",
+    "Connected accounts" : "Tilkopla kontoar",
+    "Authentication" : "Godkjenning",
+    "Username" : "Brukarnamn"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
