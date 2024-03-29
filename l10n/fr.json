@@ -43,7 +43,7 @@
     "API key (optional with LocalAI)" : "Clé d'API (optionnel avec LocalAI)",
     "your API key" : "votre clé d'API",
     "You can create an API key in your OpenAI account settings:" : "Vous pouvez créer une clé d'API dans vos paramètres de compte OpenAI :",
-    "Username" : "Nom d'utilisateur",
+    "Username" : "Nom d’utilisateur",
     "your Basic Auth user" : "votre utilisateur Authentification Basique",
     "Password" : "Mot de passe",
     "your Basic Auth password" : "votre mot de passe Authentification Basique",
