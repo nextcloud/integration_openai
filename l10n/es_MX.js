@@ -8,6 +8,7 @@ OC.L10N.register(
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
-    "Username" : "Usuario"
+    "Username" : "Usuario",
+    "Password" : "Contraseña"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
