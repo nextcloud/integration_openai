@@ -1,4 +1,5 @@
 { "translations": {
+    "Image generation" : "Kuvien generointi",
     "Unknown" : "Tuntematon",
     "seconds" : "sekuntia",
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
