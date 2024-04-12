@@ -85,6 +85,25 @@
 					</a>
 				</div>
 				<div class="line">
+					<label for="llm-extra-params">
+						{{ t('integration_openai', 'Extra completion model parameters (as a JSON object)') }}
+					</label>
+					<NcTextField
+						id="llm-extra-params"
+						class="input"
+						:value.sync="state.llm_extra_params"
+						:label-outside="true"
+						:show-trailing-button="!!state.llm_extra_params"
+						@update:value="onInput(false)"
+						@trailing-button-click="state.llm_extra_params = '' ; onInput(false)" />
+					<NcButton type="tertiary"
+						:title="llmExtraParamHint">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</div>
+				<div class="line">
 					<label for="openai-api-timeout">
 						<TimerAlertOutlineIcon :size="20" class="icon" />
 						{{ t('integration_openai', 'Request timeout (seconds)') }}
@@ -274,6 +293,7 @@ import OpenAiIcon from './icons/OpenAiIcon.vue'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
@@ -294,6 +314,7 @@ export default {
 		NcButton,
 		NcSelect,
 		NcCheckboxRadioSwitch,
+		NcTextField,
 	},
 
 	props: [],
@@ -307,6 +328,7 @@ export default {
 			selectedModel: null,
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
+			llmExtraParamHint: t('integration_openai', 'Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
 		}
 	},
 
@@ -402,6 +424,7 @@ export default {
 					chat_endpoint_enabled: this.state.chat_endpoint_enabled,
 					request_timeout: this.state.request_timeout,
 					max_tokens: this.state.max_tokens,
+					llm_extra_params: this.state.llm_extra_params,
 					quota_period: this.state.quota_period,
 					quotas: this.state.quotas,
 				}).then(() => {
@@ -466,12 +489,13 @@ export default {
 
 	.line {
 		> label {
-			width: 300px;
+			width: 350px;
 			display: flex;
 			align-items: center;
 		}
-		> input {
-			width: 300px;
+		> input, .input {
+			width: 350px;
+			margin-top: 0;
 		}
 		> input:invalid {
 			border-color: var(--color-error);

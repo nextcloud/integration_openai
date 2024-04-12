@@ -254,6 +254,12 @@ class OpenAiAPIService {
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
+
+		$modelExtraParams = $this->getExtraParams('llm_extra_params');
+		if ($modelExtraParams !== null) {
+			$params = array_merge($modelExtraParams, $params);
+		}
+
 		$response = $this->request($userId, 'completions', $params, 'POST');
 
 		if (!isset($response['choices'])) {
@@ -315,6 +321,11 @@ class OpenAiAPIService {
 			$params['user'] = $userId;
 		}
 
+		$modelExtraParams = $this->getExtraParams('llm_extra_params');
+		if ($modelExtraParams !== null) {
+			$params = array_merge($modelExtraParams, $params);
+		}
+
 		$response = $this->request($userId, 'chat/completions', $params, 'POST');
 
 		if (!isset($response['choices'])) {
@@ -338,6 +349,22 @@ class OpenAiAPIService {
 		}
 
 		return $completions;
+	}
+
+	/**
+	 * @param string $configKey
+	 * @return array|null
+	 */
+	private function getExtraParams(string $configKey): ?array {
+		$stringValue = $this->config->getAppValue(Application::APP_ID, $configKey);
+		if ($stringValue === '') {
+			return null;
+		}
+		$arrayValue = json_decode($stringValue, true);
+		if ($arrayValue === null) {
+			return null;
+		}
+		return $arrayValue;
 	}
 
 	/**

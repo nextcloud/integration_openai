@@ -34,6 +34,7 @@ class OpenAiSettingsService {
 		'api_key' => 'string',
 		'default_completion_model_id' => 'string',
 		'max_tokens' => 'integer',
+		'llm_extra_params' => 'string',
 		'quota_period' => 'integer',
 		'quotas' => 'array',
 		'translation_provider_enabled' => 'boolean',
@@ -104,6 +105,13 @@ class OpenAiSettingsService {
 	 */
 	public function getMaxTokens(): int {
 		return intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', strval(Application::DEFAULT_MAX_NUM_OF_TOKENS))) ?: Application::DEFAULT_MAX_NUM_OF_TOKENS;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLlmExtraParams(): string {
+		return $this->config->getAppValue(Application::APP_ID, 'llm_extra_params');
 	}
 
 	/**
@@ -194,6 +202,7 @@ class OpenAiSettingsService {
 			'api_key' => $this->getAdminApiKey(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
 			'max_tokens' => $this->getMaxTokens(),
+			'llm_extra_params' => $this->getLlmExtraParams(),
 			// Updated to get max tokens
 			'quota_period' => $this->getQuotaPeriod(),
 			// Updated to get quota period
@@ -343,6 +352,14 @@ class OpenAiSettingsService {
 		$this->config->setAppValue(Application::APP_ID, 'max_tokens', strval($maxTokens));
 	}
 
+	public function setLlmExtraParams(string $llmExtraParams): void {
+		$paramsArray = json_decode($llmExtraParams, true);
+		if ($paramsArray === null) {
+			throw new Exception('Invalid model extra parameters');
+		}
+		$this->config->setAppValue(Application::APP_ID, 'llm_extra_params', $llmExtraParams);
+	}
+
 	/**
 	 * Setter for quotaPeriod; minimum is 1 day
 	 * @param int $quotaPeriod
@@ -428,6 +445,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['max_tokens'])) {
 			$this->setMaxTokens($adminConfig['max_tokens']);
+		}
+		if (isset($adminConfig['llm_extra_params'])) {
+			$this->setLlmExtraParams($adminConfig['llm_extra_params']);
 		}
 		if (isset($adminConfig['quota_period'])) {
 			$this->setQuotaPeriod($adminConfig['quota_period']);
