@@ -86,7 +86,7 @@
 				</div>
 				<div class="line">
 					<label for="llm-extra-params">
-						{{ t('integration_openai', 'Extra completion model parameters') }}
+						{{ t('integration_openai', 'Extra completion model parameters (as a JSON object)') }}
 					</label>
 					<NcTextField
 						id="llm-extra-params"
@@ -489,12 +489,13 @@ export default {
 
 	.line {
 		> label {
-			width: 300px;
+			width: 350px;
 			display: flex;
 			align-items: center;
 		}
 		> input, .input {
-			width: 300px;
+			width: 350px;
+			margin-top: 0;
 		}
 		> input:invalid {
 			border-color: var(--color-error);

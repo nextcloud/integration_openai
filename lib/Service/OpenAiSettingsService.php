@@ -353,6 +353,10 @@ class OpenAiSettingsService {
 	}
 
 	public function setLlmExtraParams(string $llmExtraParams): void {
+		$paramsArray = json_decode($llmExtraParams, true);
+		if ($paramsArray === null) {
+			throw new Exception('Invalid model extra parameters');
+		}
 		$this->config->setAppValue(Application::APP_ID, 'llm_extra_params', $llmExtraParams);
 	}
 
