@@ -96,7 +96,6 @@ class OpenAiProviderTest extends TestCase {
 		$freePromptProvider = new FreePromptProvider(
 			$this->openAiApiService,
 			\OC::$server->get(IConfig::class),
-			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 			$this->openAiSettingsService);
 
@@ -151,7 +150,6 @@ class OpenAiProviderTest extends TestCase {
 		$headlineProvider = new HeadlineProvider(
 			$this->openAiApiService,
 			\OC::$server->get(IConfig::class),
-			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 			$this->openAiSettingsService);
 
@@ -206,7 +204,6 @@ class OpenAiProviderTest extends TestCase {
 		$reformulateProvider = new ReformulateProvider(
 			$this->openAiApiService,
 			\OC::$server->get(IConfig::class),
-			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 			$this->openAiSettingsService);
 
@@ -261,7 +258,6 @@ class OpenAiProviderTest extends TestCase {
 		$summaryProvider = new SummaryProvider(
 			$this->openAiApiService,
 			\OC::$server->get(IConfig::class),
-			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 			$this->openAiSettingsService);
 
