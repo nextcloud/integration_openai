@@ -39,6 +39,8 @@ class OpenAiSettingsService {
 		'quota_period' => 'integer',
 		'quotas' => 'array',
 		'translation_provider_enabled' => 'boolean',
+		'llm_provider_enabled' => 'boolean',
+		't2i_provider_enabled' => 'boolean',
 		'stt_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
@@ -218,6 +220,8 @@ class OpenAiSettingsService {
 			'quotas' => $this->getQuotas(),
 			// Get quotas from the config value and return it
 			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
+			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
+			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
@@ -248,6 +252,21 @@ class OpenAiSettingsService {
 	public function getTranslationProviderEnabled(): bool {
 		return $this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function getLlmProviderEnabled(): bool {
+		return $this->config->getAppValue(Application::APP_ID, 'llm_provider_enabled', '1') === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getT2iProviderEnabled(): bool {
+		return $this->config->getAppValue(Application::APP_ID, 't2i_provider_enabled', '1') === '1';
+	}
+
 	/**
 	 * @return bool
 	 */
@@ -480,6 +499,12 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['translation_provider_enabled'])) {
 			$this->setTranslationProviderEnabled($adminConfig['translation_provider_enabled']);
 		}
+		if (isset($adminConfig['llm_provider_enabled'])) {
+			$this->setLlmProviderEnabled($adminConfig['llm_provider_enabled']);
+		}
+		if (isset($adminConfig['t2i_provider_enabled'])) {
+			$this->setT2iProviderEnabled($adminConfig['t2i_provider_enabled']);
+		}
 		if (isset($adminConfig['stt_provider_enabled'])) {
 			$this->setSttProviderEnabled($adminConfig['stt_provider_enabled']);
 		}
@@ -532,6 +557,23 @@ class OpenAiSettingsService {
 	public function setTranslationProviderEnabled(bool $enabled): void {
 		$this->config->setAppValue(Application::APP_ID, 'translation_provider_enabled', $enabled ? '1' : '0');
 	}
+
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setLlmProviderEnabled(bool $enabled): void {
+		$this->config->setAppValue(Application::APP_ID, 'llm_provider_enabled', $enabled ? '1' : '0');
+	}
+
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setT2iProviderEnabled(bool $enabled): void {
+		$this->config->setAppValue(Application::APP_ID, 't2i_provider_enabled', $enabled ? '1' : '0');
+	}
+
 	/**
 	 * @param bool $enabled
 	 * @return void

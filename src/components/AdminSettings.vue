@@ -308,6 +308,16 @@
 					{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
+					:checked="state.llm_provider_enabled"
+					@update:checked="onCheckboxChanged($event, 'llm_provider_enabled', false)">
+					{{ t('integration_openai', 'Text processing provider (to generate text, summarize etc...)') }}
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch
+					:checked="state.t2i_provider_enabled"
+					@update:checked="onCheckboxChanged($event, 't2i_provider_enabled', false)">
+					{{ t('integration_openai', 'Image generation provider') }}
+				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch
 					:checked="state.stt_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'stt_provider_enabled', false)">
 					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
