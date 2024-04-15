@@ -58,6 +58,21 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getServiceName(): string {
+		if ($this->isUsingOpenAi()) {
+			return 'OpenAI';
+		} else {
+			$serviceName = $this->openAiSettingsService->getServiceName();
+			if ($serviceName === '') {
+				return 'LocalAI';
+			}
+			return $serviceName;
+		}
+	}
+
+	/**
 	 * @param string $userId
 	 * @return array|string[]
 	 * @throws Exception

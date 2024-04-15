@@ -27,10 +27,27 @@
 				</div>
 				<p class="settings-hint">
 					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'This should be the address of your LocalAI instance (or any service implementing a similar API than OpenAI) from the point of view of your Nextcloud server.') }}
+					{{ t('integration_openai', 'This should be the address of your LocalAI instance (or any service implementing an API similar to OpenAI). This URL will be accessed by your Nextcloud server.') }}
 					<br>
 					{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case make sure \'allow_local_remote_servers\' is set to true in config.php', { example : 'http://localhost:8080' }) }}
 				</p>
+				<div v-if="state.url !== ''" class="line">
+					<NcTextField
+						id="openai-service-name"
+						class="input"
+						:value.sync="state.service_name"
+						:label="t('integration_openai', 'Service name (optional)')"
+						:placeholder="t('integration_openai', 'Example: LocalAI of university ABC')"
+						:show-trailing-button="!!state.service_name"
+						@update:value="onInput(false)"
+						@trailing-button-click="state.service_name = '' ; onInput(false)" />
+					<NcButton type="tertiary"
+						:title="t('integration_openai', 'This name will be displayed as provider name in the AI admin settings')">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</div>
 				<div v-show="state.url !== ''" class="line">
 					<label>
 						<EarthIcon :size="20" class="icon" />
@@ -452,6 +469,7 @@ export default {
 					basic_user: this.state.basic_user,
 					basic_password: this.state.basic_password,
 					url: this.state.url,
+					service_name: this.state.service_name,
 					chat_endpoint_enabled: this.state.chat_endpoint_enabled,
 					request_timeout: this.state.request_timeout,
 					max_tokens: this.state.max_tokens,
