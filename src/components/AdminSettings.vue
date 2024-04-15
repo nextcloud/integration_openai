@@ -48,6 +48,91 @@
 						</template>
 					</NcButton>
 				</div>
+			</div>
+			<div>
+				<h2 class="mid-setting-heading">
+					{{ t('integration_openai', 'Authentication') }}
+				</h2>
+				<div v-show="state.url !== ''" class="line">
+					<label>
+						{{ t('integration_openai', 'Authentication method') }}
+					</label>
+					<div class="radios">
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:checked.sync="state.use_basic_auth"
+							type="radio"
+							:value="false"
+							button-variant-grouped="horizontal"
+							name="auth_method"
+							@update:checked="onCheckboxChanged($event, 'use_basic_auth')">
+							{{ t('assistant', 'API key') }}
+						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:checked.sync="state.use_basic_auth"
+							type="radio"
+							:value="true"
+							button-variant-grouped="horizontal"
+							name="auth_method"
+							@update:checked="onCheckboxChanged($event, 'use_basic_auth')">
+							{{ t('assistant', 'Basic Authentication') }}
+						</NcCheckboxRadioSwitch>
+					</div>
+				</div>
+				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
+					<NcTextField
+						id="openai-api-key"
+						class="input"
+						:value.sync="state.api_key"
+						type="password"
+						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
+						:show-trailing-button="!!state.api_key"
+						@update:value="onInput"
+						@trailing-button-click="state.api_key = '' ; onInput">
+						<KeyIcon />
+					</NcTextField>
+				</div>
+				<p v-show="state.url === ''" class="settings-hint">
+					<InformationOutlineIcon :size="20" class="icon" />
+					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings:') }}
+					&nbsp;
+					<a :href="apiKeyUrl" target="_blank" class="external">
+						{{ apiKeyUrl }}
+					</a>
+				</p>
+				<div v-show="state.url !== '' && state.use_basic_auth">
+					<div class="line">
+						<NcTextField
+							id="openai-basic-user"
+							class="input"
+							:value.sync="state.basic_user"
+							:label="t('integration_openai', 'Basic Auth user')"
+							:show-trailing-button="!!state.basic_user"
+							@update:value="onInput"
+							@trailing-button-click="state.basic_user = '' ; onInput">
+							<AccountIcon />
+						</NcTextField>
+					</div>
+					<div class="line">
+						<NcTextField
+							id="openai-basic-password"
+							class="input"
+							:value.sync="state.basic_password"
+							type="password"
+							:label="t('integration_openai', 'Basic Auth password')"
+							:show-trailing-button="!!state.basic_password"
+							@update:value="onInput"
+							@trailing-button-click="state.basic_password = '' ; onInput">
+							<KeyIcon />
+						</NcTextField>
+					</div>
+				</div>
+			</div>
+			<div>
+				<h2 class="mid-setting-heading">
+					{{ t('integration_openai', 'Text generation') }}
+				</h2>
 				<div v-show="state.url !== ''" class="line">
 					<label>
 						<EarthIcon :size="20" class="icon" />
@@ -140,86 +225,6 @@
 						@trailing-button-click="state.request_timeout = '' ; onInput(false)">
 						<TimerAlertOutlineIcon />
 					</NcTextField>
-				</div>
-			</div>
-			<div>
-				<h2 class="mid-setting-heading">
-					{{ t('integration_openai', 'Authentication') }}
-				</h2>
-				<div v-show="state.url !== ''" class="line">
-					<label>
-						{{ t('integration_openai', 'Authentication method') }}
-					</label>
-					<div class="radios">
-						<NcCheckboxRadioSwitch
-							:button-variant="true"
-							:checked.sync="state.use_basic_auth"
-							type="radio"
-							:value="false"
-							button-variant-grouped="horizontal"
-							name="auth_method"
-							@update:checked="onCheckboxChanged($event, 'use_basic_auth')">
-							{{ t('assistant', 'API key') }}
-						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch
-							:button-variant="true"
-							:checked.sync="state.use_basic_auth"
-							type="radio"
-							:value="true"
-							button-variant-grouped="horizontal"
-							name="auth_method"
-							@update:checked="onCheckboxChanged($event, 'use_basic_auth')">
-							{{ t('assistant', 'Basic Authentication') }}
-						</NcCheckboxRadioSwitch>
-					</div>
-				</div>
-				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
-					<NcTextField
-						id="openai-api-key"
-						class="input"
-						:value.sync="state.api_key"
-						type="password"
-						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
-						:show-trailing-button="!!state.api_key"
-						@update:value="onInput"
-						@trailing-button-click="state.api_key = '' ; onInput">
-						<KeyIcon />
-					</NcTextField>
-				</div>
-				<p v-show="state.url === ''" class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings:') }}
-					&nbsp;
-					<a :href="apiKeyUrl" target="_blank" class="external">
-						{{ apiKeyUrl }}
-					</a>
-				</p>
-				<div v-show="state.url !== '' && state.use_basic_auth">
-					<div class="line">
-						<NcTextField
-							id="openai-basic-user"
-							class="input"
-							:value.sync="state.basic_user"
-							:label="t('integration_openai', 'Basic Auth user')"
-							:show-trailing-button="!!state.basic_user"
-							@update:value="onInput"
-							@trailing-button-click="state.basic_user = '' ; onInput">
-							<AccountIcon />
-						</NcTextField>
-					</div>
-					<div class="line">
-						<NcTextField
-							id="openai-basic-password"
-							class="input"
-							:value.sync="state.basic_password"
-							type="password"
-							:label="t('integration_openai', 'Basic Auth password')"
-							:show-trailing-button="!!state.basic_password"
-							@update:value="onInput"
-							@trailing-button-click="state.basic_password = '' ; onInput">
-							<KeyIcon />
-						</NcTextField>
-					</div>
 				</div>
 			</div>
 			<div>
