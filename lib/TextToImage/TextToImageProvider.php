@@ -33,7 +33,7 @@ class TextToImageProvider implements IProvider {
 	public function getName(): string {
 		return $this->openAiAPIService->isUsingOpenAi()
 			? $this->l->t('OpenAI\'s DALL-E 2 Text-To-Image')
-			: $this->l->t('LocalAI\'s stable diffusion Text-To-Image');
+			: $this->openAiAPIService->getServiceName();
 	}
 
 	/**

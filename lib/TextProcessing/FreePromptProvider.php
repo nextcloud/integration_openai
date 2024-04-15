@@ -9,7 +9,6 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IConfig;
-use OCP\IL10N;
 use OCP\TextProcessing\FreePromptTaskType;
 use OCP\TextProcessing\IProviderWithExpectedRuntime;
 use OCP\TextProcessing\IProviderWithUserId;
@@ -24,16 +23,13 @@ class FreePromptProvider implements IProviderWithExpectedRuntime, IProviderWithU
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,
-		private IL10N $l10n,
 		private ?string $userId,
 		private OpenAiSettingsService $openAiSettingsService,
 	) {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? $this->l10n->t('OpenAI integration')
-			: $this->l10n->t('LocalAI integration');
+		return $this->openAiAPIService->getServiceName();
 	}
 
 	public function process(string $prompt): string {

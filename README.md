@@ -5,11 +5,13 @@ as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/
 
 This app implements:
 
-* Text generation providers: Free prompt, Summarize, Headline and Reformulate (using any available language model)
+* Text generation providers: Free prompt, Summarize, Headline and Reformulate (using any available large language model)
 * A Translation provider (using any available language model)
 * A SpeechToText provider (using Whisper)
+* An image generation provider
 
-Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance.
+Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance
+or to any service that implements an API similar to the OpenAI one, for example: [Plusserver](https://www.plusserver.com/en/ai-platform/).
 
 ## Ethical AI Rating
 ### Rating for Text generation using ChatGPT via OpenAI API: 🔴
@@ -78,10 +80,12 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 
 ### Admin settings
 
-There is a "Connected accounts" **admin** settings section to set a global OpenAI API key or LocalAI credentials for the Nextcloud instance.
-It is also possible to configure default models and quota settings.
+There is a "Connected accounts" **admin** settings section where you can:
+* Choose whether you use OpenAI, a LocalAI instance or another remote service
+* Set a global API key (or basic auth credentials) for the Nextcloud instance
+* Configure default models and quota settings
 
 ### Personal settings
 
-There is a "Connected accounts" **personal** settings section to let users set their personal OpenAI API key or LocalAI credentials.
+There is a "Connected accounts" **personal** settings section to let users set their personal API key or basic auth credentials.
 Users can also see their quota information there.

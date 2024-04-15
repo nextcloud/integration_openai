@@ -76,11 +76,15 @@ class Application extends App implements IBootstrap {
 			$context->registerSpeechToTextProvider(STTProvider::class);
 		}
 
-		$context->registerTextProcessingProvider(FreePromptProvider::class);
-		$context->registerTextProcessingProvider(SummaryProvider::class);
-		$context->registerTextProcessingProvider(HeadlineProvider::class);
-		$context->registerTextProcessingProvider(ReformulateProvider::class);
-		$context->registerTextToImageProvider(TextToImageProvider::class);
+		if ($this->config->getAppValue(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
+			$context->registerTextProcessingProvider(FreePromptProvider::class);
+			$context->registerTextProcessingProvider(SummaryProvider::class);
+			$context->registerTextProcessingProvider(HeadlineProvider::class);
+			$context->registerTextProcessingProvider(ReformulateProvider::class);
+		}
+		if ($this->config->getAppValue(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
+			$context->registerTextToImageProvider(TextToImageProvider::class);
+		}
 
 		$context->registerCapability(Capabilities::class);
 	}
