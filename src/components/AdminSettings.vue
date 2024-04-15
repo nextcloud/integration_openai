@@ -7,59 +7,69 @@
 		<div id="openai-content">
 			<div>
 				<div class="line">
-					<label for="openai-url">
-						<EarthIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'LocalAI URL (leave empty to use openai.com)') }}
-					</label>
-					<input id="openai-url"
-						v-model="state.url"
-						type="text"
-						:readonly="readonly"
-						:placeholder="t('integration_openai', 'example:') + ' http://localhost:8080'"
-						@input="onInput"
-						@focus="readonly = false">
+					<NcTextField
+						id="openai-url"
+						class="input"
+						:value.sync="state.url"
+						:label="t('integration_openai', 'Service URL')"
+						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080' })"
+						:show-trailing-button="!!state.url"
+						@update:value="onInput"
+						@trailing-button-click="state.url = '' ; onInput">
+						<EarthIcon />
+					</NcTextField>
+					<NcButton type="tertiary"
+						:title="t('integration_openai', 'Leave empty to use {openaiApiUrl}', { openaiApiUrl: 'https://api.openai.com' })">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
 				</div>
 				<p class="settings-hint">
 					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080') }}
+					{{ t('integration_openai', 'This should be the address of your LocalAI instance (or any service implementing a similar API than OpenAI) from the point of view of your Nextcloud server.') }}
+					<br>
+					{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case make sure \'allow_local_remote_servers\' is set to true in config.php', { example : 'http://localhost:8080' }) }}
 				</p>
 				<div v-show="state.url !== ''" class="line">
 					<label>
 						<EarthIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Choose endpoint: ') }}
+						{{ t('integration_openai', 'Text completion endpoint') }}
 					</label>
-					<input id="openai-chat-endpoint-yes"
-						v-model="state.chat_endpoint_enabled"
-						:value="true"
-						type="radio"
-						name="chat_endpoint"
-						@input="onInput">
-					<label for="openai-chat-endpoint-yes">
-						{{ t('integration_openai', 'Chat completions') }}
-					</label>
-					<input id="openai-chat-endpoint-no"
-						v-model="state.chat_endpoint_enabled"
-						:value="false"
-						type="radio"
-						name="chat_endpoint"
-						@input="onInput">
-					<label for="openai-chat-endpoint-no">
-						{{ t('integration_openai', 'Completions') }}
-					</label>
+					<div class="radios">
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:checked.sync="state.chat_endpoint_enabled"
+							type="radio"
+							:value="true"
+							button-variant-grouped="horizontal"
+							name="chat_endpoint"
+							@update:checked="onCheckboxChanged($event, 'chat_endpoint_enabled', false)">
+							{{ t('assistant', 'Chat completions') }}
+						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:checked.sync="state.chat_endpoint_enabled"
+							type="radio"
+							:value="false"
+							button-variant-grouped="horizontal"
+							name="chat_endpoint"
+							@update:checked="onCheckboxChanged($event, 'chat_endpoint_enabled', false)">
+							{{ t('assistant', 'Completions') }}
+						</NcCheckboxRadioSwitch>
+					</div>
 				</div>
 				<p v-show="state.url !== ''" class="settings-hint">
 					<InformationOutlineIcon :size="20" class="icon" />
 					{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
 				</p>
 				<div v-if="models"
-					class="line">
-					<label for="size">
-						{{ t('integration_openai', 'Default completion model to use') }}
-					</label>
+					class="line line-select">
 					<NcSelect
 						v-model="selectedModel"
 						class="model-select"
 						:options="formattedModels"
+						:input-label="t('integration_openai', 'Default completion model to use')"
 						:no-wrap="true"
 						input-id="openai-model-select"
 						@input="onModelSelected" />
@@ -85,14 +95,11 @@
 					</a>
 				</div>
 				<div class="line">
-					<label for="llm-extra-params">
-						{{ t('integration_openai', 'Extra completion model parameters (as a JSON object)') }}
-					</label>
 					<NcTextField
 						id="llm-extra-params"
 						class="input"
 						:value.sync="state.llm_extra_params"
-						:label-outside="true"
+						:label="t('integration_openai', 'Extra completion model parameters')"
 						:show-trailing-button="!!state.llm_extra_params"
 						@update:value="onInput(false)"
 						@trailing-button-click="state.llm_extra_params = '' ; onInput(false)" />
@@ -104,14 +111,18 @@
 					</NcButton>
 				</div>
 				<div class="line">
-					<label for="openai-api-timeout">
-						<TimerAlertOutlineIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Request timeout (seconds)') }}
-					</label>
-					<input id="openai-api-timeout"
-						v-model.number="state.request_timeout"
+					<NcTextField
+						id="openai-api-timeout"
+						class="input"
+						:value.sync="state.request_timeout"
 						type="number"
-						@input="onInput(false)">
+						:label="t('integration_openai', 'Request timeout (seconds)')"
+						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
+						:show-trailing-button="!!state.request_timeout"
+						@update:value="onInput(false)"
+						@trailing-button-click="state.request_timeout = '' ; onInput(false)">
+						<TimerAlertOutlineIcon />
+					</NcTextField>
 				</div>
 			</div>
 			<div>
@@ -122,38 +133,41 @@
 					<label>
 						{{ t('integration_openai', 'Authentication method') }}
 					</label>
-					<input id="openai-auth-method-key"
-						v-model="state.use_basic_auth"
-						:value="false"
-						type="radio"
-						name="auth_method"
-						@input="onInput">
-					<label for="openai-auth-method-key">
-						{{ t('integration_openai', 'API key') }}
-					</label>
-					<input id="openai-auth-method-basic"
-						v-model="state.use_basic_auth"
-						:value="true"
-						type="radio"
-						name="auth_method"
-						@input="onInput">
-					<label for="openai-auth-method-basic">
-						{{ t('integration_openai', 'Basic Authentication') }}
-					</label>
+					<div class="radios">
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:checked.sync="state.use_basic_auth"
+							type="radio"
+							:value="false"
+							button-variant-grouped="horizontal"
+							name="auth_method"
+							@update:checked="onCheckboxChanged($event, 'use_basic_auth')">
+							{{ t('assistant', 'API key') }}
+						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:checked.sync="state.use_basic_auth"
+							type="radio"
+							:value="true"
+							button-variant-grouped="horizontal"
+							name="auth_method"
+							@update:checked="onCheckboxChanged($event, 'use_basic_auth')">
+							{{ t('assistant', 'Basic Authentication') }}
+						</NcCheckboxRadioSwitch>
+					</div>
 				</div>
 				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
-					<label for="openai-api-key">
-						<KeyIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'API key (optional with LocalAI)') }}
-					</label>
-					<input id="openai-api-key"
-						v-model="state.api_key"
-						autocomplete="off"
+					<NcTextField
+						id="openai-api-key"
+						class="input"
+						:value.sync="state.api_key"
 						type="password"
-						:readonly="readonly"
-						:placeholder="t('integration_openai', 'your API key')"
-						@input="onInput"
-						@focus="readonly = false">
+						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
+						:show-trailing-button="!!state.api_key"
+						@update:value="onInput"
+						@trailing-button-click="state.api_key = '' ; onInput">
+						<KeyIcon />
+					</NcTextField>
 				</div>
 				<p v-show="state.url === ''" class="settings-hint">
 					<InformationOutlineIcon :size="20" class="icon" />
@@ -165,32 +179,29 @@
 				</p>
 				<div v-show="state.url !== '' && state.use_basic_auth">
 					<div class="line">
-						<label for="basic-user">
-							<KeyIcon :size="20" class="icon" />
-							{{ t('integration_openai', 'Username') }}
-						</label>
-						<input id="openai-basic-user"
-							v-model="state.basic_user"
-							autocomplete="off"
-							type="text"
-							:readonly="readonly"
-							:placeholder="t('integration_openai', 'your Basic Auth user')"
-							@input="onInput"
-							@focus="readonly = false">
+						<NcTextField
+							id="openai-basic-user"
+							class="input"
+							:value.sync="state.basic_user"
+							:label="t('integration_openai', 'Basic Auth user')"
+							:show-trailing-button="!!state.basic_user"
+							@update:value="onInput"
+							@trailing-button-click="state.basic_user = '' ; onInput">
+							<AccountIcon />
+						</NcTextField>
 					</div>
 					<div class="line">
-						<label for="basic-password">
-							<KeyIcon :size="20" class="icon" />
-							{{ t('integration_openai', 'Password') }}
-						</label>
-						<input id="openai-basic-password"
-							v-model="state.basic_password"
-							autocomplete="off"
+						<NcTextField
+							id="openai-basic-password"
+							class="input"
+							:value.sync="state.basic_password"
 							type="password"
-							:readonly="readonly"
-							:placeholder="t('integration_openai', 'your Basic Auth password')"
-							@input="onInput"
-							@focus="readonly = false">
+							:label="t('integration_openai', 'Basic Auth password')"
+							:show-trailing-button="!!state.basic_password"
+							@update:value="onInput"
+							@trailing-button-click="state.basic_password = '' ; onInput">
+							<KeyIcon />
+						</NcTextField>
 					</div>
 				</div>
 			</div>
@@ -200,13 +211,15 @@
 				</h2>
 				<div class="line">
 					<!--Time period in days for the token usage-->
-					<label for="openai-api-quota-period">
-						{{ t('integration_openai', 'Quota enforcement time period (days)') }}
-					</label>
-					<input id="openai-api-quota-period"
-						v-model.number="state.quota_period"
+					<NcTextField
+						id="openai-api-quota-period"
+						class="input"
 						type="number"
-						@input="onInput(false)">
+						:value.sync="state.quota_period"
+						:label="t('integration_openai', 'Quota enforcement time period (days)')"
+						:show-trailing-button="!!state.quota_period"
+						@update:value="onInput(false)"
+						@trailing-button-click="state.quota_period = '' ; onInput(false)" />
 				</div>
 				<div class="line">
 					<!--Loop through all quota types and list an input for them on this line-->
@@ -251,15 +264,21 @@
 				<div class="line">
 					<!--A input for max number of tokens to generate for a single request-->
 					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
-					<label for="openai-api-max-tokens">
-						<InformationOutlineIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Max new tokens per request') }}
-					</label>
-					<input id="openai-api-max-tokens"
-						v-model.number="state.max_tokens"
-						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')"
+					<NcTextField
+						id="openai-api-max-tokens"
+						class="input"
 						type="number"
-						@input="onInput(false)">
+						:value.sync="state.max_tokens"
+						:label="t('integration_openai', 'Max new tokens per request')"
+						:show-trailing-button="!!state.max_tokens"
+						@update:value="onInput(false)"
+						@trailing-button-click="state.max_tokens = '' ; onInput(false)" />
+					<NcButton type="tertiary"
+						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
 				</div>
 			</div>
 			<div>
@@ -268,12 +287,12 @@
 				</h2>
 				<NcCheckboxRadioSwitch
 					:checked="state.translation_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 'translation_provider_enabled')">
+					@update:checked="onCheckboxChanged($event, 'translation_provider_enabled', false)">
 					{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
 					:checked="state.stt_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 'stt_provider_enabled')">
+					@update:checked="onCheckboxChanged($event, 'stt_provider_enabled', false)">
 					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
 				</NcCheckboxRadioSwitch>
 			</div>
@@ -286,6 +305,7 @@ import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.v
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
+import AccountIcon from 'vue-material-design-icons/Account.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
@@ -307,6 +327,7 @@ export default {
 	components: {
 		OpenAiIcon,
 		KeyIcon,
+		AccountIcon,
 		EarthIcon,
 		InformationOutlineIcon,
 		TimerAlertOutlineIcon,
@@ -328,7 +349,7 @@ export default {
 			selectedModel: null,
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
-			llmExtraParamHint: t('integration_openai', 'Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
+			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
 		}
 	},
 
@@ -409,9 +430,19 @@ export default {
 		capitalizedWord(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)
 		},
-		onCheckboxChanged(newValue, key) {
+		onCheckboxChanged(newValue, key, getModels = true) {
 			this.state[key] = newValue
-			this.saveOptions({ [key]: this.state[key] })
+			this.saveOptions({ [key]: this.state[key] }).then(() => {
+				if (getModels) {
+					this.models = null
+					if (this.configured) {
+						this.getModels().then(() => {
+							const selectedModelId = this.selectedModel?.id ?? ''
+							this.saveOptions({ default_completion_model_id: selectedModelId }, false)
+						})
+					}
+				}
+			})
 		},
 		onInput(getModels = true) {
 			delay(() => {
@@ -476,6 +507,9 @@ export default {
 		.icon {
 			margin-right: 4px;
 		}
+		&.line-select {
+			align-items: end;
+		}
 	}
 
 	h2 .icon {
@@ -488,6 +522,9 @@ export default {
 	}
 
 	.line {
+		.radios {
+			display: flex;
+		}
 		> label {
 			width: 350px;
 			display: flex;
