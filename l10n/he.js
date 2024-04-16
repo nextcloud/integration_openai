@@ -6,10 +6,10 @@ OC.L10N.register(
     "Bad HTTP method" : "שגיאה במתודת HTTP",
     "Bad credentials" : "פרטי גישה שגויים",
     "Connected accounts" : "חשבונות מקושרים",
-    "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Authentication" : "אימות",
     "Authentication method" : "שיטת אימות",
     "API key" : "מפתח API",
+    "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Username" : "שם משתמש",
     "Password" : "ססמה"
 },

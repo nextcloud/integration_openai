@@ -4,9 +4,9 @@ OC.L10N.register(
     "Image generation" : "Image generation",
     "Unknown" : "Unknown",
     "seconds" : "seconds",
-    "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Authentication",
     "API key" : "API key",
+    "Request timeout (seconds)" : "Request timeout (seconds)",
     "Username" : "Username",
     "Password" : "Password"
 },

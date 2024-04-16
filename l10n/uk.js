@@ -7,10 +7,10 @@ OC.L10N.register(
     "Bad HTTP method" : "Поганий метод HTTP",
     "Bad credentials" : "Погані облікові дані",
     "Connected accounts" : "Підключені облікові записи",
-    "Request timeout (seconds)" : "Час очікування запиту (секунди)",
     "Authentication" : "Авторизація",
     "Authentication method" : "Спосіб авторизації",
     "API key" : "ключ API",
+    "Request timeout (seconds)" : "Час очікування запиту (секунди)",
     "Username" : "Ім'я користувача",
     "Password" : "Пароль"
 },

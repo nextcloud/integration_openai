@@ -7,11 +7,10 @@ OC.L10N.register(
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
     "Bad credentials" : "Virheelliset kirjautumistiedot",
     "Connected accounts" : "Yhdistetyt tilit",
-    "OpenAI integration" : "OpenAI-integraatio",
-    "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "Authentication" : "Tunnistautuminen",
     "Authentication method" : "Tunnistautumistapa",
     "API key" : "API-avain",
+    "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "your API key" : "API-avaimesi",
     "Username" : "Käyttäjätunnus",
     "Password" : "Salasana"

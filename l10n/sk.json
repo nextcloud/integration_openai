@@ -5,10 +5,10 @@
     "Bad HTTP method" : "Zlá metóda HTTP",
     "Bad credentials" : "Nesprávne prihlasovacie údaje",
     "Connected accounts" : "Prepojené účty",
-    "Request timeout (seconds)" : "Timeout požiadavky (s)",
     "Authentication" : "Autentifikácia",
     "Authentication method" : "Autentifikačná metóda",
     "API key" : "API kľúč",
+    "Request timeout (seconds)" : "Timeout požiadavky (s)",
     "Username" : "Užívateľské meno",
     "Password" : "Heslo"
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);"

@@ -7,11 +7,10 @@ OC.L10N.register(
     "Bad HTTP method" : "Neustrezen način HTTP",
     "Bad credentials" : "Neustrezna poverila",
     "Connected accounts" : "Povezani računi",
-    "OpenAI integration" : "Združevalnik OpenAI",
-    "Request timeout (seconds)" : "Zahtevan časovni zamik (sekunde)",
     "Authentication" : "Overitev",
     "Authentication method" : "Način overitve",
     "API key" : "Ključ API",
+    "Request timeout (seconds)" : "Zahtevan časovni zamik (sekunde)",
     "your API key" : "vaš ključ API",
     "Username" : "Uporabniško ime",
     "Password" : "Geslo"

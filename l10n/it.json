@@ -5,12 +5,12 @@
     "Bad HTTP method" : "Metodo HTTP non corretto",
     "Bad credentials" : "Credenziali non valide",
     "Connected accounts" : "Account connessi",
-    "Request timeout (seconds)" : "Tempo massimo della richiesta (secondi)",
     "Authentication" : "Autenticazione",
     "Authentication method" : "Metodo di autenticazione",
     "API key" : "Chiave API",
+    "Request timeout (seconds)" : "Tempo massimo della richiesta (secondi)",
+    "Translation provider (to translate Talk messages for example)" : "Fornitore di traduzioni (per tradurre messaggi di Talk, ad esempio)",
     "Username" : "Nome utente",
-    "Password" : "Password",
-    "Translation provider (to translate Talk messages for example)" : "Fornitore di traduzioni (per tradurre messaggi di Talk, ad esempio)"
+    "Password" : "Password"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

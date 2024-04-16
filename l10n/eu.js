@@ -9,10 +9,10 @@ OC.L10N.register(
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
     "Connected accounts" : "Konektatutako kontuak",
-    "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
     "Authentication" : "Autentifikazioa",
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",
+    "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
     "Username" : "Erabiltzaile-izena",
     "Password" : "Pasahitza"
 },

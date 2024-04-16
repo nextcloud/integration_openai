@@ -13,19 +13,16 @@
     "Bad credentials" : "不正な資格情報",
     "Connected accounts" : "接続済みアカウント",
     "Integration of OpenAI and LocalAI services" : "OpenAIとLocalAIサービスを統合",
-    "example:" : "例: ",
-    "This should be the address of your LocalAI instance from the point of view of your Nextcloud server. This can be a local address with a port like http://localhost:8080" : "Nextcloudサーバーから見たLocalAIインスタンスのアドレスです。これは http://localhost:8080 のようなポートを持つローカルアドレスでもかまいません。",
-    "Choose endpoint: " : "エンドポイントを選択してください:",
-    "Request timeout (seconds)" : "リクエストがタイムアウトするまでの秒数",
     "Authentication" : "認証",
     "Authentication method" : "認証方法",
     "API key" : "APIキー",
+    "Request timeout (seconds)" : "リクエストがタイムアウトするまでの秒数",
+    "Usage limits" : "使用制限",
+    "Quota type" : "クォータのタイプ",
     "your API key" : "あなたのAPIキー",
     "Username" : "ユーザー名",
     "your Basic Auth user" : "基本認証ユーザー名",
     "Password" : "パスワード",
-    "your Basic Auth password" : "基本認証パスワード",
-    "Usage limits" : "使用制限",
-    "Quota type" : "クォータのタイプ"
+    "your Basic Auth password" : "基本認証パスワード"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

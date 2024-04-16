@@ -6,10 +6,10 @@ OC.L10N.register(
     "seconds" : "sekúndum",
     "Bad credentials" : "Gölluð auðkenni",
     "Connected accounts" : "Tengdir aðgangar",
-    "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Authentication" : "Auðkenning",
     "Authentication method" : "Auðkenningarmáti",
     "API key" : "API-lykill",
+    "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Username" : "Notandanafn",
     "Password" : "Lykilorð"
 },

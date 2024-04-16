@@ -7,10 +7,10 @@ OC.L10N.register(
     "Bad HTTP method" : "Zlá metóda HTTP",
     "Bad credentials" : "Nesprávne prihlasovacie údaje",
     "Connected accounts" : "Prepojené účty",
-    "Request timeout (seconds)" : "Timeout požiadavky (s)",
     "Authentication" : "Autentifikácia",
     "Authentication method" : "Autentifikačná metóda",
     "API key" : "API kľúč",
+    "Request timeout (seconds)" : "Timeout požiadavky (s)",
     "Username" : "Užívateľské meno",
     "Password" : "Heslo"
 },
