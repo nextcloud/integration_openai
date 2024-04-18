@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.0 – 2024-04-18
+
+### Added
+
+- allow admins to set extra params for completion requests @julien-nc [#86](https://github.com/nextcloud/integration_openai/pull/86)
+- new "service name" admin setting @julien-nc [#87](https://github.com/nextcloud/integration_openai/pull/87)
+- mention compatibility with Plusserver in README and app description @julien-nc [#87](https://github.com/nextcloud/integration_openai/pull/87)
+- make it possible to toggle image, text and stt providers in admin setting @julien-nc [#87](https://github.com/nextcloud/integration_openai/pull/87)
+
+### Changed
+
+- support NC 30
+- remove smart pickers that are now provided by the assistant app @julien-nc [#85](https://github.com/nextcloud/integration_openai/pull/85)
+- use nextcloud/vue components in admin settings @julien-nc [#87](https://github.com/nextcloud/integration_openai/pull/87)
+
+### Fixed
+
+- use basic auth to get generated images if necessary @julien-nc [#84](https://github.com/nextcloud/integration_openai/pull/84)
+
 ## 1.2.1 – 2024-03-13
 
 ### Changed
