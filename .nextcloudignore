@@ -20,6 +20,7 @@
 /screenshots
 /src
 /vendor/bin
+/vendor-bin
 /jest.config.js
 /Makefile
 /makefile
