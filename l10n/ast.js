@@ -8,6 +8,7 @@ OC.L10N.register(
     "Unknown image generation error" : "Error de la xeneración d'imáxenes desconocíu",
     "Authentication" : "Autenticación",
     "API key" : "Clave de l'API",
+    "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
     "Username" : "Nome d'usuariu",
     "Password" : "Contraseña",
     "OpenAI options saved" : "Guardáronse les opciones d'OpenAI"
