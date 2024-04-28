@@ -11,7 +11,7 @@ This app implements:
 * An image generation provider
 
 Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance
-or to any service that implements an API similar to the OpenAI one, for example: [Plusserver](https://www.plusserver.com/en/ai-platform/).
+or to any service that implements an API similar to the OpenAI one, for example: [Plusserver](https://www.plusserver.com/en/ai-platform/) or [MistralAI](https://mistral.ai).
 
 ## Ethical AI Rating
 ### Rating for Text generation using ChatGPT via OpenAI API: 🔴
