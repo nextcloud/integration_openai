@@ -60,22 +60,20 @@
 					<div class="radios">
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:checked.sync="state.use_basic_auth"
+							:checked="!state.use_basic_auth"
 							type="radio"
-							:value="false"
 							button-variant-grouped="horizontal"
 							name="auth_method"
-							@update:checked="onCheckboxChanged($event, 'use_basic_auth')">
+							@update:checked="onCheckboxChanged(false, 'use_basic_auth')">
 							{{ t('assistant', 'API key') }}
 						</NcCheckboxRadioSwitch>
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:checked.sync="state.use_basic_auth"
+							:checked="state.use_basic_auth"
 							type="radio"
-							:value="true"
 							button-variant-grouped="horizontal"
 							name="auth_method"
-							@update:checked="onCheckboxChanged($event, 'use_basic_auth')">
+							@update:checked="onCheckboxChanged(true, 'use_basic_auth')">
 							{{ t('assistant', 'Basic Authentication') }}
 						</NcCheckboxRadioSwitch>
 					</div>
@@ -141,22 +139,20 @@
 					<div class="radios">
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:checked.sync="state.chat_endpoint_enabled"
+							:checked="state.chat_endpoint_enabled"
 							type="radio"
-							:value="true"
 							button-variant-grouped="horizontal"
 							name="chat_endpoint"
-							@update:checked="onCheckboxChanged($event, 'chat_endpoint_enabled', false)">
+							@update:checked="onCheckboxChanged(true, 'chat_endpoint_enabled', false)">
 							{{ t('assistant', 'Chat completions') }}
 						</NcCheckboxRadioSwitch>
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:checked.sync="state.chat_endpoint_enabled"
+							:checked="!state.chat_endpoint_enabled"
 							type="radio"
-							:value="false"
 							button-variant-grouped="horizontal"
 							name="chat_endpoint"
-							@update:checked="onCheckboxChanged($event, 'chat_endpoint_enabled', false)">
+							@update:checked="onCheckboxChanged(false, 'chat_endpoint_enabled', false)">
 							{{ t('assistant', 'Completions') }}
 						</NcCheckboxRadioSwitch>
 					</div>
