@@ -31,21 +31,27 @@ class Version020000Date20240325142435 extends SimpleMigrationStep {
 
 		if ($schema->hasTable('openai_prompts')) {
 			$table = $schema->getTable('openai_prompts');
-			$table->dropIndex('openai_prompt_userid');
+			if ($table->hasIndex('openai_prompt_userid')) {
+				$table->dropIndex('openai_prompt_userid');
+			}
 			$schema->dropTable('openai_prompts');
 			$schemaChanged = true;
 		}
 
 		if ($schema->hasTable('openai_i_gen')) {
 			$table = $schema->getTable('openai_i_gen');
-			$table->dropIndex('openai_i_gen_hash');
+			if ($table->hasIndex('openai_i_gen_hash')) {
+				$table->dropIndex('openai_i_gen_hash');
+			}
 			$schema->dropTable('openai_i_gen');
 			$schemaChanged = true;
 		}
 
 		if ($schema->hasTable('openai_i_url')) {
 			$table = $schema->getTable('openai_i_url');
-			$table->dropIndex('openai_i_url_gen_id');
+			if ($table->hasIndex('openai_i_url_gen_id')) {
+				$table->dropIndex('openai_i_url_gen_id');
+			}
 			$schema->dropTable('openai_i_url');
 			$schemaChanged = true;
 		}
