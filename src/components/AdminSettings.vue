@@ -14,8 +14,8 @@
 						:label="t('integration_openai', 'Service URL')"
 						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080' })"
 						:show-trailing-button="!!state.url"
-						@update:value="onInput"
-						@trailing-button-click="state.url = '' ; onInput">
+						@update:value="onInput(true)"
+						@trailing-button-click="state.url = '' ; onInput(true)">
 						<EarthIcon />
 					</NcTextField>
 					<NcButton type="tertiary"
@@ -88,8 +88,8 @@
 						type="password"
 						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
 						:show-trailing-button="!!state.api_key"
-						@update:value="onInput"
-						@trailing-button-click="state.api_key = '' ; onInput">
+						@update:value="onInput(true)"
+						@trailing-button-click="state.api_key = '' ; onInput(true)">
 						<KeyIcon />
 					</NcTextField>
 				</div>
@@ -109,8 +109,8 @@
 							:value.sync="state.basic_user"
 							:label="t('integration_openai', 'Basic Auth user')"
 							:show-trailing-button="!!state.basic_user"
-							@update:value="onInput"
-							@trailing-button-click="state.basic_user = '' ; onInput">
+							@update:value="onInput(true)"
+							@trailing-button-click="state.basic_user = '' ; onInput(true)">
 							<AccountIcon />
 						</NcTextField>
 					</div>
@@ -122,8 +122,8 @@
 							type="password"
 							:label="t('integration_openai', 'Basic Auth password')"
 							:show-trailing-button="!!state.basic_password"
-							@update:value="onInput"
-							@trailing-button-click="state.basic_password = '' ; onInput">
+							@update:value="onInput(true)"
+							@trailing-button-click="state.basic_password = '' ; onInput(true)">
 							<KeyIcon />
 						</NcTextField>
 					</div>
