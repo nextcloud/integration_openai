@@ -332,7 +332,7 @@ class OpenAiAPIService {
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
-		if ($userId !== null) {
+		if ($userId !== null && $this->isUsingOpenAi()) {
 			$params['user'] = $userId;
 		}
 
