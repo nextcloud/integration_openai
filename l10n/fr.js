@@ -9,6 +9,7 @@ OC.L10N.register(
     "tokens" : "jetons",
     "images" : "images",
     "seconds" : "secondes",
+    "Unknown error while retrieving quota usage." : "Erreur inconnue lors de la récupération du quota d’utilisation.",
     "Text generation quota exceeded" : "Quota de génération de texte dépassé",
     "Unknown text generation error" : "Erreur de génération de texte inconnue",
     "Could not read audio file." : "Impossible de jouer le fichier audio",
