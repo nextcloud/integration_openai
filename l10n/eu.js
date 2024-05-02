@@ -6,6 +6,7 @@ OC.L10N.register(
     "Audio transcription" : "Audioen transkripzioa",
     "Unknown" : "Ezezaguna",
     "seconds" : "duela segundu batzuk",
+    "Unknown image generation error" : "Irudi sorrera errore ezezaguna",
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
     "Connected accounts" : "Konektatutako kontuak",
