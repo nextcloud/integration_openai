@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.1 – 2024-05-06
+
+### Added
+
+- support MistralAI API @julien-nc
+
+### Changed
+
+- only add user param in chat completion request if using openAI @julien-nc
+- allow empty string for extra llm params @julien-nc
+
+### Fixed
+
+- safely drop indexes in last migration step @julien-nc [#95](https://github.com/nextcloud/integration_openai/issues/95)
+- fix mistake when getting extra model params @julien-nc [#94](https://github.com/nextcloud/integration_openai/issues/94)
+
 ## 2.0.0 – 2024-04-18
 
 ### Added
