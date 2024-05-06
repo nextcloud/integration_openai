@@ -376,7 +376,7 @@ class OpenAiAPIService {
 			return null;
 		}
 		$arrayValue = json_decode($stringValue, true);
-		if ($arrayValue === null) {
+		if (!is_array($arrayValue)) {
 			return null;
 		}
 		return $arrayValue;
