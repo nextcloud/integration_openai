@@ -12,6 +12,7 @@ OC.L10N.register(
     "Text generation quota exceeded" : "テキスト生成の制限に達しました",
     "Unknown text generation error" : "不明なテキスト生成エラー",
     "Could not read audio file." : "オーディオファイルを読み取ることができませんでした。",
+    "Unknown image generation error" : "不明な画像生成エラー",
     "Bad credentials" : "不正な資格情報",
     "Connected accounts" : "接続済みアカウント",
     "Integration of OpenAI and LocalAI services" : "OpenAIとLocalAIサービスを統合",
