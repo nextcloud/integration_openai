@@ -10,12 +10,12 @@
 namespace OCA\OpenAi\AppInfo;
 
 use OCA\OpenAi\Capabilities;
-use OCA\OpenAi\SpeechToText\STTProvider;
+use OCA\OpenAi\TaskProcessing\STTProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
 use OCA\OpenAi\TaskProcessing\TopicsProvider;
-use OCA\OpenAi\TextToImage\TextToImageProvider;
+use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -73,7 +73,7 @@ class Application extends App implements IBootstrap {
 			$context->registerTranslationProvider(TranslationProvider::class);
 		}
 		if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
-			$context->registerSpeechToTextProvider(STTProvider::class);
+			$context->registerTaskProcessingProvider(STTProvider::class);
 		}
 
 		if ($this->config->getAppValue(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
@@ -83,7 +83,7 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(TopicsProvider::class);
 		}
 		if ($this->config->getAppValue(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
-			$context->registerTextToImageProvider(TextToImageProvider::class);
+			$context->registerTaskProcessingProvider(TextToImageProvider::class);
 		}
 
 		$context->registerCapability(Capabilities::class);
