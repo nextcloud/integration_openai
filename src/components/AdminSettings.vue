@@ -209,7 +209,7 @@
 					</NcButton>
 				</div>
 				<div class="line">
-					<NcTextField
+					<NcInputField
 						id="openai-api-timeout"
 						class="input"
 						:value.sync="state.request_timeout"
@@ -220,7 +220,10 @@
 						@update:value="onInput(false)"
 						@trailing-button-click="state.request_timeout = '' ; onInput(false)">
 						<TimerAlertOutlineIcon />
-					</NcTextField>
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
 				</div>
 			</div>
 			<div>
@@ -229,7 +232,7 @@
 				</h2>
 				<div class="line">
 					<!--Time period in days for the token usage-->
-					<NcTextField
+					<NcInputField
 						id="openai-api-quota-period"
 						class="input"
 						type="number"
@@ -237,7 +240,11 @@
 						:label="t('integration_openai', 'Quota enforcement time period (days)')"
 						:show-trailing-button="!!state.quota_period"
 						@update:value="onInput(false)"
-						@trailing-button-click="state.quota_period = '' ; onInput(false)" />
+						@trailing-button-click="state.quota_period = '' ; onInput(false)">
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
 				</div>
 				<div class="line">
 					<!--Loop through all quota types and list an input for them on this line-->
@@ -282,7 +289,7 @@
 				<div class="line">
 					<!--A input for max number of tokens to generate for a single request-->
 					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
-					<NcTextField
+					<NcInputField
 						id="openai-api-max-tokens"
 						class="input"
 						type="number"
@@ -290,7 +297,11 @@
 						:label="t('integration_openai', 'Max new tokens per request')"
 						:show-trailing-button="!!state.max_tokens"
 						@update:value="onInput(false)"
-						@trailing-button-click="state.max_tokens = '' ; onInput(false)" />
+						@trailing-button-click="state.max_tokens = '' ; onInput(false)">
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
 					<NcButton type="tertiary"
 						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')">
 						<template #icon>
@@ -333,6 +344,7 @@ import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.v
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
+import CloseIcon from 'vue-material-design-icons/Close.vue'
 import AccountIcon from 'vue-material-design-icons/Account.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 
@@ -342,6 +354,7 @@ import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
+import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
 
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
@@ -355,6 +368,7 @@ export default {
 	components: {
 		OpenAiIcon,
 		KeyIcon,
+		CloseIcon,
 		AccountIcon,
 		EarthIcon,
 		InformationOutlineIcon,
@@ -364,6 +378,7 @@ export default {
 		NcSelect,
 		NcCheckboxRadioSwitch,
 		NcTextField,
+		NcInputField,
 	},
 
 	props: [],
@@ -482,10 +497,10 @@ export default {
 					url: this.state.url,
 					service_name: this.state.service_name,
 					chat_endpoint_enabled: this.state.chat_endpoint_enabled,
-					request_timeout: this.state.request_timeout,
-					max_tokens: this.state.max_tokens,
+					request_timeout: parseInt(this.state.request_timeout),
+					max_tokens: parseInt(this.state.max_tokens),
 					llm_extra_params: this.state.llm_extra_params,
-					quota_period: this.state.quota_period,
+					quota_period: parseInt(this.state.quota_period),
 					quotas: this.state.quotas,
 				}).then(() => {
 					if (getModels) {

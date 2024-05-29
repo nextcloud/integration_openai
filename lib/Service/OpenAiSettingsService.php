@@ -462,8 +462,11 @@ class OpenAiSettingsService {
 	public function setAdminConfig(array $adminConfig): void {
 		// That the variable types are correct
 		foreach (array_keys($adminConfig) as $key) {
-			if (gettype($adminConfig[$key]) !== self::ADMIN_CONFIG_TYPES[$key]) {
-				throw new Exception('Invalid type for key: ' . $key . '. Expected ' . self::ADMIN_CONFIG_TYPES[$key] . ', got ' . gettype($adminConfig[$key]));
+			$value = $adminConfig[$key];
+			if ($value === null) {
+				$this->config->deleteAppValue(Application::APP_ID, $key);
+			} elseif (gettype($value) !== self::ADMIN_CONFIG_TYPES[$key]) {
+				throw new Exception('Invalid type for key: ' . $key . '. Expected ' . self::ADMIN_CONFIG_TYPES[$key] . ', got ' . gettype($value));
 			}
 		}
 
