@@ -22,9 +22,9 @@ use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IConfig;
-use OCP\IL10N;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
+use Test\Util\User\Dummy;
 
 /**
  * @group DB
@@ -45,7 +45,7 @@ class OpenAiProviderTest extends TestCase {
 
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
-		$backend = new \Test\Util\User\Dummy();
+		$backend = new Dummy();
 		$backend->createUser(self::TEST_USER1, self::TEST_USER1);
 		\OC::$server->get(\OCP\IUserManager::class)->registerBackend($backend);
 	}
@@ -97,7 +97,7 @@ class OpenAiProviderTest extends TestCase {
 			$this->openAiApiService,
 			\OC::$server->get(IConfig::class),
 			$this->openAiSettingsService,
-			\OC::$server->get(IL10N::class),
+			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 		);
 
@@ -153,7 +153,7 @@ class OpenAiProviderTest extends TestCase {
 			$this->openAiApiService,
 			\OC::$server->get(IConfig::class),
 			$this->openAiSettingsService,
-			\OC::$server->get(IL10N::class),
+			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 		);
 
@@ -209,7 +209,7 @@ class OpenAiProviderTest extends TestCase {
 			$this->openAiApiService,
 			\OC::$server->get(IConfig::class),
 			$this->openAiSettingsService,
-			\OC::$server->get(IL10N::class),
+			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 		);
 
