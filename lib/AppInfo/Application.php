@@ -10,12 +10,12 @@
 namespace OCA\OpenAi\AppInfo;
 
 use OCA\OpenAi\Capabilities;
-use OCA\OpenAi\TaskProcessing\STTProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
-use OCA\OpenAi\TaskProcessing\TextToTextProvider;
+use OCA\OpenAi\TaskProcessing\STTProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
-use OCA\OpenAi\TaskProcessing\TopicsProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
+use OCA\OpenAi\TaskProcessing\TextToTextProvider;
+use OCA\OpenAi\TaskProcessing\TopicsProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;

@@ -15,9 +15,9 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
-use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
+use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
@@ -137,7 +137,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn() => null);
+		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -194,7 +194,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $headlineProvider->process(self::TEST_USER1, ['input' => $prompt], fn() => null);
+		$result = $headlineProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -250,7 +250,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $summaryProvider->process(self::TEST_USER1, ['input' => $prompt], fn() => null);
+		$result = $summaryProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
