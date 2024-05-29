@@ -15,9 +15,6 @@ use OCP\TaskProcessing\TaskTypes\TextToImage;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-/**
- * @template-implements ISynchronousProvider
- */
 class TextToImageProvider implements ISynchronousProvider {
 
 	public function __construct(
@@ -95,6 +92,7 @@ class TextToImageProvider implements ISynchronousProvider {
 			}
 			$endTime = time();
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
+			/** @var array<string, list<numeric|string>|numeric|string> $output */
 			return $output;
 		} catch(\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);

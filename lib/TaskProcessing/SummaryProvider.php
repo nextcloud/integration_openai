@@ -16,9 +16,6 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
 use RuntimeException;
 
-/**
- * @template-implements ISynchronousProvider
- */
 class SummaryProvider implements ISynchronousProvider {
 
 	public function __construct(

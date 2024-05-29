@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <psalm
+	errorBaseline="tests/psalm-baseline.xml"
 	errorLevel="4"
 	findUnusedBaselineEntry="true"
 	findUnusedCode="false"
@@ -29,6 +30,8 @@
 				<referencedClass name="Symfony\Component\Console\Command\Command" />
 				<referencedClass name="GuzzleHttp\Exception\ServerException" />
 				<referencedClass name="GuzzleHttp\Exception\ClientException" />
+				<referencedClass name="OCP\TaskProcessing\ISynchronousProvider" />
+				<referencedClass name="OCP\TaskProcessing\EShapeType" />
 			</errorLevel>
 		</UndefinedClass>
 		<UndefinedDocblockClass>

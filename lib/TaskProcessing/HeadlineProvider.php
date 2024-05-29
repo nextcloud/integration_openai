@@ -16,9 +16,6 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextHeadline;
 use RuntimeException;
 
-/**
- * @template-implements ISynchronousProvider
- */
 class HeadlineProvider implements ISynchronousProvider {
 
 	public function __construct(

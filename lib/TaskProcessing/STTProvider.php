@@ -15,9 +15,6 @@ use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-/**
- * @template-implements ISynchronousProvider
- */
 class STTProvider implements ISynchronousProvider {
 
 	public function __construct(

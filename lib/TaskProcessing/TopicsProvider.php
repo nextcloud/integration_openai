@@ -16,9 +16,6 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextTopics;
 use RuntimeException;
 
-/**
- * @template-implements ISynchronousProvider
- */
 class TopicsProvider implements ISynchronousProvider {
 
 	public function __construct(
