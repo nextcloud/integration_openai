@@ -101,8 +101,6 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 	</background-jobs>
 	<settings>
 		<admin>OCA\OpenAi\Settings\Admin</admin>
-		<admin-section>OCA\OpenAi\Settings\AdminSection</admin-section>
 		<personal>OCA\OpenAi\Settings\Personal</personal>
-		<personal-section>OCA\OpenAi\Settings\PersonalSection</personal-section>
 	</settings>
 </info>
