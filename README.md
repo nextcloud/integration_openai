@@ -80,12 +80,12 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 
 ### Admin settings
 
-There is a "Connected accounts" **admin** settings section where you can:
+There is a "Artificial intelligence" **admin** settings section where you can:
 * Choose whether you use OpenAI, a LocalAI instance or another remote service
 * Set a global API key (or basic auth credentials) for the Nextcloud instance
 * Configure default models and quota settings
 
 ### Personal settings
 
-There is a "Connected accounts" **personal** settings section to let users set their personal API key or basic auth credentials.
+There is a "Artificial intelligence" **personal** settings section to let users set their personal API key or basic auth credentials.
 Users can also see their quota information there.

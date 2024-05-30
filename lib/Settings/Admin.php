@@ -25,7 +25,7 @@ class Admin implements ISettings {
 	}
 
 	public function getSection(): string {
-		return 'connected-accounts';
+		return 'ai';
 	}
 
 	public function getPriority(): int {
