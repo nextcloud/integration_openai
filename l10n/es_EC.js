@@ -6,7 +6,6 @@ OC.L10N.register(
     "seconds" : "segundos",
     "Bad HTTP method" : "Método HTTP incorrecto",
     "Bad credentials" : "Credenciales incorrectas",
-    "Connected accounts" : "Cuentas conectadas",
     "OpenAI's Whisper Speech-To-Text" : "Whisper de OpenAI para conversión de voz a texto",
     "OpenAI and LocalAI integration" : "Integración de OpenAI y LocalAI",
     "Integration of OpenAI and LocalAI services" : "Integración de los servicios de OpenAI y LocalAI",

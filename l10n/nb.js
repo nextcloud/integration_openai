@@ -21,7 +21,6 @@ OC.L10N.register(
     "Bad credentials" : "Påloggingsdetaljene er feil",
     "API request error: " : "Feil ved API-forespørsel: ",
     "Unknown API request error." : "Ukjent API-forespørselsfeil.",
-    "Connected accounts" : "Tilknyttede kontoer",
     "OpenAI's Whisper Speech-To-Text" : "OpenAIs Whisper Speech-To-Text",
     "LocalAI's Whisper Speech-To-Text" : "LocalAIs Whisper Speech-To-Text",
     "Reformulate" : "Reformulere",

@@ -21,7 +21,6 @@ OC.L10N.register(
     "Bad credentials" : "معلومات تسجيل الدخول غير صحيحة",
     "API request error: " : "خطأ طلب API: ",
     "Unknown API request error." : "خطأ غير محدد عند طلب API",
-    "Connected accounts" : "حسابات مترابطة",
     "OpenAI's Whisper Speech-To-Text" : "تطبيق \"ويسبر\" الهامس Whisper لتحويل الكلام إلي نص من OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "تحويل الكلام إلى نص بالذكاء االاصطناعي محليّاً باستعمال تطبيق \"الهامس\" Whisper",
     "Reformulate" : "أعِد الصياغة",

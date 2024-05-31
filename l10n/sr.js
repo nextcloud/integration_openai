@@ -21,7 +21,6 @@ OC.L10N.register(
     "Bad credentials" : "Лоши креденцијали",
     "API request error: " : "Грешка API захтева: ",
     "Unknown API request error." : "Непозната грешка API захтева.",
-    "Connected accounts" : "Повезани налози",
     "OpenAI's Whisper Speech-To-Text" : "Whisper говор-у-текст компаније OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Whisper говор-у-текст са LocalAI",
     "Reformulate" : "Реформулиши",

@@ -6,7 +6,6 @@ OC.L10N.register(
     "seconds" : "sekunder",
     "Bad HTTP method" : "Felaktig HTTP-metod",
     "Bad credentials" : "Ogiltiga inloggningsuppgifter",
-    "Connected accounts" : "Anslutna konton",
     "OpenAI's Whisper Speech-To-Text" : "OpenAI:s Whisper Tal-Till-Text",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI:s Whisper Tal-Till-Text",
     "Reformulate" : "Omformulera",

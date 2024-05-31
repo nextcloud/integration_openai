@@ -6,7 +6,6 @@ OC.L10N.register(
     "seconds" : "ثانیه ها",
     "Bad HTTP method" : "روش HTTP بد",
     "Bad credentials" : "اعتبارنامه بد",
-    "Connected accounts" : "حساب‌های متصل",
     "OpenAI's Whisper Speech-To-Text" : "OpenAI's Whisper Speech-To-Text",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI's Whisper Speech-To-Text",
     "Reformulate" : "Reformulate",

@@ -19,7 +19,6 @@
     "Bad credentials" : "Identifiants incorrects",
     "API request error: " : "Erreur de requête API :",
     "Unknown API request error." : "Erreur de requête API inconnue.",
-    "Connected accounts" : "Comptes connectés",
     "OpenAI's Whisper Speech-To-Text" : "Reconnaissance vocale par Whisper de OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Synthèse vocale par Whisper de LocalAI",
     "Reformulate" : "Reformuler",

@@ -21,7 +21,6 @@ OC.L10N.register(
     "Bad credentials" : "Credenciales erróneas",
     "API request error: " : "Error en solicitud API:",
     "Unknown API request error." : "Error desconocido en solicitud API.",
-    "Connected accounts" : "Cuentas conectadas",
     "OpenAI's Whisper Speech-To-Text" : "Dictado a texto Whisper de OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Dictado a texto Whisper de LocalAI",
     "Reformulate" : "Reformular",

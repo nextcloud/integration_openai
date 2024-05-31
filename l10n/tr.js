@@ -21,7 +21,6 @@ OC.L10N.register(
     "Bad credentials" : "Kimlik doğrulama bilgileri hatalı",
     "API request error: " : "API isteği sorunu:",
     "Unknown API request error." : "Bilinmeyen API isteği sorunu",
-    "Connected accounts" : "Bağlı hesaplar",
     "OpenAI's Whisper Speech-To-Text" : "OpenAI Whisper konuşmadan metne",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI Whisper konuşmadan metne",
     "Reformulate" : "Yeniden düzenle",

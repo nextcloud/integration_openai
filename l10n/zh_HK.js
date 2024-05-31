@@ -21,7 +21,6 @@ OC.L10N.register(
     "Bad credentials" : "錯誤的憑證",
     "API request error: " : "API 請求錯誤：",
     "Unknown API request error." : "不詳的 API 請求錯誤。",
-    "Connected accounts" : "已連線的賬號",
     "OpenAI's Whisper Speech-To-Text" : "OpenAI 的 Whisper 音頻轉文本",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI 的 Whisper 音頻轉文本",
     "Reformulate" : "重新表述",

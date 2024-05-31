@@ -5,7 +5,6 @@ OC.L10N.register(
     "seconds" : "δευτερόλεπτα",
     "Bad HTTP method" : "Κακή μέθοδος HTTP",
     "Bad credentials" : "Εσφαλμένα διαπιστευτήρια",
-    "Connected accounts" : "Συνδεδεμένοι λογαριασμοί",
     "Reformulate" : "Αναδιατύπωση",
     "Formulate text in a different way." : "Διατυπώστε το κείμενο με διαφορετικό τρόπο.",
     "OpenAI and LocalAI integration" : "Ενσωμάτωση OpenAI και LocalAI",

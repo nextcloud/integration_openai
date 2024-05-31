@@ -4,6 +4,8 @@ OC.L10N.register(
     "Image generation" : "Giniúint íomhá",
     "Unknown" : "Anaithnid",
     "Authentication" : "Fíordheimhniú",
+    "API key" : "Eochair API",
+    "Request timeout (seconds)" : "Iarr am istigh (soicindí)",
     "Username" : "Ainm úsáideora",
     "Password" : "Pasfhocal"
 },

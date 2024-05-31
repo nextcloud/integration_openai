@@ -12,7 +12,6 @@ OC.L10N.register(
     "Unknown error while retrieving quota usage." : "提取额度使用量时发生未知错误",
     "Bad HTTP method" : "错误的HTTP方法",
     "Bad credentials" : "错误的凭据",
-    "Connected accounts" : "关联账号",
     "OpenAI's Whisper Speech-To-Text" : "OpenAI的Whisper语音转文本",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI的Whisper语音转文本",
     "Reformulate" : "重新构思",

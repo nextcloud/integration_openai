@@ -4,7 +4,6 @@ OC.L10N.register(
     "Unknown" : "Desconegut",
     "seconds" : "segondas",
     "Bad credentials" : "Marrits identificants",
-    "Connected accounts" : "Comptes connectats",
     "Authentication" : "Autentificacion",
     "Username" : "Nom d'utilizaire",
     "Password" : "Senhal"

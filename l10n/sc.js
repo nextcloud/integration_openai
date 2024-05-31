@@ -6,7 +6,6 @@ OC.L10N.register(
     "seconds" : "segundos",
     "Bad HTTP method" : "Mètodu HTTP no bàlidu",
     "Bad credentials" : "Credentziales non bàlidas",
-    "Connected accounts" : "Contos connètidos",
     "Authentication" : "Autenticatzione",
     "Authentication method" : "Mètodu de autenticatzione",
     "API key" : "Crae API",

@@ -19,7 +19,6 @@
     "Bad credentials" : "Nesprávné přihlašovací údaje",
     "API request error: " : "Chyba požadavku na API rozhraní:",
     "Unknown API request error." : "Neznámá chyba požadavku požadavku na API.",
-    "Connected accounts" : "Propojené účty",
     "OpenAI's Whisper Speech-To-Text" : "Whisper - převod řeči na text od OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Převod řeči na text Whisper prostřednictvím LocalAI",
     "Reformulate" : "Přeformulovat",

@@ -5,7 +5,6 @@ OC.L10N.register(
     "seconds" : "sekunda",
     "Bad HTTP method" : "Pogrešna metoda HTTP-a",
     "Bad credentials" : "Pogrešne vjerodajnice",
-    "Connected accounts" : "Povezani računi",
     "Authentication" : "Autentifikacija",
     "Authentication method" : "Način autentifikacije",
     "API key" : "Ključ API-ja",

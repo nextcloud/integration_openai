@@ -5,7 +5,6 @@ OC.L10N.register(
     "seconds" : "секунди",
     "Bad HTTP method" : "Лош HTTP метод",
     "Bad credentials" : "Лоши идентификационни данни",
-    "Connected accounts" : "Свързани профили",
     "OpenAI's Whisper Speech-To-Text" : "Whisper Speech-To-Text - система за автоматично разпознаване на реч на OpenAI's ",
     "Authentication" : "Удостоверяване",
     "Authentication method" : "Метод за удостоверяване",

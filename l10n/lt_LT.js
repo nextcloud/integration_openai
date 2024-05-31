@@ -5,7 +5,6 @@ OC.L10N.register(
     "seconds" : "sekundes",
     "Bad HTTP method" : "Blogas HTTP metodas",
     "Bad credentials" : "Blogi prisijungimo duomenys",
-    "Connected accounts" : "Prijungtos paskyros",
     "Authentication" : "Tapatybės nustatymas",
     "Authentication method" : "Tapatybės nustatymo metodas",
     "API key" : "API raktas",

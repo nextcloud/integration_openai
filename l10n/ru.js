@@ -5,7 +5,6 @@ OC.L10N.register(
     "seconds" : "секунд",
     "Bad HTTP method" : "Неверный метод HTTP",
     "Bad credentials" : "Неверные учетные данные",
-    "Connected accounts" : "Подключённые учётные записи",
     "OpenAI and LocalAI integration" : "OpenAI и локальная интеграция",
     "Authentication" : "Аутентификация",
     "Authentication method" : "Метод проверки подлинности",
