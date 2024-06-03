@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Image generation" : "Giniúint íomhá",
     "Unknown" : "Anaithnid",
+    "seconds" : "soicind",
     "Authentication" : "Fíordheimhniú",
     "API key" : "Eochair API",
     "Request timeout (seconds)" : "Iarr am istigh (soicindí)",
