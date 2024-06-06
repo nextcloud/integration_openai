@@ -1,4 +1,5 @@
 { "translations": {
+    "Image generation" : "Создание изображений",
     "Unknown" : "Неизвестно",
     "seconds" : "секунд",
     "Bad HTTP method" : "Неверный метод HTTP",

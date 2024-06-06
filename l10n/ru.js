@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Image generation" : "Создание изображений",
     "Unknown" : "Неизвестно",
     "seconds" : "секунд",
     "Bad HTTP method" : "Неверный метод HTTP",
