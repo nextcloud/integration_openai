@@ -34,7 +34,7 @@ class HeadlineProvider implements IProviderWithExpectedRuntime, IProviderWithUse
 	public function process(string $prompt): string {
 		$startTime = time();
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-		$prompt = 'Give me the headline of the following text:' . "\n\n" . $prompt;
+		$prompt = 'Give me the headline of the following text in its original language. Output only the headline.' . "\n\n" . $prompt;
 		// Max tokens are limited later to max tokens specified in the admin settings so here we just request PHP_INT_MAX
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {

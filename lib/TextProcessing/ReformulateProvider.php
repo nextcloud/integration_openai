@@ -33,7 +33,7 @@ class ReformulateProvider implements IProviderWithExpectedRuntime, IProviderWith
 	public function process(string $prompt): string {
 		$startTime = time();
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-		$prompt = 'Reformulate the following text:' . "\n\n" . $prompt;
+		$prompt = 'Reformulate the following text. Detect the language of the text. Use the same language as the original text.  Output only the reformulation. Here is the text:' . "\n\n" . $prompt . "\n\n" . 'Here is your reformulation in the same language:';
 		// Max tokens are limited later to max tokens specified in the admin settings so here we just request PHP_INT_MAX
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
