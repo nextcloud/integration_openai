@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation" : "Giniúint téacs",
     "Image generation" : "Giniúint íomhá",
     "Audio transcription" : "Trascríobh fuaime",
     "Unknown" : "Anaithnid",
