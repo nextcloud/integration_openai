@@ -32,7 +32,7 @@ class SummaryProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName() . '-sync';
+		return $this->openAiAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
