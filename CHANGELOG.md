@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.0.2 – 2024-06-21
+
+### Fixed
+- incorrect numeric settings handling on the server side @julien-nc
+
+### Changed
+- move personal and admin settings to AI sections @julien-nc
+- update npm pkgs @julien-nc
+
+
 ## 2.0.1 – 2024-05-06
 
 ### Added
