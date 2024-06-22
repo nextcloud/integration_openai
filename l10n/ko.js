@@ -2,8 +2,10 @@ OC.L10N.register(
     "integration_openai",
     {
     "Image generation" : "이미지 생성",
+    "Audio transcription" : "음성 전사",
     "Unknown" : "알 수 없음",
     "seconds" : "초",
+    "Unknown image generation error" : "알 수 없는 이미지 생성 오류",
     "Bad HTTP method" : "옳지 않은 HTTP 메소드",
     "Bad credentials" : "옳지 않은 자격 증명",
     "Authentication" : "인증",
