@@ -63,11 +63,13 @@ class TextToTextProvider implements ISynchronousProvider {
 	}
 
 	public function process(?string $userId, array $input, callable $reportProgress): array {
+		/*
 		foreach (range(1, 20) as $i) {
 			$reportProgress($i / 100 * 5);
 			error_log('aa ' . ($i / 100 * 5));
 			sleep(1);
 		}
+		*/
 		$startTime = time();
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 
