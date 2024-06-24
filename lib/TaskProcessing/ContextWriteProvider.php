@@ -14,7 +14,6 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\ContextWrite;
-use OCP\TaskProcessing\TaskTypes\TextToText;
 use RuntimeException;
 
 class ContextWriteProvider implements ISynchronousProvider {
