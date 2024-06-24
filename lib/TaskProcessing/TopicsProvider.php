@@ -70,7 +70,7 @@ class TopicsProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Extract topics from the following text and write them separated by commas:' . "\n\n" . $prompt;
+		$prompt = 'Extract topics from the following text. Detect the language of the text. Use the same language as the text. Output only the topics. Here is the text:' . "\n\n" . $prompt;
 
 		$temperature = null;
 		if (isset($input['temperature'])

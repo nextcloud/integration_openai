@@ -70,7 +70,7 @@ class SummaryProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Summarize the following text in its original language:' . "\n\n" . $prompt;
+		$prompt = 'Summarize the following text. Detect the language of the text. Use the same language as the text.  Output only the summary.  Here is the text:' . "\n\n" . $prompt . "\n\n" . 'Here is your summary in the same language as the text:';
 
 		$temperature = null;
 		if (isset($input['temperature'])

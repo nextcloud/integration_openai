@@ -70,7 +70,7 @@ class HeadlineProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Give me the headline of the following text in its original language:' . "\n\n" . $prompt;
+		$prompt = 'Give me the headline of the following text in its original language. Output only the headline.' . "\n\n" . $prompt;
 
 		$temperature = null;
 		if (isset($input['temperature'])
