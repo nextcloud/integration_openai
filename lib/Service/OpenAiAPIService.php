@@ -239,7 +239,8 @@ class OpenAiAPIService {
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $model
-	 * @param int $maxTokens
+	 * @param int|null $maxTokens
+	 * @param array|null $extraParams
 	 * @return array|string[]
 	 * @throws Exception
 	 */
@@ -248,7 +249,8 @@ class OpenAiAPIService {
 		string $prompt,
 		int $n,
 		string $model,
-		int $maxTokens = 1000,
+		?int $maxTokens = null,
+		?array $extraParams = null,
 	): array {
 
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
@@ -256,7 +258,7 @@ class OpenAiAPIService {
 		}
 
 		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
-		if ($maxTokens > $maxTokensLimit) {
+		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
 			$maxTokens = $maxTokensLimit;
 		}
 
@@ -270,9 +272,12 @@ class OpenAiAPIService {
 			$params['user'] = $userId;
 		}
 
-		$modelExtraParams = $this->getExtraParams('llm_extra_params');
-		if ($modelExtraParams !== null) {
-			$params = array_merge($modelExtraParams, $params);
+		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
+		if ($adminExtraParams !== null) {
+			$params = array_merge($adminExtraParams, $params);
+		}
+		if ($extraParams !== null) {
+			$params = array_merge($extraParams, $params);
 		}
 
 		$response = $this->request($userId, 'completions', $params, 'POST');
@@ -306,7 +311,8 @@ class OpenAiAPIService {
 	 * @param string $prompt
 	 * @param int $n
 	 * @param string $model
-	 * @param int $maxTokens
+	 * @param int|null $maxTokens
+	 * @param array|null $extraParams
 	 * @return string[]
 	 * @throws Exception
 	 */
@@ -315,14 +321,15 @@ class OpenAiAPIService {
 		string $prompt,
 		int $n,
 		string $model,
-		int $maxTokens = 1000,
+		?int $maxTokens = null,
+		?array $extraParams = null,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
 		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
-		if ($maxTokens > $maxTokensLimit) {
+		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
 			$maxTokens = $maxTokensLimit;
 		}
 
@@ -336,9 +343,12 @@ class OpenAiAPIService {
 			$params['user'] = $userId;
 		}
 
-		$modelExtraParams = $this->getExtraParams('llm_extra_params');
-		if ($modelExtraParams !== null) {
-			$params = array_merge($modelExtraParams, $params);
+		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
+		if ($adminExtraParams !== null) {
+			$params = array_merge($adminExtraParams, $params);
+		}
+		if ($extraParams !== null) {
+			$params = array_merge($extraParams, $params);
 		}
 
 		$response = $this->request($userId, 'chat/completions', $params, 'POST');
@@ -370,7 +380,7 @@ class OpenAiAPIService {
 	 * @param string $configKey
 	 * @return array|null
 	 */
-	private function getExtraParams(string $configKey): ?array {
+	private function getAdminExtraParams(string $configKey): ?array {
 		$stringValue = $this->config->getAppValue(Application::APP_ID, $configKey);
 		if ($stringValue === '') {
 			return null;

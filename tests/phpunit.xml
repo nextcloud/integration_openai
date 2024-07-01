@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
       <clover outputFile="./clover.xml"/>
     </report>
   </coverage>
-  <testsuite name="GptFreePrompt App Tests">
+  <testsuite name="OpenAI integration App Tests">
     <directory suffix="Test.php">.</directory>
   </testsuite>
   <!-- filters for code coverage -->
