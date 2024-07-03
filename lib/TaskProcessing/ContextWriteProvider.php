@@ -45,14 +45,9 @@ class ContextWriteProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShape(): array {
 		return [
-			'temperature' => new ShapeDescriptor(
-				$this->l->t('Temperature'),
-				$this->l->t('What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.'),
-				EShapeType::Number
-			),
 			'max_tokens' => new ShapeDescriptor(
-				$this->l->t('Maximum tokens'),
-				$this->l->t('The maximum number of tokens that can be generated in the completion.'),
+				$this->l->t('Maximum output words'),
+				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
 		];
@@ -84,26 +79,16 @@ class ContextWriteProvider implements ISynchronousProvider {
 			. ' Also, use the *WRITING STYLE* as a guide for how to write the text ONLY and not as a source of facts or events.'
 			. ' Detect the language used in the *SOURCE_MATERIAL*. Make sure to use the same language in your response. Do not mention the language explicitly.';
 
-		$temperature = null;
-		if (isset($input['temperature'])
-			&& (is_float($input['temperature']) || is_int($input['temperature']))) {
-			$temperature = $input['temperature'];
-		}
-
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$extraParams = $temperature === null
-			? null
-			: ['temperature' => $temperature];
-
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, $maxTokens, $extraParams);
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $prompt, 1, $adminModel, $maxTokens);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, $maxTokens, $extraParams);
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, $maxTokens);
 			}
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
