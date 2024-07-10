@@ -246,46 +246,44 @@
 						</template>
 					</NcInputField>
 				</div>
-				<div class="line">
-					<!--Loop through all quota types and list an input for them on this line-->
-					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
-					<label for="openai-api-quotas">
-						{{ t('integration_openai', 'Usage quotas per time period') }}
-					</label>
-					<table class="quota-table">
-						<thead>
-							<tr>
-								<th width="120px">
-									{{ t('integration_openai', 'Quota type') }}
-								</th>
-								<th>{{ t('integration_openai', 'Per-user quota / period') }}</th>
-								<th v-if="quotaInfo !== null">
-									{{ t('integration_openai', 'Current system-wide usage / period') }}
-								</th>
-							</tr>
-						</thead>
-						<tbody v-if="quotaInfo !== null">
-							<tr v-for="(_,index) in state.quotas" :key="index">
-								<td class="text-cell">
-									{{ quotaInfo[index].type }}
-								</td>
-								<td>
-									<input :id="'openai-api-quota-' + index"
-										v-model.number="state.quotas[index]"
-										:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
-										type="number"
-										@input="onInput(false)">
-									<span v-if="quotaInfo !== null" class="text-cell">
-										{{ quotaInfo[index].unit }}
-									</span>
-								</td>
-								<td v-if="quotaInfo !== null" class="text-cell">
-									{{ quotaInfo[index].used }}
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				<h4>
+					{{ t('integration_openai', 'Usage quotas per time period') }}
+				</h4>
+				<!--Loop through all quota types and list an input for them on this line-->
+				<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
+				<table class="quota-table">
+					<thead>
+						<tr>
+							<th width="120px">
+								{{ t('integration_openai', 'Quota type') }}
+							</th>
+							<th>{{ t('integration_openai', 'Per-user quota / period') }}</th>
+							<th v-if="quotaInfo !== null">
+								{{ t('integration_openai', 'Current system-wide usage / period') }}
+							</th>
+						</tr>
+					</thead>
+					<tbody v-if="quotaInfo !== null">
+						<tr v-for="(_,index) in state.quotas" :key="index">
+							<td class="text-cell">
+								{{ quotaInfo[index].type }}
+							</td>
+							<td>
+								<input :id="'openai-api-quota-' + index"
+									v-model.number="state.quotas[index]"
+									:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
+									type="number"
+									@input="onInput(false)">
+								<span v-if="quotaInfo !== null" class="text-cell">
+									{{ quotaInfo[index].unit }}
+								</span>
+							</td>
+							<td v-if="quotaInfo !== null" class="text-cell">
+								{{ quotaInfo[index].used }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
 				<div class="line">
 					<!--A input for max number of tokens to generate for a single request-->
 					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
@@ -565,10 +563,27 @@ export default {
 		text-decoration: underline;
 	}
 
-	.line {
-		.radios {
-			display: flex;
+	.radios {
+		display: flex;
+	}
+
+	.quota-table {
+		padding: 4px 8px 4px 8px;
+		border: 2px solid var(--color-border);
+		border-radius: var(--border-radius);
+		.text-cell {
+			opacity: 0.5;
 		}
+		th, td {
+			width: 300px;
+			text-align: left;
+			> input:invalid {
+				border-color: var(--color-error);
+			}
+		}
+	}
+
+	.line {
 		> label {
 			width: 350px;
 			display: flex;
@@ -583,22 +598,6 @@ export default {
 		}
 		> input[type='radio'] {
 			width: auto;
-		}
-		.quota-table {
-			padding: 4px 8px 4px 8px;
-			border: 2px solid var(--color-border);
-			border-radius: var(--border-radius);
-			.text-cell {
-				opacity: 0.5;
-			}
-			th, td {
-				width: 300px;
-				text-align: left;
-				> input:invalid {
-					border-color: var(--color-error);
-				}
-			}
-
 		}
 	}
 

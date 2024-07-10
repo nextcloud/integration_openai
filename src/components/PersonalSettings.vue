@@ -10,40 +10,36 @@
 				{{ t('integration_openai', 'Your administrator defined a custom service address') }}
 			</p>
 			<div v-if="!state.is_custom_service || !state.use_basic_auth">
-				<p class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
+				<NcNoteCard type="info">
 					{{ t('integration_openai', 'Leave the API key empty to use the one defined by administrators') }}
-				</p>
+				</NcNoteCard>
 				<div class="line">
-					<label for="openai-api-key">
-						<KeyIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'API key') }}
-					</label>
-					<input id="openai-api-key"
-						v-model="state.api_key"
-						autocomplete="off"
+					<NcTextField
+						id="openai-api-key"
+						class="input"
+						:value.sync="state.api_key"
 						type="password"
-						:readonly="readonly"
-						:placeholder="t('integration_openai', 'your API key')"
-						@input="onInput"
-						@focus="readonly = false">
+						:label="t('integration_openai', 'API key')"
+						:show-trailing-button="!!state.api_key"
+						@update:value="onInput"
+						@trailing-button-click="state.api_key = '' ; onInput()">
+						<KeyIcon />
+					</NcTextField>
 				</div>
 				<div v-if="!state.is_custom_service">
-					<p class="settings-hint">
-						<InformationOutlineIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings:') }}
+					<NcNoteCard type="info">
+						{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings') }}:
 						&nbsp;
 						<a :href="apiKeyUrl" target="_blank" class="external">
 							{{ apiKeyUrl }}
 						</a>
-					</p>
+					</NcNoteCard>
 				</div>
 			</div>
 			<div v-else>
-				<p class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
+				<NcNoteCard type="info">
 					{{ t('integration_openai', 'Leave the username and password empty to use the ones defined by your administrator') }}
-				</p>
+				</NcNoteCard>
 				<div class="line">
 					<label for="basic-user">
 						<KeyIcon :size="20" class="icon" />
@@ -71,12 +67,11 @@
 						@focus="readonly = false">
 				</div>
 			</div>
-			<div v-if="quotaInfo !== null" class="line">
+			<div v-if="quotaInfo !== null">
 				<!-- Show quota info -->
-				<label>
-					<InformationOutlineIcon :size="20" class="icon" />
+				<h4>
 					{{ t('integration_openai', 'Usage quota info') }}
-				</label>
+				</h4>
 				<!-- Loop through all quota types-->
 				<table class="quota-table">
 					<thead>
@@ -101,10 +96,9 @@
 				</table>
 			</div>
 			<div v-if="!state.is_custom_service">
-				<p class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
+				<NcNoteCard type="info">
 					{{ t('integration_openai', 'Specifying your own API key will allow unlimited usage') }}
-				</p>
+				</NcNoteCard>
 			</div>
 		</div>
 	</div>
@@ -115,6 +109,9 @@ import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline
 import KeyIcon from 'vue-material-design-icons/Key.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
+
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
@@ -129,6 +126,8 @@ export default {
 		OpenAiIcon,
 		KeyIcon,
 		InformationOutlineIcon,
+		NcNoteCard,
+		NcTextField,
 	},
 
 	props: [],
@@ -231,31 +230,31 @@ export default {
 		margin-right: 8px;
 	}
 
+	.quota-table {
+		padding: 4px 8px 4px 8px;
+		border: 2px solid var(--color-border);
+		border-radius: var(--border-radius);
+		tbody {
+			opacity: 0.5;
+		}
+		th, td {
+			width: 200px;
+			text-align: left;
+		}
+	}
+
 	.line {
 		> label {
 			width: 300px;
 			display: flex;
 			align-items: center;
 		}
-		> input {
+		> input, .input {
 			width: 300px;
 		}
 		.spacer {
 			display: inline-block;
 			width: 36px;
-		}
-
-		.quota-table {
-			padding: 4px 8px 4px 8px;
-			border: 2px solid var(--color-border);
-			border-radius: var(--border-radius);
-			tbody {
-				opacity: 0.5;
-			}
-			th, td {
-				width: 200px;
-				text-align: left;
-			}
 		}
 	}
 
