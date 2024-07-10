@@ -94,7 +94,7 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 	<screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot3.jpg</screenshot>
 	<screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot4.jpg</screenshot>
 	<dependencies>
-		<nextcloud min-version="28" max-version="30"/>
+		<nextcloud min-version="30" max-version="30"/>
 	</dependencies>
 	<background-jobs>
 		<job>OCA\OpenAi\Cron\CleanupQuotaDb</job>

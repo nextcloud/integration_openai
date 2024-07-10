@@ -13,7 +13,6 @@ use OCA\OpenAi\Capabilities;
 use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\ReformulateProvider;
-use OCA\OpenAi\TaskProcessing\ReformulateTaskType;
 use OCA\OpenAi\TaskProcessing\STTProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
@@ -85,7 +84,6 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(HeadlineProvider::class);
 			$context->registerTaskProcessingProvider(TopicsProvider::class);
 			$context->registerTaskProcessingProvider(ContextWriteProvider::class);
-			$context->registerTaskProcessingTaskType(ReformulateTaskType::class);
 			$context->registerTaskProcessingProvider(ReformulateProvider::class);
 		}
 		if ($this->config->getAppValue(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {

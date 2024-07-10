@@ -13,6 +13,7 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\TaskTypes\TextToTextReformulation;
 use RuntimeException;
 
 class ReformulateProvider implements ISynchronousProvider {
@@ -35,7 +36,7 @@ class ReformulateProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		return ReformulateTaskType::ID;
+		return TextToTextReformulation::ID;
 	}
 
 	public function getExpectedRuntime(): int {
