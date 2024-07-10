@@ -16,6 +16,7 @@ use OCA\OpenAi\TaskProcessing\ReformulateProvider;
 use OCA\OpenAi\TaskProcessing\STTProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
+use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TopicsProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
@@ -80,6 +81,7 @@ class Application extends App implements IBootstrap {
 
 		if ($this->config->getAppValue(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToTextProvider::class);
+			$context->registerTaskProcessingProvider(TextToTextChatProvider::class);
 			$context->registerTaskProcessingProvider(SummaryProvider::class);
 			$context->registerTaskProcessingProvider(HeadlineProvider::class);
 			$context->registerTaskProcessingProvider(TopicsProvider::class);

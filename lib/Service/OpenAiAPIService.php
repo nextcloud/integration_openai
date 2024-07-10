@@ -308,9 +308,11 @@ class OpenAiAPIService {
 	 * Returns an array of completions
 	 *
 	 * @param string|null $userId
-	 * @param string $prompt
-	 * @param int $n
 	 * @param string $model
+	 * @param string $userPrompt
+	 * @param string|null $systemPrompt
+	 * @param array|null $history
+	 * @param int $n
 	 * @param int|null $maxTokens
 	 * @param array|null $extraParams
 	 * @return string[]
@@ -318,9 +320,11 @@ class OpenAiAPIService {
 	 */
 	public function createChatCompletion(
 		?string $userId,
-		string $prompt,
-		int $n,
 		string $model,
+		string $userPrompt,
+		?string $systemPrompt = null,
+		?array $history = null,
+		int $n = 1,
 		?int $maxTokens = null,
 		?array $extraParams = null,
 	): array {
@@ -333,9 +337,28 @@ class OpenAiAPIService {
 			$maxTokens = $maxTokensLimit;
 		}
 
+		$messages = [];
+		if ($systemPrompt !== null) {
+			$messages[] = ['role' => 'system', 'content' => $systemPrompt];
+		}
+		if ($history !== null) {
+			foreach ($history as $historyEntry) {
+				if (str_starts_with($historyEntry, 'system:')) {
+					$historyEntry = preg_replace('/^system:/', '', $historyEntry);
+					$messages[] = ['role' => 'system', 'content' => $historyEntry];
+				} elseif (str_starts_with($historyEntry, 'user:')) {
+					$historyEntry = preg_replace('/^user:/', '', $historyEntry);
+					$messages[] = ['role' => 'user', 'content' => $historyEntry];
+				} else {
+					$messages[] = ['role' => 'user', 'content' => $historyEntry];
+				}
+			}
+		}
+		$messages[] = ['role' => 'user', 'content' => $userPrompt];
+
 		$params = [
 			'model' => $model,
-			'messages' => [['role' => 'user', 'content' => $prompt]],
+			'messages' => $messages,
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
