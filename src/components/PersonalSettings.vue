@@ -21,8 +21,8 @@
 						type="password"
 						:label="t('integration_openai', 'API key')"
 						:show-trailing-button="!!state.api_key"
-						@update:value="onInput"
-						@trailing-button-click="state.api_key = '' ; onInput()">
+						@update:value="onSensitiveInput"
+						@trailing-button-click="state.api_key = '' ; onSensitiveInput()">
 						<KeyIcon />
 					</NcTextField>
 				</div>
@@ -63,7 +63,7 @@
 						type="password"
 						:readonly="readonly"
 						:placeholder="t('integration_openai', 'your Basic Auth password')"
-						@input="onInput"
+						@input="onSensitiveInput"
 						@focus="readonly = false">
 				</div>
 			</div>
@@ -116,8 +116,9 @@ import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import { delay } from '../utils.js'
 import { showSuccess, showError } from '@nextcloud/dialogs'
+import { confirmPassword } from '@nextcloud/password-confirmation'
+import debounce from 'debounce'
 
 export default {
 	name: 'PersonalSettings',
@@ -154,57 +155,60 @@ export default {
 	},
 
 	methods: {
-		onInput() {
-			delay(() => {
-				this.saveOptions({
-					api_key: this.state.api_key,
-					basic_user: this.state.basic_user,
-					basic_password: this.state.basic_password,
-				})
-			}, 2000)()
-		},
-		loadQuotaInfo() {
-			const url = generateUrl('/apps/integration_openai/quota-info')
-			axios.get(url)
-				.then((response) => {
-					this.quotaInfo = response.data
-				})
-				.catch((error) => {
-					showError(
-						t('integration_openai', 'Failed to load quota info')
-						+ ': ' + error.response?.request?.responseText,
-					)
-				})
-			if (this.quotaInfo === null) {
-				return
+		onInput: debounce(function() {
+			this.saveOptions({
+				basic_user: this.state.basic_user,
+			})
+		}, 2000),
+		onSensitiveInput: debounce(function() {
+			const values = {}
+			if (this.state.api_key !== 'dummyApiKey') {
+				values.api_key = this.state.api_key
 			}
-			// Loop through all quota types and check if any are limited by admin
-			// If so, show a hint that the user can provide their own api key to remove the limit
-			for (const quota of this.quotaInfo) {
-				if (quota.limit > 0) {
-					this.showQuotaRemovalInfo = true
-					break
+			if (this.state.basic_password !== 'dummyPassword') {
+				values.basic_password = this.state.basic_password
+			}
+			this.saveOptions(values, true)
+		}, 2000),
+		async loadQuotaInfo() {
+			const url = generateUrl('/apps/integration_openai/quota-info')
+			try {
+				const response = await axios.get(url)
+				this.quotaInfo = response.data
+				if (this.quotaInfo === null) {
+					return
 				}
+				// Loop through all quota types and check if any are limited by admin
+				// If so, show a hint that the user can provide their own api key to remove the limit
+				for (const quota of this.quotaInfo.quota_usage) {
+					if (quota.limit > 0) {
+						this.showQuotaRemovalInfo = true
+						break
+					}
+				}
+			} catch (error) {
+				showError(t('integration_openai', 'Failed to load quota info'))
+				console.error(error)
 			}
 		},
 		capitalizedWord(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)
 		},
-		saveOptions(values) {
-			const req = {
-				values,
+		async saveOptions(values, sensitive = false) {
+			if (sensitive) {
+				await confirmPassword()
 			}
-			const url = generateUrl('/apps/integration_openai/config')
-			return axios.put(url, req)
-				.then((response) => {
-					showSuccess(t('integration_openai', 'OpenAI options saved'))
-				})
-				.catch((error) => {
-					showError(
-						t('integration_openai', 'Failed to save OpenAI options')
-						+ ': ' + error.response?.request?.responseText,
-					)
-				})
+			try {
+				const req = {
+					values,
+				}
+				const url = sensitive ? generateUrl('/apps/integration_openai/config/sensitive') : generateUrl('/apps/integration_openai/config')
+				await axios.put(url, req)
+				showSuccess(t('integration_openai', 'OpenAI options saved'))
+			} catch (error) {
+				showError(t('integration_openai', 'Failed to save OpenAI options'))
+				console.error(error)
+			}
 		},
 	},
 }

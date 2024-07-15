@@ -88,8 +88,8 @@
 						type="password"
 						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
 						:show-trailing-button="!!state.api_key"
-						@update:value="onInput(true)"
-						@trailing-button-click="state.api_key = '' ; onInput(true)">
+						@update:value="onSensitiveInput(true)"
+						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)">
 						<KeyIcon />
 					</NcTextField>
 				</div>
@@ -121,8 +121,8 @@
 							type="password"
 							:label="t('integration_openai', 'Basic Auth password')"
 							:show-trailing-button="!!state.basic_password"
-							@update:value="onInput(true)"
-							@trailing-button-click="state.basic_password = '' ; onInput(true)">
+							@update:value="onSensitiveInput(true)"
+							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)">
 							<KeyIcon />
 						</NcTextField>
 					</div>
@@ -357,8 +357,9 @@ import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import { delay } from '../utils.js'
 import { showSuccess, showError } from '@nextcloud/dialogs'
+import { confirmPassword } from '@nextcloud/password-confirmation'
+import debounce from 'debounce'
 
 export default {
 	name: 'AdminSettings',
@@ -425,6 +426,10 @@ export default {
 
 	methods: {
 		getModels() {
+			this.models = null
+			if (!this.configured) {
+				return
+			}
 			const url = generateUrl('/apps/integration_openai/models')
 			return axios.get(url)
 				.then((response) => {
@@ -443,6 +448,8 @@ export default {
 								+ (modelToSelect.owned_by ? ' (' + modelToSelect.owned_by + ')' : ''),
 						}
 					}
+					const selectedModelId = this.selectedModel?.id ?? ''
+					this.saveOptions({ default_completion_model_id: selectedModelId }, false)
 				})
 				.catch((error) => {
 					console.error(error)
@@ -471,65 +478,62 @@ export default {
 		capitalizedWord(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)
 		},
-		onCheckboxChanged(newValue, key, getModels = true) {
+		async onCheckboxChanged(newValue, key, getModels = true, sensitive = false) {
 			this.state[key] = newValue
-			this.saveOptions({ [key]: this.state[key] }).then(() => {
-				if (getModels) {
-					this.models = null
-					if (this.configured) {
-						this.getModels().then(() => {
-							const selectedModelId = this.selectedModel?.id ?? ''
-							this.saveOptions({ default_completion_model_id: selectedModelId }, false)
-						})
-					}
-				}
-			})
+			await this.saveOptions({ [key]: this.state[key] }, sensitive)
+			if (getModels) {
+				this.getModels()
+			}
 		},
-		onInput(getModels = true) {
-			delay(() => {
-				this.saveOptions({
-					use_basic_auth: this.state.use_basic_auth,
-					api_key: this.state.api_key,
-					basic_user: this.state.basic_user,
-					basic_password: this.state.basic_password,
-					url: this.state.url,
-					service_name: this.state.service_name,
-					chat_endpoint_enabled: this.state.chat_endpoint_enabled,
-					request_timeout: parseInt(this.state.request_timeout),
-					max_tokens: parseInt(this.state.max_tokens),
-					llm_extra_params: this.state.llm_extra_params,
-					quota_period: parseInt(this.state.quota_period),
-					quotas: this.state.quotas,
-				}).then(() => {
-					if (getModels) {
-						this.models = null
-						if (this.configured) {
-							this.getModels().then(() => {
-								const selectedModelId = this.selectedModel?.id ?? ''
-								this.saveOptions({ default_completion_model_id: selectedModelId }, false)
-							})
-						}
-					}
-				})
-			}, 2000)()
-		},
-		saveOptions(values, notify = true) {
+		onSensitiveInput: debounce(async function(getModels = true) {
+			const values = {}
+			if (this.state.api_key !== 'dummyApiKey') {
+				values.api_key = this.state.api_key
+			}
+			if (this.state.basic_password !== 'dummyPassword') {
+				values.basic_password = this.state.basic_password
+			}
+			await this.saveOptions(values, true)
+			if (getModels) {
+				this.getModels()
+			}
+		}, 2000),
+		onInput: debounce(async function(getModels = true) {
+			const values = {
+				use_basic_auth: this.state.use_basic_auth,
+				basic_user: this.state.basic_user,
+				url: this.state.url,
+				service_name: this.state.service_name,
+				chat_endpoint_enabled: this.state.chat_endpoint_enabled,
+				request_timeout: parseInt(this.state.request_timeout),
+				max_tokens: parseInt(this.state.max_tokens),
+				llm_extra_params: this.state.llm_extra_params,
+				quota_period: parseInt(this.state.quota_period),
+				quotas: this.state.quotas,
+			}
+			await this.saveOptions(values, false)
+			if (getModels) {
+				this.getModels()
+			}
+		}, 2000),
+		async saveOptions(values, sensitive = false, notify = true) {
+			if (sensitive) {
+				await confirmPassword()
+			}
+
 			const req = {
 				values,
 			}
-			const url = generateUrl('/apps/integration_openai/admin-config')
-			return axios.put(url, req)
-				.then((response) => {
-					if (notify) {
-						showSuccess(t('integration_openai', 'OpenAI admin options saved'))
-					}
-				})
-				.catch((error) => {
-					showError(
-						t('integration_openai', 'Failed to save OpenAI admin options')
-						+ ': ' + error.response?.request?.responseText,
-					)
-				})
+			const url = sensitive ? generateUrl('/apps/integration_openai/admin-config/sensitive') : generateUrl('/apps/integration_openai/admin-config')
+			try {
+				await axios.put(url, req)
+				if (notify) {
+					showSuccess(t('integration_openai', 'OpenAI admin options saved'))
+				}
+			} catch (error) {
+				console.error(error)
+				showError(t('integration_openai', 'Failed to save OpenAI admin options'))
+			}
 		},
 	},
 }

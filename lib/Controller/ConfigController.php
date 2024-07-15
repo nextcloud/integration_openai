@@ -17,6 +17,7 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 
+use OCP\AppFramework\Http\Attribute\PasswordConfirmationRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
 use OCP\PreConditionNotMetException;
@@ -40,12 +41,33 @@ class ConfigController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function setUserConfig(array $values): DataResponse {
+		if (isset($values['api_key']) || isset($values['basic_password'])) {
+			return new DataResponse('', Http::STATUS_BAD_REQUEST);
+		}
 		try {
 			$this->openAiSettingsService->setUserConfig($this->userId, $values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
-		return new DataResponse(1);
+		return new DataResponse('');
+	}
+
+	/**
+	 * Set sensitive config values
+	 *
+	 * @param array $values key/value pairs to store in config
+	 * @return DataResponse
+	 * @throws PreConditionNotMetException
+	 */
+	#[NoAdminRequired]
+	#[PasswordConfirmationRequired]
+	public function setSensitiveUserConfig(array $values): DataResponse {
+		try {
+			$this->openAiSettingsService->setUserConfig($this->userId, $values);
+		} catch (Exception $e) {
+			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
+		}
+		return new DataResponse('');
 	}
 
 	/**
@@ -55,12 +77,32 @@ class ConfigController extends Controller {
 	 * @return DataResponse
 	 */
 	public function setAdminConfig(array $values): DataResponse {
+		if (isset($values['api_key']) || isset($values['basic_password'])) {
+			return new DataResponse('', Http::STATUS_BAD_REQUEST);
+		}
 		try {
 			$this->openAiSettingsService->setAdminConfig($values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
 
-		return new DataResponse(1);
+		return new DataResponse('');
+	}
+
+	/**
+	 * Set sensitive admin config values
+	 *
+	 * @param array $values key/value pairs to store in app config
+	 * @return DataResponse
+	 */
+	#[PasswordConfirmationRequired]
+	public function setSensitiveAdminConfig(array $values): DataResponse {
+		try {
+			$this->openAiSettingsService->setAdminConfig($values);
+		} catch (Exception $e) {
+			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
+		}
+
+		return new DataResponse('');
 	}
 }

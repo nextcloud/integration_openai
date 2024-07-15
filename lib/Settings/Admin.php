@@ -20,6 +20,8 @@ class Admin implements ISettings {
 	 */
 	public function getForm(): TemplateResponse {
 		$adminConfig = $this->openAiSettingsService->getAdminConfig();
+		$adminConfig['api_key'] = $adminConfig['api_key'] === '' ? '' : 'dummyApiKey';
+		$adminConfig['basic_password'] = $adminConfig['basic_password'] === '' ? '' : 'dummyPassword';
 		$this->initialStateService->provideInitialState('admin-config', $adminConfig);
 		return new TemplateResponse(Application::APP_ID, 'adminSettings');
 	}
