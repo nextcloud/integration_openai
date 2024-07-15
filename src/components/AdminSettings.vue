@@ -25,12 +25,14 @@
 						</template>
 					</NcButton>
 				</div>
-				<p class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'This should be the address of your LocalAI instance (or any service implementing an API similar to OpenAI). This URL will be accessed by your Nextcloud server.') }}
-					<br>
-					{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case make sure \'allow_local_remote_servers\' is set to true in config.php', { example : 'http://localhost:8080' }) }}
-				</p>
+				<NcNoteCard type="info">
+					<p>
+						{{ t('integration_openai', 'This should be the address of your LocalAI instance (or any service implementing an API similar to OpenAI). This URL will be accessed by your Nextcloud server.') }}
+					</p>
+					<p>
+						{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case make sure \'allow_local_remote_servers\' is set to true in config.php', { example : 'http://localhost:8080' }) }}
+					</p>
+				</NcNoteCard>
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
 						id="openai-service-name"
@@ -50,7 +52,7 @@
 				</div>
 			</div>
 			<div>
-				<h2 class="mid-setting-heading">
+				<h2>
 					{{ t('integration_openai', 'Authentication') }}
 				</h2>
 				<div v-show="state.url !== ''" class="line">
@@ -91,14 +93,13 @@
 						<KeyIcon />
 					</NcTextField>
 				</div>
-				<p v-show="state.url === ''" class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings:') }}
+				<NcNoteCard v-show="state.url === ''" type="info">
+					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings') }}:
 					&nbsp;
 					<a :href="apiKeyUrl" target="_blank" class="external">
 						{{ apiKeyUrl }}
 					</a>
-				</p>
+				</NcNoteCard>
 				<div v-show="state.url !== '' && state.use_basic_auth">
 					<div class="line">
 						<NcTextField
@@ -128,7 +129,7 @@
 				</div>
 			</div>
 			<div>
-				<h2 class="mid-setting-heading">
+				<h2>
 					{{ t('integration_openai', 'Text generation') }}
 				</h2>
 				<div v-show="state.url !== ''" class="line">
@@ -157,10 +158,9 @@
 						</NcCheckboxRadioSwitch>
 					</div>
 				</div>
-				<p v-show="state.url !== ''" class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
+				<NcNoteCard v-show="state.url !== ''" type="info">
 					{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
-				</p>
+				</NcNoteCard>
 				<div v-if="models"
 					class="line line-select">
 					<NcSelect
@@ -227,7 +227,7 @@
 				</div>
 			</div>
 			<div>
-				<h2 class="mid-setting-heading">
+				<h2>
 					{{ t('integration_openai', 'Usage limits') }}
 				</h2>
 				<div class="line">
@@ -309,7 +309,7 @@
 				</div>
 			</div>
 			<div>
-				<h2 class="mid-setting-heading">
+				<h2>
 					{{ t('integration_openai', 'Select enabled features') }}
 				</h2>
 				<NcCheckboxRadioSwitch
@@ -320,7 +320,7 @@
 				<NcCheckboxRadioSwitch
 					:checked="state.llm_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'llm_provider_enabled', false)">
-					{{ t('integration_openai', 'Text processing provider (to generate text, summarize etc...)') }}
+					{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write etc...)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
 					:checked="state.t2i_provider_enabled"
@@ -339,7 +339,6 @@
 
 <script>
 import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
-import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
 import CloseIcon from 'vue-material-design-icons/Close.vue'
@@ -353,6 +352,7 @@ import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
@@ -369,7 +369,6 @@ export default {
 		CloseIcon,
 		AccountIcon,
 		EarthIcon,
-		InformationOutlineIcon,
 		TimerAlertOutlineIcon,
 		HelpCircleIcon,
 		NcButton,
@@ -377,6 +376,7 @@ export default {
 		NcCheckboxRadioSwitch,
 		NcTextField,
 		NcInputField,
+		NcNoteCard,
 	},
 
 	props: [],
@@ -540,27 +540,13 @@ export default {
 	#openai-content {
 		margin-left: 40px;
 	}
-	h2,
-	.line,
-	.settings-hint {
+
+	h2 {
 		display: flex;
 		align-items: center;
-		margin-top: 12px;
 		.icon {
-			margin-right: 4px;
+			margin-right: 8px;
 		}
-		&.line-select {
-			align-items: end;
-		}
-	}
-
-	h2 .icon {
-		margin-right: 8px;
-	}
-
-	.mid-setting-heading {
-		margin-top: 32px;
-		text-decoration: underline;
 	}
 
 	.radios {
@@ -584,6 +570,15 @@ export default {
 	}
 
 	.line {
+		display: flex;
+		align-items: center;
+		margin-top: 12px;
+		.icon {
+			margin-right: 4px;
+		}
+		&.line-select {
+			align-items: end;
+		}
 		> label {
 			width: 350px;
 			display: flex;

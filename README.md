@@ -5,7 +5,7 @@ as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/
 
 This app implements:
 
-* Text generation providers: Free prompt, Summarize, Headline and Reformulate (using any available large language model)
+* Text generation providers: Free prompt, Summarize, Headline, Context write, Chat, and Reformulate (using any available large language model)
 * A Translation provider (using any available language model)
 * A SpeechToText provider (using Whisper)
 * An image generation provider
