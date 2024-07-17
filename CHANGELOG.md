@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.0.0 – 2024-07-17
+
+### Added
+
+- Create all task processing providers that were text processing ones + image generation + audio transcription @julien-nc [#102](https://github.com/nextcloud/integration_openai/pull/102)
+- ContextWrite provider
+- Chat provider
+- Add password confirmation when setting sensitive values in user and admin settings
+
+### Changed
+
+- Drop old image generation, audio transcription and text processing providers
+- Use nc/vue 8.14.0
+
+### Fixed
+
+- Fix topics provider output: make it comma separated
+
 ## 2.0.3 – 2024-06-21
 
 ### Fixed
