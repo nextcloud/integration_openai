@@ -342,15 +342,18 @@ class OpenAiAPIService {
 			$messages[] = ['role' => 'system', 'content' => $systemPrompt];
 		}
 		if ($history !== null) {
-			foreach ($history as $historyEntry) {
+			foreach ($history as $i => $historyEntry) {
 				if (str_starts_with($historyEntry, 'system:')) {
 					$historyEntry = preg_replace('/^system:/', '', $historyEntry);
 					$messages[] = ['role' => 'system', 'content' => $historyEntry];
 				} elseif (str_starts_with($historyEntry, 'user:')) {
 					$historyEntry = preg_replace('/^user:/', '', $historyEntry);
 					$messages[] = ['role' => 'user', 'content' => $historyEntry];
-				} else {
+				} elseif (((int)$i) % 2 === 0) {
+					// we assume even indexes are user messages and odd ones are system ones
 					$messages[] = ['role' => 'user', 'content' => $historyEntry];
+				} else {
+					$messages[] = ['role' => 'system', 'content' => $historyEntry];
 				}
 			}
 		}
