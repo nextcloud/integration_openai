@@ -65,7 +65,7 @@ class TopicsProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Extract topics from the following text. Detect the language of the text. Use the same language as the text. Output only the topics. Here is the text:' . "\n\n" . $prompt;
+		$prompt = 'Extract topics from the following text. Detect the language of the text. Use the same language as the text. Output only the topics, comma separated. Here is the text:' . "\n\n" . $prompt;
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
