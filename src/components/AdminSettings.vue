@@ -25,12 +25,14 @@
 						</template>
 					</NcButton>
 				</div>
-				<p class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'This should be the address of your LocalAI instance (or any service implementing an API similar to OpenAI). This URL will be accessed by your Nextcloud server.') }}
-					<br>
-					{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case make sure \'allow_local_remote_servers\' is set to true in config.php', { example : 'http://localhost:8080' }) }}
-				</p>
+				<NcNoteCard type="info">
+					<p>
+						{{ t('integration_openai', 'This should be the address of your LocalAI instance (or any service implementing an API similar to OpenAI). This URL will be accessed by your Nextcloud server.') }}
+					</p>
+					<p>
+						{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case make sure \'allow_local_remote_servers\' is set to true in config.php', { example : 'http://localhost:8080' }) }}
+					</p>
+				</NcNoteCard>
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
 						id="openai-service-name"
@@ -50,7 +52,7 @@
 				</div>
 			</div>
 			<div>
-				<h2 class="mid-setting-heading">
+				<h2>
 					{{ t('integration_openai', 'Authentication') }}
 				</h2>
 				<div v-show="state.url !== ''" class="line">
@@ -86,19 +88,18 @@
 						type="password"
 						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
 						:show-trailing-button="!!state.api_key"
-						@update:value="onInput(true)"
-						@trailing-button-click="state.api_key = '' ; onInput(true)">
+						@update:value="onSensitiveInput(true)"
+						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)">
 						<KeyIcon />
 					</NcTextField>
 				</div>
-				<p v-show="state.url === ''" class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
-					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings:') }}
+				<NcNoteCard v-show="state.url === ''" type="info">
+					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings') }}:
 					&nbsp;
 					<a :href="apiKeyUrl" target="_blank" class="external">
 						{{ apiKeyUrl }}
 					</a>
-				</p>
+				</NcNoteCard>
 				<div v-show="state.url !== '' && state.use_basic_auth">
 					<div class="line">
 						<NcTextField
@@ -120,15 +121,15 @@
 							type="password"
 							:label="t('integration_openai', 'Basic Auth password')"
 							:show-trailing-button="!!state.basic_password"
-							@update:value="onInput(true)"
-							@trailing-button-click="state.basic_password = '' ; onInput(true)">
+							@update:value="onSensitiveInput(true)"
+							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)">
 							<KeyIcon />
 						</NcTextField>
 					</div>
 				</div>
 			</div>
 			<div>
-				<h2 class="mid-setting-heading">
+				<h2>
 					{{ t('integration_openai', 'Text generation') }}
 				</h2>
 				<div v-show="state.url !== ''" class="line">
@@ -157,10 +158,9 @@
 						</NcCheckboxRadioSwitch>
 					</div>
 				</div>
-				<p v-show="state.url !== ''" class="settings-hint">
-					<InformationOutlineIcon :size="20" class="icon" />
+				<NcNoteCard v-show="state.url !== ''" type="info">
 					{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
-				</p>
+				</NcNoteCard>
 				<div v-if="models"
 					class="line line-select">
 					<NcSelect
@@ -227,7 +227,7 @@
 				</div>
 			</div>
 			<div>
-				<h2 class="mid-setting-heading">
+				<h2>
 					{{ t('integration_openai', 'Usage limits') }}
 				</h2>
 				<div class="line">
@@ -246,46 +246,44 @@
 						</template>
 					</NcInputField>
 				</div>
-				<div class="line">
-					<!--Loop through all quota types and list an input for them on this line-->
-					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
-					<label for="openai-api-quotas">
-						{{ t('integration_openai', 'Usage quotas per time period') }}
-					</label>
-					<table class="quota-table">
-						<thead>
-							<tr>
-								<th width="120px">
-									{{ t('integration_openai', 'Quota type') }}
-								</th>
-								<th>{{ t('integration_openai', 'Per-user quota / period') }}</th>
-								<th v-if="quotaInfo !== null">
-									{{ t('integration_openai', 'Current system-wide usage / period') }}
-								</th>
-							</tr>
-						</thead>
-						<tbody v-if="quotaInfo !== null">
-							<tr v-for="(_,index) in state.quotas" :key="index">
-								<td class="text-cell">
-									{{ quotaInfo[index].type }}
-								</td>
-								<td>
-									<input :id="'openai-api-quota-' + index"
-										v-model.number="state.quotas[index]"
-										:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
-										type="number"
-										@input="onInput(false)">
-									<span v-if="quotaInfo !== null" class="text-cell">
-										{{ quotaInfo[index].unit }}
-									</span>
-								</td>
-								<td v-if="quotaInfo !== null" class="text-cell">
-									{{ quotaInfo[index].used }}
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				<h4>
+					{{ t('integration_openai', 'Usage quotas per time period') }}
+				</h4>
+				<!--Loop through all quota types and list an input for them on this line-->
+				<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
+				<table class="quota-table">
+					<thead>
+						<tr>
+							<th width="120px">
+								{{ t('integration_openai', 'Quota type') }}
+							</th>
+							<th>{{ t('integration_openai', 'Per-user quota / period') }}</th>
+							<th v-if="quotaInfo !== null">
+								{{ t('integration_openai', 'Current system-wide usage / period') }}
+							</th>
+						</tr>
+					</thead>
+					<tbody v-if="quotaInfo !== null">
+						<tr v-for="(_,index) in state.quotas" :key="index">
+							<td class="text-cell">
+								{{ quotaInfo[index].type }}
+							</td>
+							<td>
+								<input :id="'openai-api-quota-' + index"
+									v-model.number="state.quotas[index]"
+									:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
+									type="number"
+									@input="onInput(false)">
+								<span v-if="quotaInfo !== null" class="text-cell">
+									{{ quotaInfo[index].unit }}
+								</span>
+							</td>
+							<td v-if="quotaInfo !== null" class="text-cell">
+								{{ quotaInfo[index].used }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
 				<div class="line">
 					<!--A input for max number of tokens to generate for a single request-->
 					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
@@ -311,7 +309,7 @@
 				</div>
 			</div>
 			<div>
-				<h2 class="mid-setting-heading">
+				<h2>
 					{{ t('integration_openai', 'Select enabled features') }}
 				</h2>
 				<NcCheckboxRadioSwitch
@@ -322,7 +320,7 @@
 				<NcCheckboxRadioSwitch
 					:checked="state.llm_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'llm_provider_enabled', false)">
-					{{ t('integration_openai', 'Text processing provider (to generate text, summarize etc...)') }}
+					{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write etc...)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
 					:checked="state.t2i_provider_enabled"
@@ -341,7 +339,6 @@
 
 <script>
 import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
-import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
 import CloseIcon from 'vue-material-design-icons/Close.vue'
@@ -355,12 +352,14 @@ import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
+import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import { delay } from '../utils.js'
 import { showSuccess, showError } from '@nextcloud/dialogs'
+import { confirmPassword } from '@nextcloud/password-confirmation'
+import debounce from 'debounce'
 
 export default {
 	name: 'AdminSettings',
@@ -371,7 +370,6 @@ export default {
 		CloseIcon,
 		AccountIcon,
 		EarthIcon,
-		InformationOutlineIcon,
 		TimerAlertOutlineIcon,
 		HelpCircleIcon,
 		NcButton,
@@ -379,6 +377,7 @@ export default {
 		NcCheckboxRadioSwitch,
 		NcTextField,
 		NcInputField,
+		NcNoteCard,
 	},
 
 	props: [],
@@ -427,6 +426,10 @@ export default {
 
 	methods: {
 		getModels() {
+			this.models = null
+			if (!this.configured) {
+				return
+			}
 			const url = generateUrl('/apps/integration_openai/models')
 			return axios.get(url)
 				.then((response) => {
@@ -445,6 +448,8 @@ export default {
 								+ (modelToSelect.owned_by ? ' (' + modelToSelect.owned_by + ')' : ''),
 						}
 					}
+					const selectedModelId = this.selectedModel?.id ?? ''
+					this.saveOptions({ default_completion_model_id: selectedModelId }, false)
 				})
 				.catch((error) => {
 					console.error(error)
@@ -473,65 +478,62 @@ export default {
 		capitalizedWord(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)
 		},
-		onCheckboxChanged(newValue, key, getModels = true) {
+		async onCheckboxChanged(newValue, key, getModels = true, sensitive = false) {
 			this.state[key] = newValue
-			this.saveOptions({ [key]: this.state[key] }).then(() => {
-				if (getModels) {
-					this.models = null
-					if (this.configured) {
-						this.getModels().then(() => {
-							const selectedModelId = this.selectedModel?.id ?? ''
-							this.saveOptions({ default_completion_model_id: selectedModelId }, false)
-						})
-					}
-				}
-			})
+			await this.saveOptions({ [key]: this.state[key] }, sensitive)
+			if (getModels) {
+				this.getModels()
+			}
 		},
-		onInput(getModels = true) {
-			delay(() => {
-				this.saveOptions({
-					use_basic_auth: this.state.use_basic_auth,
-					api_key: this.state.api_key,
-					basic_user: this.state.basic_user,
-					basic_password: this.state.basic_password,
-					url: this.state.url,
-					service_name: this.state.service_name,
-					chat_endpoint_enabled: this.state.chat_endpoint_enabled,
-					request_timeout: parseInt(this.state.request_timeout),
-					max_tokens: parseInt(this.state.max_tokens),
-					llm_extra_params: this.state.llm_extra_params,
-					quota_period: parseInt(this.state.quota_period),
-					quotas: this.state.quotas,
-				}).then(() => {
-					if (getModels) {
-						this.models = null
-						if (this.configured) {
-							this.getModels().then(() => {
-								const selectedModelId = this.selectedModel?.id ?? ''
-								this.saveOptions({ default_completion_model_id: selectedModelId }, false)
-							})
-						}
-					}
-				})
-			}, 2000)()
-		},
-		saveOptions(values, notify = true) {
+		onSensitiveInput: debounce(async function(getModels = true) {
+			const values = {}
+			if (this.state.api_key !== 'dummyApiKey') {
+				values.api_key = this.state.api_key
+			}
+			if (this.state.basic_password !== 'dummyPassword') {
+				values.basic_password = this.state.basic_password
+			}
+			await this.saveOptions(values, true)
+			if (getModels) {
+				this.getModels()
+			}
+		}, 2000),
+		onInput: debounce(async function(getModels = true) {
+			const values = {
+				use_basic_auth: this.state.use_basic_auth,
+				basic_user: this.state.basic_user,
+				url: this.state.url,
+				service_name: this.state.service_name,
+				chat_endpoint_enabled: this.state.chat_endpoint_enabled,
+				request_timeout: parseInt(this.state.request_timeout),
+				max_tokens: parseInt(this.state.max_tokens),
+				llm_extra_params: this.state.llm_extra_params,
+				quota_period: parseInt(this.state.quota_period),
+				quotas: this.state.quotas,
+			}
+			await this.saveOptions(values, false)
+			if (getModels) {
+				this.getModels()
+			}
+		}, 2000),
+		async saveOptions(values, sensitive = false, notify = true) {
+			if (sensitive) {
+				await confirmPassword()
+			}
+
 			const req = {
 				values,
 			}
-			const url = generateUrl('/apps/integration_openai/admin-config')
-			return axios.put(url, req)
-				.then((response) => {
-					if (notify) {
-						showSuccess(t('integration_openai', 'OpenAI admin options saved'))
-					}
-				})
-				.catch((error) => {
-					showError(
-						t('integration_openai', 'Failed to save OpenAI admin options')
-						+ ': ' + error.response?.request?.responseText,
-					)
-				})
+			const url = sensitive ? generateUrl('/apps/integration_openai/admin-config/sensitive') : generateUrl('/apps/integration_openai/admin-config')
+			try {
+				await axios.put(url, req)
+				if (notify) {
+					showSuccess(t('integration_openai', 'OpenAI admin options saved'))
+				}
+			} catch (error) {
+				console.error(error)
+				showError(t('integration_openai', 'Failed to save OpenAI admin options'))
+			}
 		},
 	},
 }
@@ -542,9 +544,36 @@ export default {
 	#openai-content {
 		margin-left: 40px;
 	}
-	h2,
-	.line,
-	.settings-hint {
+
+	h2 {
+		display: flex;
+		align-items: center;
+		.icon {
+			margin-right: 8px;
+		}
+	}
+
+	.radios {
+		display: flex;
+	}
+
+	.quota-table {
+		padding: 4px 8px 4px 8px;
+		border: 2px solid var(--color-border);
+		border-radius: var(--border-radius);
+		.text-cell {
+			opacity: 0.5;
+		}
+		th, td {
+			width: 300px;
+			text-align: left;
+			> input:invalid {
+				border-color: var(--color-error);
+			}
+		}
+	}
+
+	.line {
 		display: flex;
 		align-items: center;
 		margin-top: 12px;
@@ -553,21 +582,6 @@ export default {
 		}
 		&.line-select {
 			align-items: end;
-		}
-	}
-
-	h2 .icon {
-		margin-right: 8px;
-	}
-
-	.mid-setting-heading {
-		margin-top: 32px;
-		text-decoration: underline;
-	}
-
-	.line {
-		.radios {
-			display: flex;
 		}
 		> label {
 			width: 350px;
@@ -583,22 +597,6 @@ export default {
 		}
 		> input[type='radio'] {
 			width: auto;
-		}
-		.quota-table {
-			padding: 4px 8px 4px 8px;
-			border: 2px solid var(--color-border);
-			border-radius: var(--border-radius);
-			.text-cell {
-				opacity: 0.5;
-			}
-			th, td {
-				width: 300px;
-				text-align: left;
-				> input:invalid {
-					border-color: var(--color-error);
-				}
-			}
-
 		}
 	}
 

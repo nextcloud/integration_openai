@@ -9,7 +9,7 @@ as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/
 
 This app implements:
 
-* Text generation providers: Free prompt, Summarize, Headline and Reformulate (using any available large language model)
+* Text generation providers: Free prompt, Summarize, Headline, Context write, Chat, and Reformulate (using any available large language model)
 * A Translation provider (using any available language model)
 * A SpeechToText provider (using Whisper)
 * An image generation provider
@@ -18,64 +18,64 @@ Instead of connecting to the OpenAI API for these, you can also connect to a sel
 or to any service that implements an API similar to the OpenAI one, for example: [Plusserver](https://www.plusserver.com/en/ai-platform/) or [MistralAI](https://mistral.ai).
 
 ## Ethical AI Rating
-### Rating for Text generation using ChatGPT via OpenAI API: 🔴
+### Rating for Text generation using ChatGPT via the OpenAI API: 🔴
 
 Negative:
-* the software for training and inference of this model is proprietary, limiting running it locally or training by yourself
-* the trained model is not freely available, so the model can not be run on-premises
-* the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
+* The software for training and inference of this model is proprietary, limiting running it locally or training by yourself
+* The trained model is not freely available, so the model can not be run on-premises
+* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
 
 
-### Rating for Translation using ChatGPT via OpenAI API: 🔴
-
-Negative:
-* the software for training and inference of this model is proprietary, limiting running it locally or training by yourself
-* the trained model is not freely available, so the model can not be run on-premises
-* the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
-
-### Rating for Image generation using DALL·E via OpenAI API: 🔴
+### Rating for Translation using ChatGPT via the OpenAI API: 🔴
 
 Negative:
-* the software for training and inferencing of this model is proprietary, limiting running it locally or training by yourself
-* the trained model is not freely available, so the model can not be ran on-premises
-* the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
+* The software for training and inference of this model is proprietary, limiting running it locally or training by yourself
+* The trained model is not freely available, so the model can not be run on-premises
+* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
+
+### Rating for Image generation using DALL·E via the OpenAI API: 🔴
+
+Negative:
+* The software for training and inferencing of this model is proprietary, limiting running it locally or training by yourself
+* The trained model is not freely available, so the model can not be ran on-premises
+* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
 
 
-### Rating for Speech-To-Text using Whisper via OpenAI API: 🟡
+### Rating for Speech-To-Text using Whisper via the OpenAI API: 🟡
 
 Positive:
-* the software for training and inferencing of this model is open source
+* The software for training and inferencing of this model is open source
 * The trained model is freely available, and thus can run on-premise
 
 Negative:
-* the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
+* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
 
 ### Rating for Text generation via LocalAI: 🟢
 
 Positive:
-* the software for training and inferencing of this model is open source
-* the trained model is freely available, and thus can be ran on-premises
-* the training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage.
+* The software for training and inferencing of this model is open source
+* The trained model is freely available, and thus can be ran on-premises
+* The training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage.
 
 
 ### Rating for Image generation using Stable Diffusion via LocalAI : 🟡
 
 Positive:
-* the software for training and inferencing of this model is open source
-* the trained model is freely available, and thus can be ran on-premises
+* The software for training and inferencing of this model is open source
+* The trained model is freely available, and thus can be ran on-premises
 
 Negative:
-* the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
+* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
 
 
 ### Rating for Speech-To-Text using Whisper via LocalAI: 🟡
 
 Positive:
-* the software for training and inferencing of this model is open source
-* the trained model is freely available, and thus can be ran on-premises
+* The software for training and inferencing of this model is open source
+* The trained model is freely available, and thus can be ran on-premises
 
 Negative:
-* the training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
+* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
 ]]>	</description>
@@ -94,7 +94,7 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 	<screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot3.jpg</screenshot>
 	<screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot4.jpg</screenshot>
 	<dependencies>
-		<nextcloud min-version="28" max-version="30"/>
+		<nextcloud min-version="30" max-version="30"/>
 	</dependencies>
 	<background-jobs>
 		<job>OCA\OpenAi\Cron\CleanupQuotaDb</job>
