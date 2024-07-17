@@ -5,6 +5,7 @@ OC.L10N.register(
     "Unknown" : "Không xác định",
     "seconds" : "giây",
     "Bad HTTP method" : "Phương thức HTTP không hợp lệ",
+    "Bad credentials" : "Thông tin đăng nhập không hợp lệ.",
     "Authentication" : "Xác thực",
     "Authentication method" : "Phương thức xác thực",
     "Username" : "Tên đăng nhập",
