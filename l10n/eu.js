@@ -9,6 +9,7 @@ OC.L10N.register(
     "Unknown image generation error" : "Irudi sorrera errore ezezaguna",
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
+    "Size" : "Tamaina",
     "Authentication" : "Autentifikazioa",
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",

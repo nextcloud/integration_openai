@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Nezināms",
     "seconds" : "sekundes",
+    "Size" : "Izmērs",
     "Authentication" : "Autentifikācija",
     "Authentication method" : "Autentifikācijas metode",
     "API key" : "API atslēga",

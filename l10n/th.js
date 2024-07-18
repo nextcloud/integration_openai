@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "ไม่ทราบ",
     "seconds" : "วินาที",
+    "Size" : "ขนาด",
     "Authentication" : "การตรวจสอบสิทธิ์",
     "Authentication method" : "วิธีการตรวจสอบความถูกต้อง",
     "API key" : "รหัส API",

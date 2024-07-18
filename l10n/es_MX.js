@@ -4,6 +4,7 @@ OC.L10N.register(
     "Image generation" : "Generación de imágenes",
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
+    "Size" : "Tamaño",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",

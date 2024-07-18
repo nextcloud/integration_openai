@@ -19,7 +19,6 @@
     "Request timeout (seconds)" : "リクエストがタイムアウトするまでの秒数",
     "Usage limits" : "使用制限",
     "Quota type" : "クォータのタイプ",
-    "your API key" : "あなたのAPIキー",
     "Username" : "ユーザー名",
     "your Basic Auth user" : "基本認証ユーザー名",
     "Password" : "パスワード",

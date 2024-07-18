@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown" : "უცნობია",
+    "Size" : "ზომა",
     "Authentication" : "აუტენტიფიკაცია",
     "Authentication method" : "აუტენტიფიკაციის მეთოდი",
     "API key" : "API გასაღები",

@@ -13,7 +13,6 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Таймаут запроса (в секундах)",
     "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)",
     "Leave the API key empty to use the one defined by administrators" : "Оставьте ключ API пустым, чтобы использовать тот, который определен администраторами",
-    "You can create a free API key in your OpenAI account settings:" : "Вы можете создать бесплатный API-ключ в настройках своей учетной записи Openair:",
     "Username" : "Имя пользователя",
     "Password" : "Пароль",
     "Usage quota info" : "Информация о квоте использования",

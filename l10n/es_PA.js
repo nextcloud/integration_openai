@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
+    "Size" : "Tamaño",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",

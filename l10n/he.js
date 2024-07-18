@@ -5,6 +5,7 @@ OC.L10N.register(
     "seconds" : "שניות",
     "Bad HTTP method" : "שגיאה במתודת HTTP",
     "Bad credentials" : "פרטי גישה שגויים",
+    "Size" : "גודל",
     "Authentication" : "אימות",
     "Authentication method" : "שיטת אימות",
     "API key" : "מפתח API",

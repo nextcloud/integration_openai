@@ -5,6 +5,7 @@ OC.L10N.register(
     "seconds" : "seconden",
     "Bad HTTP method" : "Foute HTTP methode",
     "Bad credentials" : "Foute inloggegevens",
+    "Size" : "Grootte",
     "Authentication" : "Authenticatie",
     "Authentication method" : "Authenticatiemethode",
     "API key" : "API sleutel",

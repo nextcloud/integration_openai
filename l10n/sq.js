@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "I panjohur",
     "seconds" : "sekonda",
+    "Size" : "Madhësi",
     "Authentication" : "Mirëfilltësim",
     "Authentication method" : "Metodë mirëfilltësimi",
     "API key" : "Kyç API",

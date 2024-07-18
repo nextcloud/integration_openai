@@ -1,5 +1,6 @@
 { "translations": {
     "Unknown" : "უცნობია",
+    "Size" : "ზომა",
     "Authentication" : "აუტენტიფიკაცია",
     "Authentication method" : "აუტენტიფიკაციის მეთოდი",
     "API key" : "API გასაღები",

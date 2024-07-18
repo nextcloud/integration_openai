@@ -5,6 +5,7 @@ OC.L10N.register(
     "seconds" : "detik",
     "Bad HTTP method" : "Metode HTTP tidak benar",
     "Bad credentials" : "Kredensial tidak benar",
+    "Size" : "Ukuran",
     "Authentication" : "Otentikasi",
     "Authentication method" : "Metode otentikasi",
     "API key" : "Kunci API",

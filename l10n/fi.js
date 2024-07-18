@@ -10,7 +10,6 @@ OC.L10N.register(
     "Authentication method" : "Tunnistautumistapa",
     "API key" : "API-avain",
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
-    "your API key" : "API-avaimesi",
     "Username" : "Käyttäjätunnus",
     "Password" : "Salasana"
 },

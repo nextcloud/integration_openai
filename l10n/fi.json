@@ -8,7 +8,6 @@
     "Authentication method" : "Tunnistautumistapa",
     "API key" : "API-avain",
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
-    "your API key" : "API-avaimesi",
     "Username" : "Käyttäjätunnus",
     "Password" : "Salasana"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
