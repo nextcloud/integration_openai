@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Ukendt",
     "seconds" : "sekunder ",
+    "Size" : "Størrelse",
     "Authentication" : "Godkendelse",
     "Authentication method" : "Godkendelsesmetode",
     "API key" : "API nøgle",

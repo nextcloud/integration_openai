@@ -21,6 +21,7 @@ OC.L10N.register(
     "Bad credentials" : "Nesprávné přihlašovací údaje",
     "API request error: " : "Chyba požadavku na API rozhraní:",
     "Unknown API request error." : "Neznámá chyba požadavku požadavku na API.",
+    "Size" : "Velikost",
     "OpenAI and LocalAI integration" : "Napojení na OpenAI a LocalAI",
     "Integration of OpenAI and LocalAI services" : "Napojení na služby OpenAI a LocalAI",
     "Authentication" : "Ověřování se",
