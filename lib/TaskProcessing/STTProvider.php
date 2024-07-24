@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
+use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Files\File;
-use OCP\IL10N;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
@@ -18,7 +18,6 @@ class STTProvider implements ISynchronousProvider {
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
-		private IL10N $l,
 	) {
 	}
 
@@ -38,11 +37,35 @@ class STTProvider implements ISynchronousProvider {
 		return $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
+	public function getInputShapeEnumValues(): array {
+		return [];
+	}
+
+	public function getInputShapeDefaults(): array {
+		return [];
+	}
+
 	public function getOptionalInputShape(): array {
 		return [];
 	}
 
+	public function getOptionalInputShapeEnumValues(): array {
+		return [];
+	}
+
+	public function getOptionalInputShapeDefaults(): array {
+		return [];
+	}
+
+	public function getOutputShapeEnumValues(): array {
+		return [];
+	}
+
 	public function getOptionalOutputShape(): array {
+		return [];
+	}
+
+	public function getOptionalOutputShapeEnumValues(): array {
 		return [];
 	}
 
@@ -55,9 +78,9 @@ class STTProvider implements ISynchronousProvider {
 		try {
 			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile);
 			return ['output' => $transcription];
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new \RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
+			throw new RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
 		}
 	}
 }

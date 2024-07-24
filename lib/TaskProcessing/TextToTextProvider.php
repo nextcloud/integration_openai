@@ -13,6 +13,7 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToText;
 use RuntimeException;
 
@@ -43,6 +44,14 @@ class TextToTextProvider implements ISynchronousProvider {
 		return $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
+	public function getInputShapeEnumValues(): array {
+		return [];
+	}
+
+	public function getInputShapeDefaults(): array {
+		return [];
+	}
+
 	public function getOptionalInputShape(): array {
 		return [
 			'max_tokens' => new ShapeDescriptor(
@@ -50,10 +59,48 @@ class TextToTextProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'model' => new ShapeDescriptor(
+				$this->l->t('Model'),
+				$this->l->t('The model used to generate the completion'),
+				EShapeType::Enum
+			),
+		];
+	}
+
+	public function getOptionalInputShapeEnumValues(): array {
+		if ($this->userId === null) {
+			return [];
+		}
+		$modelResponse = $this->openAiAPIService->getModels($this->userId);
+		$modelEnumValues = array_map(function(array $model) {
+			return new ShapeEnumValue($model['id'], $model['id']);
+		}, $modelResponse['data'] ?? []);
+		return [
+			'model' => $modelEnumValues,
+		];
+	}
+
+	public function getOptionalInputShapeDefaults(): array {
+		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		return [
+			'max_tokens' => 1000,
+			'model' => $adminModel,
 		];
 	}
 
 	public function getOptionalOutputShape(): array {
+		return [];
+	}
+
+	public function getOutputShapeEnumValues(): array {
+		return [];
+	}
+
+	public function getOptionalOutputShapeEnumValues(): array {
+		return [];
+	}
+
+	public function getOptionalOutputShapeDefaults(): array {
 		return [];
 	}
 
@@ -66,7 +113,11 @@ class TextToTextProvider implements ISynchronousProvider {
 		}
 		*/
 		$startTime = time();
-		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		if (isset($input['model']) && is_string($input['model'])) {
+			$model = $input['model'];
+		} else {
+			$model = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new RuntimeException('Invalid prompt');
@@ -80,9 +131,9 @@ class TextToTextProvider implements ISynchronousProvider {
 
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, $maxTokens);
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $model, $prompt, null, null, 1, $maxTokens);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, $maxTokens);
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $model, $maxTokens);
 			}
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
