@@ -1,10 +1,12 @@
 { "translations": {
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
+    "Size" : "Tamaño",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
-    "Username" : "Nombre de usuario"
+    "Username" : "Nombre de usuario",
+    "Password" : "Contraseña"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
