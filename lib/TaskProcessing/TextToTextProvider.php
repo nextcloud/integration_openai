@@ -72,7 +72,7 @@ class TextToTextProvider implements ISynchronousProvider {
 			return [];
 		}
 		$modelResponse = $this->openAiAPIService->getModels($this->userId);
-		$modelEnumValues = array_map(function(array $model) {
+		$modelEnumValues = array_map(function (array $model) {
 			return new ShapeEnumValue($model['id'], $model['id']);
 		}, $modelResponse['data'] ?? []);
 		return [
