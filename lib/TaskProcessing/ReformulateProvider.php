@@ -43,6 +43,14 @@ class ReformulateProvider implements ISynchronousProvider {
 		return $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
+	public function getInputShapeEnumValues(): array {
+		return [];
+	}
+
+	public function getInputShapeDefaults(): array {
+		return [];
+	}
+
 	public function getOptionalInputShape(): array {
 		return [
 			'max_tokens' => new ShapeDescriptor(
@@ -53,7 +61,23 @@ class ReformulateProvider implements ISynchronousProvider {
 		];
 	}
 
+	public function getOptionalInputShapeEnumValues(): array {
+		return [];
+	}
+
+	public function getOptionalInputShapeDefaults(): array {
+		return [];
+	}
+
+	public function getOutputShapeEnumValues(): array {
+		return [];
+	}
+
 	public function getOptionalOutputShape(): array {
+		return [];
+	}
+
+	public function getOptionalOutputShapeEnumValues(): array {
 		return [];
 	}
 

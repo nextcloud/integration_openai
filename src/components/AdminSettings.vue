@@ -132,7 +132,7 @@
 				<h2>
 					{{ t('integration_openai', 'Text generation') }}
 				</h2>
-				<div v-show="state.url !== ''" class="line">
+				<div class="line completion-endpoint">
 					<label>
 						<EarthIcon :size="20" class="icon" />
 						{{ t('integration_openai', 'Text completion endpoint') }}
@@ -158,7 +158,7 @@
 						</NcCheckboxRadioSwitch>
 					</div>
 				</div>
-				<NcNoteCard v-show="state.url !== ''" type="info">
+				<NcNoteCard type="info">
 					{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
 				</NcNoteCard>
 				<div v-if="models"
@@ -597,6 +597,11 @@ export default {
 		}
 		> input[type='radio'] {
 			width: auto;
+		}
+
+		&.completion-endpoint {
+			flex-direction: column;
+			align-items: start;
 		}
 	}
 

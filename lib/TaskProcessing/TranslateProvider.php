@@ -8,28 +8,34 @@ use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCP\ICacheFactory;
 use OCP\IConfig;
 use OCP\IL10N;
+use OCP\L10N\IFactory;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
-use OCP\TaskProcessing\TaskTypes\TextToText;
+use OCP\TaskProcessing\TaskTypes\TextToTextTranslate;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class TextToTextProvider implements ISynchronousProvider {
+class TranslateProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IConfig $config,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
+		private IFactory $l10nFactory,
+		private ICacheFactory $cacheFactory,
+		private LoggerInterface $logger,
 		private ?string $userId,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2text';
+		return Application::APP_ID . '-translate';
 	}
 
 	public function getName(): string {
@@ -37,7 +43,7 @@ class TextToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		return TextToText::ID;
+		return TextToTextTranslate::ID;
 	}
 
 	public function getExpectedRuntime(): int {
@@ -45,11 +51,22 @@ class TextToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getInputShapeEnumValues(): array {
-		return [];
+		$coreL = $this->l10nFactory->getLanguages();
+		$languages = array_merge($coreL['commonLanguages'], $coreL['otherLanguages']);
+		$languageEnumValues = array_map(static function (array $language) {
+			return new ShapeEnumValue($language['name'], $language['code']);
+		}, $languages);
+		$detectLanguageEnumValue = new ShapeEnumValue($this->l->t('Detect language'), 'detect_language');
+		return [
+			'origin_language' => array_merge([$detectLanguageEnumValue], $languageEnumValues),
+			'target_language' => $languageEnumValues,
+		];
 	}
 
 	public function getInputShapeDefaults(): array {
-		return [];
+		return [
+			'origin_language' => 'detect_language',
+		];
 	}
 
 	public function getOptionalInputShape(): array {
@@ -104,6 +121,15 @@ class TextToTextProvider implements ISynchronousProvider {
 		return [];
 	}
 
+	private function getCoreLanguagesByCode(): array {
+		$coreL = $this->l10nFactory->getLanguages();
+		$coreLanguages = array_reduce(array_merge($coreL['commonLanguages'], $coreL['otherLanguages']), function ($carry, $val) {
+			$carry[$val['code']] = $val['name'];
+			return $carry;
+		});
+		return $coreLanguages;
+	}
+
 	public function process(?string $userId, array $input, callable $reportProgress): array {
 		/*
 		foreach (range(1, 20) as $i) {
@@ -120,30 +146,50 @@ class TextToTextProvider implements ISynchronousProvider {
 		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new RuntimeException('Invalid input text');
 		}
-		$prompt = $input['input'];
+		$inputText = $input['input'];
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$cacheKey = ($input['origin_language'] ?? '') . '/' . $input['target_language'] . '/' . md5($inputText);
+
+		$cache = $this->cacheFactory->createDistributed('integration_openai');
+		if ($cached = $cache->get($cacheKey)) {
+			return ['output' => $cached];
+		}
+
 		try {
+			$coreLanguages = $this->getCoreLanguagesByCode();
+
+			$toLanguage = $coreLanguages[$input['target_language']] ?? $input['target_language'];
+			if ($input['origin_language'] !== 'detect_language') {
+				$fromLanguage = $coreLanguages[$input['origin_language']] ?? $input['origin_language'];
+				$this->logger->debug('OpenAI translation FROM[' . $fromLanguage . '] TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
+				$prompt = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ' . $inputText;
+			} else {
+				$this->logger->debug('OpenAI translation TO['.$toLanguage.']', ['app' => Application::APP_ID]);
+				$prompt = 'Translate to ' . $toLanguage . ': ' . $inputText;
+			}
+
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $model, $prompt, null, null, 1, $maxTokens);
 			} else {
 				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $model, $maxTokens);
 			}
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
-		}
-		if (count($completion) > 0) {
-			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-			return ['output' => array_pop($completion)];
-		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+			if (count($completion) > 0) {
+				$endTime = time();
+				$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+				return ['output' => array_pop($completion)];
+			}
+
+		} catch (Exception $e) {
+			throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage}", 0, $e);
+		}
+		throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage}");
 	}
 }
