@@ -74,7 +74,6 @@ class Application extends App implements IBootstrap {
 
 	public function register(IRegistrationContext $context): void {
 		if ($this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
-			$context->registerTranslationProvider(TranslationProvider::class);
 			$context->registerTaskProcessingProvider(TranslateProvider::class);
 		}
 		if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
