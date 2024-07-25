@@ -5,4 +5,12 @@
       <code><![CDATA[ShapeEnumValue]]></code>
     </UndefinedClass>
   </file>
+  <file src="lib/TaskProcessing/TranslateProvider.php">
+    <UndefinedClass>
+      <code><![CDATA[ShapeEnumValue]]></code>
+      <code><![CDATA[ShapeEnumValue]]></code>
+      <code><![CDATA[ShapeEnumValue]]></code>
+      <code><![CDATA[TextToTextTranslate]]></code>
+    </UndefinedClass>
+  </file>
 </files>

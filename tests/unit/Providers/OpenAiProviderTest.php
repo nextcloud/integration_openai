@@ -18,7 +18,7 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
-use OCA\OpenAi\Translation\TranslationProvider;
+use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IConfig;
@@ -263,16 +263,18 @@ class OpenAiProviderTest extends TestCase {
 	}
 
 	public function testTranslationProvider(): void {
-		$translationProvider = new TranslationProvider(
-			$this->createMock(\OCP\ICacheFactory::class),
-			\OC::$server->get(\OCP\L10N\IFactory::class),
+		$translationProvider = new TranslateProvider(
 			$this->openAiApiService,
-			$this->createMock(\Psr\Log\LoggerInterface::class),
 			\OC::$server->get(IConfig::class),
+			$this->openAiSettingsService,
+			$this->createMock(\OCP\IL10N::class),
+			\OC::$server->get(\OCP\L10N\IFactory::class),
+			$this->createMock(\OCP\ICacheFactory::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
 			self::TEST_USER1,
-			$this->openAiSettingsService);
+		);
 
-		$prompt = 'This is a test prompt';
+		$inputText = 'This is a test prompt';
 		$n = 1;
 		$fromLang = 'Swedish';
 		$toLang = 'en';
@@ -303,7 +305,7 @@ class OpenAiProviderTest extends TestCase {
 		$url = self::OPENAI_API_BASE . 'chat/completions';
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
-		$options['body'] = json_encode(['model' => Application::DEFAULT_COMPLETION_MODEL_ID, 'messages' => [['role' => 'user', 'content' => 'Translate from ' . $fromLang . ' to English (US): ' . $prompt]], 'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS, 'n' => $n, 'user' => self::TEST_USER1]);
+		$options['body'] = json_encode(['model' => Application::DEFAULT_COMPLETION_MODEL_ID, 'messages' => [['role' => 'user', 'content' => 'Translate from ' . $fromLang . ' to English (US): ' . $inputText]], 'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS, 'n' => $n, 'user' => self::TEST_USER1]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
@@ -311,8 +313,8 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $translationProvider->translate($fromLang, $toLang, $prompt);
-		$this->assertEquals('This is a test response.', $result);
+		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => null);
+		$this->assertEquals(['output' => 'This is a test response.'], $result);
 
 		// Check that token usage is logged properly
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);

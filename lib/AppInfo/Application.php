@@ -20,7 +20,6 @@ use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TopicsProvider;
 use OCA\OpenAi\TaskProcessing\TranslateProvider;
-use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 
