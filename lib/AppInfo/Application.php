@@ -19,6 +19,7 @@ use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TopicsProvider;
+use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCA\OpenAi\Translation\TranslationProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -74,6 +75,7 @@ class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		if ($this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
 			$context->registerTranslationProvider(TranslationProvider::class);
+			$context->registerTaskProcessingProvider(TranslateProvider::class);
 		}
 		if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(STTProvider::class);
