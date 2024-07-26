@@ -23,6 +23,8 @@ OC.L10N.register(
     "Unknown API request error." : "Bilinmeyen API isteği sorunu",
     "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI DALL-E 2 yazıdan görsele",
     "Size" : "Boyut",
+    "Model" : "Model",
+    "Detect language" : "Dili algıla",
     "OpenAI and LocalAI integration" : "OpenAI ve LocalAI bütünleştirmesi",
     "Integration of OpenAI and LocalAI services" : "OpenAI ve LocalAI hizmetleri bütünleştirmesi",
     "Service URL" : "Hizmet adresi",

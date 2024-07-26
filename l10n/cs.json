@@ -20,6 +20,8 @@
     "API request error: " : "Chyba požadavku na API rozhraní:",
     "Unknown API request error." : "Neznámá chyba požadavku požadavku na API.",
     "Size" : "Velikost",
+    "Model" : "Model",
+    "Detect language" : "Zjistit jazyk",
     "OpenAI and LocalAI integration" : "Napojení na OpenAI a LocalAI",
     "Integration of OpenAI and LocalAI services" : "Napojení na služby OpenAI a LocalAI",
     "Authentication" : "Ověřování se",

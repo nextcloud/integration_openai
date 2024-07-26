@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Nekonata",
     "seconds" : "sekundoj",
+    "Size" : "Grando",
     "Authentication" : "Aŭtentigo",
     "Authentication method" : "Aŭtentiga metodo",
     "API key" : "API-ŝlosilo",

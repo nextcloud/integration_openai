@@ -8,6 +8,7 @@ OC.L10N.register(
     "Unknown image generation error" : "알 수 없는 이미지 생성 오류",
     "Bad HTTP method" : "옳지 않은 HTTP 메소드",
     "Bad credentials" : "옳지 않은 자격 증명",
+    "Detect language" : "언어 감지",
     "Authentication" : "인증",
     "Authentication method" : "인증 방법",
     "API key" : "API 키",

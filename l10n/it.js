@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "secondi",
     "Bad HTTP method" : "Metodo HTTP non corretto",
     "Bad credentials" : "Credenziali non valide",
+    "Detect language" : "Rileva lingua",
     "Authentication" : "Autenticazione",
     "Authentication method" : "Metodo di autenticazione",
     "API key" : "Chiave API",

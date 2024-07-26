@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "sekúndum",
     "Bad credentials" : "Gölluð auðkenni",
     "Size" : "Stærð",
+    "Detect language" : "Greina tungumál",
     "Authentication" : "Auðkenning",
     "Authentication method" : "Auðkenningarmáti",
     "API key" : "API-lykill",

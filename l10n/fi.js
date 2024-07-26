@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "sekuntia",
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
     "Bad credentials" : "Virheelliset kirjautumistiedot",
+    "Detect language" : "Havaitse kieli",
     "Authentication" : "Tunnistautuminen",
     "Authentication method" : "Tunnistautumistapa",
     "API key" : "API-avain",

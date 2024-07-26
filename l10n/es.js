@@ -22,6 +22,8 @@ OC.L10N.register(
     "API request error: " : "Error en solicitud API:",
     "Unknown API request error." : "Error desconocido en solicitud API.",
     "OpenAI's DALL-E 2 Text-To-Image" : "Texto a imágenes DALL-E 2 OpenAI",
+    "Model" : "Modelo",
+    "Detect language" : "Detectar idioma",
     "OpenAI and LocalAI integration" : "Integración de OpenAI y LocalAI",
     "Integration of OpenAI and LocalAI services" : "Integración de los servicios de OpenAI y LocalAI",
     "Service URL" : "URL del servicio",

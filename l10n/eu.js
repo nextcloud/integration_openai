@@ -10,6 +10,8 @@ OC.L10N.register(
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
     "Size" : "Tamaina",
+    "Model" : "Modeloa",
+    "Detect language" : "Detektatu hizkuntza",
     "Authentication" : "Autentifikazioa",
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",

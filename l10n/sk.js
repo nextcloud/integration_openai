@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "sekúnd",
     "Bad HTTP method" : "Zlá metóda HTTP",
     "Bad credentials" : "Nesprávne prihlasovacie údaje",
+    "Detect language" : "Zistiť jazyk",
     "Authentication" : "Autentifikácia",
     "Authentication method" : "Autentifikačná metóda",
     "API key" : "API kľúč",

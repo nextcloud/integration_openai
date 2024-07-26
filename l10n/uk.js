@@ -7,6 +7,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Поганий метод HTTP",
     "Bad credentials" : "Погані облікові дані",
     "Size" : "Розмір",
+    "Detect language" : "Визначити мову",
     "Authentication" : "Авторизація",
     "Authentication method" : "Спосіб авторизації",
     "API key" : "ключ API",

@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "sekunder",
     "Bad HTTP method" : "Felaktig HTTP-metod",
     "Bad credentials" : "Ogiltiga inloggningsuppgifter",
+    "Detect language" : "Upptäck språk",
     "OpenAI and LocalAI integration" : "OpenAI och LocalAI integration",
     "Integration of OpenAI and LocalAI services" : "Integration av OpenAI och LocalAI-tjänster",
     "Authentication" : "Autentisering",

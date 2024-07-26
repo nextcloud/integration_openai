@@ -7,6 +7,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Mètode HTTP incorrecte",
     "Bad credentials" : "Credencials dolentes",
     "Size" : "Tamany",
+    "Detect language" : "Detecta la llengua",
     "Authentication" : "Autenticació",
     "Authentication method" : "Mètode d'autenticació",
     "API key" : "Clau de l'API",

@@ -17,6 +17,7 @@
     "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI DALL-E 2 Besedilo-v-Sliko",
     "Size" : "Velikost",
     "Optional. The size of the generated images. Must be in 256x256 format." : "Izbirna velikost ustvarjenih slik, zapisana v zapisu 256x256.",
+    "Detect language" : "Zaznava jezika",
     "OpenAI and LocalAI integration" : "Združevalnik OpenAI in LocalAI",
     "Integration of OpenAI and LocalAI services" : "Storitve OpenAI in LocalAI",
     "Service URL" : "Naslov URL storitve",

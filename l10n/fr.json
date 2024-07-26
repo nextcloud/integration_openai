@@ -21,6 +21,8 @@
     "Unknown API request error." : "Erreur de requête API inconnue.",
     "OpenAI's DALL-E 2 Text-To-Image" : "Texte à l'image par DALL-E 2 d'OpenAI",
     "Size" : "Taille",
+    "Model" : "Modèle",
+    "Detect language" : "Détecter la langue",
     "OpenAI and LocalAI integration" : "Intégration OpenAI et LocalAI",
     "Integration of OpenAI and LocalAI services" : "Intégration des services OpenAI et LocalAI",
     "Service URL" : "URL du service",

@@ -8,6 +8,8 @@ OC.L10N.register(
     "Bad HTTP method" : "Hibás HTTP metódus",
     "Bad credentials" : "Hibás hitelesítő adatok",
     "Size" : "?éret",
+    "Model" : "Modell",
+    "Detect language" : "Nyelv észlelése",
     "OpenAI and LocalAI integration" : "OpenAI és LocalAI integráció",
     "Integration of OpenAI and LocalAI services" : "OpenAI és LocalAI szolgáltatások integrációja",
     "Authentication" : "Hitelesítés",

@@ -7,6 +7,8 @@ OC.L10N.register(
     "Bad HTTP method" : "روش HTTP بد",
     "Bad credentials" : "اعتبارنامه بد",
     "Size" : "اندازه",
+    "Model" : "Model",
+    "Detect language" : "Detect language",
     "OpenAI and LocalAI integration" : "OpenAI and LocalAI integration",
     "Integration of OpenAI and LocalAI services" : "Integration of OpenAI and LocalAI services",
     "Authentication" : "احراز هویت",
