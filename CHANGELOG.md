@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.0.1 – 2024-07-26
+
+### Added
+
+- Translation provider for the task processing API @julien-nc [#111](https://github.com/nextcloud/integration_openai/pull/111)
+
+### Changed
+
+- Adjust providers to changes in server (enum values and defaults) @julien-nc [#111](https://github.com/nextcloud/integration_openai/pull/111)
+- Drop the old translation provider @julien-nc [#111](https://github.com/nextcloud/integration_openai/pull/111)
+
 ## 3.0.0 – 2024-07-17
 
 ### Added
