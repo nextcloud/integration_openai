@@ -8,7 +8,7 @@ OC.L10N.register(
     "Bad credentials" : "Falsche Anmeldeinformationen",
     "Size" : "Größe",
     "Model" : "Modell",
-    "Detect language" : "Benötigt keine Übersetzung. Hier wird nur die formelle Übersetzung verwendet (de_DE).",
+    "Detect language" : "Sprache erkennen",
     "Authentication" : "Authentifizierung",
     "Authentication method" : "Authentifizierungsmethode",
     "API key" : "API-Schlüssel",
