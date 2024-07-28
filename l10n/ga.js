@@ -26,6 +26,8 @@ OC.L10N.register(
     "OpenAI's DALL-E 2 Text-To-Image" : "Téacs go Íomhá DALL-E 2 de chuid OpenAI",
     "Size" : "Méid",
     "Optional. The size of the generated images. Must be in 256x256 format." : "Roghnach. Méid na n-íomhánna ginte. Caithfidh sé a bheith i bhformáid 256x256.",
+    "Model" : "Mionsamhail",
+    "The model used to generate the completion" : "An tsamhail a úsáidtear chun an críochnú a ghiniúint",
     "Detect language" : "Braith teanga",
     "OpenAI and LocalAI integration" : "Comhtháthú OpenAI agus LocalAI",
     "Integration of OpenAI and LocalAI services" : "Comhtháthú seirbhísí OpenAI agus LocalAI",
