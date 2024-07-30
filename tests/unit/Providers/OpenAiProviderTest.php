@@ -23,6 +23,7 @@ use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IConfig;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use Test\TestCase;
 use Test\Util\User\Dummy;
 
@@ -99,6 +100,7 @@ class OpenAiProviderTest extends TestCase {
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
+			\OCP\Server::get(LoggerInterface::class),
 		);
 
 		$prompt = 'This is a test prompt';

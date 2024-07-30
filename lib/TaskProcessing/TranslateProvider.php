@@ -88,13 +88,18 @@ class TranslateProvider implements ISynchronousProvider {
 		if ($this->userId === null) {
 			return [];
 		}
-		$modelResponse = $this->openAiAPIService->getModels($this->userId);
-		$modelEnumValues = array_map(function (array $model) {
-			return new ShapeEnumValue($model['id'], $model['id']);
-		}, $modelResponse['data'] ?? []);
-		return [
-			'model' => $modelEnumValues,
-		];
+		try {
+			$modelResponse = $this->openAiAPIService->getModels($this->userId);
+			$modelEnumValues = array_map(function (array $model) {
+				return new ShapeEnumValue($model['id'], $model['id']);
+			}, $modelResponse['data'] ?? []);
+			return [
+				'model' => $modelEnumValues,
+			];
+		} catch (\Throwable $e) {
+			$this->logger->warning('Error in TranslateProvider', ['exception' => $e]);
+			return [];
+		}
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
