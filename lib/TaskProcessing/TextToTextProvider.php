@@ -15,6 +15,7 @@ use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToText;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class TextToTextProvider implements ISynchronousProvider {
@@ -25,6 +26,7 @@ class TextToTextProvider implements ISynchronousProvider {
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private ?string $userId,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -71,13 +73,18 @@ class TextToTextProvider implements ISynchronousProvider {
 		if ($this->userId === null) {
 			return [];
 		}
-		$modelResponse = $this->openAiAPIService->getModels($this->userId);
-		$modelEnumValues = array_map(function (array $model) {
-			return new ShapeEnumValue($model['id'], $model['id']);
-		}, $modelResponse['data'] ?? []);
-		return [
-			'model' => $modelEnumValues,
-		];
+		try {
+			$modelResponse = $this->openAiAPIService->getModels($this->userId);
+			$modelEnumValues = array_map(function (array $model) {
+				return new ShapeEnumValue($model['id'], $model['id']);
+			}, $modelResponse['data'] ?? []);
+			return [
+				'model' => $modelEnumValues,
+			];
+		} catch (\Throwable $e) {
+			$this->logger->warning('Error in TextToTextProvider', ['exception' => $e]);
+			return [];
+		}
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
