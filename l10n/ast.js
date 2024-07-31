@@ -7,6 +7,7 @@ OC.L10N.register(
     "seconds" : "segundos",
     "Unknown image generation error" : "Error de la xeneración d'imáxenes desconocíu",
     "Size" : "Tamañu",
+    "Detect language" : "Detectar la llingua",
     "Authentication" : "Autenticación",
     "API key" : "Clave de l'API",
     "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",

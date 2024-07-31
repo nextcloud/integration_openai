@@ -5,6 +5,7 @@ OC.L10N.register(
     "seconds" : "секунди",
     "Bad HTTP method" : "Лош HTTP метод",
     "Bad credentials" : "Лоши идентификационни данни",
+    "Detect language" : "Разпознаване на език",
     "Authentication" : "Удостоверяване",
     "Authentication method" : "Метод за удостоверяване",
     "API key" : "API ключ",
