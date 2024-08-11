@@ -525,6 +525,7 @@ class OpenAiAPIService {
 		$params = [
 			'prompt' => $prompt,
 			'size' => $size,
+			'model' => 'stablediffusion-cpp',
 		];
 
 		if ($this->isUsingOpenAi()) {
