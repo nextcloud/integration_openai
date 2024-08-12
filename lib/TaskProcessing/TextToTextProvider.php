@@ -107,10 +107,6 @@ class TextToTextProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function getOptionalOutputShapeDefaults(): array {
-		return [];
-	}
-
 	public function process(?string $userId, array $input, callable $reportProgress): array {
 		/*
 		foreach (range(1, 20) as $i) {

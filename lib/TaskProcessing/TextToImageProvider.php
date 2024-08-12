@@ -48,7 +48,9 @@ class TextToImageProvider implements ISynchronousProvider {
 	}
 
 	public function getInputShapeDefaults(): array {
-		return [];
+		return [
+			'numberOfImages' => 1,
+		];
 	}
 
 	public function getOptionalInputShape(): array {
@@ -94,8 +96,13 @@ class TextToImageProvider implements ISynchronousProvider {
 			$nbImages = $input['numberOfImages'];
 		}
 
+		$size = Application::DEFAULT_IMAGE_SIZE;
+		if (isset($input['size']) && is_string($input['size'])) {
+			$size = trim($input['size']);
+		}
+
 		try {
-			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $nbImages);
+			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $nbImages, $size);
 			$urls = array_map(static function (array $result) {
 				return $result['url'] ?? null;
 			}, $apiResponse['data']);

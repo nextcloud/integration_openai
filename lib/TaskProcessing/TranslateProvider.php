@@ -122,10 +122,6 @@ class TranslateProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function getOptionalOutputShapeDefaults(): array {
-		return [];
-	}
-
 	private function getCoreLanguagesByCode(): array {
 		$coreL = $this->l10nFactory->getLanguages();
 		$coreLanguages = array_reduce(array_merge($coreL['commonLanguages'], $coreL['otherLanguages']), function ($carry, $val) {
