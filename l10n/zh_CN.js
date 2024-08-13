@@ -10,6 +10,7 @@ OC.L10N.register(
     "images" : "图像",
     "seconds" : "秒",
     "Unknown error while retrieving quota usage." : "提取额度使用量时发生未知错误",
+    "Unknown image generation error" : "未知的图像生成错误",
     "Bad HTTP method" : "错误的HTTP方法",
     "Bad credentials" : "错误的凭据",
     "Size" : "尺寸",
