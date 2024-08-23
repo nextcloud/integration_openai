@@ -78,7 +78,7 @@ OC.L10N.register(
     "Your administrator defined a custom service address" : "Dein Administration hat eine benutzerdefinierte Dienstadresse definiert",
     "Leave the API key empty to use the one defined by administrators" : "API-Schlüssel leer lassen, um den von der Administration definierten Schlüssel zu verwenden",
     "You can create a free API key in your OpenAI account settings" : "Du kannst in deinen OpenAI-Kontoeinstellungen einen kostenlosen API-Schlüssel erstellen",
-    "Leave the username and password empty to use the ones defined by your administrator" : "Benutzername und Passwort leer lassen, um den von der Administration definierten Schlüssel zu verwenden",
+    "Leave the username and password empty to use the ones defined by your administrator" : "Benutzername und Passwort leer lassen, um den von deinem Administrator definierten Schlüssel zu verwenden",
     "Username" : "Benutzername",
     "your Basic Auth user" : "Dein Basic Auth-Konto",
     "Password" : "Passwort",
