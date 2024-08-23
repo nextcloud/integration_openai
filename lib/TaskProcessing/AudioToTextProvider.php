@@ -13,7 +13,7 @@ use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class STTProvider implements ISynchronousProvider {
+class AudioToTextProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
