@@ -51,7 +51,7 @@ OC.L10N.register(
     "Text completion endpoint" : "Metin tamamlama uç birimi",
     "Chat completions" : "Sohbet tamamlamaları",
     "Completions" : "Tamamlamalar",
-    "Using the chat endpoint may improve text generation quality for \"instruction following\" fine-tuned models." : "Sohbet uç noktasının kullanılması, \"yönergeleri izleyen\" ince ayarlı modeller için metin oluşturma kalitesini iyileştirebilir.",
+    "Using the chat endpoint may improve text generation quality for \"instruction following\" fine-tuned models." : "Sohbet uç noktasının kullanılması, \"yönergeyi izleyen\" ince ayarlı modeller için metin oluşturma kalitesini iyileştirebilir.",
     "Default completion model to use" : "Kullanılacak varsayılan tamamlama modeli",
     "More information about OpenAI models" : "OpenAI modelleri hakkında ayrıntılı bilgi",
     "More information about LocalAI models" : "LocalAI modelleri hakkında ayrıntılı bilgi",
