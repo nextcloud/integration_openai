@@ -23,7 +23,7 @@ declare(strict_types=1);
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace OCA\OpenAi\Translation;
+namespace OCA\OpenAi\OldProcessing\Translation;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;

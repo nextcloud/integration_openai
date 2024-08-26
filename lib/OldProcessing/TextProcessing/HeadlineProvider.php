@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\OpenAi\TextProcessing;
+namespace OCA\OpenAi\OldProcessing\TextProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;

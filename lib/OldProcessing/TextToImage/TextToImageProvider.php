@@ -4,7 +4,7 @@ declare(strict_types=1);
 // SPDX-FileCopyrightText: Julien Veyssier <julien-nc@posteo.net>
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace OCA\OpenAi\TextToImage;
+namespace OCA\OpenAi\OldProcessing\TextToImage;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;

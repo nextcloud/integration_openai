@@ -10,7 +10,12 @@
 namespace OCA\OpenAi\AppInfo;
 
 use OCA\OpenAi\Capabilities;
-use OCA\OpenAi\SpeechToText\STTProvider as OldSTTProvider;
+use OCA\OpenAi\OldProcessing\SpeechToText\STTProvider as OldSTTProvider;
+use OCA\OpenAi\OldProcessing\TextProcessing\FreePromptProvider as OldFreePromptProvider;
+use OCA\OpenAi\OldProcessing\TextProcessing\HeadlineProvider as OldHeadlineProvider;
+use OCA\OpenAi\OldProcessing\TextProcessing\SummaryProvider as OldSummaryProvider;
+use OCA\OpenAi\OldProcessing\TextToImage\TextToImageProvider as OldTextToImageProvider;
+use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
@@ -21,11 +26,6 @@ use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TopicsProvider;
 use OCA\OpenAi\TaskProcessing\TranslateProvider;
-use OCA\OpenAi\TextProcessing\FreePromptProvider as OldFreePromptProvider;
-use OCA\OpenAi\TextProcessing\HeadlineProvider as OldHeadlineProvider;
-use OCA\OpenAi\TextProcessing\SummaryProvider as OldSummaryProvider;
-use OCA\OpenAi\TextToImage\TextToImageProvider as OldTextToImageProvider;
-use OCA\OpenAi\Translation\TranslationProvider as OldTranslationProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 
