@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "OpenAIs Whisper Speech-To-Text",
+    "LocalAI's Whisper Speech-To-Text" : "LocalAIs Whisper Speech-To-Text",
+    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAIs DALL-E 2 Tekst-Til-Bilde",
     "Unknown models error" : "Feil i ukjente modeller",
     "Text generation" : "Tekstgenerering",
     "Image generation" : "Bildegenerering",
@@ -23,7 +26,6 @@ OC.L10N.register(
     "Unknown API request error." : "Ukjent API-forespørselsfeil.",
     "Maximum output words" : "Maksimalt antall utdataord",
     "The maximum number of words/tokens that can be generated in the completion." : "Maksimalt antall ord/tokens som kan genereres i fullføringen.",
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAIs DALL-E 2 Tekst-Til-Bilde",
     "Size" : "Størrelse",
     "Optional. The size of the generated images. Must be in 256x256 format." : "Valgfri. Størrelsen på de genererte bildene. Må være i 256x256-format.",
     "Model" : "Modell",

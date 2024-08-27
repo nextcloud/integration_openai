@@ -1,6 +1,8 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "OpenAI的Whisper语音转文本",
+    "LocalAI's Whisper Speech-To-Text" : "LocalAI的Whisper语音转文本",
     "Unknown models error" : "未知模型错误",
     "Text generation" : "文本生成",
     "Image generation" : "图像生成",

@@ -1,4 +1,5 @@
 { "translations": {
+    "OpenAI's DALL-E 2 Text-To-Image" : "من نص إلى صورة بواسطة DALL-E 2 من OpenAI",
     "Unknown models error" : "خطأ نماذج غير محدد",
     "Text generation" : "توليد النص",
     "Image generation" : "توليد الصورة",
@@ -21,7 +22,6 @@
     "Unknown API request error." : "خطأ غير محدد عند طلب API",
     "Maximum output words" : "أقصى عدد من الكلمات في الخرج",
     "The maximum number of words/tokens that can be generated in the completion." : "العدد الأقصى من الكلمات أو الأَمَارَات التي يمكن توليدها عند الإكمال.",
-    "OpenAI's DALL-E 2 Text-To-Image" : "من نص إلى صورة بواسطة DALL-E 2 من OpenAI",
     "Size" : "حجم",
     "Optional. The size of the generated images. Must be in 256x256 format." : "اختياري: حجم الصور المولدة. يجب أن تكون في شكل 256*256.",
     "Model" : "نموذج model",

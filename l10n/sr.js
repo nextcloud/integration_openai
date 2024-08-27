@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "Whisper говор-у-текст компаније OpenAI",
+    "LocalAI's Whisper Speech-To-Text" : "Whisper говор-у-текст са LocalAI",
+    "OpenAI's DALL-E 2 Text-To-Image" : "DALL-E 2 Текст-у-слику компаније OpenAI",
     "Unknown models error" : "Непозната грешка модела",
     "Text generation" : "Генерисање текста",
     "Image generation" : "Генерисање слике",
@@ -23,7 +26,6 @@ OC.L10N.register(
     "Unknown API request error." : "Непозната грешка API захтева.",
     "Maximum output words" : "Максимални број речи у излазу",
     "The maximum number of words/tokens that can be generated in the completion." : "Максимални број речи/жетона који ће се генерисати у довршавању.",
-    "OpenAI's DALL-E 2 Text-To-Image" : "DALL-E 2 Текст-у-слику компаније OpenAI",
     "Size" : "величина",
     "Optional. The size of the generated images. Must be in 256x256 format." : "Није обавезно. Величина генерисаних слика. Мора да буде у формату 256x256.",
     "Model" : "Модел",

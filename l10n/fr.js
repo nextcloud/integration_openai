@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "Reconnaissance vocale par Whisper de OpenAI",
+    "LocalAI's Whisper Speech-To-Text" : "Synthèse vocale par Whisper de LocalAI",
+    "OpenAI's DALL-E 2 Text-To-Image" : "Texte à l'image par DALL-E 2 d'OpenAI",
     "Unknown models error" : "Erreur des modèles inconnue",
     "Text generation" : "Génération de texte",
     "Image generation" : "Génération d'image",
@@ -21,7 +24,6 @@ OC.L10N.register(
     "Bad credentials" : "Identifiants incorrects",
     "API request error: " : "Erreur de requête API :",
     "Unknown API request error." : "Erreur de requête API inconnue.",
-    "OpenAI's DALL-E 2 Text-To-Image" : "Texte à l'image par DALL-E 2 d'OpenAI",
     "Size" : "Taille",
     "Model" : "Modèle",
     "Detect language" : "Détecter la langue",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "Whisper de OpenAI para conversión de voz a texto",
     "Image generation" : "Generación de imágenes",
     "Unknown" : "Desconocido",
     "seconds" : "segundos",

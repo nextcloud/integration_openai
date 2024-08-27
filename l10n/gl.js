@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "Conversión de voz a texto con Whisper en  OpenAI",
+    "LocalAI's Whisper Speech-To-Text" : "Conversión de voz a texto con Whisper en  LocalAI",
+    "OpenAI's DALL-E 2 Text-To-Image" : "Texto a imaxe DALL-E 2 de OpenAI",
     "Unknown models error" : "Produciuse un erro descoñecido nos modelos",
     "Text generation" : "Xeración de texto",
     "Image generation" : "Xeración de imaxes",
@@ -23,7 +26,6 @@ OC.L10N.register(
     "Unknown API request error." : "Produciuse un erro descoñecido na solicitude da API",
     "Maximum output words" : "Máximo de palabras de saída",
     "The maximum number of words/tokens that can be generated in the completion." : "O número máximo de palabras/testemuños que se poden xerar ao completar.",
-    "OpenAI's DALL-E 2 Text-To-Image" : "Texto a imaxe DALL-E 2 de OpenAI",
     "Size" : "Tamaño",
     "Optional. The size of the generated images. Must be in 256x256 format." : "Opcional. O tamaño das imaxes xeradas. Debe estar en formato 256 x 256.",
     "Model" : "Modelo",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI DALL-E 2 Besedilo-v-Sliko",
     "Unknown models error" : "Neznana napaka modela",
     "Text generation" : "Ustvarjanje besedila",
     "Image generation" : "Ustvarjanje slik",
@@ -16,7 +17,6 @@ OC.L10N.register(
     "Unknown API request error." : "Neznana napaka zahteve API:",
     "Maximum output words" : "Največje število besed odvoda",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI DALL-E 2 Besedilo-v-Sliko",
     "Size" : "Velikost",
     "Optional. The size of the generated images. Must be in 256x256 format." : "Izbirna velikost ustvarjenih slik, zapisana v zapisu 256x256.",
     "Detect language" : "Zaznava jezika",

@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "OpenAI 的 Whisper 語音轉文字",
+    "LocalAI's Whisper Speech-To-Text" : "LocalAI 的 Whisper 語音轉文字",
+    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI 的 DALL-E 2 文字轉影像",
     "Unknown models error" : "未知模型錯誤",
     "Text generation" : "產生文字",
     "Image generation" : "影像產生",
@@ -23,7 +26,6 @@ OC.L10N.register(
     "Unknown API request error." : "未知的 API 請求錯誤。",
     "Maximum output words" : "最大輸出字數",
     "The maximum number of words/tokens that can be generated in the completion." : "補齊中可以產生的最大文字/權杖數。",
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI 的 DALL-E 2 文字轉影像",
     "Size" : "大小",
     "Optional. The size of the generated images. Must be in 256x256 format." : "選擇性。產生影像的大小。必須為 256x256。",
     "Model" : "模型",

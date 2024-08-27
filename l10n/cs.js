@@ -1,6 +1,8 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "Whisper - převod řeči na text od OpenAI",
+    "LocalAI's Whisper Speech-To-Text" : "Převod řeči na text Whisper prostřednictvím LocalAI",
     "Unknown models error" : "Neznámá chyba modelů",
     "Text generation" : "Vytváření textu",
     "Image generation" : "Vytváření obrázků",

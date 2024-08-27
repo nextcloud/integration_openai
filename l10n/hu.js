@@ -1,6 +1,8 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "OpenAI Whisper beszédfelismerés",
+    "LocalAI's Whisper Speech-To-Text" : "LocalAI Whisper beszédfelismerés",
     "Unknown models error" : "Ismeretlen modell hiba",
     "Text generation" : "Szöveg generálás",
     "Image generation" : "Kép generálás",

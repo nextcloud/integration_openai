@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "OpenAI Whisper konuşmadan metne",
+    "LocalAI's Whisper Speech-To-Text" : "LocalAI Whisper konuşmadan metne",
+    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI DALL-E 2 yazıdan görsele",
     "Unknown models error" : "Bilinmeyen modeller sorunu",
     "Text generation" : "Metin oluşturma",
     "Image generation" : "Görsel oluşturma",
@@ -23,7 +26,6 @@ OC.L10N.register(
     "Unknown API request error." : "Bilinmeyen API isteği sorunu",
     "Maximum output words" : "En fazla çıktı sözcüğü sayısı",
     "The maximum number of words/tokens that can be generated in the completion." : "Tamamlarken üretilebilecek en fazla sözcük/kod sayısı.",
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI DALL-E 2 yazıdan görsele",
     "Size" : "Boyut",
     "Optional. The size of the generated images. Must be in 256x256 format." : "İsteğe bağlı. Oluşturulan görsellerin boyutu. 256x256 boyutunda olmalıdır.",
     "Model" : "Model",

@@ -1,4 +1,7 @@
 { "translations": {
+    "OpenAI's Whisper Speech-To-Text" : "OpenAI Whisper fala-para-texto",
+    "LocalAI's Whisper Speech-To-Text" : "Discurso para texto em sussurro da LocalAI",
+    "OpenAI's DALL-E 2 Text-To-Image" : "Texto para imagem DALL-E 2 da OpenAI",
     "Unknown models error" : "Erro de modelos desconhecidos",
     "Text generation" : "Geração de texto",
     "Image generation" : "Geração de imagem",
@@ -21,7 +24,6 @@
     "Unknown API request error." : "Erro de solicitação de API desconhecido.",
     "Maximum output words" : "Palavras de saída máxima",
     "The maximum number of words/tokens that can be generated in the completion." : "O número máximo de palavras/tokens que podem ser gerados na conclusão.",
-    "OpenAI's DALL-E 2 Text-To-Image" : "Texto para imagem DALL-E 2 da OpenAI",
     "Size" : "Tamanho",
     "Optional. The size of the generated images. Must be in 256x256 format." : "Opcional. O tamanho das imagens geradas. Deve estar no formato 256x256.",
     "Model" : "Modelo",
