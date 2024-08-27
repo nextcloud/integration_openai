@@ -31,9 +31,9 @@ class TextToImageProvider implements IProvider {
 	 * @inheritDoc
 	 */
 	public function getName(): string {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? $this->l->t('OpenAI\'s DALL-E 2 Text-To-Image')
-			: $this->openAiAPIService->getServiceName();
+		return ($this->openAiAPIService->isUsingOpenAi()
+			? $this->l->t('OpenAI\'s DALL-E 2')
+			: $this->openAiAPIService->getServiceName()) . ' ImageGeneration';
 	}
 
 	/**
