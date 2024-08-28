@@ -1,8 +1,8 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "Conversión de voz a texto con Whisper en  OpenAI",
-    "LocalAI's Whisper Speech-To-Text" : "Conversión de voz a texto con Whisper en  LocalAI",
+    "OpenAI's Whisper Speech-To-Text" : "Conversión de voz a texto con Whisper en OpenAI",
+    "LocalAI's Whisper Speech-To-Text" : "Conversión de voz a texto con Whisper en LocalAI",
     "OpenAI's DALL-E 2 Text-To-Image" : "Texto a imaxe DALL-E 2 de OpenAI",
     "Unknown models error" : "Produciuse un erro descoñecido nos modelos",
     "Text generation" : "Xeración de texto",
