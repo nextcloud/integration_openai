@@ -132,7 +132,7 @@
 				<h2>
 					{{ t('integration_openai', 'Text generation') }}
 				</h2>
-				<div class="line completion-endpoint">
+				<div v-if="state.url !== ''" class="line completion-endpoint">
 					<label>
 						<EarthIcon :size="20" class="icon" />
 						{{ t('integration_openai', 'Text completion endpoint') }}
@@ -159,7 +159,9 @@
 					</div>
 				</div>
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
+					{{ state.url === ''
+						? t('integration_openai', 'Selection of chat/completion endpoint is not available for OpenAI since it implicitly uses chat completions for "instruction following" fine-tuned models.')
+						: t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
 				</NcNoteCard>
 				<div v-if="models"
 					class="line line-select">
@@ -338,27 +340,27 @@
 </template>
 
 <script>
-import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
-import EarthIcon from 'vue-material-design-icons/Earth.vue'
-import KeyIcon from 'vue-material-design-icons/Key.vue'
-import CloseIcon from 'vue-material-design-icons/Close.vue'
 import AccountIcon from 'vue-material-design-icons/Account.vue'
+import CloseIcon from 'vue-material-design-icons/Close.vue'
+import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
+import KeyIcon from 'vue-material-design-icons/Key.vue'
+import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
-import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
 import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 
-import { loadState } from '@nextcloud/initial-state'
-import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import { showSuccess, showError } from '@nextcloud/dialogs'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { loadState } from '@nextcloud/initial-state'
 import { confirmPassword } from '@nextcloud/password-confirmation'
+import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 
 export default {
