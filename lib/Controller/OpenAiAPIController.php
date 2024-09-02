@@ -38,13 +38,11 @@ class OpenAiAPIController extends Controller {
 	public function getModels(): DataResponse {
 		try {
 			$response = $this->openAiAPIService->getModels($this->userId);
+			return new DataResponse($response);
 		} catch (Exception $e) {
 			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);
 		}
-
-		$response['default_completion_model_id'] = $this->openAiSettingsService->getUserDefaultCompletionModelId($this->userId);
-		return new DataResponse($response);
 	}
 
 	/**

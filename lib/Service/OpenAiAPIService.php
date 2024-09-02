@@ -136,7 +136,7 @@ class OpenAiAPIService {
 
 		try {
 			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
-		} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
+		} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
 			$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
 			throw new Exception('Could not retrieve quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -196,7 +196,7 @@ class OpenAiAPIService {
 			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
 			try {
 				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
-			} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
+			} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
 				$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 			}
@@ -223,7 +223,7 @@ class OpenAiAPIService {
 			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
 			try {
 				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $quotaPeriod);
-			} catch (DoesNotExistException | MultipleObjectsReturnedException | DBException | RuntimeException $e) {
+			} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
 				$this->logger->warning('Could not retrieve quota usage for quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 				// We can pass detailed error info to the UI here since the user is an admin in any case:
 				throw new Exception('Could not retrieve quota usage: ' . $e->getMessage(), Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -263,7 +263,7 @@ class OpenAiAPIService {
 		}
 
 		$params = [
-			'model' => $model,
+			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
 			'prompt' => $prompt,
 			'max_tokens' => $maxTokens,
 			'n' => $n,
@@ -360,7 +360,7 @@ class OpenAiAPIService {
 		$messages[] = ['role' => 'user', 'content' => $userPrompt];
 
 		$params = [
-			'model' => $model,
+			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
 			'messages' => $messages,
 			'max_tokens' => $maxTokens,
 			'n' => $n,
@@ -454,7 +454,7 @@ class OpenAiAPIService {
 	): string {
 		try {
 			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
-		} catch (NotPermittedException | LockedException | GenericFileException $e) {
+		} catch (NotPermittedException|LockedException|GenericFileException $e) {
 			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -522,19 +522,15 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
+		$model = $this->config->getAppValue(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
 		$params = [
 			'prompt' => $prompt,
 			'size' => $size,
+			'n' => $n,
+			'response_format' => 'url',
 		];
-
-		if ($this->isUsingOpenAi()) {
-			$params['model'] = 'dall-e-2';
-			$params['n'] = $n;
-			$params['response_format'] = 'url';
-
-			if ($userId !== null) {
-				$params['user'] = $userId;
-			}
+		if ($model !== Application::DEFAULT_MODEL_ID) {
+			$params['model'] = $model;
 		}
 
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
@@ -731,7 +727,7 @@ class OpenAiAPIService {
 			} else {
 				return json_decode($body, true) ?: [];
 			}
-		} catch (ClientException | ServerException $e) {
+		} catch (ClientException|ServerException $e) {
 			$responseBody = $e->getResponse()->getBody();
 			$parsedResponseBody = json_decode($responseBody, true);
 			if ($e->getResponse()->getStatusCode() === 404) {
@@ -744,7 +740,7 @@ class OpenAiAPIService {
 			} else {
 				throw new Exception($this->l10n->t('API request error: ') . $e->getMessage(), intval($e->getCode()));
 			}
-		} catch (Exception | Throwable $e) {
+		} catch (Exception|Throwable $e) {
 			$this->logger->warning('API request error : ' . $e->getMessage(), ['exception' => $e]);
 			throw new Exception($this->l10n->t('Unknown API request error.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}

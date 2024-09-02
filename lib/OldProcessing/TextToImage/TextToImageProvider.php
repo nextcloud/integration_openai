@@ -68,7 +68,7 @@ class TextToImageProvider implements IProvider {
 			}
 			$endTime = time();
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
-		} catch(\Exception $e) {
+		} catch (\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new \RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
 		}
