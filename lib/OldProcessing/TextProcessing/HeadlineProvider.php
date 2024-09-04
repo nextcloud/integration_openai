@@ -28,7 +28,7 @@ class HeadlineProvider implements IProviderWithExpectedRuntime, IProviderWithUse
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->openAiAPIService->getServiceName() . ' TextProcessing';
 	}
 
 	public function process(string $prompt): string {

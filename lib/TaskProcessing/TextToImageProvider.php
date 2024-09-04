@@ -31,7 +31,7 @@ class TextToImageProvider implements ISynchronousProvider {
 
 	public function getName(): string {
 		return $this->openAiAPIService->isUsingOpenAi()
-			? $this->l->t('OpenAI\'s DALL-E 2 Text-To-Image')
+			? $this->l->t('OpenAI\'s DALL-E 2')
 			: $this->openAiAPIService->getServiceName();
 	}
 
