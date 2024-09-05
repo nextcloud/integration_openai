@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.1.0 – 2024-09-05
+
+### Added
+
+- admin-settings: add image model selection dropdown @kyteinsky [#122](https://github.com/nextcloud/integration_openai/pull/122)
+
+### Changed
+
+- bump max NC version to 31, update composer dev dependencies @julien-nc
+- Bring back textProcessing, translation, STT, and image generation providers @julien-nc [#120](https://github.com/nextcloud/integration_openai/pull/120)
+- Avoid ambiguity between old and new providers @julien-nc [#121](https://github.com/nextcloud/integration_openai/pull/121)
+
+### Fixed
+
+- fix(TextToText,Translate): Don't throw in getOptionalInputShapeEnumValues @marcelklehr [#115](https://github.com/nextcloud/integration_openai/pull/115)
+- fix(providers): do no implement useless 'getOptionalOutputShapeDefaults' method, use the size param in text2image provider @julien-nc [#119](https://github.com/nextcloud/integration_openai/pull/119)
+
 ## 3.0.1 – 2024-07-26
 
 ### Added
