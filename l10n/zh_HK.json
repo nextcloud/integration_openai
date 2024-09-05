@@ -1,7 +1,6 @@
 { "translations": {
     "OpenAI's Whisper Speech-To-Text" : "OpenAI 的 Whisper 音頻轉文本",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI 的 Whisper 音頻轉文本",
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI 的 DALL-E 2 文字轉影像",
     "Unknown models error" : "模型錯誤不詳",
     "Text generation" : "產生文字",
     "Image generation" : "圖像產生",

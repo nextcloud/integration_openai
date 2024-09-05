@@ -3,7 +3,6 @@ OC.L10N.register(
     {
     "OpenAI's Whisper Speech-To-Text" : "Whisper Sprache-zu-Text von OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Whisper Sprache-zu-Text von LocalAI",
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAIs DALL-E 2 Text-zu-Bild",
     "Unknown models error" : "Unbekannter Modellfehler",
     "Text generation" : "Texterstellung",
     "Image generation" : "Bilderstellung",

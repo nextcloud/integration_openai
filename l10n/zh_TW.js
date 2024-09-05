@@ -3,7 +3,6 @@ OC.L10N.register(
     {
     "OpenAI's Whisper Speech-To-Text" : "OpenAI 的 Whisper 語音轉文字",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI 的 Whisper 語音轉文字",
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI 的 DALL-E 2 文字轉影像",
     "Unknown models error" : "未知模型錯誤",
     "Text generation" : "產生文字",
     "Image generation" : "影像產生",

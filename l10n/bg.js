@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI's Whisper Speech-To-Text" : "Whisper Speech-To-Text - система за автоматично разпознаване на реч на OpenAI's ",
     "Unknown" : "Неизвестен",
     "seconds" : "секунди",
     "Bad HTTP method" : "Лош HTTP метод",

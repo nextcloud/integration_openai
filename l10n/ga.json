@@ -1,7 +1,6 @@
 { "translations": {
     "OpenAI's Whisper Speech-To-Text" : "Cogar Óráid Go Téacs OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Cogar Óráid Go Téacs LocalAI",
-    "OpenAI's DALL-E 2 Text-To-Image" : "Téacs go Íomhá DALL-E 2 de chuid OpenAI",
     "Unknown models error" : "Earráid samhlacha anaithnid",
     "Text generation" : "Giniúint téacs",
     "Image generation" : "Giniúint íomhá",

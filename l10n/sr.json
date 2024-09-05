@@ -1,7 +1,6 @@
 { "translations": {
     "OpenAI's Whisper Speech-To-Text" : "Whisper говор-у-текст компаније OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Whisper говор-у-текст са LocalAI",
-    "OpenAI's DALL-E 2 Text-To-Image" : "DALL-E 2 Текст-у-слику компаније OpenAI",
     "Unknown models error" : "Непозната грешка модела",
     "Text generation" : "Генерисање текста",
     "Image generation" : "Генерисање слике",

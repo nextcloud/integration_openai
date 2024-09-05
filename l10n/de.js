@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAIs DALL-E 2 Text-zu-Bild",
     "Unknown models error" : "Unbekannter Modellfehler",
     "Text generation" : "Texterstellung",
     "Image generation" : "Bilderstellung",

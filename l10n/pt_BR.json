@@ -1,7 +1,6 @@
 { "translations": {
     "OpenAI's Whisper Speech-To-Text" : "OpenAI Whisper fala-para-texto",
     "LocalAI's Whisper Speech-To-Text" : "Discurso para texto em sussurro da LocalAI",
-    "OpenAI's DALL-E 2 Text-To-Image" : "Texto para imagem DALL-E 2 da OpenAI",
     "Unknown models error" : "Erro de modelos desconhecidos",
     "Text generation" : "Geração de texto",
     "Image generation" : "Geração de imagem",

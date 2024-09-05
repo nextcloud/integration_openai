@@ -1,7 +1,8 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's DALL-E 2 Text-To-Image" : "من نص إلى صورة بواسطة DALL-E 2 من OpenAI",
+    "OpenAI's Whisper Speech-To-Text" : "تطبيق \"ويسبر\" الهامس Whisper لتحويل الكلام إلي نص من OpenAI",
+    "LocalAI's Whisper Speech-To-Text" : "تحويل الكلام إلى نص بالذكاء االاصطناعي محليّاً باستعمال تطبيق \"الهامس\" Whisper",
     "Unknown models error" : "خطأ نماذج غير محدد",
     "Text generation" : "توليد النص",
     "Image generation" : "توليد الصورة",

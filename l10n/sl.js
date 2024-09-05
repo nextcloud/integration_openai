@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's DALL-E 2 Text-To-Image" : "OpenAI DALL-E 2 Besedilo-v-Sliko",
     "Unknown models error" : "Neznana napaka modela",
     "Text generation" : "Ustvarjanje besedila",
     "Image generation" : "Ustvarjanje slik",
