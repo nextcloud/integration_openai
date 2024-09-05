@@ -55,7 +55,7 @@
 				<h2>
 					{{ t('integration_openai', 'Authentication') }}
 				</h2>
-				<div v-show="state.url !== ''" class="line">
+				<div v-show="state.url !== ''" class="line column">
 					<label>
 						{{ t('integration_openai', 'Authentication method') }}
 					</label>
@@ -132,7 +132,7 @@
 				<h2>
 					{{ t('integration_openai', 'Text generation') }}
 				</h2>
-				<div class="line completion-endpoint">
+				<div v-if="state.url !== ''" class="line column">
 					<label>
 						<EarthIcon :size="20" class="icon" />
 						{{ t('integration_openai', 'Text completion endpoint') }}
@@ -159,18 +159,21 @@
 					</div>
 				</div>
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
+					{{ state.url === ''
+						? t('integration_openai', 'Selection of chat/completion endpoint is not available for OpenAI since it implicitly uses chat completions for "instruction following" fine-tuned models.')
+						: t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
 				</NcNoteCard>
 				<div v-if="models"
 					class="line line-select">
 					<NcSelect
-						v-model="selectedModel"
+						v-model="selectedModel.text"
 						class="model-select"
+						:clearable="state.default_completion_model_id !== DEFAULT_MODEL_ITEM.id"
 						:options="formattedModels"
 						:input-label="t('integration_openai', 'Default completion model to use')"
 						:no-wrap="true"
 						input-id="openai-model-select"
-						@input="onModelSelected" />
+						@input="onModelSelected('text', $event)" />
 					<a v-if="state.url === ''"
 						:title="t('integration_openai', 'More information about OpenAI models')"
 						href="https://beta.openai.com/docs/models"
@@ -225,6 +228,46 @@
 						</template>
 					</NcInputField>
 				</div>
+			</div>
+			<div>
+				<h2>
+					{{ t('integration_openai', 'Image generation') }}
+				</h2>
+				<div v-if="models"
+					class="line line-select">
+					<NcSelect
+						v-model="selectedModel.image"
+						class="model-select"
+						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
+						:options="formattedModels"
+						:input-label="t('integration_openai', 'Default image generation model to use')"
+						:no-wrap="true"
+						input-id="openai-model-select"
+						@input="onModelSelected('image', $event)" />
+					<a v-if="state.url === ''"
+						:title="t('integration_openai', 'More information about OpenAI models')"
+						href="https://beta.openai.com/docs/models"
+						target="_blank">
+						<NcButton type="tertiary" aria-label="openai-info">
+							<template #icon>
+								<HelpCircleIcon />
+							</template>
+						</NcButton>
+					</a>
+					<a v-else
+						:title="t('integration_openai', 'More information about LocalAI models')"
+						href="https://localai.io/model-compatibility/index.html"
+						target="_blank">
+						<NcButton type="tertiary" aria-label="localai-info">
+							<template #icon>
+								<HelpCircleIcon />
+							</template>
+						</NcButton>
+					</a>
+				</div>
+				<NcNoteCard v-else type="info">
+					{{ t('integration_openai', 'No models to list') }}
+				</NcNoteCard>
 			</div>
 			<div>
 				<h2>
@@ -338,28 +381,30 @@
 </template>
 
 <script>
-import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
-import EarthIcon from 'vue-material-design-icons/Earth.vue'
-import KeyIcon from 'vue-material-design-icons/Key.vue'
-import CloseIcon from 'vue-material-design-icons/Close.vue'
 import AccountIcon from 'vue-material-design-icons/Account.vue'
+import CloseIcon from 'vue-material-design-icons/Close.vue'
+import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
+import KeyIcon from 'vue-material-design-icons/Key.vue'
+import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
-import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
 import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
+import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 
-import { loadState } from '@nextcloud/initial-state'
-import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import { showSuccess, showError } from '@nextcloud/dialogs'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { loadState } from '@nextcloud/initial-state'
 import { confirmPassword } from '@nextcloud/password-confirmation'
+import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
+
+const DEFAULT_MODEL_ITEM = { id: 'Default' }
 
 export default {
 	name: 'AdminSettings',
@@ -380,15 +425,16 @@ export default {
 		NcNoteCard,
 	},
 
-	props: [],
-
 	data() {
 		return {
 			state: loadState('integration_openai', 'admin-config'),
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
 			models: null,
-			selectedModel: null,
+			selectedModel: {
+				text: null,
+				image: null,
+			},
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
 			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
@@ -414,7 +460,8 @@ export default {
 		},
 	},
 
-	watch: {
+	created() {
+		this.DEFAULT_MODEL_ITEM = DEFAULT_MODEL_ITEM
 	},
 
 	mounted() {
@@ -425,6 +472,15 @@ export default {
 	},
 
 	methods: {
+		modelToNcSelectObject(model) {
+			return {
+				id: model.id,
+				value: model.id,
+				label: (model.id === DEFAULT_MODEL_ITEM.id ? t('integration_openai', 'Default') : model.id)
+					+ (model.owned_by ? ' (' + model.owned_by + ')' : ''),
+			}
+		},
+
 		getModels() {
 			this.models = null
 			if (!this.configured) {
@@ -433,34 +489,56 @@ export default {
 			const url = generateUrl('/apps/integration_openai/models')
 			return axios.get(url)
 				.then((response) => {
-					this.models = response.data?.data
-					const defaultModelId = this.state.default_completion_model_id ?? response.data?.default_completion_model_id
-					const defaultModel = this.models.find(m => m.id === defaultModelId)
-					const modelToSelect = defaultModel
-						?? this.models.find(m => m.id === 'gpt-3.5-turbo')
-						?? this.models[0]
-						?? null
-					if (modelToSelect) {
-						this.selectedModel = {
-							id: modelToSelect.id,
-							value: modelToSelect.id,
-							label: modelToSelect.id
-								+ (modelToSelect.owned_by ? ' (' + modelToSelect.owned_by + ')' : ''),
-						}
+					this.models = [DEFAULT_MODEL_ITEM, ...response.data?.data ?? []]
+					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
+					const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
+						|| this.models.find(m => m.id === 'gpt-3.5-turbo')
+						|| this.models[1]
+						|| this.models[0]
+
+					const defaultImageModelId = this.state.default_image_model_id || response.data?.default_image_model_id
+					const imageModelToSelect = this.models.find(m => m.id === defaultImageModelId)
+						|| this.models.find(m => m.id === 'dall-e-2')
+						|| this.models[1]
+						|| this.models[0]
+
+					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
+					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
+
+					if (this.state.default_completion_model_id !== this.selectedModel.text.id
+						|| this.state.default_image_model_id !== this.selectedModel.image.id) {
+						this.saveOptions({
+							default_completion_model_id: this.selectedModel.text.id,
+							default_image_model_id: this.selectedModel.image.id,
+						}, false)
 					}
-					const selectedModelId = this.selectedModel?.id ?? ''
-					this.saveOptions({ default_completion_model_id: selectedModelId }, false)
 				})
 				.catch((error) => {
+					showError(t('integration_openai', 'Failed to load models'))
 					console.error(error)
 				})
 		},
-		onModelSelected(selected) {
-			if (selected === null) {
-				return
+		onModelSelected(type, selected) {
+			console.debug(`Selected model: ${type}: ${selected}`)
+			if (selected == null) {
+				if (type === 'image') {
+					this.selectedModel.image = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
+					this.state.default_image_model_id = DEFAULT_MODEL_ITEM.id
+				} else if (type === 'text') {
+					this.selectedModel.text = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
+					this.state.default_completion_model_id = DEFAULT_MODEL_ITEM.id
+				}
+			} else {
+				if (type === 'image') {
+					this.state.default_image_model_id = selected.id
+				} else if (type === 'text') {
+					this.state.default_completion_model_id = selected.id
+				}
 			}
-			this.state.default_completion_model_id = selected.id
-			this.saveOptions({ default_completion_model_id: this.state.default_completion_model_id })
+			this.saveOptions({
+				default_completion_model_id: this.state.default_completion_model_id,
+				default_image_model_id: this.state.default_image_model_id,
+			})
 		},
 		loadQuotaInfo() {
 			const url = generateUrl('/apps/integration_openai/admin-quota-info')
@@ -599,9 +677,10 @@ export default {
 			width: auto;
 		}
 
-		&.completion-endpoint {
+		&.column {
 			flex-direction: column;
 			align-items: start;
+			gap: 8px;
 		}
 	}
 

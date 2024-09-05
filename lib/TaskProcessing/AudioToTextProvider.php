@@ -78,7 +78,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 		try {
 			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile);
 			return ['output' => $transcription];
-		} catch(Exception $e) {
+		} catch (Exception $e) {
 			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
 		}

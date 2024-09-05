@@ -34,6 +34,7 @@ class OpenAiSettingsService {
 		'service_name' => 'string',
 		'api_key' => 'string',
 		'default_completion_model_id' => 'string',
+		'default_image_model_id' => 'string',
 		'max_tokens' => 'integer',
 		'llm_extra_params' => 'string',
 		'quota_period' => 'integer',
@@ -50,7 +51,6 @@ class OpenAiSettingsService {
 
 	private const USER_CONFIG_TYPES = [
 		'api_key' => 'string',
-		'default_completion_model_id' => 'string',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
 	];
@@ -87,6 +87,13 @@ class OpenAiSettingsService {
 	 */
 	public function getAdminDefaultCompletionModelId(): string {
 		return $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminDefaultImageModelId(): string {
+		return $this->config->getAppValue(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
 	}
 
 	/**
@@ -212,6 +219,7 @@ class OpenAiSettingsService {
 			'service_name' => $this->getServiceName(),
 			'api_key' => $this->getAdminApiKey(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
+			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
 			'max_tokens' => $this->getMaxTokens(),
 			'llm_extra_params' => $this->getLlmExtraParams(),
 			// Updated to get max tokens
@@ -274,16 +282,6 @@ class OpenAiSettingsService {
 		return $this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
 	}
 
-	/**
-	 * @param string $userId
-	 * @return string
-	 */
-	public function getUserDefaultCompletionModelId(string $userId): string {
-		// Fall back on admin model setting if necessary:
-		$adminModel = $this->getAdminDefaultCompletionModelId();
-		return $this->config->getUserValue($userId, Application::APP_ID, 'default_completion_model_id', $adminModel) ?: $adminModel;
-	}
-
 	////////////////////////////////////////////
 	//////////// Setters for settings //////////
 
@@ -339,12 +337,12 @@ class OpenAiSettingsService {
 	}
 
 	/**
-	 * @param string $userId
-	 * @param string $defaultCompletionModelId
+	 * @param string $defaultImageModelId
+	 * @return void
 	 */
-	public function setUserDefaultCompletionModelId(string $userId, string $defaultCompletionModelId): void {
+	public function setAdminDefaultImageModelId(string $defaultImageModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->config->setUserValue($userId, Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId);
+		$this->config->setAppValue(Application::APP_ID, 'default_image_model_id', $defaultImageModelId);
 	}
 
 	/**
@@ -489,6 +487,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['default_completion_model_id'])) {
 			$this->setAdminDefaultCompletionModelId($adminConfig['default_completion_model_id']);
 		}
+		if (isset($adminConfig['default_image_model_id'])) {
+			$this->setAdminDefaultImageModelId($adminConfig['default_image_model_id']);
+		}
 		if (isset($adminConfig['max_tokens'])) {
 			$this->setMaxTokens($adminConfig['max_tokens']);
 		}
@@ -543,9 +544,6 @@ class OpenAiSettingsService {
 		// Validation of the input values is done in the individual setters
 		if (isset($userConfig['api_key'])) {
 			$this->setUserApiKey($userId, $userConfig['api_key']);
-		}
-		if (isset($userConfig['default_completion_model_id'])) {
-			$this->setUserDefaultCompletionModelId($userId, $userConfig['default_completion_model_id']);
 		}
 		if (isset($userConfig['basic_user'])) {
 			$this->setUserBasicUser($userId, $userConfig['basic_user']);

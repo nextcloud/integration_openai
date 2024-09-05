@@ -40,6 +40,7 @@ class Application extends App implements IBootstrap {
 	public const OPENAI_DEFAULT_REQUEST_TIMEOUT = 60 * 4;
 	public const USER_AGENT = 'Nextcloud OpenAI/LocalAI integration';
 
+	public const DEFAULT_MODEL_ID = 'Default';
 	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
 	public const DEFAULT_TRANSCRIPTION_MODEL_ID = 'whisper-1';
 	public const DEFAULT_IMAGE_SIZE = '1024x1024';

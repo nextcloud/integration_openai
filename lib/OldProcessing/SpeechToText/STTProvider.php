@@ -36,7 +36,7 @@ class STTProvider implements ISpeechToTextProvider {
 	public function transcribeFile(File $file): string {
 		try {
 			return $this->openAiAPIService->transcribeFile($this->userId, $file);
-		} catch(\Exception $e) {
+		} catch (\Exception $e) {
 			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new \RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
 		}

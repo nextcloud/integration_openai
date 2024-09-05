@@ -82,7 +82,7 @@ class OpenAiProviderTest extends TestCase {
 		$quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
 		try {
 			$quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
-		} catch (\OCP\Db\Exception | \RuntimeException | \Exception | \Throwable $e) {
+		} catch (\OCP\Db\Exception|\RuntimeException|\Exception|\Throwable $e) {
 			// Ignore
 		}
 
