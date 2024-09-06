@@ -11,6 +11,7 @@ OC.L10N.register(
     "Authentication method" : "Mètodu de autenticatzione",
     "API key" : "Crae API",
     "Request timeout (seconds)" : "Tempus màssimu de sa rechesta (segundos)",
+    "Default" : "Predefinidu",
     "Username" : "Nùmene utente",
     "Password" : "Crae"
 },

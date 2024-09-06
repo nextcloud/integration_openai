@@ -71,6 +71,7 @@
     "Image generation provider" : "Leverandør av bildegenerering",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Tale-til-tekst-leverandør (for eksempel for å transkribere Talk-opptak)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON-objekt. Se API-dokumentasjonen for å få listen over alle tilgjengelige parametere. For eksempel: {example}",
+    "Default" : "Forvalg",
     "Failed to load quota info" : "Lasting av kvoteinfo feilet",
     "OpenAI admin options saved" : "OpenAI administratoralternativer lagret",
     "Failed to save OpenAI admin options" : "Kunne ikke lagre OpenAI-administratoralternativer",

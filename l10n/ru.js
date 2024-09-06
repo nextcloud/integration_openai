@@ -22,6 +22,7 @@ OC.L10N.register(
     "A per-user limit for usage of this API type (0 for unlimited)" : "Ограничение на использование данного типа API для каждого пользователя (0 для неограниченного количества)",
     "Max new tokens per request" : "Максимальное количество новых токенов на запрос",
     "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)",
+    "Default" : "По умолчанию",
     "Leave the API key empty to use the one defined by administrators" : "Оставьте ключ API пустым, чтобы использовать тот, который определен администраторами",
     "Username" : "Имя пользователя",
     "Password" : "Пароль",

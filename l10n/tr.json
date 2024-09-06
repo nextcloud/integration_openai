@@ -71,6 +71,7 @@
     "Image generation provider" : "Görsel oluşturma hizmeti sağlayıcısı",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Yazıdan metni dönüştürme hizmeti (örneğin Konuş kayıtlarını yazıya dönüştürmek için)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON nesnesi. Kullanılabilecek parametrelerin listesi için API belgelerine bakın. Örnek: {example}",
+    "Default" : "Varsayılan",
     "Failed to load quota info" : "Kota bilgileri yüklenemedi",
     "OpenAI admin options saved" : "OpenAI yönetici ayarları kaydedildi",
     "Failed to save OpenAI admin options" : "OpenAI yönetici ayarları kaydedilemedi",

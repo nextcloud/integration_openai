@@ -52,6 +52,7 @@
     "Translation provider (to translate Talk messages for example)" : "Fournisseur de traduction (pour traduire les messages instantanés, par exemple)",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Fournisseur de synthèse vocale (pour transcrire des enregistrements de Discussion, par exemple)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Objet JSON. Vérifiez la documentation de l’API pour récupérer la liste de tous les paramètres disponibles. Par exemple : {example}",
+    "Default" : "Défaut",
     "OpenAI admin options saved" : "Options d'administration OpenAI sauvegardées",
     "Failed to save OpenAI admin options" : "Impossible de sauvegarder les options d'administration OpenAI",
     "Your administrator defined a custom service address" : "Votre administrateur a défini une adresse de service spécifique",

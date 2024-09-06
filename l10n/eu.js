@@ -16,6 +16,7 @@ OC.L10N.register(
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",
     "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
+    "Default" : "Lehenetsia",
     "Username" : "Erabiltzaile-izena",
     "Password" : "Pasahitza"
 },

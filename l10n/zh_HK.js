@@ -73,6 +73,7 @@ OC.L10N.register(
     "Image generation provider" : "圖像產生提供者",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "音頻轉文字提供者（舉例來說，用來轉錄 Talk 的錄音）",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON 物件。看看 API 文件以取得所有可用參數清單。例如：{example}",
+    "Default" : "默認",
     "Failed to load quota info" : "載入配額資訊失敗",
     "OpenAI admin options saved" : "OpenAI 管理選項已儲存",
     "Failed to save OpenAI admin options" : "儲存 OpenAI 管理選項失敗",

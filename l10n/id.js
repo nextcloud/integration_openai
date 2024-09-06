@@ -10,6 +10,7 @@ OC.L10N.register(
     "Authentication method" : "Metode otentikasi",
     "API key" : "Kunci API",
     "Request timeout (seconds)" : "Minta waktu habis (detik)",
+    "Default" : "Default",
     "Username" : "Username",
     "Password" : "Kata sandi"
 },

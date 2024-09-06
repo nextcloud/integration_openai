@@ -71,6 +71,7 @@
     "Image generation provider" : "Provedor de geração de imagens",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provedor de fala para texto (para transcrever gravações do Talk, por exemplo)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Objeto JSON. Verifique a documentação da API para obter a lista de todos os parâmetros disponíveis. Por exemplo: {exemplo}",
+    "Default" : "Padrão",
     "Failed to load quota info" : "Falha ao carregar informações de cota",
     "OpenAI admin options saved" : "Opções de administração OpenAI salvas",
     "Failed to save OpenAI admin options" : "Falha ao salver opções de admin da OpenAI",

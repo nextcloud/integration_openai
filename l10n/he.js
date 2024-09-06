@@ -10,6 +10,7 @@ OC.L10N.register(
     "Authentication method" : "שיטת אימות",
     "API key" : "מפתח API",
     "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
+    "Default" : "ברירת מחדל",
     "Username" : "שם משתמש",
     "Password" : "ססמה"
 },

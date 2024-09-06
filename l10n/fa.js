@@ -22,6 +22,7 @@ OC.L10N.register(
     "Request timeout (seconds)" : "درخواست زمان (ثانیه)",
     "Translation provider (to translate Talk messages for example)" : "Translation provider (to translate Talk messages for example)",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Speech-to-text provider (to transcribe Talk recordings for example)",
+    "Default" : "پیش‌فرض",
     "OpenAI admin options saved" : "OpenAI admin options saved",
     "Failed to save OpenAI admin options" : "Failed to save OpenAI admin options",
     "Your administrator defined a custom service address" : "Your administrator defined a custom service address",

@@ -8,6 +8,7 @@ OC.L10N.register(
     "Authentication" : "Autentificare",
     "Authentication method" : "Modul de autentificare",
     "API key" : "Cheie API",
+    "Default" : "Implicită",
     "Username" : "Nume utilizator",
     "Password" : "Parolă"
 },

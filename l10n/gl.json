@@ -1,6 +1,7 @@
 { "translations": {
     "OpenAI's Whisper Speech-To-Text" : "Conversión de voz a texto con Whisper en OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Conversión de voz a texto con Whisper en LocalAI",
+    "OpenAI's DALL-E 2" : "DALL-E 2 de OpenAI",
     "Unknown models error" : "Produciuse un erro descoñecido nos modelos",
     "Text generation" : "Xeración de texto",
     "Image generation" : "Xeración de imaxes",
@@ -71,6 +72,7 @@
     "Image generation provider" : "Provedor de xeración de imaxes",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provedor de conversión de voz a texto (para transcribir as gravacións de Talk, por exemplo)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Obxecto JSON. Consulte a documentación da API para obter a lista de todos os parámetros dispoñíbeis. Por exemplo: {example}",
+    "Default" : "Predeterminado",
     "Failed to load quota info" : "Produciuse un fallo ao cargar a información da cota",
     "OpenAI admin options saved" : "Gardáronse as opcións de administración de OpenAI",
     "Failed to save OpenAI admin options" : "Produciuse un fallo ao gardar as opcións de administración de OpenAI",

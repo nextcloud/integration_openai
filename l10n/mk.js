@@ -7,6 +7,7 @@ OC.L10N.register(
     "Authentication" : "Автентикација",
     "Authentication method" : "Начин на автентификација",
     "API key" : "API key",
+    "Default" : "Предефиниран",
     "Username" : "Корисничко име",
     "Password" : "Лозинка"
 },

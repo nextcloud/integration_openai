@@ -71,6 +71,7 @@
     "Image generation provider" : "Пружалац услуге генерисања слике",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Пружалац услуге претварања говора у текст (на пример, за транскрибовање Talk снимака)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON објекат. Погледајте API документацију да сазнате листу свих доступних параметара. На пример: {example}",
+    "Default" : "Подразумевано",
     "Failed to load quota info" : "Није успело учитавање информација о квоти",
     "OpenAI admin options saved" : "Сачуване су OpenAI админ опције",
     "Failed to save OpenAI admin options" : "Није успело чување OpenAI админ опција",

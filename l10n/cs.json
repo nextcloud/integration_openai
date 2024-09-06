@@ -49,6 +49,7 @@
     "Select enabled features" : "Vyberte zapnuté funkce",
     "Translation provider (to translate Talk messages for example)" : "Poskytovatel překladů (například pro překládání zpráv v Talk)",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Poskytovatel převodu řeči na text (například pro přepis nahrávek z Talk)",
+    "Default" : "Výchozí",
     "Failed to load quota info" : "Nepodařilo se načíst informace o kvótě",
     "OpenAI admin options saved" : "Předvolby správy pro OpenAI uloženy",
     "Failed to save OpenAI admin options" : "Nepodařilo se uložit předvolby správy pro OpenAI",

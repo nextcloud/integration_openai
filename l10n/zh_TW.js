@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "OpenAI's Whisper Speech-To-Text" : "OpenAI 的 Whisper 語音轉文字",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI 的 Whisper 語音轉文字",
+    "OpenAI's DALL-E 2" : "OpenAI 的DALL-E 2",
     "Unknown models error" : "未知模型錯誤",
     "Text generation" : "產生文字",
     "Image generation" : "影像產生",
@@ -73,6 +74,7 @@ OC.L10N.register(
     "Image generation provider" : "影像產生提供者",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "語音轉文字提供者（舉例來說，用來轉錄 Talk 的錄音）",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON 物件。看看 API 文件以取得所有可用參數清單。例如：{example}",
+    "Default" : "預設",
     "Failed to load quota info" : "載入配額資訊失敗",
     "OpenAI admin options saved" : "OpenAI 管理選項已儲存",
     "Failed to save OpenAI admin options" : "儲存 OpenAI 管理選項失敗",

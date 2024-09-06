@@ -29,6 +29,7 @@ OC.L10N.register(
     "API key" : "Ključ API",
     "Request timeout (seconds)" : "Zahtevan časovni zamik (sekunde)",
     "Usage limits" : "Omejitve uporabe",
+    "Default" : "privzeto",
     "Username" : "Uporabniško ime",
     "Password" : "Geslo",
     "Usage" : "Uporaba"

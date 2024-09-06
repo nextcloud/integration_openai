@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "OpenAI's Whisper Speech-To-Text" : "Whisper Sprache-zu-Text von OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Whisper Sprache-zu-Text von LocalAI",
+    "OpenAI's DALL-E 2" : "DALL-E 2 von OpenAI",
     "Unknown models error" : "Unbekannter Modellfehler",
     "Text generation" : "Texterstellung",
     "Image generation" : "Bilderstellung",
@@ -73,6 +74,7 @@ OC.L10N.register(
     "Image generation provider" : "Bilderstellungsanbieter",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Sprache-zu-Text-Anbieter (zum Beispiel zum Transkribieren von Talk-Gesprächsaufzeichnungen)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON-Objekt. Sehen Sie sich die API-Dokumentation an, um eine Liste aller verfügbaren Parameter zu erhalten. Zum Beispiel: {example}",
+    "Default" : "Standard",
     "Failed to load quota info" : "Kontingentinformationen konnten nicht geladen werden",
     "OpenAI admin options saved" : "OpenAI-Administrationseinstellungen gespeichert",
     "Failed to save OpenAI admin options" : "Fehler beim Speichern der OpenAI-Administrationseinstellungen",

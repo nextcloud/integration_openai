@@ -14,6 +14,7 @@ OC.L10N.register(
     "More information about LocalAI models" : "Περισσότερες πληροφορίες σχετικά με τα μοντέλα LocalAI",
     "Request timeout (seconds)" : "Χρονικό όριο αιτήματος (δευτερόλεπτα)",
     "Translation provider (to translate Talk messages for example)" : "Πάροχος μετάφρασης (για παράδειγμα για μετάφραση μηνυμάτων του Talk)",
+    "Default" : "Προεπιλογή",
     "OpenAI admin options saved" : "Οι επιλογές διαχειριστή OpenAI αποθηκεύτηκαν",
     "Failed to save OpenAI admin options" : "Αποτυχία αποθήκευσης των επιλογών διαχειριστή OpenAI",
     "Your administrator defined a custom service address" : "Ο διαχειριστής σας όρισε μια προσαρμοσμένη διεύθυνση υπηρεσίας",

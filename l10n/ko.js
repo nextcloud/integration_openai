@@ -13,6 +13,7 @@ OC.L10N.register(
     "Authentication method" : "인증 방법",
     "API key" : "API 키",
     "Request timeout (seconds)" : "요청 시간 제한(초)",
+    "Default" : "디폴트",
     "Username" : "사용자 이름",
     "Password" : "암호"
 },

@@ -9,6 +9,7 @@ OC.L10N.register(
     "Authentication method" : "Način autentifikacije",
     "API key" : "Ključ API-ja",
     "Request timeout (seconds)" : "Istek zahtjeva (u sekundama)",
+    "Default" : "Zadani",
     "Username" : "Korisničko ime",
     "Password" : "Zaporka"
 },

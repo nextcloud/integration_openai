@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "OpenAI's Whisper Speech-To-Text" : "تطبيق \"ويسبر\" الهامس Whisper لتحويل الكلام إلي نص من OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "تحويل الكلام إلى نص بالذكاء االاصطناعي محليّاً باستعمال تطبيق \"الهامس\" Whisper",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Unknown models error" : "خطأ نماذج غير محدد",
     "Text generation" : "توليد النص",
     "Image generation" : "توليد الصورة",

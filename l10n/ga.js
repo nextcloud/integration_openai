@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "OpenAI's Whisper Speech-To-Text" : "Cogar Óráid Go Téacs OpenAI",
     "LocalAI's Whisper Speech-To-Text" : "Cogar Óráid Go Téacs LocalAI",
+    "OpenAI's DALL-E 2" : "DALL-E 2 de chuid OpenAI",
     "Unknown models error" : "Earráid samhlacha anaithnid",
     "Text generation" : "Giniúint téacs",
     "Image generation" : "Giniúint íomhá",
@@ -73,6 +74,7 @@ OC.L10N.register(
     "Image generation provider" : "Soláthraí giniúna íomhá",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Soláthraí cainte go téacs (chun taifeadtaí Talk a thrascríobh mar shampla)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "réad JSON. Seiceáil an doiciméadú API chun liosta de na paraiméadair go léir atá ar fáil a fháil. Mar shampla: {example}",
+    "Default" : "Réamhshocrú",
     "Failed to load quota info" : "Theip ar lódáil an fhaisnéis chuóta",
     "OpenAI admin options saved" : "Sábháladh roghanna riaracháin OpenAI",
     "Failed to save OpenAI admin options" : "Theip ar shábháil roghanna riaracháin OpenAI",

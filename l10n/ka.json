@@ -6,6 +6,7 @@
     "Authentication" : "Authentication",
     "API key" : "API key",
     "Request timeout (seconds)" : "Request timeout (seconds)",
+    "Default" : "Default",
     "Username" : "Username",
     "Password" : "Password"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"

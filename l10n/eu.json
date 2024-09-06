@@ -14,6 +14,7 @@
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",
     "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
+    "Default" : "Lehenetsia",
     "Username" : "Erabiltzaile-izena",
     "Password" : "Pasahitza"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
