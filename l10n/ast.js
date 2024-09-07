@@ -11,6 +11,7 @@ OC.L10N.register(
     "Authentication" : "Autenticación",
     "API key" : "Clave de l'API",
     "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
+    "Default" : "Por defeutu",
     "Username" : "Nome d'usuariu",
     "Password" : "Contraseña",
     "OpenAI options saved" : "Guardáronse les opciones d'OpenAI"

@@ -13,6 +13,7 @@ OC.L10N.register(
     "Default completion model to use" : "Модел на изпълнение по подразбиране, който да използвате",
     "More information about OpenAI models" : "Повече информация за моделите на OpenAI",
     "Request timeout (seconds)" : "Време за изчакване на заявката (секунди)",
+    "Default" : "По подразбиране",
     "OpenAI admin options saved" : "Опциите за администратор на OpenAI са записани",
     "Failed to save OpenAI admin options" : "Неуспешно записване на опциите за администратор на OpenAI",
     "Leave the API key empty to use the one defined by administrators" : "Оставяне на празен API ключ, за да се използва този, определен от администраторите",
