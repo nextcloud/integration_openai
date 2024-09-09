@@ -5,6 +5,8 @@ OC.L10N.register(
     "Image generation" : "Irudien sorpena",
     "Audio transcription" : "Audioen transkripzioa",
     "Unknown" : "Ezezaguna",
+    "tokens" : "tokenak",
+    "images" : "irudiak",
     "seconds" : "duela segundu batzuk",
     "Unknown image generation error" : "Irudi sorrera errore ezezaguna",
     "Bad HTTP method" : "HTTP metodo okerra",
@@ -15,9 +17,11 @@ OC.L10N.register(
     "Authentication" : "Autentifikazioa",
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",
+    "Completions" : "Osaketak",
     "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
     "Default" : "Lehenetsia",
     "Username" : "Erabiltzaile-izena",
-    "Password" : "Pasahitza"
+    "Password" : "Pasahitza",
+    "Usage" : "Erabilpena"
 },
 "nplurals=2; plural=(n != 1);");
