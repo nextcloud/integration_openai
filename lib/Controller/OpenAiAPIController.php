@@ -13,7 +13,6 @@ namespace OCA\OpenAi\Controller;
 
 use Exception;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -25,7 +24,6 @@ class OpenAiAPIController extends Controller {
 		string $appName,
 		IRequest $request,
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private ?string $userId,
 	) {
 		parent::__construct($appName, $request);
