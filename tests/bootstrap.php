@@ -1,6 +1,9 @@
 <?php
 
+use OCP\App\IAppManager;
+use OCP\Server;
+
 require_once __DIR__ . '/../../../tests/bootstrap.php';
 
-\OC_App::loadApps();
+Server::get(IAppManager::class)->loadApps();
 OC_Hook::clear();

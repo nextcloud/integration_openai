@@ -30,7 +30,6 @@ use OCP\IL10N;
 use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Throwable;
 
 /**
  * Service to make requests to OpenAI/LocalAI REST API
@@ -740,9 +739,6 @@ class OpenAiAPIService {
 			} else {
 				throw new Exception($this->l10n->t('API request error: ') . $e->getMessage(), intval($e->getCode()));
 			}
-		} catch (Exception|Throwable $e) {
-			$this->logger->warning('API request error : ' . $e->getMessage(), ['exception' => $e]);
-			throw new Exception($this->l10n->t('Unknown API request error.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 	}
 }
