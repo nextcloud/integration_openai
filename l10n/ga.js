@@ -23,7 +23,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Droch-mhodh HTTP",
     "Bad credentials" : "Dintiúir dona",
     "API request error: " : "Earráid iarratais API:",
-    "Unknown API request error." : "Earráid iarratais API anaithnid.",
     "Maximum output words" : "Focail aschuir uasta",
     "The maximum number of words/tokens that can be generated in the completion." : "An t-uaslíon focal/chomharthaí is féidir a ghiniúint sa chríochnú.",
     "Size" : "Méid",

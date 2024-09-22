@@ -23,7 +23,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Ungültige HTTP-Methode",
     "Bad credentials" : "Falsche Anmeldeinformationen",
     "API request error: " : "Fehler bei der API-Anfrage:",
-    "Unknown API request error." : "Unbekannter API-Anfragefehler.",
     "Maximum output words" : "Maximal ausgegebene Wörter",
     "The maximum number of words/tokens that can be generated in the completion." : "Die maximale Anzahl von Wörtern/Tokens, die in der Vervollständigung erzeugt werden können.",
     "Size" : "Größe",

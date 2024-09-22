@@ -21,7 +21,6 @@
     "Bad HTTP method" : "Bad HTTP method",
     "Bad credentials" : "Bad credentials",
     "API request error: " : "API request error: ",
-    "Unknown API request error." : "Unknown API request error.",
     "Maximum output words" : "Maximum output words",
     "The maximum number of words/tokens that can be generated in the completion." : "The maximum number of words/tokens that can be generated in the completion.",
     "Size" : "Size",

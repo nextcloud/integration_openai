@@ -21,7 +21,6 @@
     "Bad HTTP method" : "Método HTTP incorrecto",
     "Bad credentials" : "Credenciais incorrectas",
     "API request error: " : "Produciuse un erro na solicitude da API:",
-    "Unknown API request error." : "Produciuse un erro descoñecido na solicitude da API",
     "Maximum output words" : "Máximo de palabras de saída",
     "The maximum number of words/tokens that can be generated in the completion." : "O número máximo de palabras/testemuños que se poden xerar na conclusión.",
     "Size" : "Tamaño",

@@ -22,7 +22,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Método HTTP erróneo",
     "Bad credentials" : "Credenciales erróneas",
     "API request error: " : "Error en solicitud API:",
-    "Unknown API request error." : "Error desconocido en solicitud API.",
     "Model" : "Modelo",
     "Detect language" : "Detectar idioma",
     "OpenAI and LocalAI integration" : "Integración de OpenAI y LocalAI",

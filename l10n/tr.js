@@ -23,7 +23,6 @@ OC.L10N.register(
     "Bad HTTP method" : "HTTP yöntemi hatalı",
     "Bad credentials" : "Kimlik doğrulama bilgileri hatalı",
     "API request error: " : "API isteği sorunu:",
-    "Unknown API request error." : "Bilinmeyen API isteği sorunu",
     "Maximum output words" : "En fazla çıktı sözcüğü sayısı",
     "The maximum number of words/tokens that can be generated in the completion." : "Tamamlarken üretilebilecek en fazla sözcük/kod sayısı.",
     "Size" : "Boyut",

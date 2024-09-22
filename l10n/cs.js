@@ -22,7 +22,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Nesprávná HTTP metoda",
     "Bad credentials" : "Nesprávné přihlašovací údaje",
     "API request error: " : "Chyba požadavku na API rozhraní:",
-    "Unknown API request error." : "Neznámá chyba požadavku požadavku na API.",
     "Size" : "Velikost",
     "Model" : "Model",
     "Detect language" : "Zjistit jazyk",

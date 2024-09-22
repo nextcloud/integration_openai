@@ -22,7 +22,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Mauvaise méthode HTTP",
     "Bad credentials" : "Identifiants incorrects",
     "API request error: " : "Erreur de requête API :",
-    "Unknown API request error." : "Erreur de requête API inconnue.",
     "Size" : "Taille",
     "Model" : "Modèle",
     "Detect language" : "Détecter la langue",

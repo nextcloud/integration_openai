@@ -8,7 +8,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Неверный метод HTTP",
     "Bad credentials" : "Неверные учетные данные",
     "API request error: " : "Ошибка запроса API:",
-    "Unknown API request error." : "Неизвестная ошибка запроса API.",
     "Model" : "Модель",
     "Detect language" : "Определить язык",
     "OpenAI and LocalAI integration" : "OpenAI и локальная интеграция",

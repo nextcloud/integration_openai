@@ -23,7 +23,6 @@ OC.L10N.register(
     "Bad HTTP method" : "دالة HTTP  غير صحيحة",
     "Bad credentials" : "معلومات تسجيل الدخول غير صحيحة",
     "API request error: " : "خطأ طلب API: ",
-    "Unknown API request error." : "خطأ غير محدد عند طلب API",
     "Maximum output words" : "أقصى عدد من الكلمات في الخرج",
     "The maximum number of words/tokens that can be generated in the completion." : "العدد الأقصى من الكلمات أو الأَمَارَات التي يمكن توليدها عند الإكمال.",
     "Size" : "حجم",

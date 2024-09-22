@@ -20,7 +20,6 @@
     "Bad HTTP method" : "HTTP-metode er feil",
     "Bad credentials" : "Påloggingsdetaljene er feil",
     "API request error: " : "Feil ved API-forespørsel: ",
-    "Unknown API request error." : "Ukjent API-forespørselsfeil.",
     "Maximum output words" : "Maksimalt antall utdataord",
     "The maximum number of words/tokens that can be generated in the completion." : "Maksimalt antall ord/tokens som kan genereres i fullføringen.",
     "Size" : "Størrelse",

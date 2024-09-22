@@ -23,7 +23,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Лоша HTTP метода",
     "Bad credentials" : "Лоши креденцијали",
     "API request error: " : "Грешка API захтева: ",
-    "Unknown API request error." : "Непозната грешка API захтева.",
     "Maximum output words" : "Максимални број речи у излазу",
     "The maximum number of words/tokens that can be generated in the completion." : "Максимални број речи/жетона који ће се генерисати у довршавању.",
     "Size" : "величина",

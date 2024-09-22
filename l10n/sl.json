@@ -11,7 +11,6 @@
     "Bad HTTP method" : "Neustrezen način HTTP",
     "Bad credentials" : "Neustrezna poverila",
     "API request error: " : "Napaka zahteve API:",
-    "Unknown API request error." : "Neznana napaka zahteve API:",
     "Maximum output words" : "Največje število besed odvoda",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",
     "Size" : "Velikost",
