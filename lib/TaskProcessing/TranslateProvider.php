@@ -85,24 +85,9 @@ class TranslateProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		if ($this->userId === null) {
-			return [];
-		}
-		try {
-			$modelResponse = $this->openAiAPIService->getModels($this->userId);
-			$modelEnumValues = array_map(function (array $model) {
-				return new ShapeEnumValue($model['id'], $model['id']);
-			}, $modelResponse['data'] ?? []);
-			if ($this->openAiAPIService->isUsingOpenAi()) {
-				array_unshift($modelEnumValues, new ShapeEnumValue($this->l->t('Default'), 'Default'));
-			}
-			return [
-				'model' => $modelEnumValues,
-			];
-		} catch (\Throwable $e) {
-			$this->logger->warning('Error in TranslateProvider', ['exception' => $e]);
-			return [];
-		}
+		return [
+			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
+		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
@@ -148,7 +133,7 @@ class TranslateProvider implements ISynchronousProvider {
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		} else {
-			$model = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+			$model = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {

@@ -12,7 +12,6 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
-use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToImage;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -73,24 +72,9 @@ class TextToImageProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		if ($this->userId === null) {
-			return [];
-		}
-		try {
-			$modelResponse = $this->openAiAPIService->getModels($this->userId);
-			$modelEnumValues = array_map(function (array $model) {
-				return new ShapeEnumValue($model['id'], $model['id']);
-			}, $modelResponse['data'] ?? []);
-			if ($this->openAiAPIService->isUsingOpenAi()) {
-				array_unshift($modelEnumValues, new ShapeEnumValue($this->l->t('Default'), 'Default'));
-			}
-			return [
-				'model' => $modelEnumValues,
-			];
-		} catch (\Throwable $e) {
-			$this->logger->warning('Error in TextToImageProvider', ['exception' => $e]);
-			return [];
-		}
+		return [
+			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
+		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {

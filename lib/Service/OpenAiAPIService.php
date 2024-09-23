@@ -28,6 +28,7 @@ use OCP\Http\Client\IClientService;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
+use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -98,6 +99,29 @@ class OpenAiAPIService {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @return array
+	 */
+	public function getModelEnumValues(?string $userId): array {
+		if ($userId === null) {
+			return [];
+		}
+		try {
+			$modelResponse = $this->getModels($userId);
+			$modelEnumValues = array_map(function (array $model) {
+				return new ShapeEnumValue($model['id'], $model['id']);
+			}, $modelResponse['data'] ?? []);
+			if ($this->isUsingOpenAi()) {
+				array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
+			}
+			return $modelEnumValues;
+		} catch (\Throwable $e) {
+			$this->logger->warning('Error getting model enum values', ['exception' => $e]);
+			return [];
+		}
 	}
 
 	/**
