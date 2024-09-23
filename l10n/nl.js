@@ -10,6 +10,7 @@ OC.L10N.register(
     "Authentication method" : "Authenticatiemethode",
     "API key" : "API sleutel",
     "Request timeout (seconds)" : "Aanvraag time-out (seconds)",
+    "Default" : "Standaard",
     "Username" : "Gebruikersnaam",
     "Password" : "Wachtwoord"
 },

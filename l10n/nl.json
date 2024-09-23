@@ -8,6 +8,7 @@
     "Authentication method" : "Authenticatiemethode",
     "API key" : "API sleutel",
     "Request timeout (seconds)" : "Aanvraag time-out (seconds)",
+    "Default" : "Standaard",
     "Username" : "Gebruikersnaam",
     "Password" : "Wachtwoord"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
