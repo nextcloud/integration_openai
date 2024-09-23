@@ -511,26 +511,26 @@ class OpenAiAPIService {
 	/**
 	 * @param string|null $userId
 	 * @param string $prompt
+	 * @param string $model
 	 * @param int $n
 	 * @param string $size
 	 * @return array
 	 * @throws Exception
 	 */
-	public function requestImageCreation(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
+	public function requestImageCreation(
+		?string $userId, string $prompt, string $model, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE
+	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
-		$model = $this->config->getAppValue(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
 		$params = [
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => $n,
 			'response_format' => 'url',
+			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
 		];
-		if ($model !== Application::DEFAULT_MODEL_ID) {
-			$params['model'] = $model;
-		}
 
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
 

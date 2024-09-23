@@ -506,6 +506,8 @@ export default {
 
 					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
 					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
+					this.state.default_completion_model_id = completionModelToSelect.id
+					this.state.default_image_model_id = imageModelToSelect.id
 
 					if (save) {
 						this.saveOptions({

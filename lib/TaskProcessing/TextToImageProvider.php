@@ -7,10 +7,12 @@ namespace OCA\OpenAi\TaskProcessing;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Http\Client\IClientService;
+use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToImage;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -22,6 +24,8 @@ class TextToImageProvider implements ISynchronousProvider {
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private IClientService $clientService,
+		private IConfig $config,
+		private ?string $userId,
 	) {
 	}
 
@@ -60,15 +64,42 @@ class TextToImageProvider implements ISynchronousProvider {
 				$this->l->t('Optional. The size of the generated images. Must be in 256x256 format.'),
 				EShapeType::Text
 			),
+			'model' => new ShapeDescriptor(
+				$this->l->t('Model'),
+				$this->l->t('The model used to generate the images'),
+				EShapeType::Enum
+			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [];
+		if ($this->userId === null) {
+			return [];
+		}
+		try {
+			$modelResponse = $this->openAiAPIService->getModels($this->userId);
+			$modelEnumValues = array_map(function (array $model) {
+				return new ShapeEnumValue($model['id'], $model['id']);
+			}, $modelResponse['data'] ?? []);
+			if ($this->openAiAPIService->isUsingOpenAi()) {
+				array_unshift($modelEnumValues, new ShapeEnumValue($this->l->t('Default'), 'Default'));
+			}
+			return [
+				'model' => $modelEnumValues,
+			];
+		} catch (\Throwable $e) {
+			$this->logger->warning('Error in TextToImageProvider', ['exception' => $e]);
+			return [];
+		}
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		return [];
+		$adminModel = $this->openAiAPIService->isUsingOpenAi()
+			? ($this->config->getAppValue(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
+			: $this->config->getAppValue(Application::APP_ID, 'default_image_model_id');
+		return [
+			'model' => $adminModel,
+		];
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -101,8 +132,14 @@ class TextToImageProvider implements ISynchronousProvider {
 			$size = trim($input['size']);
 		}
 
+		if (isset($input['model']) && is_string($input['model'])) {
+			$model = $input['model'];
+		} else {
+			$model = $this->config->getAppValue(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
+		}
+
 		try {
-			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $nbImages, $size);
+			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $model, $nbImages, $size);
 			$urls = array_map(static function (array $result) {
 				return $result['url'] ?? null;
 			}, $apiResponse['data']);
