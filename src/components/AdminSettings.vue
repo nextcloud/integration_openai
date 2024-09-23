@@ -480,7 +480,7 @@ export default {
 			}
 		},
 
-		getModels(save = true) {
+		getModels(shouldSave = true) {
 			this.models = null
 			if (!this.configured) {
 				return
@@ -506,15 +506,19 @@ export default {
 
 					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
 					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
-					this.state.default_completion_model_id = completionModelToSelect.id
-					this.state.default_image_model_id = imageModelToSelect.id
 
-					if (save) {
+					// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
+					if (shouldSave
+						|| this.state.default_completion_model_id !== this.selectedModel.text.id
+						|| this.state.default_image_model_id !== this.selectedModel.image.id) {
 						this.saveOptions({
 							default_completion_model_id: this.selectedModel.text.id,
 							default_image_model_id: this.selectedModel.image.id,
 						}, false)
 					}
+
+					this.state.default_completion_model_id = completionModelToSelect.id
+					this.state.default_image_model_id = imageModelToSelect.id
 				})
 				.catch((error) => {
 					showError(t('integration_openai', 'Failed to load models'))
