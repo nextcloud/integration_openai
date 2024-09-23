@@ -14,8 +14,8 @@
 						:label="t('integration_openai', 'Service URL')"
 						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080' })"
 						:show-trailing-button="!!state.url"
-						@update:value="onInput(true)"
-						@trailing-button-click="state.url = '' ; onInput(true)">
+						@update:value="onSensitiveInput(true)"
+						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
 						<EarthIcon />
 					</NcTextField>
 					<NcButton type="tertiary"
@@ -41,8 +41,8 @@
 						:label="t('integration_openai', 'Service name (optional)')"
 						:placeholder="t('integration_openai', 'Example: LocalAI of university ABC')"
 						:show-trailing-button="!!state.service_name"
-						@update:value="onInput(false)"
-						@trailing-button-click="state.service_name = '' ; onInput(false)" />
+						@update:value="onInput()"
+						@trailing-button-click="state.service_name = '' ; onInput()" />
 					<NcButton type="tertiary"
 						:title="t('integration_openai', 'This name will be displayed as provider name in the AI admin settings')">
 						<template #icon>
@@ -108,8 +108,8 @@
 							:value.sync="state.basic_user"
 							:label="t('integration_openai', 'Basic Auth user')"
 							:show-trailing-button="!!state.basic_user"
-							@update:value="onInput(true)"
-							@trailing-button-click="state.basic_user = '' ; onInput(true)">
+							@update:value="onSensitiveInput(true)"
+							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)">
 							<AccountIcon />
 						</NcTextField>
 					</div>
@@ -202,8 +202,8 @@
 						:value.sync="state.llm_extra_params"
 						:label="t('integration_openai', 'Extra completion model parameters')"
 						:show-trailing-button="!!state.llm_extra_params"
-						@update:value="onInput(false)"
-						@trailing-button-click="state.llm_extra_params = '' ; onInput(false)" />
+						@update:value="onInput()"
+						@trailing-button-click="state.llm_extra_params = '' ; onInput()" />
 					<NcButton type="tertiary"
 						:title="llmExtraParamHint">
 						<template #icon>
@@ -220,8 +220,8 @@
 						:label="t('integration_openai', 'Request timeout (seconds)')"
 						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
 						:show-trailing-button="!!state.request_timeout"
-						@update:value="onInput(false)"
-						@trailing-button-click="state.request_timeout = '' ; onInput(false)">
+						@update:value="onInput()"
+						@trailing-button-click="state.request_timeout = '' ; onInput()">
 						<TimerAlertOutlineIcon />
 						<template #trailing-button-icon>
 							<CloseIcon :size="20" />
@@ -282,8 +282,8 @@
 						:value.sync="state.quota_period"
 						:label="t('integration_openai', 'Quota enforcement time period (days)')"
 						:show-trailing-button="!!state.quota_period"
-						@update:value="onInput(false)"
-						@trailing-button-click="state.quota_period = '' ; onInput(false)">
+						@update:value="onInput()"
+						@trailing-button-click="state.quota_period = '' ; onInput()">
 						<template #trailing-button-icon>
 							<CloseIcon :size="20" />
 						</template>
@@ -316,7 +316,7 @@
 									v-model.number="state.quotas[index]"
 									:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
 									type="number"
-									@input="onInput(false)">
+									@input="onInput()">
 								<span v-if="quotaInfo !== null" class="text-cell">
 									{{ quotaInfo[index].unit }}
 								</span>
@@ -337,8 +337,8 @@
 						:value.sync="state.max_tokens"
 						:label="t('integration_openai', 'Max new tokens per request')"
 						:show-trailing-button="!!state.max_tokens"
-						@update:value="onInput(false)"
-						@trailing-button-click="state.max_tokens = '' ; onInput(false)">
+						@update:value="onInput()"
+						@trailing-button-click="state.max_tokens = '' ; onInput()">
 						<template #trailing-button-icon>
 							<CloseIcon :size="20" />
 						</template>
@@ -438,10 +438,14 @@ export default {
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
 			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
+			DEFAULT_MODEL_ITEM,
 		}
 	},
 
 	computed: {
+		isUsingOpenAI() {
+			return this.state.url === ''
+		},
 		configured() {
 			return !!this.state.url || !!this.state.api_key || !!this.state.basic_user || !!this.state.basic_password
 		},
@@ -460,13 +464,9 @@ export default {
 		},
 	},
 
-	created() {
-		this.DEFAULT_MODEL_ITEM = DEFAULT_MODEL_ITEM
-	},
-
 	mounted() {
 		if (this.configured) {
-			this.getModels()
+			this.getModels(false)
 		}
 		this.loadQuotaInfo()
 	},
@@ -476,12 +476,11 @@ export default {
 			return {
 				id: model.id,
 				value: model.id,
-				label: (model.id === DEFAULT_MODEL_ITEM.id ? t('integration_openai', 'Default') : model.id)
-					+ (model.owned_by ? ' (' + model.owned_by + ')' : ''),
+				label: model.id + (model.owned_by ? ' (' + model.owned_by + ')' : ''),
 			}
 		},
 
-		getModels() {
+		getModels(save = true) {
 			this.models = null
 			if (!this.configured) {
 				return
@@ -489,7 +488,10 @@ export default {
 			const url = generateUrl('/apps/integration_openai/models')
 			return axios.get(url)
 				.then((response) => {
-					this.models = [DEFAULT_MODEL_ITEM, ...response.data?.data ?? []]
+					this.models = response.data?.data ?? []
+					if (this.isUsingOpenAI) {
+						this.models.unshift(DEFAULT_MODEL_ITEM)
+					}
 					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
 					const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
 						|| this.models.find(m => m.id === 'gpt-3.5-turbo')
@@ -505,8 +507,7 @@ export default {
 					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
 					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
 
-					if (this.state.default_completion_model_id !== this.selectedModel.text.id
-						|| this.state.default_image_model_id !== this.selectedModel.image.id) {
+					if (save) {
 						this.saveOptions({
 							default_completion_model_id: this.selectedModel.text.id,
 							default_image_model_id: this.selectedModel.image.id,
@@ -564,7 +565,10 @@ export default {
 			}
 		},
 		onSensitiveInput: debounce(async function(getModels = true) {
-			const values = {}
+			const values = {
+				basic_user: this.state.basic_user,
+				url: this.state.url,
+			}
 			if (this.state.api_key !== 'dummyApiKey') {
 				values.api_key = this.state.api_key
 			}
@@ -576,13 +580,9 @@ export default {
 				this.getModels()
 			}
 		}, 2000),
-		onInput: debounce(async function(getModels = true) {
+		onInput: debounce(async function() {
 			const values = {
-				use_basic_auth: this.state.use_basic_auth,
-				basic_user: this.state.basic_user,
-				url: this.state.url,
 				service_name: this.state.service_name,
-				chat_endpoint_enabled: this.state.chat_endpoint_enabled,
 				request_timeout: parseInt(this.state.request_timeout),
 				max_tokens: parseInt(this.state.max_tokens),
 				llm_extra_params: this.state.llm_extra_params,
@@ -590,9 +590,6 @@ export default {
 				quotas: this.state.quotas,
 			}
 			await this.saveOptions(values, false)
-			if (getModels) {
-				this.getModels()
-			}
 		}, 2000),
 		async saveOptions(values, sensitive = false, notify = true) {
 			if (sensitive) {

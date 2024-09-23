@@ -50,7 +50,7 @@
 						type="text"
 						:readonly="readonly"
 						:placeholder="t('integration_openai', 'your Basic Auth user')"
-						@input="onInput"
+						@input="onSensitiveInput"
 						@focus="readonly = false">
 				</div>
 				<div class="line">
@@ -157,11 +157,12 @@ export default {
 	methods: {
 		onInput: debounce(function() {
 			this.saveOptions({
-				basic_user: this.state.basic_user,
 			})
 		}, 2000),
 		onSensitiveInput: debounce(function() {
-			const values = {}
+			const values = {
+				basic_user: this.state.basic_user,
+			}
 			if (this.state.api_key !== 'dummyApiKey') {
 				values.api_key = this.state.api_key
 			}

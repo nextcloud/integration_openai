@@ -93,6 +93,9 @@ class TranslateProvider implements ISynchronousProvider {
 			$modelEnumValues = array_map(function (array $model) {
 				return new ShapeEnumValue($model['id'], $model['id']);
 			}, $modelResponse['data'] ?? []);
+			if ($this->openAiAPIService->isUsingOpenAi()) {
+				array_unshift($modelEnumValues, new ShapeEnumValue($this->l->t('Default'), 'Default'));
+			}
 			return [
 				'model' => $modelEnumValues,
 			];
@@ -103,7 +106,9 @@ class TranslateProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		$adminModel = $this->openAiAPIService->isUsingOpenAi()
+			? ($this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
+			: $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id');
 		return [
 			'max_tokens' => 1000,
 			'model' => $adminModel,
