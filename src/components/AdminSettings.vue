@@ -689,6 +689,7 @@ export default {
 
 	.model-select {
 		min-width: 350px;
+		margin: 0 !important;
 	}
 }
 </style>
