@@ -58,15 +58,28 @@ class ReformulateProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'model' => new ShapeDescriptor(
+				$this->l->t('Model'),
+				$this->l->t('The model used to generate the completion'),
+				EShapeType::Enum
+			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [];
+		return [
+			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
+		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		return [];
+		$adminModel = $this->openAiAPIService->isUsingOpenAi()
+			? ($this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
+			: $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id');
+		return [
+			'max_tokens' => 1000,
+			'model' => $adminModel,
+		];
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -83,7 +96,6 @@ class ReformulateProvider implements ISynchronousProvider {
 
 	public function process(?string $userId, array $input, callable $reportProgress): array {
 		$startTime = time();
-		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new RuntimeException('Invalid prompt');
@@ -96,11 +108,17 @@ class ReformulateProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		if (isset($input['model']) && is_string($input['model'])) {
+			$model = $input['model'];
+		} else {
+			$model = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
+		}
+
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, $maxTokens);
+				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $model, $prompt, null, null, 1, $maxTokens);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, $maxTokens);
+				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $model, $maxTokens);
 			}
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());

@@ -28,6 +28,7 @@ use OCP\Http\Client\IClientService;
 use OCP\IConfig;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
+use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -98,6 +99,29 @@ class OpenAiAPIService {
 		}
 
 		return false;
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @return array
+	 */
+	public function getModelEnumValues(?string $userId): array {
+		if ($userId === null) {
+			return [];
+		}
+		try {
+			$modelResponse = $this->getModels($userId);
+			$modelEnumValues = array_map(function (array $model) {
+				return new ShapeEnumValue($model['id'], $model['id']);
+			}, $modelResponse['data'] ?? []);
+			if ($this->isUsingOpenAi()) {
+				array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
+			}
+			return $modelEnumValues;
+		} catch (\Throwable $e) {
+			$this->logger->warning('Error getting model enum values', ['exception' => $e]);
+			return [];
+		}
 	}
 
 	/**
@@ -511,26 +535,26 @@ class OpenAiAPIService {
 	/**
 	 * @param string|null $userId
 	 * @param string $prompt
+	 * @param string $model
 	 * @param int $n
 	 * @param string $size
 	 * @return array
 	 * @throws Exception
 	 */
-	public function requestImageCreation(?string $userId, string $prompt, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE): array {
+	public function requestImageCreation(
+		?string $userId, string $prompt, string $model, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE
+	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
-		$model = $this->config->getAppValue(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
 		$params = [
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => $n,
 			'response_format' => 'url',
+			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
 		];
-		if ($model !== Application::DEFAULT_MODEL_ID) {
-			$params['model'] = $model;
-		}
 
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
 

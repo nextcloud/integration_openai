@@ -9,6 +9,7 @@ namespace OCA\OpenAi\OldProcessing\TextToImage;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Http\Client\IClientService;
+use OCP\IConfig;
 use OCP\IL10N;
 use OCP\TextToImage\IProvider;
 use Psr\Log\LoggerInterface;
@@ -19,6 +20,7 @@ class TextToImageProvider implements IProvider {
 		private LoggerInterface $logger,
 		private IL10N $l,
 		private IClientService $clientService,
+		private IConfig $config,
 		private ?string $userId,
 	) {
 	}
@@ -42,7 +44,8 @@ class TextToImageProvider implements IProvider {
 	public function generate(string $prompt, array $resources): void {
 		$startTime = time();
 		try {
-			$apiResponse = $this->openAiAPIService->requestImageCreation($this->userId, $prompt, count($resources));
+			$model = $this->config->getAppValue(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
+			$apiResponse = $this->openAiAPIService->requestImageCreation($this->userId, $prompt, $model, count($resources));
 			$urls = array_map(static function (array $result) {
 				return $result['url'] ?? null;
 			}, $apiResponse['data']);

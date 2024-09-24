@@ -41,7 +41,7 @@ class ConfigController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function setUserConfig(array $values): DataResponse {
-		if (isset($values['api_key']) || isset($values['basic_password'])) {
+		if (isset($values['api_key']) || isset($values['basic_password']) || isset($values['basic_user'])) {
 			return new DataResponse('', Http::STATUS_BAD_REQUEST);
 		}
 		try {
@@ -77,7 +77,7 @@ class ConfigController extends Controller {
 	 * @return DataResponse
 	 */
 	public function setAdminConfig(array $values): DataResponse {
-		if (isset($values['api_key']) || isset($values['basic_password'])) {
+		if (isset($values['api_key']) || isset($values['basic_password']) || isset($values['basic_user']) || isset($values['url'])) {
 			return new DataResponse('', Http::STATUS_BAD_REQUEST);
 		}
 		try {
