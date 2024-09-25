@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Predefinito",
     "Image generation" : "Generazione di immagini",
     "Unknown" : "Sconosciuto",
     "seconds" : "secondi",
@@ -12,7 +13,6 @@ OC.L10N.register(
     "API key" : "Chiave API",
     "Request timeout (seconds)" : "Tempo massimo della richiesta (secondi)",
     "Translation provider (to translate Talk messages for example)" : "Fornitore di traduzioni (per tradurre messaggi di Talk, ad esempio)",
-    "Default" : "Predefinito",
     "Username" : "Nome utente",
     "Password" : "Password"
 },

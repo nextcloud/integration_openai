@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "По умолчанию",
     "Image generation" : "Создание изображений",
     "Unknown" : "Неизвестно",
     "seconds" : "секунд",
@@ -25,7 +26,6 @@ OC.L10N.register(
     "Max new tokens per request" : "Максимальное количество новых токенов на запрос",
     "Maximum number of new tokens generated for a single text generation prompt" : "Максимальное количество новых токенов, сгенерированных для одного текстового запроса на генерацию",
     "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)",
-    "Default" : "По умолчанию",
     "Leave the API key empty to use the one defined by administrators" : "Оставьте ключ API пустым, чтобы использовать тот, который определен администраторами",
     "You can create a free API key in your OpenAI account settings" : "Вы можете создать бесплатный ключ API в настройках вашего аккаунта OpenAI.",
     "Username" : "Имя пользователя",

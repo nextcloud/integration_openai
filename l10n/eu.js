@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Lehenetsia",
     "Text generation" : "Testuen sorpena",
     "Image generation" : "Irudien sorpena",
     "Audio transcription" : "Audioen transkripzioa",
@@ -11,15 +12,14 @@ OC.L10N.register(
     "Unknown image generation error" : "Irudi sorrera errore ezezaguna",
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
-    "Size" : "Tamaina",
     "Model" : "Modeloa",
+    "Size" : "Tamaina",
     "Detect language" : "Detektatu hizkuntza",
     "Authentication" : "Autentifikazioa",
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",
     "Completions" : "Osaketak",
     "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
-    "Default" : "Lehenetsia",
     "Username" : "Erabiltzaile-izena",
     "Password" : "Pasahitza",
     "Usage" : "Erabilpena"

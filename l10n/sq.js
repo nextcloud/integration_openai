@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Paraprake",
     "Unknown" : "I panjohur",
     "seconds" : "sekonda",
     "Size" : "Madhësi",
@@ -8,7 +9,6 @@ OC.L10N.register(
     "Authentication method" : "Metodë mirëfilltësimi",
     "API key" : "Kyç API",
     "Request timeout (seconds)" : "Kohë skadimi kërkese (sekonda)",
-    "Default" : "Paraprake",
     "Username" : "Emri i përdoruesit",
     "Password" : "Fjalëkalimi"
 },

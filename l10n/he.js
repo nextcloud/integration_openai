@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "ברירת מחדל",
     "Unknown" : "לא ידוע",
     "seconds" : "שניות",
     "Bad HTTP method" : "שגיאה במתודת HTTP",
@@ -10,7 +11,6 @@ OC.L10N.register(
     "Authentication method" : "שיטת אימות",
     "API key" : "מפתח API",
     "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
-    "Default" : "ברירת מחדל",
     "Username" : "שם משתמש",
     "Password" : "ססמה"
 },

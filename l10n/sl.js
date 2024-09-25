@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown models error" : "Neznana napaka modela",
+    "Default" : "privzeto",
     "Text generation" : "Ustvarjanje besedila",
     "Image generation" : "Ustvarjanje slik",
     "Audio transcription" : "Zvočni prepis",
@@ -28,7 +29,6 @@ OC.L10N.register(
     "API key" : "Ključ API",
     "Request timeout (seconds)" : "Zahtevan časovni zamik (sekunde)",
     "Usage limits" : "Omejitve uporabe",
-    "Default" : "privzeto",
     "Username" : "Uporabniško ime",
     "Password" : "Geslo",
     "Usage" : "Uporaba"

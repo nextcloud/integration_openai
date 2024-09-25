@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "OpenAI's Whisper Speech-To-Text" : "OpenAI:s Whisper Tal-Till-Text",
     "LocalAI's Whisper Speech-To-Text" : "LocalAI:s Whisper Tal-Till-Text",
+    "Default" : "Förvald",
     "Image generation" : "Bildgenerering",
     "Unknown" : "Okänd",
     "seconds" : "sekunder",
@@ -20,7 +21,6 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Sekunder för anslutningsförsök",
     "Translation provider (to translate Talk messages for example)" : "Översättningsleverantör (för att till exempel översätta Talk-meddelanden)",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Tal-till-text-leverantör (till exempel för att transkribera Talk-inspelningar)",
-    "Default" : "Förvald",
     "OpenAI admin options saved" : "OpenAI administratörsalternativ sparade",
     "Failed to save OpenAI admin options" : "Det gick inte att spara OpenAI-administratörsalternativ",
     "Your administrator defined a custom service address" : "Din administratör har definierat en anpassad service-adress",

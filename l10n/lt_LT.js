@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Numatytasis",
     "Unknown" : "Nežinoma",
     "seconds" : "sekundes",
     "Bad HTTP method" : "Blogas HTTP metodas",
@@ -9,7 +10,6 @@ OC.L10N.register(
     "Authentication method" : "Tapatybės nustatymo metodas",
     "API key" : "API raktas",
     "Request timeout (seconds)" : "Prisijungimo laikas (sekundėmis)",
-    "Default" : "Numatytasis",
     "Username" : "Naudotojo vardas",
     "Password" : "Slaptažodis"
 },

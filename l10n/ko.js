@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "디폴트",
     "Image generation" : "이미지 생성",
     "Audio transcription" : "음성 전사",
     "Unknown" : "알 수 없음",
@@ -13,7 +14,6 @@ OC.L10N.register(
     "Authentication method" : "인증 방법",
     "API key" : "API 키",
     "Request timeout (seconds)" : "요청 시간 제한(초)",
-    "Default" : "디폴트",
     "Username" : "사용자 이름",
     "Password" : "암호"
 },

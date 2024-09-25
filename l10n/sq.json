@@ -1,4 +1,5 @@
 { "translations": {
+    "Default" : "Paraprake",
     "Unknown" : "I panjohur",
     "seconds" : "sekonda",
     "Size" : "Madhësi",
@@ -6,7 +7,6 @@
     "Authentication method" : "Metodë mirëfilltësimi",
     "API key" : "Kyç API",
     "Request timeout (seconds)" : "Kohë skadimi kërkese (sekonda)",
-    "Default" : "Paraprake",
     "Username" : "Emri i përdoruesit",
     "Password" : "Fjalëkalimi"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
