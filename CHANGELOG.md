@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.1.1 – 2024-09-26
+
+### Added
+
+- Ability to choose model in the assistant for most providers @julien-nc [#130](https://github.com/nextcloud/integration_openai/pull/130)
+
+### Changed
+
+- Switch from webpack to vite @julien-nc [#131](https://github.com/nextcloud/integration_openai/pull/131)
+
+### Fixed
+
+- Fix admin settings not saving the models in some cases @julien-nc [#130](https://github.com/nextcloud/integration_openai/pull/130)
+
 ## 3.1.0 – 2024-09-05
 
 ### Added
