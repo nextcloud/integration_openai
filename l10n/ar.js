@@ -30,6 +30,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "النموذج المُستخدَم لتوليد الإكمال",
     "Size" : "حجم",
     "Optional. The size of the generated images. Must be in 256x256 format." : "اختياري: حجم الصور المولدة. يجب أن تكون في شكل 256*256.",
+    "The model used to generate the images" : "النموذج المستعمل لتوليد الصِّوَر",
     "Detect language" : "إكتشف اللغة",
     "OpenAI and LocalAI integration" : "مُكاملة OpenAI و LocalAI",
     "Integration of OpenAI and LocalAI services" : "مُكامَلة خِدْمَات OpenAI و LocalAI",

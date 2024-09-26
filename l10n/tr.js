@@ -30,6 +30,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "Tamamlarken kullanılacak model",
     "Size" : "Boyut",
     "Optional. The size of the generated images. Must be in 256x256 format." : "İsteğe bağlı. Oluşturulan görsellerin boyutu. 256x256 boyutunda olmalıdır.",
+    "The model used to generate the images" : "Görselleri oluşturmakta kullanılacak model",
     "Detect language" : "Dili algıla",
     "OpenAI and LocalAI integration" : "OpenAI ve LocalAI bütünleştirmesi",
     "Integration of OpenAI and LocalAI services" : "OpenAI ve LocalAI hizmetleri bütünleştirmesi",
