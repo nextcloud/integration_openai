@@ -37,6 +37,7 @@ use RuntimeException;
  */
 class OpenAiAPIService {
 	private IClient $client;
+	private ?array $modelResponseCache = null;
 
 	public function __construct(
 		private LoggerInterface $logger,
@@ -78,7 +79,14 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function getModels(string $userId): array {
-		$response = $this->request($userId, 'models');
+		if ($this->modelResponseCache !== null) {
+			$response = $this->modelResponseCache;
+			$this->logger->debug('Getting OpenAI models from the memory cache');
+		} else {
+			$response = $this->request($userId, 'models');
+			$this->modelResponseCache = $response;
+			$this->logger->debug('Actually getting OpenAI models with a network request');
+		}
 		if (!isset($response['data'])) {
 			$this->logger->warning('Error retrieving models: ' . json_encode($response));
 			throw new Exception($this->l10n->t('Unknown models error'), Http::STATUS_INTERNAL_SERVER_ERROR);
