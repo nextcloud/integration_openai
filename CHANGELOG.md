@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.1.2 – 2024-09-28
+
+### Changed
+
+- Simple cache for model list to speed up provider loading @julien-nc [#133](https://github.com/nextcloud/integration_openai/pull/133)
+- Change default image generation size @kyteinsky [#124](https://github.com/nextcloud/integration_openai/pull/124)
+
 ## 3.1.1 – 2024-09-26
 
 ### Added
