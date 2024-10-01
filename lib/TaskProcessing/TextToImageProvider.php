@@ -57,10 +57,11 @@ class TextToImageProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShape(): array {
+		$defaultImageSize = $this->config->getAppValue(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 		return [
 			'size' => new ShapeDescriptor(
 				$this->l->t('Size'),
-				$this->l->t('Optional. The size of the generated images. Must be in 256x256 format.'),
+				$this->l->t('Optional. The size of the generated images. Must be in 256x256 format. Default is %s', [$defaultImageSize]),
 				EShapeType::Text
 			),
 			'model' => new ShapeDescriptor(
@@ -111,8 +112,8 @@ class TextToImageProvider implements ISynchronousProvider {
 			$nbImages = $input['numberOfImages'];
 		}
 
-		$size = Application::DEFAULT_IMAGE_SIZE;
-		if (isset($input['size']) && is_string($input['size'])) {
+		$size = $this->config->getAppValue(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+		if (isset($input['size']) && is_string($input['size']) && preg_match('/^\d+x\d+$/', $input['size'])) {
 			$size = trim($input['size']);
 		}
 

@@ -268,6 +268,22 @@
 				<NcNoteCard v-else type="info">
 					{{ t('integration_openai', 'No models to list') }}
 				</NcNoteCard>
+				<div class="line">
+					<NcTextField
+						id="default-image-size"
+						class="input"
+						:value.sync="state.default_image_size"
+						:label="t('integration_openai', 'Default image size')"
+						:show-trailing-button="!!state.default_image_size"
+						@update:value="onInput()"
+						@trailing-button-click="state.default_image_size = '' ; onInput()" />
+					<NcButton type="tertiary"
+						:title="defaultImageSizeParamHint">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</div>
 			</div>
 			<div>
 				<h2>
@@ -438,6 +454,7 @@ export default {
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
 			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
+			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '512x512' }),
 			DEFAULT_MODEL_ITEM,
 		}
 	},
@@ -592,6 +609,7 @@ export default {
 				request_timeout: parseInt(this.state.request_timeout),
 				max_tokens: parseInt(this.state.max_tokens),
 				llm_extra_params: this.state.llm_extra_params,
+				default_image_size: this.state.default_image_size,
 				quota_period: parseInt(this.state.quota_period),
 				quotas: this.state.quotas,
 			}
