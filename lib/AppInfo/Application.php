@@ -44,7 +44,7 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
 	public const DEFAULT_IMAGE_MODEL_ID = 'dall-e-2';
 	public const DEFAULT_TRANSCRIPTION_MODEL_ID = 'whisper-1';
-	public const DEFAULT_IMAGE_SIZE = '512x512';
+	public const DEFAULT_DEFAULT_IMAGE_SIZE = '512x512';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
 	public const DEFAULT_MAX_NUM_OF_TOKENS = 1000;
 	public const DEFAULT_QUOTA_PERIOD = 30;

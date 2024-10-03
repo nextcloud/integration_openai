@@ -35,6 +35,7 @@ class OpenAiSettingsService {
 		'api_key' => 'string',
 		'default_completion_model_id' => 'string',
 		'default_image_model_id' => 'string',
+		'default_image_size' => 'string',
 		'max_tokens' => 'integer',
 		'llm_extra_params' => 'string',
 		'quota_period' => 'integer',
@@ -94,6 +95,13 @@ class OpenAiSettingsService {
 	 */
 	public function getAdminDefaultImageModelId(): string {
 		return $this->config->getAppValue(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminDefaultImageSize(): string {
+		return $this->config->getAppValue(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 	}
 
 	/**
@@ -220,6 +228,7 @@ class OpenAiSettingsService {
 			'api_key' => $this->getAdminApiKey(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
 			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
+			'default_image_size' => $this->getAdminDefaultImageSize(),
 			'max_tokens' => $this->getMaxTokens(),
 			'llm_extra_params' => $this->getLlmExtraParams(),
 			// Updated to get max tokens
@@ -343,6 +352,18 @@ class OpenAiSettingsService {
 	public function setAdminDefaultImageModelId(string $defaultImageModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->config->setAppValue(Application::APP_ID, 'default_image_model_id', $defaultImageModelId);
+	}
+
+	/**
+	 * @param string $defaultImageSize
+	 * @return void
+	 * @throws Exception
+	 */
+	public function setAdminDefaultImageSize(string $defaultImageSize): void {
+		if ($defaultImageSize !== '' && preg_match('/^\d+x\d+$/', $defaultImageSize) !== 1) {
+			throw new Exception('Invalid image size value');
+		}
+		$this->config->setAppValue(Application::APP_ID, 'default_image_size', $defaultImageSize);
 	}
 
 	/**
@@ -489,6 +510,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['default_image_model_id'])) {
 			$this->setAdminDefaultImageModelId($adminConfig['default_image_model_id']);
+		}
+		if (isset($adminConfig['default_image_size'])) {
+			$this->setAdminDefaultImageSize($adminConfig['default_image_size']);
 		}
 		if (isset($adminConfig['max_tokens'])) {
 			$this->setMaxTokens($adminConfig['max_tokens']);

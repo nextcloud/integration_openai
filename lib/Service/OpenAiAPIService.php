@@ -550,7 +550,7 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function requestImageCreation(
-		?string $userId, string $prompt, string $model, int $n = 1, string $size = Application::DEFAULT_IMAGE_SIZE
+		?string $userId, string $prompt, string $model, int $n = 1, string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
