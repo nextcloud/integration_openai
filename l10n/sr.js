@@ -29,7 +29,6 @@ OC.L10N.register(
     "Model" : "Модел",
     "The model used to generate the completion" : "Модел који се користи за генерисање довршавања",
     "Size" : "величина",
-    "Optional. The size of the generated images. Must be in 256x256 format." : "Није обавезно. Величина генерисаних слика. Мора да буде у формату 256x256.",
     "The model used to generate the images" : "Модел који се користи за генерисање слика",
     "Detect language" : "Откриј језик",
     "OpenAI and LocalAI integration" : "OpenAI и LocalAI интеграција",

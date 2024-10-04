@@ -29,7 +29,6 @@ OC.L10N.register(
     "Model" : "Model",
     "The model used to generate the completion" : "The model used to generate the completion",
     "Size" : "Size",
-    "Optional. The size of the generated images. Must be in 256x256 format." : "Optional. The size of the generated images. Must be in 256x256 format.",
     "The model used to generate the images" : "The model used to generate the images",
     "Detect language" : "Detect language",
     "OpenAI and LocalAI integration" : "OpenAI and LocalAI integration",

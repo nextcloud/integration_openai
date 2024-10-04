@@ -27,7 +27,6 @@
     "Model" : "模型",
     "The model used to generate the completion" : "用來產生補齊的模型",
     "Size" : "大小",
-    "Optional. The size of the generated images. Must be in 256x256 format." : "選擇性。產生影像的大小。必須為 256x256。",
     "The model used to generate the images" : "用來產生影像的模型",
     "Detect language" : "偵測語言",
     "OpenAI and LocalAI integration" : "OpenAI 與 LocalAI 整合",

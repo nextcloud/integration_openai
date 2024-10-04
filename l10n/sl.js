@@ -17,7 +17,6 @@ OC.L10N.register(
     "Maximum output words" : "Največje število besed odvoda",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",
     "Size" : "Velikost",
-    "Optional. The size of the generated images. Must be in 256x256 format." : "Izbirna velikost ustvarjenih slik, zapisana v zapisu 256x256.",
     "Detect language" : "Zaznava jezika",
     "OpenAI and LocalAI integration" : "Združevalnik OpenAI in LocalAI",
     "Integration of OpenAI and LocalAI services" : "Storitve OpenAI in LocalAI",

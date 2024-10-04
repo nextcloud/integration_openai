@@ -29,7 +29,6 @@ OC.L10N.register(
     "Model" : "型號",
     "The model used to generate the completion" : "用來產生補齊的模型",
     "Size" : "大小",
-    "Optional. The size of the generated images. Must be in 256x256 format." : "非強制的。產生圖像的大小。必須為 256x256。",
     "Detect language" : "檢測語言",
     "OpenAI and LocalAI integration" : "OpenAI 與 LocalAI 整合",
     "Integration of OpenAI and LocalAI services" : "OpenAI 與 LocalAI 服務的整合",

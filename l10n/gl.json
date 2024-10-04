@@ -27,7 +27,6 @@
     "Model" : "Modelo",
     "The model used to generate the completion" : "O modelo utilizado para xerar a conclusión",
     "Size" : "Tamaño",
-    "Optional. The size of the generated images. Must be in 256x256 format." : "Opcional. O tamaño das imaxes xeradas. Debe estar en formato 256 x 256.",
     "The model used to generate the images" : "O modelo utilizado para xerar as imaxes",
     "Detect language" : "Detectar o idioma",
     "OpenAI and LocalAI integration" : "Integración de OpenAI e LocalAI",

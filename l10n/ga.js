@@ -29,7 +29,6 @@ OC.L10N.register(
     "Model" : "Mionsamhail",
     "The model used to generate the completion" : "An tsamhail a úsáidtear chun an críochnú a ghiniúint",
     "Size" : "Méid",
-    "Optional. The size of the generated images. Must be in 256x256 format." : "Roghnach. Méid na n-íomhánna ginte. Caithfidh sé a bheith i bhformáid 256x256.",
     "The model used to generate the images" : "An tsamhail a úsáidtear chun na híomhánna a ghiniúint",
     "Detect language" : "Braith teanga",
     "OpenAI and LocalAI integration" : "Comhtháthú OpenAI agus LocalAI",

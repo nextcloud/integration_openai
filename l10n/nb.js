@@ -28,7 +28,6 @@ OC.L10N.register(
     "Model" : "Modell",
     "The model used to generate the completion" : "Modellen som brukes til å generere fullføringen",
     "Size" : "Størrelse",
-    "Optional. The size of the generated images. Must be in 256x256 format." : "Valgfri. Størrelsen på de genererte bildene. Må være i 256x256-format.",
     "Detect language" : "Oppdag språk",
     "OpenAI and LocalAI integration" : "OpenAI og LocalAI integrasjon",
     "Integration of OpenAI and LocalAI services" : "Integrasjon av OpenAI og LocalAI tjenester",
