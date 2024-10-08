@@ -26,6 +26,8 @@ namespace OCA\OpenAi\Service;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\IConfig;
+use OCP\PreConditionNotMetException;
+use OCP\Security\ICrypto;
 
 class OpenAiSettingsService {
 	private const ADMIN_CONFIG_TYPES = [
@@ -57,7 +59,10 @@ class OpenAiSettingsService {
 	];
 
 
-	public function __construct(private IConfig $config) {
+	public function __construct(
+		private IConfig $config,
+		private ICrypto $crypto,
+	) {
 
 	}
 
@@ -66,9 +71,11 @@ class OpenAiSettingsService {
 
 	/**
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getAdminApiKey(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'api_key');
+		$encryptedApiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
+		return $encryptedApiKey === '' ? '' : $this->crypto->decrypt($encryptedApiKey);
 	}
 
 	/**
@@ -76,11 +83,16 @@ class OpenAiSettingsService {
 	 * @param null|string $userId
 	 * @param boolean $fallBackOnAdminValue
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getUserApiKey(?string $userId, bool $fallBackOnAdminValue = false): string {
 		$fallBackApiKey = $fallBackOnAdminValue ? $this->getAdminApiKey() : '';
-		$userApiKey = $userId === null ? $fallBackApiKey : ($this->config->getUserValue($userId, Application::APP_ID, 'api_key', $fallBackApiKey) ?: $fallBackApiKey);
-		return $userApiKey;
+		if ($userId === null) {
+			return $fallBackApiKey;
+		}
+		$encryptedUserApiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key');
+		$userApiKey = $encryptedUserApiKey === '' ? '' : $this->crypto->decrypt($encryptedUserApiKey);
+		return $userApiKey ?: $fallBackApiKey;
 	}
 
 	/**
@@ -186,11 +198,16 @@ class OpenAiSettingsService {
 	 * @param string|null $userId
 	 * @param bool $fallBackOnAdminValue
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getUserBasicPassword(?string $userId, bool $fallBackOnAdminValue = true): string {
-		$fallBackBasicPassword = $fallBackOnAdminValue ? $this->config->getAppValue(Application::APP_ID, 'basic_password', '') : '';
-		$basicPassword = $userId === null ? $fallBackBasicPassword : ($this->config->getUserValue($userId, Application::APP_ID, 'basic_password', $fallBackBasicPassword) ?: $fallBackBasicPassword);
-		return $basicPassword;
+		$fallBackBasicPassword = $fallBackOnAdminValue ? $this->getAdminBasicPassword() : '';
+		if ($userId === null) {
+			return $fallBackBasicPassword;
+		}
+		$encryptedUserBasicPassword = $this->config->getUserValue($userId, Application::APP_ID, 'basic_password');
+		$userBasicPassword = $encryptedUserBasicPassword === '' ? '' : $this->crypto->decrypt($encryptedUserBasicPassword);
+		return $userBasicPassword ?: $fallBackBasicPassword;
 	}
 
 	/**
@@ -204,9 +221,11 @@ class OpenAiSettingsService {
 	/**
 	 * Get admin basic password
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getAdminBasicPassword(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'basic_password', '');
+		$encryptedBasicPassword = $this->config->getAppValue(Application::APP_ID, 'basic_password', '');
+		return $encryptedBasicPassword === '' ? '' : $this->crypto->decrypt($encryptedBasicPassword);
 	}
 
 	/**
@@ -324,16 +343,27 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminApiKey(string $apiKey): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->config->setAppValue(Application::APP_ID, 'api_key', $apiKey);
+		if ($apiKey === '') {
+			$this->config->setAppValue(Application::APP_ID, 'api_key', '');
+		} else {
+			$encryptedApiKey = $this->crypto->encrypt($apiKey);
+			$this->config->setAppValue(Application::APP_ID, 'api_key', $encryptedApiKey);
+		}
 	}
 
 	/**
 	 * @param string $userId
 	 * @param string $apiKey
+	 * @throws PreConditionNotMetException
 	 */
 	public function setUserApiKey(string $userId, string $apiKey): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->config->setUserValue($userId, Application::APP_ID, 'api_key', $apiKey);
+		if ($apiKey === '') {
+			$this->config->setUserValue($userId, Application::APP_ID, 'api_key', '');
+		} else {
+			$encryptedApiKey = $this->crypto->encrypt($apiKey);
+			$this->config->setUserValue($userId, Application::APP_ID, 'api_key', $encryptedApiKey);
+		}
 	}
 
 	/**
@@ -443,13 +473,15 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setAdminBasicPassword(string $basicPassword): void {
-		$this->config->setAppValue(Application::APP_ID, 'basic_password', $basicPassword);
+		$encryptedBasicPassword = $basicPassword === '' ? '' : $this->crypto->encrypt($basicPassword);
+		$this->config->setAppValue(Application::APP_ID, 'basic_password', $encryptedBasicPassword);
 	}
 
 	/**
 	 * @param string $userId
 	 * @param string $basicUser
 	 * @return void
+	 * @throws PreConditionNotMetException
 	 */
 	public function setUserBasicUser(string $userId, string $basicUser): void {
 		$this->config->setUserValue($userId, Application::APP_ID, 'basic_user', $basicUser);
@@ -459,9 +491,11 @@ class OpenAiSettingsService {
 	 * @param string $userId
 	 * @param string $basicPassword
 	 * @return void
+	 * @throws PreConditionNotMetException
 	 */
 	public function setUserBasicPassword(string $userId, string $basicPassword): void {
-		$this->config->setUserValue($userId, Application::APP_ID, 'basic_password', $basicPassword);
+		$encryptedBasicPassword = $basicPassword === '' ? '' : $this->crypto->encrypt($basicPassword);
+		$this->config->setUserValue($userId, Application::APP_ID, 'basic_password', $encryptedBasicPassword);
 	}
 
 	/**
