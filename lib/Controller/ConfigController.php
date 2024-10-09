@@ -20,7 +20,6 @@ use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\PasswordConfirmationRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
-use OCP\PreConditionNotMetException;
 
 class ConfigController extends Controller {
 	public function __construct(
