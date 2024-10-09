@@ -87,7 +87,8 @@ class OpenAiAPIService {
 			$this->modelResponseCache = $response;
 			$this->logger->debug('Actually getting OpenAI models with a network request');
 		}
-		if (!isset($response['data'])) {
+		if (!is_array($response) || !isset($response['data'])) {
+			$this->modelResponseCache = null;
 			$this->logger->warning('Error retrieving models: ' . json_encode($response));
 			throw new Exception($this->l10n->t('Unknown models error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -313,7 +314,7 @@ class OpenAiAPIService {
 
 		$response = $this->request($userId, 'completions', $params, 'POST');
 
-		if (!isset($response['choices'])) {
+		if (!is_array($response) || !isset($response['choices'])) {
 			$this->logger->warning('Text generation error: ' . json_encode($response));
 			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -410,7 +411,7 @@ class OpenAiAPIService {
 
 		$response = $this->request($userId, 'chat/completions', $params, 'POST');
 
-		if (!isset($response['choices'])) {
+		if (!is_array($response) || !isset($response['choices'])) {
 			$this->logger->warning('Text generation error: ' . json_encode($response));
 			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -522,9 +523,9 @@ class OpenAiAPIService {
 
 		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType);
 
-		if (!isset($response['text'])) {
+		if (!is_array($response) || !isset($response['text'])) {
 			$this->logger->warning('Audio transcription error: ' . json_encode($response));
-			throw new Exception($this->l10n->t('Unknown audio trancription error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			throw new Exception($this->l10n->t('Unknown audio transcription error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
 		// Extract audio duration from response and store it as quota usage:
@@ -566,7 +567,7 @@ class OpenAiAPIService {
 
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
 
-		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
+		if (!is_array($apiResponse) || !isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
 			$this->logger->warning('OpenAI image generation error', ['api_response' => $apiResponse]);
 			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 
@@ -659,10 +660,10 @@ class OpenAiAPIService {
 	 * @param array $params Query parameters (key/val pairs)
 	 * @param string $method HTTP query method
 	 * @param string|null $contentType
-	 * @return array decoded request result or error
+	 * @return array|resource decoded request result or error in array, or raw response body
 	 * @throws Exception
 	 */
-	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
+	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): mixed {
 		try {
 			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
 			if ($serviceUrl === '') {
@@ -671,7 +672,11 @@ class OpenAiAPIService {
 
 			$timeout = $this->openAiSettingsService->getRequestTimeout();
 
-			$url = $serviceUrl . '/v1/' . $endPoint;
+			if (str_starts_with($endPoint, 'http://') || str_starts_with($endPoint, 'https://')) {
+				$url = $endPoint;
+			} else {
+				$url = $serviceUrl . '/v1/' . $endPoint;
+			}
 			$options = [
 				'timeout' => $timeout,
 				'headers' => [
@@ -755,9 +760,12 @@ class OpenAiAPIService {
 
 			if ($respCode >= 400) {
 				return ['error' => $this->l10n->t('Bad credentials')];
-			} else {
+			}
+			$this->logger->warning('the booddydyyy', ['body' => $body, 'respCode' => $respCode, 'is_resource' => is_resource($body), 'is_string' => is_string($body), 'is_array' => is_array($body)]);
+			if (!is_resource($body)) {
 				return json_decode($body, true) ?: [];
 			}
+			return $body;
 		} catch (ClientException|ServerException $e) {
 			$responseBody = $e->getResponse()->getBody();
 			$parsedResponseBody = json_decode($responseBody, true);
