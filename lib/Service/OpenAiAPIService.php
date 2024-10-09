@@ -25,7 +25,7 @@ use OCP\Files\GenericFileException;
 use OCP\Files\NotPermittedException;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
 use OCP\TaskProcessing\ShapeEnumValue;
@@ -42,7 +42,7 @@ class OpenAiAPIService {
 	public function __construct(
 		private LoggerInterface $logger,
 		private IL10N $l10n,
-		private IConfig $config,
+		private IAppConfig $appConfig,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
 		IClientService $clientService
@@ -438,7 +438,7 @@ class OpenAiAPIService {
 	 * @return array|null
 	 */
 	private function getAdminExtraParams(string $configKey): ?array {
-		$stringValue = $this->config->getAppValue(Application::APP_ID, $configKey);
+		$stringValue = $this->appConfig->getValueString(Application::APP_ID, $configKey);
 		if ($stringValue === '') {
 			return null;
 		}
@@ -609,8 +609,8 @@ class OpenAiAPIService {
 	 */
 	public function getExpTextProcessingTime(): int {
 		return $this->isUsingOpenAi()
-			? intval($this->config->getAppValue(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME)))
-			: intval($this->config->getAppValue(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME)));
+			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME)))
+			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME)));
 	}
 
 	/**
@@ -622,9 +622,9 @@ class OpenAiAPIService {
 		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
 
 		if ($this->isUsingOpenAi()) {
-			$this->config->setAppValue(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)));
 		} else {
-			$this->config->setAppValue(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)));
 		}
 	}
 
@@ -633,8 +633,8 @@ class OpenAiAPIService {
 	 */
 	public function getExpImgProcessingTime(): int {
 		return $this->isUsingOpenAi()
-			? intval($this->config->getAppValue(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME)))
-			: intval($this->config->getAppValue(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME)));
+			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME)))
+			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME)));
 	}
 
 	/**
@@ -646,9 +646,9 @@ class OpenAiAPIService {
 		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
 
 		if ($this->isUsingOpenAi()) {
-			$this->config->setAppValue(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)));
 		} else {
-			$this->config->setAppValue(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)));
 		}
 	}
 

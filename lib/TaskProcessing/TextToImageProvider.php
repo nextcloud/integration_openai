@@ -7,7 +7,7 @@ namespace OCA\OpenAi\TaskProcessing;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Http\Client\IClientService;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
@@ -23,7 +23,7 @@ class TextToImageProvider implements ISynchronousProvider {
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private IClientService $clientService,
-		private IConfig $config,
+		private IAppConfig $appConfig,
 		private ?string $userId,
 	) {
 	}
@@ -57,7 +57,7 @@ class TextToImageProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShape(): array {
-		$defaultImageSize = $this->config->getAppValue(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+		$defaultImageSize = $this->appConfig->getValueString(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 		return [
 			'size' => new ShapeDescriptor(
 				$this->l->t('Size'),
@@ -80,8 +80,8 @@ class TextToImageProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeDefaults(): array {
 		$adminModel = $this->openAiAPIService->isUsingOpenAi()
-			? ($this->config->getAppValue(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
-			: $this->config->getAppValue(Application::APP_ID, 'default_image_model_id');
+			? ($this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
+			: $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id');
 		return [
 			'model' => $adminModel,
 		];
@@ -112,7 +112,7 @@ class TextToImageProvider implements ISynchronousProvider {
 			$nbImages = $input['numberOfImages'];
 		}
 
-		$size = $this->config->getAppValue(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+		$size = $this->appConfig->getValueString(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 		if (isset($input['size']) && is_string($input['size']) && preg_match('/^\d+x\d+$/', $input['size'])) {
 			$size = trim($input['size']);
 		}
@@ -120,7 +120,7 @@ class TextToImageProvider implements ISynchronousProvider {
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		} else {
-			$model = $this->config->getAppValue(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
+			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
 
 		try {

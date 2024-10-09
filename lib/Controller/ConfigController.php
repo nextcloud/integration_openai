@@ -20,7 +20,6 @@ use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\PasswordConfirmationRequired;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\IRequest;
-use OCP\PreConditionNotMetException;
 
 class ConfigController extends Controller {
 	public function __construct(
@@ -37,7 +36,6 @@ class ConfigController extends Controller {
 	 *
 	 * @param array $values key/value pairs to store in config
 	 * @return DataResponse
-	 * @throws PreConditionNotMetException
 	 */
 	#[NoAdminRequired]
 	public function setUserConfig(array $values): DataResponse {
@@ -57,7 +55,6 @@ class ConfigController extends Controller {
 	 *
 	 * @param array $values key/value pairs to store in config
 	 * @return DataResponse
-	 * @throws PreConditionNotMetException
 	 */
 	#[NoAdminRequired]
 	#[PasswordConfirmationRequired]

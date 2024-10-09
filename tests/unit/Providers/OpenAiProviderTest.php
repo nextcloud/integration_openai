@@ -21,7 +21,7 @@ use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -68,7 +68,7 @@ class OpenAiProviderTest extends TestCase {
 		$this->openAiApiService = new OpenAiAPIService(
 			\OC::$server->get(\Psr\Log\LoggerInterface::class),
 			$this->createMock(\OCP\IL10N::class),
-			\OC::$server->get(IConfig::class),
+			\OC::$server->get(IAppConfig::class),
 			\OC::$server->get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$clientService,
@@ -96,7 +96,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testFreePromptProvider(): void {
 		$freePromptProvider = new TextToTextProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IConfig::class),
+			\OC::$server->get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
@@ -153,7 +153,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testHeadlineProvider(): void {
 		$headlineProvider = new HeadlineProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IConfig::class),
+			\OC::$server->get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
@@ -210,7 +210,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testSummaryProvider(): void {
 		$summaryProvider = new SummaryProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IConfig::class),
+			\OC::$server->get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
@@ -267,7 +267,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testTranslationProvider(): void {
 		$translationProvider = new TranslateProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IConfig::class),
+			\OC::$server->get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			\OC::$server->get(\OCP\L10N\IFactory::class),

@@ -8,8 +8,8 @@ use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCP\IAppConfig;
 use OCP\ICacheFactory;
-use OCP\IConfig;
 use OCP\IL10N;
 use OCP\L10N\IFactory;
 use OCP\TaskProcessing\EShapeType;
@@ -24,7 +24,7 @@ class TranslateProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private IConfig $config,
+		private IAppConfig $appConfig,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private IFactory $l10nFactory,
@@ -92,8 +92,8 @@ class TranslateProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeDefaults(): array {
 		$adminModel = $this->openAiAPIService->isUsingOpenAi()
-			? ($this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
-			: $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id');
+			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
+			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id');
 		return [
 			'max_tokens' => 1000,
 			'model' => $adminModel,
@@ -133,7 +133,7 @@ class TranslateProvider implements ISynchronousProvider {
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		} else {
-			$model = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
+			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {

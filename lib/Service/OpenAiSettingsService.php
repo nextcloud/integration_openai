@@ -25,6 +25,7 @@ namespace OCA\OpenAi\Service;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCP\IAppConfig;
 use OCP\IConfig;
 use OCP\PreConditionNotMetException;
 use OCP\Security\ICrypto;
@@ -61,6 +62,7 @@ class OpenAiSettingsService {
 
 	public function __construct(
 		private IConfig $config,
+		private IAppConfig $appConfig,
 		private ICrypto $crypto,
 	) {
 
@@ -74,8 +76,7 @@ class OpenAiSettingsService {
 	 * @throws Exception
 	 */
 	public function getAdminApiKey(): string {
-		$encryptedApiKey = $this->config->getAppValue(Application::APP_ID, 'api_key');
-		return $encryptedApiKey === '' ? '' : $this->crypto->decrypt($encryptedApiKey);
+		return $this->appConfig->getValueString(Application::APP_ID, 'api_key');
 	}
 
 	/**
@@ -99,70 +100,79 @@ class OpenAiSettingsService {
 	 * @return string
 	 */
 	public function getAdminDefaultCompletionModelId(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getAdminDefaultImageModelId(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getAdminDefaultImageSize(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getServiceUrl(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'url');
+		return $this->appConfig->getValueString(Application::APP_ID, 'url');
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getServiceName(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'service_name');
+		return $this->appConfig->getValueString(Application::APP_ID, 'service_name');
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getRequestTimeout(): int {
-		return intval($this->config->getAppValue(Application::APP_ID, 'request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT))) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT))) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getMaxTokens(): int {
-		return intval($this->config->getAppValue(Application::APP_ID, 'max_tokens', strval(Application::DEFAULT_MAX_NUM_OF_TOKENS))) ?: Application::DEFAULT_MAX_NUM_OF_TOKENS;
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'max_tokens', strval(Application::DEFAULT_MAX_NUM_OF_TOKENS))) ?: Application::DEFAULT_MAX_NUM_OF_TOKENS;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getLlmExtraParams(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'llm_extra_params');
+		return $this->appConfig->getValueString(Application::APP_ID, 'llm_extra_params');
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getQuotaPeriod(): int {
-		return intval($this->config->getAppValue(Application::APP_ID, 'quota_period', strval(Application::DEFAULT_QUOTA_PERIOD))) ?: Application::DEFAULT_QUOTA_PERIOD;
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'quota_period', strval(Application::DEFAULT_QUOTA_PERIOD))) ?: Application::DEFAULT_QUOTA_PERIOD;
 	}
 
 	/**
 	 * @return int[]
 	 */
 	public function getQuotas(): array {
-		$quotas = json_decode($this->config->getAppValue(Application::APP_ID, 'quotas', json_encode(Application::DEFAULT_QUOTAS)) ?: json_encode(Application::DEFAULT_QUOTAS), true);
+		$quotas = json_decode(
+			$this->appConfig->getValueString(
+				Application::APP_ID, 'quotas',
+				json_encode(Application::DEFAULT_QUOTAS)
+			) ?: json_encode(Application::DEFAULT_QUOTAS),
+			true,
+		);
+		if ($quotas === null) {
+			$quotas = Application::DEFAULT_QUOTAS;
+		}
 		// Make sure all quota types are set in the json encoded app value (in case new quota types are added in the future)
 		if (count($quotas) !== count(Application::DEFAULT_QUOTAS)) {
 			foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
@@ -170,7 +180,7 @@ class OpenAiSettingsService {
 					$quotas[$quotaType] = Application::DEFAULT_QUOTAS[$quotaType];
 				}
 			}
-			$this->config->setAppValue(Application::APP_ID, 'quotas', json_encode($quotas));
+			$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas));
 		}
 
 		return $quotas;
@@ -180,7 +190,7 @@ class OpenAiSettingsService {
 	 * @return boolean
 	 */
 	public function getChatEndpointEnabled(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'chat_endpoint_enabled', '0') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'chat_endpoint_enabled', '0') === '1';
 	}
 
 	/**
@@ -189,8 +199,10 @@ class OpenAiSettingsService {
 	 * @return string
 	 */
 	public function getUserBasicUser(?string $userId, bool $fallBackOnAdminValue = true): string {
-		$fallBackBasicUser = $fallBackOnAdminValue ? $this->config->getAppValue(Application::APP_ID, 'basic_user', '') : '';
-		$basicUser = $userId === null ? $fallBackBasicUser : ($this->config->getUserValue($userId, Application::APP_ID, 'basic_user', $fallBackBasicUser) ?: $fallBackBasicUser);
+		$fallBackBasicUser = $fallBackOnAdminValue ? $this->getAdminBasicUser() : '';
+		$basicUser = $userId === null
+			? $fallBackBasicUser
+			: ($this->config->getUserValue($userId, Application::APP_ID, 'basic_user', $fallBackBasicUser) ?: $fallBackBasicUser);
 		return $basicUser;
 	}
 
@@ -215,7 +227,7 @@ class OpenAiSettingsService {
 	 * @return string
 	 */
 	public function getAdminBasicUser(): string {
-		return $this->config->getAppValue(Application::APP_ID, 'basic_user', '');
+		return $this->appConfig->getValueString(Application::APP_ID, 'basic_user');
 	}
 
 	/**
@@ -224,15 +236,14 @@ class OpenAiSettingsService {
 	 * @throws Exception
 	 */
 	public function getAdminBasicPassword(): string {
-		$encryptedBasicPassword = $this->config->getAppValue(Application::APP_ID, 'basic_password', '');
-		return $encryptedBasicPassword === '' ? '' : $this->crypto->decrypt($encryptedBasicPassword);
+		return $this->appConfig->getValueString(Application::APP_ID, 'basic_password');
 	}
 
 	/**
 	 * @return boolean
 	 */
 	public function getUseBasicAuth(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'use_basic_auth', '0') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'use_basic_auth', '0') === '1';
 	}
 
 	/**
@@ -286,28 +297,28 @@ class OpenAiSettingsService {
 	 * @return bool
 	 */
 	public function getTranslationProviderEnabled(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function getLlmProviderEnabled(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'llm_provider_enabled', '1') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1';
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function getT2iProviderEnabled(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 't2i_provider_enabled', '1') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1';
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function getSttProviderEnabled(): bool {
-		return $this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
 	}
 
 	////////////////////////////////////////////
@@ -334,7 +345,7 @@ class OpenAiSettingsService {
 			}
 		}
 
-		$this->config->setAppValue(Application::APP_ID, 'quotas', json_encode($quotas));
+		$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas, JSON_THROW_ON_ERROR));
 	}
 
 	/**
@@ -343,12 +354,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminApiKey(string $apiKey): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		if ($apiKey === '') {
-			$this->config->setAppValue(Application::APP_ID, 'api_key', '');
-		} else {
-			$encryptedApiKey = $this->crypto->encrypt($apiKey);
-			$this->config->setAppValue(Application::APP_ID, 'api_key', $encryptedApiKey);
-		}
+		$this->appConfig->setValueString(Application::APP_ID, 'api_key', $apiKey, false, true);
 	}
 
 	/**
@@ -372,7 +378,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminDefaultCompletionModelId(string $defaultCompletionModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->config->setAppValue(Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId);
 	}
 
 	/**
@@ -381,7 +387,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminDefaultImageModelId(string $defaultImageModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->config->setAppValue(Application::APP_ID, 'default_image_model_id', $defaultImageModelId);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_image_model_id', $defaultImageModelId);
 	}
 
 	/**
@@ -393,7 +399,7 @@ class OpenAiSettingsService {
 		if ($defaultImageSize !== '' && preg_match('/^\d+x\d+$/', $defaultImageSize) !== 1) {
 			throw new Exception('Invalid image size value');
 		}
-		$this->config->setAppValue(Application::APP_ID, 'default_image_size', $defaultImageSize);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_image_size', $defaultImageSize);
 	}
 
 	/**
@@ -406,7 +412,7 @@ class OpenAiSettingsService {
 		if (!filter_var($serviceUrl, FILTER_VALIDATE_URL) && $serviceUrl !== '') {
 			throw new Exception('Invalid service URL');
 		}
-		$this->config->setAppValue(Application::APP_ID, 'url', $serviceUrl);
+		$this->appConfig->setValueString(Application::APP_ID, 'url', $serviceUrl);
 	}
 
 	/**
@@ -415,7 +421,7 @@ class OpenAiSettingsService {
 	 * @throws Exception
 	 */
 	public function setServiceName(string $serviceName): void {
-		$this->config->setAppValue(Application::APP_ID, 'service_name', $serviceName);
+		$this->appConfig->setValueString(Application::APP_ID, 'service_name', $serviceName);
 	}
 
 	/**
@@ -425,7 +431,7 @@ class OpenAiSettingsService {
 	public function setRequestTimeout(int $requestTimeout): void {
 		// Validate input:
 		$requestTimeout = max(1, $requestTimeout);
-		$this->config->setAppValue(Application::APP_ID, 'request_timeout', strval($requestTimeout));
+		$this->appConfig->setValueString(Application::APP_ID, 'request_timeout', strval($requestTimeout));
 	}
 
 	/**
@@ -436,7 +442,7 @@ class OpenAiSettingsService {
 	public function setMaxTokens(int $maxTokens): void {
 		// Validate input:
 		$maxTokens = max(100, $maxTokens);
-		$this->config->setAppValue(Application::APP_ID, 'max_tokens', strval($maxTokens));
+		$this->appConfig->setValueString(Application::APP_ID, 'max_tokens', strval($maxTokens));
 	}
 
 	public function setLlmExtraParams(string $llmExtraParams): void {
@@ -446,7 +452,7 @@ class OpenAiSettingsService {
 				throw new Exception('Invalid model extra parameters, must be a valid JSON object string or an empty string');
 			}
 		}
-		$this->config->setAppValue(Application::APP_ID, 'llm_extra_params', $llmExtraParams);
+		$this->appConfig->setValueString(Application::APP_ID, 'llm_extra_params', $llmExtraParams);
 	}
 
 	/**
@@ -457,7 +463,7 @@ class OpenAiSettingsService {
 	public function setQuotaPeriod(int $quotaPeriod): void {
 		// Validate input:
 		$quotaPeriod = max(1, $quotaPeriod);
-		$this->config->setAppValue(Application::APP_ID, 'quota_period', strval($quotaPeriod));
+		$this->appConfig->setValueString(Application::APP_ID, 'quota_period', strval($quotaPeriod));
 	}
 
 	/**
@@ -465,7 +471,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setAdminBasicUser(string $basicUser): void {
-		$this->config->setAppValue(Application::APP_ID, 'basic_user', $basicUser);
+		$this->appConfig->setValueString(Application::APP_ID, 'basic_user', $basicUser);
 	}
 
 	/**
@@ -473,8 +479,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setAdminBasicPassword(string $basicPassword): void {
-		$encryptedBasicPassword = $basicPassword === '' ? '' : $this->crypto->encrypt($basicPassword);
-		$this->config->setAppValue(Application::APP_ID, 'basic_password', $encryptedBasicPassword);
+		$this->appConfig->setValueString(Application::APP_ID, 'basic_password', $basicPassword, false, true);
 	}
 
 	/**
@@ -503,7 +508,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setUseBasicAuth(bool $useBasicAuth): void {
-		$this->config->setAppValue(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
 	}
 
 	/**
@@ -616,7 +621,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setTranslationProviderEnabled(bool $enabled): void {
-		$this->config->setAppValue(Application::APP_ID, 'translation_provider_enabled', $enabled ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'translation_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**
@@ -624,7 +629,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setLlmProviderEnabled(bool $enabled): void {
-		$this->config->setAppValue(Application::APP_ID, 'llm_provider_enabled', $enabled ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'llm_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**
@@ -632,7 +637,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setT2iProviderEnabled(bool $enabled): void {
-		$this->config->setAppValue(Application::APP_ID, 't2i_provider_enabled', $enabled ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 't2i_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**
@@ -640,13 +645,13 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setSttProviderEnabled(bool $enabled): void {
-		$this->config->setAppValue(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**
 	 * @param bool $enabled
 	 */
 	public function setChatEndpointEnabled(bool $enabled): void {
-		$this->config->setAppValue(Application::APP_ID, 'chat_endpoint_enabled', $enabled ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'chat_endpoint_enabled', $enabled ? '1' : '0');
 	}
 }
