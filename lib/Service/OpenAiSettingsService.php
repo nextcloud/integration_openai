@@ -170,6 +170,9 @@ class OpenAiSettingsService {
 			) ?: json_encode(Application::DEFAULT_QUOTAS),
 			true,
 		);
+		if ($quotas === null) {
+			$quotas = Application::DEFAULT_QUOTAS;
+		}
 		// Make sure all quota types are set in the json encoded app value (in case new quota types are added in the future)
 		if (count($quotas) !== count(Application::DEFAULT_QUOTAS)) {
 			foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
@@ -342,7 +345,7 @@ class OpenAiSettingsService {
 			}
 		}
 
-		$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas));
+		$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas, JSON_THROW_ON_ERROR));
 	}
 
 	/**
