@@ -352,7 +352,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminApiKey(string $apiKey): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'api_key', $apiKey);
+		$this->appConfig->setValueString(Application::APP_ID, 'api_key', $apiKey, false, true);
 	}
 
 	/**
@@ -477,7 +477,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setAdminBasicPassword(string $basicPassword): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'basic_password', $basicPassword);
+		$this->appConfig->setValueString(Application::APP_ID, 'basic_password', $basicPassword, false, true);
 	}
 
 	/**
