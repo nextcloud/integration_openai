@@ -37,7 +37,6 @@ class ConfigController extends Controller {
 	 *
 	 * @param array $values key/value pairs to store in config
 	 * @return DataResponse
-	 * @throws PreConditionNotMetException
 	 */
 	#[NoAdminRequired]
 	public function setUserConfig(array $values): DataResponse {
@@ -57,7 +56,6 @@ class ConfigController extends Controller {
 	 *
 	 * @param array $values key/value pairs to store in config
 	 * @return DataResponse
-	 * @throws PreConditionNotMetException
 	 */
 	#[NoAdminRequired]
 	#[PasswordConfirmationRequired]

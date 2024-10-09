@@ -11,7 +11,7 @@ namespace OCA\OpenAi\Migration;
 use Closure;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
@@ -22,7 +22,7 @@ class Version030102Date20241003155512 extends SimpleMigrationStep {
 	public function __construct(
 		private IDBConnection $connection,
 		private ICrypto $crypto,
-		private IConfig $config,
+		private IAppConfig $appConfig,
 	) {
 	}
 
@@ -34,10 +34,10 @@ class Version030102Date20241003155512 extends SimpleMigrationStep {
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options) {
 		// app config
 		foreach (['api_key', 'basic_password'] as $key) {
-			$value = $this->config->getAppValue(Application::APP_ID, $key);
+			$value = $this->appConfig->getValueString(Application::APP_ID, $key);
 			if ($value !== '') {
 				$encryptedValue = $this->crypto->encrypt($value);
-				$this->config->setAppValue(Application::APP_ID, $key, $encryptedValue);
+				$this->appConfig->setValueString(Application::APP_ID, $key, $encryptedValue);
 			}
 		}
 

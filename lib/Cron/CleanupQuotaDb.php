@@ -29,7 +29,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class CleanupQuotaDb extends TimedJob {
@@ -37,7 +37,7 @@ class CleanupQuotaDb extends TimedJob {
 		ITimeFactory $time,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private LoggerInterface $logger,
-		private IConfig $config
+		private IAppConfig $appConfig,
 	) {
 		parent::__construct($time);
 		$this->setInterval(60 * 60 * 24); // Daily
@@ -49,7 +49,7 @@ class CleanupQuotaDb extends TimedJob {
 			// The mimimum period is limited to DEFAULT_QUOTA_PERIOD to not lose
 			// the stored quota usage data below this limit.
 			max(
-				intval($this->config->getAppValue(
+				intval($this->appConfig->getValueString(
 					Application::APP_ID,
 					'quota_period',
 					strval(Application::DEFAULT_QUOTA_PERIOD)

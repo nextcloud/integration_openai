@@ -31,7 +31,9 @@ use OCP\AppFramework\Bootstrap\IBootContext;
 
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\IAppConfig;
 use OCP\IConfig;
+use Psr\Container\ContainerInterface;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'integration_openai';
@@ -70,42 +72,42 @@ class Application extends App implements IBootstrap {
 	public const PROMPT_TYPE_TEXT = 1;
 	public const MAX_PROMPT_PER_TYPE_PER_USER = 5;
 
-	private IConfig $config;
+	private IAppConfig $appConfig;
 
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);
 
 		$container = $this->getContainer();
-		$this->config = $container->query(IConfig::class);
+		$this->appConfig = $container->get(IAppConfig::class);
 	}
 
 	public function register(IRegistrationContext $context): void {
 		// deprecated APIs
-		if ($this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
+		if ($this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
 			$context->registerTranslationProvider(OldTranslationProvider::class);
 		}
-		if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
+		if ($this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
 			$context->registerSpeechToTextProvider(OldSTTProvider::class);
 		}
 
-		if ($this->config->getAppValue(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
+		if ($this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
 			$context->registerTextProcessingProvider(OldFreePromptProvider::class);
 			$context->registerTextProcessingProvider(OldSummaryProvider::class);
 			$context->registerTextProcessingProvider(OldHeadlineProvider::class);
 		}
-		if ($this->config->getAppValue(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
+		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTextToImageProvider(OldTextToImageProvider::class);
 		}
 
 		// Task processing
-		if ($this->config->getAppValue(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
+		if ($this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TranslateProvider::class);
 		}
-		if ($this->config->getAppValue(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
+		if ($this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(AudioToTextProvider::class);
 		}
 
-		if ($this->config->getAppValue(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
+		if ($this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToTextProvider::class);
 			$context->registerTaskProcessingProvider(TextToTextChatProvider::class);
 			$context->registerTaskProcessingProvider(SummaryProvider::class);
@@ -114,7 +116,7 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(ContextWriteProvider::class);
 			$context->registerTaskProcessingProvider(ReformulateProvider::class);
 		}
-		if ($this->config->getAppValue(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
+		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);
 		}
 
