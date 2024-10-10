@@ -9,13 +9,19 @@ as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/
 
 This app implements:
 
-* Text generation providers: Free prompt, Summarize, Headline, Context write, Chat, and Reformulate (using any available large language model)
+* Text generation providers: Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate (using any available large language model)
 * A Translation provider (using any available language model)
 * A SpeechToText provider (using Whisper)
 * An image generation provider
 
+⚠️ Context Write, Summarize, Headline and Reformulate have mainly been tested with OpenAI.
+They might work when connecting to other services, without any guarantee.
+
 Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance
 or to any service that implements an API similar to the OpenAI one, for example: [Plusserver](https://www.plusserver.com/en/ai-platform/) or [MistralAI](https://mistral.ai).
+
+⚠️ This app is mainly tested with OpenAI. We do not guarantee it works perfectly
+with other services that implement OpenAI-compatible APIs with slight differences.
 
 ## Ethical AI Rating
 ### Rating for Text generation using ChatGPT via the OpenAI API: 🔴
