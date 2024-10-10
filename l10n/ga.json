@@ -1,7 +1,4 @@
 { "translations": {
-    "OpenAI's Whisper Speech-To-Text" : "Cogar Óráid Go Téacs OpenAI",
-    "LocalAI's Whisper Speech-To-Text" : "Cogar Óráid Go Téacs LocalAI",
-    "OpenAI's DALL-E 2" : "DALL-E 2 de chuid OpenAI",
     "Unknown models error" : "Earráid samhlacha anaithnid",
     "Default" : "Réamhshocrú",
     "Text generation" : "Giniúint téacs",
@@ -26,6 +23,7 @@
     "The maximum number of words/tokens that can be generated in the completion." : "An t-uaslíon focal/chomharthaí is féidir a ghiniúint sa chríochnú.",
     "Model" : "Mionsamhail",
     "The model used to generate the completion" : "An tsamhail a úsáidtear chun an críochnú a ghiniúint",
+    "OpenAI's DALL-E 2" : "DALL-E 2 de chuid OpenAI",
     "Size" : "Méid",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Roghnach. Méid na n-íomhánna ginte. Caithfidh sé a bheith i bhformáid 256x256. Réamhshocrú is %s",
     "The model used to generate the images" : "An tsamhail a úsáidtear chun na híomhánna a ghiniúint",

@@ -1,8 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "OpenAIs Whisper Speech-To-Text",
-    "LocalAI's Whisper Speech-To-Text" : "LocalAIs Whisper Speech-To-Text",
     "Unknown models error" : "Feil i ukjente modeller",
     "Default" : "Forvalg",
     "Text generation" : "Tekstgenerering",

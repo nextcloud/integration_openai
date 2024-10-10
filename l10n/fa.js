@@ -1,8 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "OpenAI's Whisper Speech-To-Text",
-    "LocalAI's Whisper Speech-To-Text" : "LocalAI's Whisper Speech-To-Text",
     "Default" : "پیش‌فرض",
     "Image generation" : "Image generation",
     "Unknown" : "ناشناخته",

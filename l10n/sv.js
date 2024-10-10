@@ -1,8 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "OpenAI:s Whisper Tal-Till-Text",
-    "LocalAI's Whisper Speech-To-Text" : "LocalAI:s Whisper Tal-Till-Text",
     "Default" : "Förvald",
     "Image generation" : "Bildgenerering",
     "Unknown" : "Okänd",

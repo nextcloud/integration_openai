@@ -1,9 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "Whisper Sprache-zu-Text von OpenAI",
-    "LocalAI's Whisper Speech-To-Text" : "Whisper Sprache-zu-Text von LocalAI",
-    "OpenAI's DALL-E 2" : "DALL-E 2 von OpenAI",
     "Unknown models error" : "Unbekannter Modellfehler",
     "Default" : "Standard",
     "Text generation" : "Texterstellung",
@@ -28,6 +25,7 @@ OC.L10N.register(
     "The maximum number of words/tokens that can be generated in the completion." : "Die maximale Anzahl von Wörtern/Tokens, die in der Vervollständigung erzeugt werden können.",
     "Model" : "Modell",
     "The model used to generate the completion" : "Das zur Generierung der Vervollständigung verwendete Modell",
+    "OpenAI's DALL-E 2" : "DALL-E 2 von OpenAI",
     "Size" : "Größe",
     "The model used to generate the images" : "Das zur Generierung der Bilder verwendete Modell",
     "Detect language" : "Sprache erkennen",

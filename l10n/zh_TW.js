@@ -1,9 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "OpenAI 的 Whisper 語音轉文字",
-    "LocalAI's Whisper Speech-To-Text" : "LocalAI 的 Whisper 語音轉文字",
-    "OpenAI's DALL-E 2" : "OpenAI 的DALL-E 2",
     "Unknown models error" : "未知模型錯誤",
     "Default" : "預設",
     "Text generation" : "產生文字",
@@ -28,6 +25,7 @@ OC.L10N.register(
     "The maximum number of words/tokens that can be generated in the completion." : "補齊中可以產生的最大文字/權杖數。",
     "Model" : "模型",
     "The model used to generate the completion" : "用來產生補齊的模型",
+    "OpenAI's DALL-E 2" : "OpenAI 的DALL-E 2",
     "Size" : "大小",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "選擇性。產生影像的大小。必須為 256x256。預設為 %s",
     "The model used to generate the images" : "用來產生影像的模型",

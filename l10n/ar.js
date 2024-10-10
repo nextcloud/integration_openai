@@ -1,9 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "تطبيق \"ويسبر\" الهامس Whisper لتحويل الكلام إلي نص من OpenAI",
-    "LocalAI's Whisper Speech-To-Text" : "تحويل الكلام إلى نص بالذكاء االاصطناعي محليّاً باستعمال تطبيق \"الهامس\" Whisper",
-    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Unknown models error" : "خطأ نماذج غير محدد",
     "Default" : "التلقائي",
     "Text generation" : "توليد النص",
@@ -28,6 +25,7 @@ OC.L10N.register(
     "The maximum number of words/tokens that can be generated in the completion." : "العدد الأقصى من الكلمات أو الأَمَارَات التي يمكن توليدها عند الإكمال.",
     "Model" : "نموذج model",
     "The model used to generate the completion" : "النموذج المُستخدَم لتوليد الإكمال",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Size" : "حجم",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "إختيارياً؛ حجم الصور المُولّدة يجب أن يكون على نسق 256*256. القيمة التلقائية هي %s",
     "The model used to generate the images" : "النموذج المستعمل لتوليد الصِّوَر",

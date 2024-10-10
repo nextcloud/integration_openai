@@ -1,9 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "OpenAI 的 Whisper 音頻轉文本",
-    "LocalAI's Whisper Speech-To-Text" : "LocalAI 的 Whisper 音頻轉文本",
-    "OpenAI's DALL-E 2" : "OpenAI 的 DALL-E 2",
     "Unknown models error" : "模型錯誤不詳",
     "Default" : "默認",
     "Text generation" : "產生文字",
@@ -28,6 +25,7 @@ OC.L10N.register(
     "The maximum number of words/tokens that can be generated in the completion." : "補齊中可以產生的最大文字/權杖數。",
     "Model" : "型號",
     "The model used to generate the completion" : "用來產生補齊的模型",
+    "OpenAI's DALL-E 2" : "OpenAI 的 DALL-E 2",
     "Size" : "大小",
     "Detect language" : "檢測語言",
     "OpenAI and LocalAI integration" : "OpenAI 與 LocalAI 整合",

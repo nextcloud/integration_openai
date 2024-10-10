@@ -1,9 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "OpenAI's Whisper Speech-To-Text" : "OpenAI Whisper fala-para-texto",
-    "LocalAI's Whisper Speech-To-Text" : "Discurso para texto em sussurro da LocalAI",
-    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Unknown models error" : "Erro de modelos desconhecidos",
     "Default" : "Padrão",
     "Text generation" : "Geração de texto",
@@ -28,6 +25,7 @@ OC.L10N.register(
     "The maximum number of words/tokens that can be generated in the completion." : "O número máximo de palavras/tokens que podem ser gerados na conclusão.",
     "Model" : "Modelo",
     "The model used to generate the completion" : "O modelo usado para gerar a conclusão",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Size" : "Tamanho",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Opcional. O tamanho das imagens geradas. Deve estar no formato 256x256. O padrão é %s",
     "The model used to generate the images" : "O modelo usado para gerar as imagens",
