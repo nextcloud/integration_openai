@@ -26,6 +26,8 @@ OC.L10N.register(
     "Detect language" : "Zjistit jazyk",
     "OpenAI and LocalAI integration" : "Napojení na OpenAI a LocalAI",
     "Integration of OpenAI and LocalAI services" : "Napojení na služby OpenAI a LocalAI",
+    "Service URL" : "URL adresa služby",
+    "Example: {example}" : "Příklad: {example}",
     "Authentication" : "Ověřování se",
     "Authentication method" : "Metoda ověření",
     "API key" : "Klíč k aplikačnímu program. rozhraní (API)",
