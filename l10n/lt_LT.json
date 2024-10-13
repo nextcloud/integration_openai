@@ -14,7 +14,9 @@
     "Authentication method" : "Tapatybės nustatymo metodas",
     "API key" : "API raktas",
     "Request timeout (seconds)" : "Prisijungimo laikas (sekundėmis)",
+    "Failed to load models" : "Nepavyko įkelti modelių",
     "Username" : "Naudotojo vardas",
-    "Password" : "Slaptažodis"
+    "Password" : "Slaptažodis",
+    "Usage" : "Naudojimas"
 },"pluralForm" :"nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);"
 }
