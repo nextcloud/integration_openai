@@ -136,12 +136,14 @@ class TextToImageProvider implements ISynchronousProvider {
 				$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
 				throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
 			}
-			$client = $this->clientService->newClient();
-			$requestOptions = $this->openAiAPIService->getImageRequestOptions($userId);
 			$output = ['images' => []];
 			foreach ($urls as $url) {
-				$imageResponse = $client->get($url, $requestOptions);
-				$output['images'][] = $imageResponse->getBody();
+				$imageResponse = $this->openAiAPIService->request($userId, $url);
+				// if (!is_resource($imageResponse)) {
+				// 	$this->logger->warning('JSON returned in an image request to OpenAI/LocalAI', ['response' => $imageResponse]);
+				// 	throw new RuntimeException('JSON returned in an image request to OpenAI/LocalAI');
+				// }
+				$output['images'][] = $imageResponse;
 			}
 			$endTime = time();
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
