@@ -12,7 +12,7 @@
 						class="input"
 						:value.sync="state.url"
 						:label="t('integration_openai', 'Service URL')"
-						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080' })"
+						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080/v1' })"
 						:show-trailing-button="!!state.url"
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
@@ -30,7 +30,7 @@
 						{{ t('integration_openai', 'This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
 					</p>
 					<p>
-						{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case make sure \'allow_local_remote_servers\' is set to true in config.php', { example : 'http://localhost:8080' }) }}
+						{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case make sure \'allow_local_remote_servers\' is set to true in config.php', { example: 'http://localhost:8080/v1' }) }}
 					</p>
 				</NcNoteCard>
 				<div v-if="state.url !== ''" class="line">
