@@ -27,6 +27,13 @@
 				</div>
 				<NcNoteCard type="info">
 					<p>
+						{{ t('integration_openai', 'With the current configuration, the target URL used to get the models is:') }}
+						<br>
+						<strong>{{ modelEndpointUrl }}</strong>
+					</p>
+				</NcNoteCard>
+				<NcNoteCard type="info">
+					<p>
 						{{ t('integration_openai', 'This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
 					</p>
 					<p>
@@ -460,6 +467,12 @@ export default {
 	},
 
 	computed: {
+		modelEndpointUrl() {
+			if (this.state.url === '') {
+				return 'https://api.openai.com/v1/models'
+			}
+			return this.state.url.replace(/\/*$/, '/models')
+		},
 		isUsingOpenAI() {
 			return this.state.url === ''
 		},
