@@ -671,7 +671,7 @@ class OpenAiAPIService {
 
 			$timeout = $this->openAiSettingsService->getRequestTimeout();
 
-			$url = $serviceUrl . '/v1/' . $endPoint;
+			$url = rtrim($serviceUrl, '/') . '/' . $endPoint;
 			$options = [
 				'timeout' => $timeout,
 				'headers' => [

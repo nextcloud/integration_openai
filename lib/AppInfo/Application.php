@@ -31,7 +31,7 @@ use OCP\IAppConfig;
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'integration_openai';
 
-	public const OPENAI_API_BASE_URL = 'https://api.openai.com';
+	public const OPENAI_API_BASE_URL = 'https://api.openai.com/v1';
 	public const OPENAI_DEFAULT_REQUEST_TIMEOUT = 60 * 4;
 	public const USER_AGENT = 'Nextcloud OpenAI/LocalAI integration';
 
