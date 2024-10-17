@@ -34,8 +34,6 @@ OC.L10N.register(
     "Service URL" : "Service-URL",
     "Example: {example}" : "Beispiel: {example}",
     "Leave empty to use {openaiApiUrl}" : "Leer lassen um {openaiApiUrl} zu verwenden",
-    "This should be the address of your LocalAI instance (or any service implementing an API similar to OpenAI). This URL will be accessed by your Nextcloud server." : "Dies sollte die Adresse deiner LocalAI-Instanz sein (oder eines beliebigen Dienstes, der eine API ähnlich wie OpenAI implementiert). Auf diese URL wird von deinem Nextcloud-Server zugegriffen.",
-    "This can be a local address with a port like {example}. In this case make sure 'allow_local_remote_servers' is set to true in config.php" : "Dies kann eine lokale Adresse mit einem Port wie {example} sein. Stelle in diesem Fall sicher, dass 'allow_local_remote_servers' in config.php auf true gesetzt ist",
     "Service name (optional)" : "Service-Name (optional)",
     "Example: LocalAI of university ABC" : "Beispiel: LocalAI der Universität ABC",
     "This name will be displayed as provider name in the AI admin settings" : "Dieser Name wird als Anbietername in den AI-Administrationseinstellungen angezeigt",
