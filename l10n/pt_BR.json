@@ -33,6 +33,8 @@
     "Service URL" : "URL do serviço",
     "Example: {example}" : "Exemplo: {example}",
     "Leave empty to use {openaiApiUrl}" : "Deixe em branco para usar {openaiApiUrl}",
+    "With the current configuration, the target URL used to get the models is:" : "Com a configuração atual, a URL de destino usada para obter os modelos é:",
+    "This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server." : "Isso deve incluir o endereço da sua instância LocalAI (ou qualquer serviço implementando uma API similar à OpenAI) junto com o caminho raiz da API. Esta URL será acessada pelo seu servidor Nextcloud.",
     "This can be a local address with a port like {example}. In this case, make sure 'allow_local_remote_servers' is set to true in config.php." : "Este pode ser um endereço local com uma porta como {example}. Neste caso, certifique-se de que 'allow_local_remote_servers' esteja definido como true em config.php.",
     "Service name (optional)" : "Nome do serviço (opcional)",
     "Example: LocalAI of university ABC" : "Exemplo: LocalAI da universidade ABC",
