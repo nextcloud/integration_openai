@@ -85,6 +85,7 @@ OC.L10N.register(
     "your Basic Auth user" : "votre utilisateur Authentification Basique",
     "Password" : "Mot de passe",
     "your Basic Auth password" : "votre mot de passe Authentification Basique",
+    "Usage quota info" : "Info sur l'utilisation du quota",
     "Usage" : "Usage",
     "Specifying your own API key will allow unlimited usage" : "Spécifier votre propre clé API permettra une utilisation illimitée",
     "OpenAI options saved" : "Options OpenAI sauvegardées",
