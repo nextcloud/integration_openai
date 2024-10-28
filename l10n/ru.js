@@ -2,8 +2,10 @@ OC.L10N.register(
     "integration_openai",
     {
     "Default" : "По умолчанию",
+    "Text generation" : "Генерация текста",
     "Image generation" : "Создание изображений",
     "Unknown" : "Неизвестно",
+    "images" : "изображения",
     "seconds" : "секунд",
     "Unknown error while retrieving quota usage." : "Неизвестная ошибка при получении данных об использовании квоты.",
     "Bad HTTP method" : "Неверный метод HTTP",
