@@ -167,9 +167,9 @@ class TranslateProvider implements ISynchronousProvider {
 			}
 
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $model, $prompt, null, null, 1, $maxTokens);
+				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $model, $maxTokens);
+				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 			}
 
 			if (count($completion) > 0) {
