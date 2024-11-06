@@ -26,6 +26,7 @@ use OCP\Files\NotPermittedException;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
+use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
 use OCP\TaskProcessing\ShapeEnumValue;
@@ -37,12 +38,13 @@ use RuntimeException;
  */
 class OpenAiAPIService {
 	private IClient $client;
-	private ?array $modelResponseCache = null;
+	private ?array $modelsMemoryCache = null;
 
 	public function __construct(
 		private LoggerInterface $logger,
 		private IL10N $l10n,
 		private IAppConfig $appConfig,
+		private ICacheFactory $cacheFactory,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
 		IClientService $clientService
@@ -79,19 +81,27 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function getModels(string $userId): array {
-		if ($this->modelResponseCache !== null) {
-			$response = $this->modelResponseCache;
+		if ($this->modelsMemoryCache !== null) {
 			$this->logger->debug('Getting OpenAI models from the memory cache');
-		} else {
-			$response = $this->request($userId, 'models');
-			$this->modelResponseCache = $response;
-			$this->logger->debug('Actually getting OpenAI models with a network request');
+			return $this->modelsMemoryCache;
 		}
-		if (!isset($response['data'])) {
-			$this->logger->warning('Error retrieving models: ' . json_encode($response));
+
+		$cacheKey = Application::MODELS_CACHE_KEY;
+		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
+		if ($cachedModels = $cache->get($cacheKey)) {
+			$this->logger->debug('Getting OpenAI models from distributed cache');
+			return $cachedModels;
+		}
+
+		$modelsResponse = $this->request($userId, 'models');
+		$this->logger->debug('Actually getting OpenAI models with a network request');
+		if (!isset($modelsResponse['data'])) {
+			$this->logger->warning('Error retrieving models: ' . json_encode($modelsResponse));
 			throw new Exception($this->l10n->t('Unknown models error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
-		return $response;
+		$cache->set($cacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
+		$this->modelsMemoryCache = $modelsResponse;
+		return $modelsResponse;
 	}
 
 	/**
