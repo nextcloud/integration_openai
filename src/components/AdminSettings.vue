@@ -57,6 +57,29 @@
 						</template>
 					</NcButton>
 				</div>
+				<div class="line">
+					<NcInputField
+						id="openai-api-timeout"
+						class="input"
+						:value.sync="state.request_timeout"
+						type="number"
+						:label="t('integration_openai', 'Request timeout (seconds)')"
+						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
+						:show-trailing-button="!!state.request_timeout"
+						@update:value="onInput()"
+						@trailing-button-click="state.request_timeout = '' ; onInput()">
+						<TimerAlertOutlineIcon />
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
+					<NcButton type="tertiary"
+						:title="t('integration_openai', 'Timeout for the request to the external API')">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</div>
 			</div>
 			<div>
 				<h2>
@@ -217,23 +240,6 @@
 							<HelpCircleIcon />
 						</template>
 					</NcButton>
-				</div>
-				<div class="line">
-					<NcInputField
-						id="openai-api-timeout"
-						class="input"
-						:value.sync="state.request_timeout"
-						type="number"
-						:label="t('integration_openai', 'Request timeout (seconds)')"
-						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
-						:show-trailing-button="!!state.request_timeout"
-						@update:value="onInput()"
-						@trailing-button-click="state.request_timeout = '' ; onInput()">
-						<TimerAlertOutlineIcon />
-						<template #trailing-button-icon>
-							<CloseIcon :size="20" />
-						</template>
-					</NcInputField>
 				</div>
 			</div>
 			<div>
