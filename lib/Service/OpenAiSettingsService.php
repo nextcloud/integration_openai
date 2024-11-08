@@ -421,6 +421,7 @@ class OpenAiSettingsService {
 			throw new Exception('Invalid service URL');
 		}
 		$this->appConfig->setValueString(Application::APP_ID, 'url', $serviceUrl);
+		$this->invalidateModelsCache();
 	}
 
 	/**
