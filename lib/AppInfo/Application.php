@@ -61,9 +61,8 @@ class Application extends App implements IBootstrap {
 
 	];
 
-	public const PROMPT_TYPE_IMAGE = 0;
-	public const PROMPT_TYPE_TEXT = 1;
-	public const MAX_PROMPT_PER_TYPE_PER_USER = 5;
+	public const MODELS_CACHE_KEY = 'models';
+	public const MODELS_CACHE_TTL = 60 * 30;
 
 	private IAppConfig $appConfig;
 

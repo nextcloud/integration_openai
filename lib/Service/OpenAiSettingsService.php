@@ -26,6 +26,7 @@ namespace OCA\OpenAi\Service;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\IAppConfig;
+use OCP\ICacheFactory;
 use OCP\IConfig;
 use OCP\PreConditionNotMetException;
 use OCP\Security\ICrypto;
@@ -64,8 +65,13 @@ class OpenAiSettingsService {
 		private IConfig $config,
 		private IAppConfig $appConfig,
 		private ICrypto $crypto,
+		private ICacheFactory $cacheFactory,
 	) {
+	}
 
+	public function invalidateModelsCache(): void {
+		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
+		$cache->remove(Application::MODELS_CACHE_KEY);
 	}
 
 	////////////////////////////////////////////
@@ -355,6 +361,7 @@ class OpenAiSettingsService {
 	public function setAdminApiKey(string $apiKey): void {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->appConfig->setValueString(Application::APP_ID, 'api_key', $apiKey, false, true);
+		$this->invalidateModelsCache();
 	}
 
 	/**
@@ -370,6 +377,7 @@ class OpenAiSettingsService {
 			$encryptedApiKey = $this->crypto->encrypt($apiKey);
 			$this->config->setUserValue($userId, Application::APP_ID, 'api_key', $encryptedApiKey);
 		}
+		$this->invalidateModelsCache();
 	}
 
 	/**
@@ -413,6 +421,7 @@ class OpenAiSettingsService {
 			throw new Exception('Invalid service URL');
 		}
 		$this->appConfig->setValueString(Application::APP_ID, 'url', $serviceUrl);
+		$this->invalidateModelsCache();
 	}
 
 	/**
@@ -472,6 +481,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminBasicUser(string $basicUser): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'basic_user', $basicUser);
+		$this->invalidateModelsCache();
 	}
 
 	/**
@@ -480,6 +490,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminBasicPassword(string $basicPassword): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'basic_password', $basicPassword, false, true);
+		$this->invalidateModelsCache();
 	}
 
 	/**
@@ -490,6 +501,7 @@ class OpenAiSettingsService {
 	 */
 	public function setUserBasicUser(string $userId, string $basicUser): void {
 		$this->config->setUserValue($userId, Application::APP_ID, 'basic_user', $basicUser);
+		$this->invalidateModelsCache();
 	}
 
 	/**
@@ -501,6 +513,7 @@ class OpenAiSettingsService {
 	public function setUserBasicPassword(string $userId, string $basicPassword): void {
 		$encryptedBasicPassword = $basicPassword === '' ? '' : $this->crypto->encrypt($basicPassword);
 		$this->config->setUserValue($userId, Application::APP_ID, 'basic_password', $encryptedBasicPassword);
+		$this->invalidateModelsCache();
 	}
 
 	/**
@@ -509,6 +522,7 @@ class OpenAiSettingsService {
 	 */
 	public function setUseBasicAuth(bool $useBasicAuth): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
+		$this->invalidateModelsCache();
 	}
 
 	/**

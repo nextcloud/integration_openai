@@ -22,6 +22,7 @@ use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
+use OCP\ICacheFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -69,6 +70,7 @@ class OpenAiProviderTest extends TestCase {
 			\OC::$server->get(\Psr\Log\LoggerInterface::class),
 			$this->createMock(\OCP\IL10N::class),
 			\OC::$server->get(IAppConfig::class),
+			\OC::$server->get(ICacheFactory::class),
 			\OC::$server->get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$clientService,
