@@ -593,12 +593,17 @@ class OpenAiAPIService {
 			],
 		];
 
-		$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
-		if ($useBasicAuth && !$this->isUsingOpenAi()) {
-			$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
-			$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
-			if ($basicUser !== '' && $basicPassword !== '') {
-				$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
+		if (!$this->isUsingOpenAi()) {
+			$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
+			if ($useBasicAuth) {
+				$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
+				$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
+				if ($basicUser !== '' && $basicPassword !== '') {
+					$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
+				}
+			} else {
+				$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
+				$requestOptions['headers']['Authorization'] = 'Bearer ' . $apiKey;
 			}
 		}
 		return $requestOptions;
