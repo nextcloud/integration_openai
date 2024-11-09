@@ -9,10 +9,10 @@ OC.L10N.register(
     "Bad credentials" : "Złe poświadczenia",
     "Size" : "Wzrost",
     "Detect language" : "Wykryj język",
+    "Request timeout (seconds)" : "Limit czasu żądania (sekundy)",
     "Authentication" : "Uwierzytelnienie",
     "Authentication method" : "Metoda uwierzytelnienia",
     "API key" : "Klucz API",
-    "Request timeout (seconds)" : "Limit czasu żądania (sekundy)",
     "Username" : "Nazwa użytkownika",
     "Password" : "Hasło"
 },

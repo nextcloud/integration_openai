@@ -3,10 +3,10 @@ OC.L10N.register(
     {
     "Unknown" : "Desconocido",
     "Size" : "Tamaño",
+    "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
-    "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Username" : "Usuario",
     "Password" : "Clave"
 },

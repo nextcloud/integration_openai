@@ -6,10 +6,10 @@ OC.L10N.register(
     "seconds" : "sekunda",
     "Bad HTTP method" : "Pogrešna metoda HTTP-a",
     "Bad credentials" : "Pogrešne vjerodajnice",
+    "Request timeout (seconds)" : "Istek zahtjeva (u sekundama)",
     "Authentication" : "Autentifikacija",
     "Authentication method" : "Način autentifikacije",
     "API key" : "Ključ API-ja",
-    "Request timeout (seconds)" : "Istek zahtjeva (u sekundama)",
     "Username" : "Korisničko ime",
     "Password" : "Zaporka"
 },

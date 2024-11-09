@@ -7,10 +7,10 @@ OC.L10N.register(
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
     "Bad credentials" : "Virheelliset kirjautumistiedot",
     "Detect language" : "Havaitse kieli",
+    "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "Authentication" : "Tunnistautuminen",
     "Authentication method" : "Tunnistautumistapa",
     "API key" : "API-avain",
-    "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "Username" : "Käyttäjätunnus",
     "Password" : "Salasana"
 },

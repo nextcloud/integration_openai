@@ -6,9 +6,9 @@ OC.L10N.register(
     "Unknown" : "Unknown",
     "seconds" : "seconds",
     "Size" : "Size",
+    "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Authentication",
     "API key" : "API key",
-    "Request timeout (seconds)" : "Request timeout (seconds)",
     "Username" : "Username",
     "Password" : "Password"
 },

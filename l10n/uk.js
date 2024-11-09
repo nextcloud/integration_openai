@@ -8,10 +8,10 @@ OC.L10N.register(
     "Bad credentials" : "Погані облікові дані",
     "Size" : "Розмір",
     "Detect language" : "Визначити мову",
+    "Request timeout (seconds)" : "Час очікування запиту (секунди)",
     "Authentication" : "Авторизація",
     "Authentication method" : "Спосіб авторизації",
     "API key" : "ключ API",
-    "Request timeout (seconds)" : "Час очікування запиту (секунди)",
     "Username" : "Ім'я користувача",
     "Password" : "Пароль"
 },

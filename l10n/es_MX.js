@@ -7,10 +7,10 @@ OC.L10N.register(
     "seconds" : "segundos",
     "Size" : "Tamaño",
     "Detect language" : "Detectar idioma",
+    "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
-    "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Username" : "Usuario",
     "Password" : "Contraseña"
 },

@@ -8,10 +8,10 @@ OC.L10N.register(
     "Bad credentials" : "Credencials dolentes",
     "Size" : "Tamany",
     "Detect language" : "Detecta la llengua",
+    "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
     "Authentication" : "Autenticació",
     "Authentication method" : "Mètode d'autenticació",
     "API key" : "Clau de l'API",
-    "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
     "Username" : "Nom d'usuari",
     "Password" : "Contrasenya"
 },

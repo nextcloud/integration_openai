@@ -5,10 +5,10 @@
     "Bad HTTP method" : "שגיאה במתודת HTTP",
     "Bad credentials" : "פרטי גישה שגויים",
     "Size" : "גודל",
+    "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Authentication" : "אימות",
     "Authentication method" : "שיטת אימות",
     "API key" : "מפתח API",
-    "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Username" : "שם משתמש",
     "Password" : "ססמה"
 },"pluralForm" :"nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;"

@@ -7,10 +7,10 @@ OC.L10N.register(
     "Bad credentials" : "Gölluð auðkenni",
     "Size" : "Stærð",
     "Detect language" : "Greina tungumál",
+    "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Authentication" : "Auðkenning",
     "Authentication method" : "Auðkenningarmáti",
     "API key" : "API-lykill",
-    "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Username" : "Notandanafn",
     "Password" : "Lykilorð"
 },

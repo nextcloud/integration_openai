@@ -4,10 +4,10 @@ OC.L10N.register(
     "Unknown" : "Nekonata",
     "seconds" : "sekundoj",
     "Size" : "Grando",
+    "Request timeout (seconds)" : "Eltempiĝo (sekundoj)",
     "Authentication" : "Aŭtentigo",
     "Authentication method" : "Aŭtentiga metodo",
     "API key" : "API-ŝlosilo",
-    "Request timeout (seconds)" : "Eltempiĝo (sekundoj)",
     "Username" : "Uzantnomo"
 },
 "nplurals=2; plural=(n != 1);");

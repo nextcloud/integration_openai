@@ -15,11 +15,11 @@ OC.L10N.register(
     "Model" : "Modeloa",
     "Size" : "Tamaina",
     "Detect language" : "Detektatu hizkuntza",
+    "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
     "Authentication" : "Autentifikazioa",
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",
     "Completions" : "Osaketak",
-    "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
     "Username" : "Erabiltzaile-izena",
     "Password" : "Pasahitza",
     "Usage" : "Erabilpena"

@@ -7,10 +7,10 @@ OC.L10N.register(
     "Bad HTTP method" : "Foute HTTP methode",
     "Bad credentials" : "Foute inloggegevens",
     "Size" : "Grootte",
+    "Request timeout (seconds)" : "Aanvraag time-out (seconds)",
     "Authentication" : "Authenticatie",
     "Authentication method" : "Authenticatiemethode",
     "API key" : "API sleutel",
-    "Request timeout (seconds)" : "Aanvraag time-out (seconds)",
     "Username" : "Gebruikersnaam",
     "Password" : "Wachtwoord"
 },

@@ -7,10 +7,10 @@ OC.L10N.register(
     "Bad HTTP method" : "Método HTTP incorreto",
     "Bad credentials" : "Credenciais inválidas",
     "Size" : "Altura",
+    "Request timeout (seconds)" : "Pedido expira (segundos)",
     "Authentication" : "Autenticação",
     "Authentication method" : "Método de Autenticação",
     "API key" : "Chave API",
-    "Request timeout (seconds)" : "Pedido expira (segundos)",
     "Username" : "Nome de utilizador",
     "Password" : "Password"
 },
