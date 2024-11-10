@@ -43,6 +43,7 @@ OC.L10N.register(
     "Example: LocalAI of university ABC" : "مثال: LocalAI لجامعة كذا كذا",
     "This name will be displayed as provider name in the AI admin settings" : "هذا الاسم سيظهر كاسم مزود في إعدادات المدير للذكاء الاصطناعي",
     "Request timeout (seconds)" : "مُهلة تنفيذ الطلب (بالثواني)",
+    "Timeout for the request to the external API" : "انتهاء مهلة الطلب إلى واجهة برمجة التطبيقات الخارجية",
     "Authentication" : "مصادقة",
     "Authentication method" : "أسلوب التحقُّق من الهويّة",
     "API key" : "مفتاح واجهة برمجة التطبيقات API key",
