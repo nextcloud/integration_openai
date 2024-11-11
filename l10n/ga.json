@@ -41,6 +41,7 @@
     "Example: LocalAI of university ABC" : "Sampla: LocalAI na hollscoile ABC",
     "This name will be displayed as provider name in the AI admin settings" : "Taispeánfar an t-ainm seo mar ainm an tsoláthraí sna socruithe admin AI",
     "Request timeout (seconds)" : "Iarr am istigh (soicindí)",
+    "Timeout for the request to the external API" : "Teorainn ama don iarratas chuig an API seachtrach",
     "Authentication" : "Fíordheimhniú",
     "Authentication method" : "Modh fíordheimhnithe",
     "API key" : "Eochair API",
