@@ -43,6 +43,7 @@ OC.L10N.register(
     "Example: LocalAI of university ABC" : "範例：ABC 大學的LocalAI",
     "This name will be displayed as provider name in the AI admin settings" : "該名稱將在 AI 管理設定中顯示為提供者名稱",
     "Request timeout (seconds)" : "請求逾時（秒）",
+    "Timeout for the request to the external API" : "向外部 API 提出請求的逾時時間",
     "Authentication" : "驗證",
     "Authentication method" : "認證方式",
     "API key" : "API 金鑰",
