@@ -41,6 +41,7 @@
     "Example: LocalAI of university ABC" : "Пример: LocalAI универзитета АБВ",
     "This name will be displayed as provider name in the AI admin settings" : "Ово име ће се приказати као име пружаоца услуге у AI админ подешавањима",
     "Request timeout (seconds)" : "Рок захтева (секунде)",
+    "Timeout for the request to the external API" : "Тајмапут захтева за спољним API-јем",
     "Authentication" : "Провера идентитета",
     "Authentication method" : "Начин провере идентитета",
     "API key" : "API кључ",
