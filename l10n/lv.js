@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Unknown" : "Nezināms",
     "seconds" : "sekundes",
+    "Bad HTTP method" : "Nederīgs HTTP pieprasījuma veids",
+    "Bad credentials" : "Nederīgi pieteikšanās dati",
     "Size" : "Izmērs",
     "Authentication" : "Autentifikācija",
     "Authentication method" : "Autentifikācijas metode",
