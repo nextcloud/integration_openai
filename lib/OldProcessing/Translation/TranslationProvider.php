@@ -126,11 +126,11 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 
 			$toLanguage = $coreLanguages[$toLanguage];
 			if ($fromLanguage !== null) {
-				$this->logger->debug('OpenAI translation FROM['.$fromLanguage.'] TO['.$toLanguage.']', ['app' => Application::APP_ID]);
+				$this->logger->debug('OpenAI translation FROM[' . $fromLanguage . '] TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$fromLanguage = $coreLanguages[$fromLanguage] ?? $fromLanguage;
 				$prompt = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ' . $text;
 			} else {
-				$this->logger->debug('OpenAI translation TO['.$toLanguage.']', ['app' => Application::APP_ID]);
+				$this->logger->debug('OpenAI translation TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $text;
 			}
 			$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;

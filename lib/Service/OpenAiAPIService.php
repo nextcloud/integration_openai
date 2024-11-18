@@ -47,7 +47,7 @@ class OpenAiAPIService {
 		private ICacheFactory $cacheFactory,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
-		IClientService $clientService
+		IClientService $clientService,
 	) {
 		$this->client = $clientService->newClient();
 	}
@@ -470,7 +470,7 @@ class OpenAiAPIService {
 		?string $userId,
 		string $audioBase64,
 		bool $translate = true,
-		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
+		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID,
 	): string {
 		return $this->transcribe(
 			$userId,
@@ -491,7 +491,7 @@ class OpenAiAPIService {
 		?string $userId,
 		File $file,
 		bool $translate = false,
-		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
+		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID,
 	): string {
 		try {
 			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
@@ -515,7 +515,7 @@ class OpenAiAPIService {
 		?string $userId,
 		string $audioFileContent,
 		bool $translate = true,
-		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID
+		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID,
 	): string {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -564,7 +564,7 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function requestImageCreation(
-		?string $userId, string $prompt, string $model, int $n = 1, string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE
+		?string $userId, string $prompt, string $model, int $n = 1, string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
