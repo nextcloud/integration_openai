@@ -44,6 +44,8 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_TRANSCRIPTION_MODEL_ID = 'whisper-1';
 	public const DEFAULT_DEFAULT_IMAGE_SIZE = '512x512';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
+	public const DEFAULT_CHUNK_SIZE = 10000;
+	public const MIN_CHUNK_SIZE = 500;
 	public const DEFAULT_MAX_NUM_OF_TOKENS = 1000;
 	public const DEFAULT_QUOTA_PERIOD = 30;
 
