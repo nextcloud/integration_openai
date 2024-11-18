@@ -26,7 +26,7 @@ class ConfigController extends Controller {
 		string $appName,
 		IRequest $request,
 		private OpenAiSettingsService $openAiSettingsService,
-		private ?string $userId
+		private ?string $userId,
 	) {
 		parent::__construct($appName, $request);
 	}

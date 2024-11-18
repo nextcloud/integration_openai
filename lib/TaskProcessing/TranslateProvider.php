@@ -162,7 +162,7 @@ class TranslateProvider implements ISynchronousProvider {
 				$this->logger->debug('OpenAI translation FROM[' . $fromLanguage . '] TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ' . $inputText;
 			} else {
-				$this->logger->debug('OpenAI translation TO['.$toLanguage.']', ['app' => Application::APP_ID]);
+				$this->logger->debug('OpenAI translation TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $inputText;
 			}
 

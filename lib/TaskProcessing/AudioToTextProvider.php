@@ -8,6 +8,7 @@ use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Files\File;
+use OCP\IAppConfig;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
@@ -18,6 +19,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
+		private IAppConfig $appConfig,
 	) {
 	}
 
@@ -75,8 +77,10 @@ class AudioToTextProvider implements ISynchronousProvider {
 		}
 		$inputFile = $input['input'];
 
+		$model = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
+
 		try {
-			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile);
+			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model);
 			return ['output' => $transcription];
 		} catch (Exception $e) {
 			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);

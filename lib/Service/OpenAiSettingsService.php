@@ -38,6 +38,7 @@ class OpenAiSettingsService {
 		'service_name' => 'string',
 		'api_key' => 'string',
 		'default_completion_model_id' => 'string',
+		'default_stt_model_id' => 'string',
 		'default_image_model_id' => 'string',
 		'default_image_size' => 'string',
 		'max_tokens' => 'integer',
@@ -107,6 +108,13 @@ class OpenAiSettingsService {
 	 */
 	public function getAdminDefaultCompletionModelId(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminDefaultSttModelId(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id') ?: Application::DEFAULT_MODEL_ID;
 	}
 
 	/**
@@ -263,6 +271,7 @@ class OpenAiSettingsService {
 			'service_name' => $this->getServiceName(),
 			'api_key' => $this->getAdminApiKey(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
+			'default_stt_model_id' => $this->getAdminDefaultSttModelId(),
 			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
 			'default_image_size' => $this->getAdminDefaultImageSize(),
 			'max_tokens' => $this->getMaxTokens(),
@@ -387,6 +396,15 @@ class OpenAiSettingsService {
 	public function setAdminDefaultCompletionModelId(string $defaultCompletionModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->appConfig->setValueString(Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId);
+	}
+
+	/**
+	 * @param string $defaultSttModelId
+	 * @return void
+	 */
+	public function setAdminDefaultSttModelId(string $defaultSttModelId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		$this->appConfig->setValueString(Application::APP_ID, 'default_stt_model_id', $defaultSttModelId);
 	}
 
 	/**
@@ -560,6 +578,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['default_completion_model_id'])) {
 			$this->setAdminDefaultCompletionModelId($adminConfig['default_completion_model_id']);
+		}
+		if (isset($adminConfig['default_stt_model_id'])) {
+			$this->setAdminDefaultSttModelId($adminConfig['default_stt_model_id']);
 		}
 		if (isset($adminConfig['default_image_model_id'])) {
 			$this->setAdminDefaultImageModelId($adminConfig['default_image_model_id']);

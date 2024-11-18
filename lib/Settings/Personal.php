@@ -12,7 +12,7 @@ class Personal implements ISettings {
 	public function __construct(
 		private IInitialState $initialStateService,
 		private OpenAiSettingsService $openAiSettingsService,
-		private ?string $userId
+		private ?string $userId,
 	) {
 	}
 
