@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.2.0 – 2024-11-18
+
+### Added
+
+- Admin setting to choose transcription model @julien-nc [#154](https://github.com/nextcloud/integration_openai/pull/154)
+- Admin setting to set the default image size @julien-nc [#135](https://github.com/nextcloud/integration_openai/pull/135)
+- Add ability to customize API root path in service URL @edward-ly [#143](https://github.com/nextcloud/integration_openai/pull/143)
+
+### Changed
+
+- Encrypt api keys and basic passwords for app config and user settings @julien-nc [#136](https://github.com/nextcloud/integration_openai/pull/136) [#139](https://github.com/nextcloud/integration_openai/pull/139)
+- Remove old providers since old APIs can use TaskProcessing providers @julien-nc [#140](https://github.com/nextcloud/integration_openai/pull/140)
+- Cache the models for 30min in distributed cache @julien-nc [#152](https://github.com/nextcloud/integration_openai/pull/152)
+
+### Fixed
+
+- Missuse of user ID in most providers @julien-nc [#153](https://github.com/nextcloud/integration_openai/pull/153)
+- Use api key in image retrieval request @julien-nc [#147](https://github.com/nextcloud/integration_openai/pull/147)
+
 ## 3.1.2 – 2024-09-28
 
 ### Changed
