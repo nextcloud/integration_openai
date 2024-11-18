@@ -300,6 +300,46 @@
 			</div>
 			<div>
 				<h2>
+					{{ t('integration_openai', 'Audio transcription') }}
+				</h2>
+				<div v-if="models"
+					class="line line-select">
+					<NcSelect
+						v-model="selectedModel.stt"
+						class="model-select"
+						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
+						:options="formattedModels"
+						:input-label="t('integration_openai', 'Default transcription model to use')"
+						:no-wrap="true"
+						input-id="openai-stt-model-select"
+						@input="onModelSelected('stt', $event)" />
+					<a v-if="state.url === ''"
+						:title="t('integration_openai', 'More information about OpenAI models')"
+						href="https://beta.openai.com/docs/models"
+						target="_blank">
+						<NcButton type="tertiary" aria-label="openai-info">
+							<template #icon>
+								<HelpCircleIcon />
+							</template>
+						</NcButton>
+					</a>
+					<a v-else
+						:title="t('integration_openai', 'More information about LocalAI models')"
+						href="https://localai.io/model-compatibility/index.html"
+						target="_blank">
+						<NcButton type="tertiary" aria-label="localai-info">
+							<template #icon>
+								<HelpCircleIcon />
+							</template>
+						</NcButton>
+					</a>
+				</div>
+				<NcNoteCard v-else type="info">
+					{{ t('integration_openai', 'No models to list') }}
+				</NcNoteCard>
+			</div>
+			<div>
+				<h2>
 					{{ t('integration_openai', 'Usage limits') }}
 				</h2>
 				<div class="line">
@@ -463,6 +503,7 @@ export default {
 			selectedModel: {
 				text: null,
 				image: null,
+				stt: null,
 			},
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
@@ -540,8 +581,15 @@ export default {
 						|| this.models[1]
 						|| this.models[0]
 
+					const defaultSttModelId = this.state.default_stt_model_id || response.data?.default_stt_model_id
+					const sttModelToSelect = this.models.find(m => m.id === defaultSttModelId)
+						|| this.models.find(m => m.id.match(/whisper/i))
+						|| this.models[1]
+						|| this.models[0]
+
 					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
 					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
+					this.selectedModel.stt = this.modelToNcSelectObject(sttModelToSelect)
 
 					// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
 					if (shouldSave
@@ -570,17 +618,23 @@ export default {
 				} else if (type === 'text') {
 					this.selectedModel.text = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
 					this.state.default_completion_model_id = DEFAULT_MODEL_ITEM.id
+				} else if (type === 'stt') {
+					this.selectedModel.stt = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
+					this.state.default_stt_model_id = DEFAULT_MODEL_ITEM.id
 				}
 			} else {
 				if (type === 'image') {
 					this.state.default_image_model_id = selected.id
 				} else if (type === 'text') {
 					this.state.default_completion_model_id = selected.id
+				} else if (type === 'stt') {
+					this.state.default_stt_model_id = selected.id
 				}
 			}
 			this.saveOptions({
 				default_completion_model_id: this.state.default_completion_model_id,
 				default_image_model_id: this.state.default_image_model_id,
+				default_stt_model_id: this.state.default_stt_model_id,
 			})
 		},
 		loadQuotaInfo() {

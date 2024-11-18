@@ -520,9 +520,13 @@ class OpenAiAPIService {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
+		// enforce whisper for OpenAI
+		if ($this->isUsingOpenAi()) {
+			$model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID;
+		}
 
 		$params = [
-			'model' => $model,
+			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_TRANSCRIPTION_MODEL_ID : $model,
 			'file' => $audioFileContent,
 			'response_format' => 'verbose_json',
 			// Verbose needed for extraction of audio duration
