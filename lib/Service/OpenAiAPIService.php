@@ -470,7 +470,7 @@ class OpenAiAPIService {
 		?string $userId,
 		string $audioBase64,
 		bool $translate = true,
-		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID,
+		string $model = Application::DEFAULT_MODEL_ID,
 	): string {
 		return $this->transcribe(
 			$userId,
@@ -491,7 +491,7 @@ class OpenAiAPIService {
 		?string $userId,
 		File $file,
 		bool $translate = false,
-		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID,
+		string $model = Application::DEFAULT_MODEL_ID,
 	): string {
 		try {
 			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
@@ -515,7 +515,7 @@ class OpenAiAPIService {
 		?string $userId,
 		string $audioFileContent,
 		bool $translate = true,
-		string $model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID,
+		string $model = Application::DEFAULT_MODEL_ID,
 	): string {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
