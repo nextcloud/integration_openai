@@ -64,6 +64,7 @@ OC.L10N.register(
     "Default image generation model to use" : "Zu verwendendes Standard-Bilderzeugungsmodell",
     "No models to list" : "Keine Modelle zum Auflisten",
     "Default image size" : "Standardbildgröße",
+    "Default transcription model to use" : "Zu verwendendes Standard-Transkriptionsmodell",
     "Usage limits" : "Nutzungsbeschränkungen",
     "Quota enforcement time period (days)" : "Zeitraum der Kontingentdurchsetzung (Tage)",
     "Usage quotas per time period" : "Nutzungskontingente pro Zeitraum",

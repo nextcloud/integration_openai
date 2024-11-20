@@ -64,6 +64,7 @@ OC.L10N.register(
     "Default image generation model to use" : "النموذج التلقائي لتوليد الصور الذي سيتم استعماله",
     "No models to list" : "لا توجد أي نماذج ",
     "Default image size" : "حجم الصورة التلقائي",
+    "Default transcription model to use" : "نموذج الاستنساخ الافتراضي المُستعمَل",
     "Usage limits" : "حدود الاستعمال",
     "Quota enforcement time period (days)" : "الفترة الزمنية لإنفاذ الحصص (بالأيام)",
     "Usage quotas per time period" : "حصص الاستخدام لكل فترة زمنية",

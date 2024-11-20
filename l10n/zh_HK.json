@@ -62,6 +62,7 @@
     "Default image generation model to use" : "預設使用的影像產生模型",
     "No models to list" : "沒有可列出的模型",
     "Default image size" : "默認圖像大小",
+    "Default transcription model to use" : "預設使用的轉錄模型",
     "Usage limits" : "使用量限制",
     "Quota enforcement time period (days)" : "配額執行期限（天）",
     "Usage quotas per time period" : "每個時段的使用量配額",

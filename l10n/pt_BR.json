@@ -62,6 +62,7 @@
     "Default image generation model to use" : "Modelo de geração de imagem padrão a ser usado",
     "No models to list" : "Sem modelos a listar",
     "Default image size" : "Tamanho da imagem padrão",
+    "Default transcription model to use" : "Modelo de transcrição padrão a ser usado",
     "Usage limits" : "Limites de uso",
     "Quota enforcement time period (days)" : "Período de aplicação da cota (dias)",
     "Usage quotas per time period" : "Cotas de uso por período",
