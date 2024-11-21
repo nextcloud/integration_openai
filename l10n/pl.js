@@ -5,6 +5,7 @@ OC.L10N.register(
     "Image generation" : "Generowanie obrazu",
     "Unknown" : "Nieznany",
     "seconds" : "sekund",
+    "Unknown image generation error" : "Nieznany błąd generowania obrazu",
     "Bad HTTP method" : "Zła metoda HTTP",
     "Bad credentials" : "Złe poświadczenia",
     "Size" : "Wzrost",
