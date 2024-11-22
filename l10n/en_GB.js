@@ -64,6 +64,7 @@ OC.L10N.register(
     "Default image generation model to use" : "Default image generation model to use",
     "No models to list" : "No models to list",
     "Default image size" : "Default image size",
+    "Default transcription model to use" : "Default transcription model to use",
     "Usage limits" : "Usage limits",
     "Quota enforcement time period (days)" : "Quota enforcement time period (days)",
     "Usage quotas per time period" : "Usage quotas per time period",
