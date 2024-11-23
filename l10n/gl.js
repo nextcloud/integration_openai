@@ -64,6 +64,7 @@ OC.L10N.register(
     "Default image generation model to use" : "Modelo de xeración de imaxes predeterminado a empregar",
     "No models to list" : "Non hai modelos para enumerar",
     "Default image size" : "Tamaño predeterminado de imaxe",
+    "Default transcription model to use" : "Modelo de transcrición predeterminado a empregar",
     "Usage limits" : "Límites de uso",
     "Quota enforcement time period (days)" : "Período de execución da cota (días)",
     "Usage quotas per time period" : "Cotas de uso por período de tempo",

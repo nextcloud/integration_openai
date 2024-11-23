@@ -13,6 +13,7 @@ OC.L10N.register(
     "Unknown text generation error" : "不明なテキスト生成エラー",
     "Could not read audio file." : "オーディオファイルを読み取ることができませんでした。",
     "Unknown image generation error" : "不明な画像生成エラー",
+    "Bad HTTP method" : "不正なHTTPメソッド",
     "Bad credentials" : "不正な資格情報",
     "Detect language" : "言語を検出する",
     "Integration of OpenAI and LocalAI services" : "OpenAIとLocalAIサービスを統合",
