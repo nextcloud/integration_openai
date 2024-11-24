@@ -64,6 +64,7 @@ OC.L10N.register(
     "Default image generation model to use" : "Múnla giniúna íomhá réamhshocraithe le húsáid",
     "No models to list" : "Níl samhlacha le liostú",
     "Default image size" : "Méid réamhshocraithe na híomhá",
+    "Default transcription model to use" : "Múnla trascríobh réamhshocraithe le húsáid",
     "Usage limits" : "Teorainneacha úsáide",
     "Quota enforcement time period (days)" : "Tréimhse ama forfheidhmithe cuóta (laethanta)",
     "Usage quotas per time period" : "Cuótaí úsáide in aghaidh na tréimhse ama",
