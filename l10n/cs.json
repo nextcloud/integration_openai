@@ -61,6 +61,7 @@
     "Default image generation model to use" : "Výchozí model pro vytváření obrázků",
     "No models to list" : "Žádné modely k vypsání",
     "Default image size" : "Výchozí velikost obrázku",
+    "Default transcription model to use" : "Výchozí přepisovací model, který použít",
     "Usage limits" : "Limity využití",
     "Quota enforcement time period (days)" : "Časová perioda (days) vynucování kvóty",
     "Usage quotas per time period" : "Kvóty využití na časové období",
