@@ -19,7 +19,11 @@ OC.L10N.register(
     "Authentication" : "Autentifikazioa",
     "Authentication method" : "Autentifikazio metodoa",
     "API key" : "APIaren gakoa",
+    "Basic Authentication" : "Oinarrizko autentifikazioa",
+    "Chat completions" : "Txat osaketak",
     "Completions" : "Osaketak",
+    "Usage limits" : "Erabilpen mugak",
+    "Quota type" : "Kuota mota",
     "Username" : "Erabiltzaile-izena",
     "Password" : "Pasahitza",
     "Usage" : "Erabilpena"
