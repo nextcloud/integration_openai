@@ -12,6 +12,8 @@ namespace OCA\OpenAi\AppInfo;
 use OCA\OpenAi\Capabilities;
 use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
+use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
+use OCA\OpenAi\TaskProcessing\ChangeToneTaskType;
 use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\ReformulateProvider;
@@ -95,6 +97,8 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(TopicsProvider::class);
 			$context->registerTaskProcessingProvider(ContextWriteProvider::class);
 			$context->registerTaskProcessingProvider(ReformulateProvider::class);
+			$context->registerTaskProcessingTaskType(ChangeToneTaskType::class);
+			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
 		}
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);

@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OCA\OpenAi\TaskProcessing;
+
+use OCA\OpenAi\AppInfo\Application;
+use OCP\IL10N;
+use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\ITaskType;
+use OCP\TaskProcessing\ShapeDescriptor;
+
+class ChangeToneTaskType implements ITaskType {
+	public const ID = Application::APP_ID . ':change_tone';
+
+	public function __construct(
+		private IL10N $l,
+	) {
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getName(): string {
+		return $this->l->t('Change Tone');
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getDescription(): string {
+		return $this->l->t('Ask a question about your data.');
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getId(): string {
+		return self::ID;
+	}
+
+	/**
+	 * @return ShapeDescriptor[]
+	 */
+	public function getInputShape(): array {
+		return [
+			'input' => new ShapeDescriptor(
+				$this->l->t('Input text'),
+				$this->l->t('Write a text that you want the assistant to rewrite in another tone.'),
+				EShapeType::Text,
+			),
+		];
+	}
+
+	/**
+	 * @return ShapeDescriptor[]
+	 */
+	public function getOutputShape(): array {
+		return [
+			'output' => new ShapeDescriptor(
+				$this->l->t('Generated response'),
+				$this->l->t('The rewritten text in the desired tone, written by the assistant:'),
+				EShapeType::Text
+			),
+		];
+	}
+}
