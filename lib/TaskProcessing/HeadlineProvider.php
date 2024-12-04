@@ -101,7 +101,7 @@ class HeadlineProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Give me the headline of the following text in its original language. Output only the headline.' . "\n\n" . $prompt;
+		$prompt = 'Give me the headline of the following text in its original language. Do not output the language. Output only the headline without any quotes or additional punctuation.' . "\n\n" . $prompt;
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
