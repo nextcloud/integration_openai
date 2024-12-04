@@ -108,10 +108,9 @@ class SummaryProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
-		} else {
-			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
 
 		try {
