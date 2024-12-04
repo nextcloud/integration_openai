@@ -121,12 +121,18 @@ class SummaryProvider implements ISynchronousProvider {
 			try {
 				$completions = [];
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+					$summarySystemPrompt = 'Summarize the following text in the same language as the text.';
+
 					foreach ($prompts as $p) {
-						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, null, null, 1, $maxTokens);
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
 						$completions[] = $completion['messages'];
 					}
 				} else {
-					foreach ($prompts as $p) {
+					$wrapSummaryPrompt = function (string $p): string {
+						return 'Summarize the following text delimited by XML tags in the same language as the text.\n\n<text>\n' . $p . '\n</text>';
+					};
+
+					foreach (array_map($wrapSummaryPrompt, $prompts) as $p) {
 						$completions[] = $this->openAiAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
 					}
 				}
@@ -161,13 +167,9 @@ class SummaryProvider implements ISynchronousProvider {
 		// It's safer to have a lower estimate on the max number of tokens, so consider 3 bytes per token instead of 4 (to account for some multibyte characters)
 		$maxChars = $chunkSize * 3;
 
-		$wrapSummaryPrompt = function (string $p): string {
-			return 'Summarize the following text. Detect the language of the text. Use the same language as the text.  Output only the summary.  Here is the text:' . "\n\n" . $p . "\n\n" . 'Here is your summary in the same language as the text:';
-		};
-
 		if (!$chunkSize || (mb_strlen($prompt) <= $maxChars)) {
 			// Chunking is disabled or prompt is short enough to be a single chunk
-			return [$wrapSummaryPrompt($prompt)];
+			return [$prompt];
 		}
 
 		// Try splitting by paragraph, match as many paragraphs as possible per chunk up to the maximum chunk size
