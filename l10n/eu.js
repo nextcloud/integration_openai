@@ -15,6 +15,8 @@ OC.L10N.register(
     "Model" : "Modeloa",
     "Size" : "Tamaina",
     "Detect language" : "Detektatu hizkuntza",
+    "Service URL" : "Zerbitzuaren URLa",
+    "Example: {example}" : "Adibidea: {example}",
     "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",
     "Authentication" : "Autentifikazioa",
     "Authentication method" : "Autentifikazio metodoa",
