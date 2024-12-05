@@ -113,7 +113,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 		}
 		$textInput = $input['input'];
 		$toneInput = $input['tone_input'];
-		$prompt = "Reformulate the following text in a $toneInput tone. Use the same language as the original text.  Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
+		$prompt = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
