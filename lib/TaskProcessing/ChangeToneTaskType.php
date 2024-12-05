@@ -52,7 +52,7 @@ class ChangeToneTaskType implements ITaskType {
 			'tone_input' => new ShapeDescriptor(
 				$this->l->t('Desired tone'),
 				$this->l->t('In which tone should your text be rewritten?'),
-				EShapeType::Text,
+				EShapeType::Enum,
 			),
 		];
 	}

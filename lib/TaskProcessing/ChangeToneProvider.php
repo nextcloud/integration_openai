@@ -44,11 +44,22 @@ class ChangeToneProvider implements ISynchronousProvider {
 	}
 
 	public function getInputShapeEnumValues(): array {
-		return [];
+		$toneInputEnumValue = new ShapeEnumValue($this->l->t('Detect language'), 'detect_language');
+		return [
+			'tone_input' => [
+				new ShapeEnumValue($this->l->t('Friendler'), 'friendler'),
+				new ShapeEnumValue($this->l->t('More formal'), 'more formal'),
+				new ShapeEnumValue($this->l->t('Funnier'), 'funnier'),
+				new ShapeEnumValue($this->l->t('More casual'), 'more casual'),
+				new ShapeEnumValue($this->l->t('More urgent'), 'more urgent'),
+			],
+		];
 	}
 
 	public function getInputShapeDefaults(): array {
-		return [];
+		return [
+			'tone_input' => 'friendler',
+		];
 	}
 
 	public function getOptionalInputShape(): array {
@@ -98,11 +109,11 @@ class ChangeToneProvider implements ISynchronousProvider {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new RuntimeException('Invalid input text');
 		}
-		$prompt = $input['input'];
+		$textInput = $input['input'];
 		$toneInput = $input['tone_input'];
-		$prompt = "Reformulate the following text in a $toneInput tone. Use the same language as the original text.  Output only the reformulation. Here is the text:" . "\n\n" . $prompt . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
+		$prompt = "Reformulate the following text in a $toneInput tone. Use the same language as the original text.  Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
