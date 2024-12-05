@@ -101,7 +101,8 @@ class ChangeToneProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Reformulate the following text. Use the same language as the original text.  Output only the reformulation. Here is the text:' . "\n\n" . $prompt . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
+		$toneInput = $input['tone_input'];
+		$prompt = "Reformulate the following text in a $toneInput tone. Use the same language as the original text.  Output only the reformulation. Here is the text:" . "\n\n" . $prompt . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
