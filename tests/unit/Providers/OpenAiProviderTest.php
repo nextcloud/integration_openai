@@ -15,6 +15,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
@@ -208,6 +209,65 @@ class OpenAiProviderTest extends TestCase {
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
+
+	public function testChangeToneProvider(): void {
+		$changeToneProvider = new ChangeToneProvider(
+			$this->openAiApiService,
+			\OC::$server->get(IAppConfig::class),
+			$this->openAiSettingsService,
+			$this->createMock(\OCP\IL10N::class),
+			self::TEST_USER1,
+		);
+
+		$textInput = 'This is a test prompt';
+		$toneInput = 'friendlier';
+		$n = 1;
+
+		$response = '{
+			"id": "chatcmpl-123",
+			"object": "chat.completion",
+			"created": 1677652288,
+			"model": "gpt-3.5-turbo-0613",
+			"system_fingerprint": "fp_44709d6fcb",
+			"choices": [
+			  {
+				"index": 0,
+				"message": {
+				  "role": "assistant",
+				  "content": "This is a test response."
+				},
+				"finish_reason": "stop"
+			  }
+			],
+			"usage": {
+			  "prompt_tokens": 9,
+			  "completion_tokens": 12,
+			  "total_tokens": 21
+			}
+		}';
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$message = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
+		$options['body'] = json_encode(['model' => Application::DEFAULT_COMPLETION_MODEL_ID, 'messages' => [['role' => 'user', 'content' => $message]], 'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS, 'n' => $n, 'user' => self::TEST_USER1]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone_input' => $toneInput ], fn () => null);
+		$this->assertEquals('This is a test response.', $result['output']);
+
+		// Check that token usage is logged properly
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
 
 	public function testSummaryProvider(): void {
 		$summaryProvider = new SummaryProvider(
