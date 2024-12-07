@@ -16,6 +16,7 @@ OC.L10N.register(
     "Bad HTTP method" : "不正なHTTPメソッド",
     "Bad credentials" : "不正な資格情報",
     "Detect language" : "言語を検出する",
+    "Input text" : "テキストを入力",
     "Integration of OpenAI and LocalAI services" : "OpenAIとLocalAIサービスを統合",
     "Request timeout (seconds)" : "リクエストがタイムアウトするまでの秒数",
     "Authentication" : "認証",

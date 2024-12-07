@@ -7,6 +7,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Zlá metóda HTTP",
     "Bad credentials" : "Nesprávne prihlasovacie údaje",
     "Detect language" : "Zistiť jazyk",
+    "Input text" : "Vstupný text",
     "Request timeout (seconds)" : "Timeout požiadavky (s)",
     "Authentication" : "Autentifikácia",
     "Authentication method" : "Autentifikačná metóda",
