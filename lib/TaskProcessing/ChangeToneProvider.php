@@ -47,7 +47,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 		$toneInputEnumValue = new ShapeEnumValue($this->l->t('Detect language'), 'detect_language');
 		return [
 			'tone_input' => [
-				new ShapeEnumValue($this->l->t('Friendler'), 'friendler'),
+				new ShapeEnumValue($this->l->t('Friendlier'), 'friendler'),
 				new ShapeEnumValue($this->l->t('More formal'), 'more formal'),
 				new ShapeEnumValue($this->l->t('Funnier'), 'funnier'),
 				new ShapeEnumValue($this->l->t('More casual'), 'more casual'),
