@@ -27,6 +27,7 @@ OC.L10N.register(
     "Model" : "Modèle",
     "The model used to generate the completion" : "Le modèle utilisé pour générer la complétion",
     "Input text" : "Texte d'entrée",
+    "Generated response" : "Réponse générée",
     "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Size" : "Taille",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Facultatif. La taille des images générées. Doit être au format 256x256. Par défaut elle est de %s",

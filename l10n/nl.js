@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "seconden",
     "Bad HTTP method" : "Foute HTTP methode",
     "Bad credentials" : "Foute inloggegevens",
+    "Detect language" : "Detecteer taal",
     "Size" : "Grootte",
     "Request timeout (seconds)" : "Aanvraag time-out (seconds)",
     "Authentication" : "Authenticatie",

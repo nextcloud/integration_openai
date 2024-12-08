@@ -24,6 +24,7 @@
     "The maximum number of words/tokens that can be generated in the completion." : "Die maximale Anzahl von Wörtern/Tokens, die in der Vervollständigung erzeugt werden können.",
     "Model" : "Modell",
     "The model used to generate the completion" : "Das zur Generierung der Vervollständigung verwendete Modell",
+    "Input text" : "Texteingabe",
     "OpenAI's DALL-E 2" : "DALL-E 2 von OpenAI",
     "Size" : "Größe",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Optional. Die Größe der generierten Bilder muss im Format 256x256 sein. Standard ist %s",

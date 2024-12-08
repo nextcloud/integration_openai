@@ -24,6 +24,7 @@
     "The maximum number of words/tokens that can be generated in the completion." : "Nejvyšší počet slov/tokenů, který je možné v dokončování vytvořit.",
     "Model" : "Model",
     "The model used to generate the completion" : "Model použitý pro vytvoření dokončení",
+    "Input text" : "Zadejte text",
     "OpenAI's DALL-E 2" : "DALL-E 2 od OpenAI",
     "Size" : "Velikost",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Volitelné. Velikost vytvářených obrázků. Je třeba, aby bylo ve formátu 256x256. Výchozí je %s",
