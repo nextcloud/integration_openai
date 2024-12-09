@@ -22,7 +22,6 @@ OC.L10N.register(
     "Bad credentials" : "Dintiúir dona",
     "API request error: " : "Earráid iarratais API:",
     "Detect language" : "Braith teanga",
-    "Friendler" : "Níos cairdiúla",
     "More formal" : "Níos foirmiúla",
     "Funnier" : "Níos greannmhaire",
     "More casual" : "Níos ócáideach",

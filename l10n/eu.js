@@ -13,7 +13,6 @@ OC.L10N.register(
     "Bad HTTP method" : "HTTP metodo okerra",
     "Bad credentials" : "Kredentzial okerrak",
     "Detect language" : "Detektatu hizkuntza",
-    "Friendler" : "Adiskideagoa",
     "Funnier" : "Xelebreagoa",
     "Model" : "Modeloa",
     "Input text" : "Sartu testua",
