@@ -12,7 +12,6 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
-use OCP\TaskProcessing\TaskTypes\TextToTextChat;
 use OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools;
 use RuntimeException;
 
