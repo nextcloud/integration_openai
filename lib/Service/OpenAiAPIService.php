@@ -350,24 +350,28 @@ class OpenAiAPIService {
 	 *
 	 * @param string|null $userId
 	 * @param string $model
-	 * @param string $userPrompt
+	 * @param string|null $userPrompt
 	 * @param string|null $systemPrompt
 	 * @param array|null $history
 	 * @param int $n
 	 * @param int|null $maxTokens
 	 * @param array|null $extraParams
-	 * @return string[]
+	 * @param string|null $toolMessage
+	 * @param array|null $tools
+	 * @return array<string, array<string>>
 	 * @throws Exception
 	 */
 	public function createChatCompletion(
 		?string $userId,
 		string $model,
-		string $userPrompt,
+		?string $userPrompt = null,
 		?string $systemPrompt = null,
 		?array $history = null,
 		int $n = 1,
 		?int $maxTokens = null,
 		?array $extraParams = null,
+		?string $toolMessage = null,
+		?array $tools = null,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -390,6 +394,9 @@ class OpenAiAPIService {
 				} elseif (str_starts_with($historyEntry, 'user:')) {
 					$historyEntry = preg_replace('/^user:/', '', $historyEntry);
 					$messages[] = ['role' => 'user', 'content' => $historyEntry];
+				} elseif (str_starts_with($historyEntry, 'tool:')) {
+					$historyEntry = preg_replace('/^tool:/', '', $historyEntry);
+					$messages[] = ['role' => 'tool', 'content' => $historyEntry];
 				} elseif (((int)$i) % 2 === 0) {
 					// we assume even indexes are user messages and odd ones are system ones
 					$messages[] = ['role' => 'user', 'content' => $historyEntry];
@@ -398,7 +405,12 @@ class OpenAiAPIService {
 				}
 			}
 		}
-		$messages[] = ['role' => 'user', 'content' => $userPrompt];
+		if ($userPrompt !== null) {
+			$messages[] = ['role' => 'user', 'content' => $userPrompt];
+		}
+		if ($toolMessage !== null) {
+			$messages[] = ['role' => 'tool', 'content' => $toolMessage];
+		}
 
 		$params = [
 			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
@@ -406,6 +418,9 @@ class OpenAiAPIService {
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
+		if ($tools !== null) {
+			$params['tools'] = $tools;
+		}
 		if ($userId !== null && $this->isUsingOpenAi()) {
 			$params['user'] = $userId;
 		}
@@ -434,10 +449,17 @@ class OpenAiAPIService {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
 		}
-		$completions = [];
+		$completions = [
+			'messages' => [],
+			'tool_calls' => [],
+		];
 
 		foreach ($response['choices'] as $choice) {
-			$completions[] = $choice['message']['content'];
+			if ($choice['finish_reason'] === 'tool_calls') {
+				$completions['tool_calls'][] = json_encode($choice['message']['tool_calls']);
+			} else {
+				$completions['messages'][] = $choice['message']['content'];
+			}
 		}
 
 		return $completions;
