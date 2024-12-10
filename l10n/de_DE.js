@@ -22,6 +22,7 @@ OC.L10N.register(
     "Bad credentials" : "Falsche Anmeldeinformationen",
     "API request error: " : "Fehler bei der API-Anfrage:",
     "Detect language" : "Sprache erkennen",
+    "Friendlier" : "Freundlicher",
     "More formal" : "Mehr formal",
     "Funnier" : "Lustiger",
     "More casual" : "Mehr lässig",
