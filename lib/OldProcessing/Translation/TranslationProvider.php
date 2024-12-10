@@ -91,6 +91,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, 100);
+				$completion = $completion['messages'];
 			} else {
 				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 100);
 			}
@@ -137,6 +138,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, PHP_INT_MAX);
+				$completion = $completion['messages'];
 			} else {
 				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 4000);
 			}
