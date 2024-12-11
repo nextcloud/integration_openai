@@ -86,6 +86,9 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid input');
 		}
 		$userPrompt = $input['input'];
+		if ($userPrompt === '') {
+			$userPrompt = null;
+		}
 
 		if (!isset($input['system_prompt']) || !is_string($input['system_prompt'])) {
 			throw new RuntimeException('Invalid system_prompt');
@@ -95,10 +98,10 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 		if (!isset($input['tool_message']) || !is_string($input['tool_message'])) {
 			throw new RuntimeException('Invalid tool_message');
 		}
-		// TODO find a solution to allow passing no tool message
-		// OpenAI is rejecting the request if this param is set when there was no tool call done before
-		// and we are requiring this task input param
 		$toolMessage = $input['tool_message'];
+		if ($toolMessage === '') {
+			$toolMessage = null;
+		}
 
 		if (!isset($input['tools']) || !is_string($input['tools'])) {
 			throw new RuntimeException('Invalid tools');
