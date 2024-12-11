@@ -456,9 +456,14 @@ class OpenAiAPIService {
 		];
 
 		foreach ($response['choices'] as $choice) {
-			if ($choice['finish_reason'] === 'tool_calls') {
+			// get tool calls only if this is the finish reason and it's defined and it's an array
+			if ($choice['finish_reason'] === 'tool_calls'
+				&& isset($choice['message']['tool_calls'])
+				&& is_array($choice['message']['tool_calls'])) {
 				$completions['tool_calls'][] = json_encode($choice['message']['tool_calls']);
-			} else {
+			}
+			// always try to get a message
+			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
 				$completions['messages'][] = $choice['message']['content'];
 			}
 		}
