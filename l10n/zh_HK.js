@@ -22,6 +22,7 @@ OC.L10N.register(
     "Bad credentials" : "錯誤的憑證",
     "API request error: " : "API 請求錯誤：",
     "Detect language" : "檢測語言",
+    "Friendlier" : "更友善",
     "More formal" : "更正式",
     "Funnier" : "更搞笑",
     "More casual" : "更隨意",
