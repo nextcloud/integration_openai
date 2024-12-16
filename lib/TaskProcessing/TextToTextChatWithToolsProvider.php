@@ -106,12 +106,12 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 		if (!isset($input['tools']) || !is_string($input['tools'])) {
 			throw new RuntimeException('Invalid tools');
 		}
-		$tools = json_decode($input['tools'], true);
-		if (!is_array($tools)) {
+		$tools = json_decode($input['tools']);
+		if (!is_array($tools) || !array_is_list($tools)) {
 			throw new RuntimeException('Invalid JSON tools');
 		}
 
-		if (!isset($input['history']) || !is_array($input['history'])) {
+		if (!isset($input['history']) || !is_array($input['history']) || !array_is_list($input['history'])) {
 			throw new RuntimeException('Invalid history');
 		}
 		$history = $input['history'];

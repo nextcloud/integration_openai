@@ -389,21 +389,11 @@ class OpenAiAPIService {
 		}
 		if ($history !== null) {
 			foreach ($history as $i => $historyEntry) {
-				if (str_starts_with($historyEntry, 'system:')) {
-					$historyEntry = preg_replace('/^system:/', '', $historyEntry);
-					$messages[] = ['role' => 'system', 'content' => $historyEntry];
-				} elseif (str_starts_with($historyEntry, 'user:')) {
-					$historyEntry = preg_replace('/^user:/', '', $historyEntry);
-					$messages[] = ['role' => 'user', 'content' => $historyEntry];
-				} elseif (str_starts_with($historyEntry, 'tool:')) {
-					$historyEntry = preg_replace('/^tool:/', '', $historyEntry);
-					$messages[] = ['role' => 'tool', 'content' => $historyEntry];
-				} elseif (((int)$i) % 2 === 0) {
-					// we assume even indexes are user messages and odd ones are system ones
-					$messages[] = ['role' => 'user', 'content' => $historyEntry];
-				} else {
-					$messages[] = ['role' => 'system', 'content' => $historyEntry];
+				$message = json_decode($historyEntry, true);
+				if ($message['role'] === 'human') {
+					$message['role'] = 'user';
 				}
+				$messages[] = $message;
 			}
 		}
 		if ($userPrompt !== null) {
@@ -459,7 +449,15 @@ class OpenAiAPIService {
 			// get tool calls only if this is the finish reason and it's defined and it's an array
 			if ($choice['finish_reason'] === 'tool_calls'
 				&& isset($choice['message']['tool_calls'])
-				&& is_array($choice['message']['tool_calls'])) {
+				&& is_array($choice['message']['tool_calls'])
+			) {
+				// fix the tool_calls format, make it like expected by the context_agent app
+				$choice['message']['tool_calls'] = array_map(static function ($toolCall) {
+					$toolCall['function']['id'] = $toolCall['id'];
+					$toolCall['function']['args'] = json_decode($toolCall['function']['arguments']);
+					unset($toolCall['function']['arguments']);
+					return $toolCall['function'];
+				}, $choice['message']['tool_calls']);
 				$completions['tool_calls'][] = json_encode($choice['message']['tool_calls']);
 			}
 			// always try to get a message
