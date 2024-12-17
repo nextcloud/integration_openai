@@ -357,7 +357,7 @@ class OpenAiAPIService {
 	 * @param int $n
 	 * @param int|null $maxTokens
 	 * @param array|null $extraParams
-	 * @param string|null $toolMessage
+	 * @param string|null $toolMessage JSON string with role, content, tool_call_id
 	 * @param array|null $tools
 	 * @return array<string, array<string>>
 	 * @throws Exception
@@ -393,6 +393,20 @@ class OpenAiAPIService {
 				if ($message['role'] === 'human') {
 					$message['role'] = 'user';
 				}
+				if (isset($message['tool_calls']) && is_array($message['tool_calls'])) {
+					$message['tool_calls'] = array_map(static function ($toolCall) {
+						$formattedToolCall = [
+							'id' => $toolCall['id'],
+							'type' => 'function',
+							'function' => $toolCall,
+						];
+						unset($formattedToolCall['function']['id']);
+						$formattedToolCall['function']['arguments'] = json_encode($toolCall['args']);
+						unset($formattedToolCall['function']['args']);
+//						unset($formattedToolCall['function']['type']);
+						return $formattedToolCall;
+					}, $message['tool_calls']);
+				}
 				$messages[] = $message;
 			}
 		}
@@ -400,7 +414,9 @@ class OpenAiAPIService {
 			$messages[] = ['role' => 'user', 'content' => $userPrompt];
 		}
 		if ($toolMessage !== null) {
-			$messages[] = ['role' => 'tool', 'content' => $toolMessage];
+			$msg = json_decode($toolMessage, true);
+			$msg['role'] = 'tool';
+			$messages[] = $msg;
 		}
 
 		$params = [
