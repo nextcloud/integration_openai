@@ -403,7 +403,7 @@ class OpenAiAPIService {
 						unset($formattedToolCall['function']['id']);
 						$formattedToolCall['function']['arguments'] = json_encode($toolCall['args']);
 						unset($formattedToolCall['function']['args']);
-//						unset($formattedToolCall['function']['type']);
+						unset($formattedToolCall['function']['type']);
 						return $formattedToolCall;
 					}, $message['tool_calls']);
 				}
