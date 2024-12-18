@@ -400,8 +400,8 @@ class OpenAiAPIService {
 							'type' => 'function',
 							'function' => $toolCall,
 						];
-						unset($formattedToolCall['function']['id']);
 						$formattedToolCall['function']['arguments'] = json_encode($toolCall['args']);
+						unset($formattedToolCall['function']['id']);
 						unset($formattedToolCall['function']['args']);
 						unset($formattedToolCall['function']['type']);
 						return $formattedToolCall;
@@ -414,9 +414,11 @@ class OpenAiAPIService {
 			$messages[] = ['role' => 'user', 'content' => $userPrompt];
 		}
 		if ($toolMessage !== null) {
-			$msg = json_decode($toolMessage, true);
-			$msg['role'] = 'tool';
-			$messages[] = $msg;
+			$msgs = json_decode($toolMessage, true);
+			foreach ($msgs as $msg) {
+				$msg['role'] = 'tool';
+				$messages[] = $msg;
+			}
 		}
 
 		$params = [
