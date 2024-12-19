@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - OpenAI
  *
@@ -99,6 +100,9 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(ReformulateProvider::class);
 			$context->registerTaskProcessingTaskType(ChangeToneTaskType::class);
 			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
+			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChatWithTools')) {
+				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
+			}
 		}
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);

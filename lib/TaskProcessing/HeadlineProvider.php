@@ -117,6 +117,7 @@ class HeadlineProvider implements ISynchronousProvider {
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+				$completion = $completion['messages'];
 			} else {
 				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 			}

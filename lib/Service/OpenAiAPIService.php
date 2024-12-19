@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - OpenAI
  *
@@ -350,24 +351,28 @@ class OpenAiAPIService {
 	 *
 	 * @param string|null $userId
 	 * @param string $model
-	 * @param string $userPrompt
+	 * @param string|null $userPrompt
 	 * @param string|null $systemPrompt
 	 * @param array|null $history
 	 * @param int $n
 	 * @param int|null $maxTokens
 	 * @param array|null $extraParams
-	 * @return string[]
+	 * @param string|null $toolMessage JSON string with role, content, tool_call_id
+	 * @param array|null $tools
+	 * @return array<string, array<string>>
 	 * @throws Exception
 	 */
 	public function createChatCompletion(
 		?string $userId,
 		string $model,
-		string $userPrompt,
+		?string $userPrompt = null,
 		?string $systemPrompt = null,
 		?array $history = null,
 		int $n = 1,
 		?int $maxTokens = null,
 		?array $extraParams = null,
+		?string $toolMessage = null,
+		?array $tools = null,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -384,21 +389,37 @@ class OpenAiAPIService {
 		}
 		if ($history !== null) {
 			foreach ($history as $i => $historyEntry) {
-				if (str_starts_with($historyEntry, 'system:')) {
-					$historyEntry = preg_replace('/^system:/', '', $historyEntry);
-					$messages[] = ['role' => 'system', 'content' => $historyEntry];
-				} elseif (str_starts_with($historyEntry, 'user:')) {
-					$historyEntry = preg_replace('/^user:/', '', $historyEntry);
-					$messages[] = ['role' => 'user', 'content' => $historyEntry];
-				} elseif (((int)$i) % 2 === 0) {
-					// we assume even indexes are user messages and odd ones are system ones
-					$messages[] = ['role' => 'user', 'content' => $historyEntry];
-				} else {
-					$messages[] = ['role' => 'system', 'content' => $historyEntry];
+				$message = json_decode($historyEntry, true);
+				if ($message['role'] === 'human') {
+					$message['role'] = 'user';
 				}
+				if (isset($message['tool_calls']) && is_array($message['tool_calls'])) {
+					$message['tool_calls'] = array_map(static function ($toolCall) {
+						$formattedToolCall = [
+							'id' => $toolCall['id'],
+							'type' => 'function',
+							'function' => $toolCall,
+						];
+						$formattedToolCall['function']['arguments'] = json_encode($toolCall['args']);
+						unset($formattedToolCall['function']['id']);
+						unset($formattedToolCall['function']['args']);
+						unset($formattedToolCall['function']['type']);
+						return $formattedToolCall;
+					}, $message['tool_calls']);
+				}
+				$messages[] = $message;
 			}
 		}
-		$messages[] = ['role' => 'user', 'content' => $userPrompt];
+		if ($userPrompt !== null) {
+			$messages[] = ['role' => 'user', 'content' => $userPrompt];
+		}
+		if ($toolMessage !== null) {
+			$msgs = json_decode($toolMessage, true);
+			foreach ($msgs as $msg) {
+				$msg['role'] = 'tool';
+				$messages[] = $msg;
+			}
+		}
 
 		$params = [
 			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
@@ -406,6 +427,9 @@ class OpenAiAPIService {
 			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
+		if ($tools !== null) {
+			$params['tools'] = $tools;
+		}
 		if ($userId !== null && $this->isUsingOpenAi()) {
 			$params['user'] = $userId;
 		}
@@ -434,10 +458,30 @@ class OpenAiAPIService {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
 		}
-		$completions = [];
+		$completions = [
+			'messages' => [],
+			'tool_calls' => [],
+		];
 
 		foreach ($response['choices'] as $choice) {
-			$completions[] = $choice['message']['content'];
+			// get tool calls only if this is the finish reason and it's defined and it's an array
+			if ($choice['finish_reason'] === 'tool_calls'
+				&& isset($choice['message']['tool_calls'])
+				&& is_array($choice['message']['tool_calls'])
+			) {
+				// fix the tool_calls format, make it like expected by the context_agent app
+				$choice['message']['tool_calls'] = array_map(static function ($toolCall) {
+					$toolCall['function']['id'] = $toolCall['id'];
+					$toolCall['function']['args'] = json_decode($toolCall['function']['arguments']);
+					unset($toolCall['function']['arguments']);
+					return $toolCall['function'];
+				}, $choice['message']['tool_calls']);
+				$completions['tool_calls'][] = json_encode($choice['message']['tool_calls']);
+			}
+			// always try to get a message
+			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
+				$completions['messages'][] = $choice['message']['content'];
+			}
 		}
 
 		return $completions;

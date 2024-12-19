@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9ca0605f9abffa47a821ed39f8316af8",
+    "content-hash": "d640b263721df3bd3a44de13fd090bec",
     "packages": [
         {
             "name": "bamarni/composer-bin-plugin",
@@ -71,16 +71,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud-deps/ocp.git",
-                "reference": "75fdb04d94e614ec08f1b7322b9fd64889655dab"
+                "reference": "e73188203e2b6c859ad865fc44d94530480c0af8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/75fdb04d94e614ec08f1b7322b9fd64889655dab",
-                "reference": "75fdb04d94e614ec08f1b7322b9fd64889655dab",
+                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/e73188203e2b6c859ad865fc44d94530480c0af8",
+                "reference": "e73188203e2b6c859ad865fc44d94530480c0af8",
                 "shasum": ""
             },
             "require": {
-                "php": "~8.0 || ~8.1 || ~8.2 || ~8.3",
+                "php": "~8.1 || ~8.2 || ~8.3",
                 "psr/clock": "^1.0",
                 "psr/container": "^2.0.2",
                 "psr/event-dispatcher": "^1.0",
@@ -101,14 +101,18 @@
                 {
                     "name": "Christoph Wurst",
                     "email": "christoph@winzerhof-wurst.at"
+                },
+                {
+                    "name": "Joas Schilling",
+                    "email": "coding@schilljs.com"
                 }
             ],
-            "description": "Composer package containing Nextcloud's public API (classes, interfaces)",
+            "description": "Composer package containing Nextcloud's public OCP API and the unstable NCU API",
             "support": {
                 "issues": "https://github.com/nextcloud-deps/ocp/issues",
                 "source": "https://github.com/nextcloud-deps/ocp/tree/master"
             },
-            "time": "2024-11-18T10:21:20+00:00"
+            "time": "2024-12-10T00:49:44+00:00"
         },
         {
             "name": "psr/clock",
@@ -324,7 +328,7 @@
     },
     "platform-dev": [],
     "platform-overrides": {
-        "php": "8.0"
+        "php": "8.1"
     },
     "plugin-api-version": "2.6.0"
 }

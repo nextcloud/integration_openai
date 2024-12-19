@@ -104,6 +104,7 @@ class TextToTextChatProvider implements ISynchronousProvider {
 
 		try {
 			$completion = $this->openAiAPIService->createChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+			$completion = $completion['messages'];
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
