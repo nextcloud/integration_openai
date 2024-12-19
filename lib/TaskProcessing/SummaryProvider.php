@@ -101,35 +101,93 @@ class SummaryProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Summarize the following text. Detect the language of the text. Use the same language as the text.  Output only the summary.  Here is the text:' . "\n\n" . $prompt . "\n\n" . 'Here is your summary in the same language as the text:';
 
-		$maxTokens = null;
+		$maxTokens = $this->openAiSettingsService->getMaxTokens();
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
-		} else {
-			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
 
-		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-				$completion = $completion['messages'];
-			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+		$prompts = self::chunkSplitPrompt($prompt);
+		$newNumChunks = count($prompts);
+
+		do {
+			$oldNumChunks = $newNumChunks;
+
+			try {
+				$completions = [];
+				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+					$summarySystemPrompt = 'Summarize the following text in the same language as the text.';
+
+					foreach ($prompts as $p) {
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
+						$completions[] = $completion['messages'];
+					}
+				} else {
+					$wrapSummaryPrompt = function (string $p): string {
+						return 'Summarize the following text delimited by XML tags in the same language as the text.\n\n<text>\n' . $p . '\n</text>';
+					};
+
+					foreach (array_map($wrapSummaryPrompt, $prompts) as $p) {
+						$completions[] = $this->openAiAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
+					}
+				}
+			} catch (Exception $e) {
+				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
-		}
-		if (count($completion) > 0) {
-			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-			return ['output' => array_pop($completion)];
+
+			// Each prompt chunk should return a non-empty array of completions, this will return false if at least one array is empty
+			$allPromptsHaveCompletions = array_reduce($completions, fn (bool $prev, array $next): bool => $prev && count($next), true);
+			if (!$allPromptsHaveCompletions) {
+				throw new RuntimeException('No result in OpenAI/LocalAI response.');
+			}
+
+			// Take only one completion for each chunk and combine them into a single summary (which may be used as the next prompt)
+			$completionStrings = array_map(fn (array $val): string => end($val), $completions);
+			$summary = implode(' ', $completionStrings);
+
+			$prompts = self::chunkSplitPrompt($summary);
+			$newNumChunks = count($prompts);
+		} while ($oldNumChunks > $newNumChunks);
+
+		$endTime = time();
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		return ['output' => $summary];
+	}
+
+	private function chunkSplitPrompt(string $prompt): array {
+		$chunkSize = $this->openAiSettingsService->getChunkSize();
+
+		// https://platform.openai.com/tokenizer
+		// Rough approximation, 1 token is approximately 4 bytes for OpenAI models
+		// It's safer to have a lower estimate on the max number of tokens, so consider 3 bytes per token instead of 4 (to account for some multibyte characters)
+		$maxChars = $chunkSize * 3;
+
+		if (!$chunkSize || (mb_strlen($prompt) <= $maxChars)) {
+			// Chunking is disabled or prompt is short enough to be a single chunk
+			return [$prompt];
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		// Try splitting by paragraph, match as many paragraphs as possible per chunk up to the maximum chunk size
+		if (preg_match_all("/.{1,{$maxChars}}\n/su", $prompt, $prompts)) {
+			return $prompts[0];
+		}
+
+		// Try splitting by sentence
+		if (preg_match_all("/.{1,{$maxChars}}[!\.\?\n]/su", $prompt, $prompts)) {
+			return $prompts[0];
+		}
+
+		// Try splitting by word
+		if (preg_match_all("/.{1,{$maxChars}}\W/su", $prompt, $prompts)) {
+			return $prompts[0];
+		}
+
+		// Split by number of characters in maximum chunk size
+		return mb_str_split($prompt, $maxChars);
 	}
 }

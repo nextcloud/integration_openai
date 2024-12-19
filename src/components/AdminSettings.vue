@@ -241,6 +241,28 @@
 						</template>
 					</NcButton>
 				</div>
+				<div class="line">
+					<!--Input for max chunk size (prompt length) for a single request-->
+					<NcInputField
+						id="openai-chunk-size"
+						class="input"
+						type="number"
+						:value.sync="state.chunk_size"
+						:label="t('integration_openai', 'Max input tokens per request')"
+						:show-trailing-button="!!state.chunk_size"
+						@update:value="onInput()"
+						@trailing-button-click="state.chunk_size = '' ; onInput()">
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
+					<NcButton type="tertiary"
+						:title="t('integration_openai', 'Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)')">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</div>
 			</div>
 			<div>
 				<h2>
@@ -397,7 +419,7 @@
 					</tbody>
 				</table>
 				<div class="line">
-					<!--A input for max number of tokens to generate for a single request-->
+					<!--Input for max number of tokens to generate for a single request-->
 					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
 					<NcInputField
 						id="openai-api-max-tokens"
@@ -680,6 +702,7 @@ export default {
 			const values = {
 				service_name: this.state.service_name,
 				request_timeout: parseInt(this.state.request_timeout),
+				chunk_size: parseInt(this.state.chunk_size),
 				max_tokens: parseInt(this.state.max_tokens),
 				llm_extra_params: this.state.llm_extra_params,
 				default_image_size: this.state.default_image_size,

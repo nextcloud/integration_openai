@@ -42,6 +42,7 @@ class OpenAiSettingsService {
 		'default_stt_model_id' => 'string',
 		'default_image_model_id' => 'string',
 		'default_image_size' => 'string',
+		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
 		'llm_extra_params' => 'string',
 		'quota_period' => 'integer',
@@ -151,6 +152,13 @@ class OpenAiSettingsService {
 	 */
 	public function getRequestTimeout(): int {
 		return intval($this->appConfig->getValueString(Application::APP_ID, 'request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT))) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getChunkSize(): int {
+		return $this->appConfig->getValueInt(Application::APP_ID, 'chunk_size', Application::DEFAULT_CHUNK_SIZE) ?: Application::DEFAULT_CHUNK_SIZE;
 	}
 
 	/**
@@ -275,6 +283,7 @@ class OpenAiSettingsService {
 			'default_stt_model_id' => $this->getAdminDefaultSttModelId(),
 			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
 			'default_image_size' => $this->getAdminDefaultImageSize(),
+			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
 			'llm_extra_params' => $this->getLlmExtraParams(),
 			// Updated to get max tokens
@@ -463,6 +472,20 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * Setter for chunkSize; default/minimum is 0 (no chunking)
+	 * @param int $chunkSize
+	 * @return void
+	 */
+	public function setChunkSize(int $chunkSize): void {
+		// Validate input:
+		$chunkSize = max(0, $chunkSize);
+		if ($chunkSize) {
+			$chunkSize = max(Application::MIN_CHUNK_SIZE, $chunkSize);
+		}
+		$this->appConfig->setValueInt(Application::APP_ID, 'chunk_size', $chunkSize);
+	}
+
+	/**
 	 * Setter for maxTokens; minimum is 100
 	 * @param int $maxTokens
 	 * @return void
@@ -588,6 +611,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['default_image_size'])) {
 			$this->setAdminDefaultImageSize($adminConfig['default_image_size']);
+		}
+		if (isset($adminConfig['chunk_size'])) {
+			$this->setChunkSize(intval($adminConfig['chunk_size']));
 		}
 		if (isset($adminConfig['max_tokens'])) {
 			$this->setMaxTokens($adminConfig['max_tokens']);
