@@ -17,6 +17,7 @@ use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneTaskType;
 use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
+use OCA\OpenAi\TaskProcessing\ProofreadProvider;
 use OCA\OpenAi\TaskProcessing\ReformulateProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
@@ -103,6 +104,7 @@ class Application extends App implements IBootstrap {
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChatWithTools')) {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
 			}
+			$context->registerTaskProcessingProvider(ProofreadProvider::class);
 		}
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);
