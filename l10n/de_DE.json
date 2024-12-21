@@ -72,6 +72,8 @@
     "More information about OpenAI models" : "Weitere Informationen über OpenAI-Modelle",
     "More information about LocalAI models" : "Weitere Informationen über LocalAI-Modelle",
     "Extra completion model parameters" : "Zusätzliche Parameter des Vervollständigungsmodells",
+    "Max input tokens per request" : "Maximale Eingabetoken pro Anfrage",
+    "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "Die Eingabeaufforderung in Blöcke aufteilen, wobei jeder Block nicht mehr als die angegebene Anzahl von Tokens umfassen darf (0 deaktiviert das Aufteilen)",
     "Default image generation model to use" : "Zu verwendendes Standard-Bilderzeugungsmodell",
     "No models to list" : "Keine Modelle zum Auflisten",
     "Default image size" : "Standardbildgröße",

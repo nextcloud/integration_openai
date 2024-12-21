@@ -74,6 +74,8 @@ OC.L10N.register(
     "More information about OpenAI models" : "關於 OpenAI 模型的更多資訊",
     "More information about LocalAI models" : "更多關於 LocalAI 模型的資訊",
     "Extra completion model parameters" : "額外補完模型參數",
+    "Max input tokens per request" : "每個請求的最大輸入詞元數",
+    "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "將指示分割成小區塊，每個區塊不超過指定的詞元數（設定為 0 以停用分割）",
     "Default image generation model to use" : "預設使用的影像產生模型",
     "No models to list" : "沒有可列出的模型",
     "Default image size" : "默認圖像大小",

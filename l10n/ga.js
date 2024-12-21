@@ -74,6 +74,8 @@ OC.L10N.register(
     "More information about OpenAI models" : "Tuilleadh eolais faoi mhúnlaí OpenAI",
     "More information about LocalAI models" : "Tuilleadh eolais faoi shamhlacha LocalAI",
     "Extra completion model parameters" : "Paraiméadair múnla críochnaithe breise",
+    "Max input tokens per request" : "Uasmhéid comharthaí ionchuir in aghaidh an iarratais",
+    "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "Roinn an leid ina smután agus gan níos mó ná an líon sonraithe comharthaí a bheith i ngach smután (0 díchumasaigh an smután)",
     "Default image generation model to use" : "Múnla giniúna íomhá réamhshocraithe le húsáid",
     "No models to list" : "Níl samhlacha le liostú",
     "Default image size" : "Méid réamhshocraithe na híomhá",

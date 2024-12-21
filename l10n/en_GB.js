@@ -74,6 +74,8 @@ OC.L10N.register(
     "More information about OpenAI models" : "More information about OpenAI models",
     "More information about LocalAI models" : "More information about LocalAI models",
     "Extra completion model parameters" : "Extra completion model parameters",
+    "Max input tokens per request" : "Max input tokens per request",
+    "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)",
     "Default image generation model to use" : "Default image generation model to use",
     "No models to list" : "No models to list",
     "Default image size" : "Default image size",
