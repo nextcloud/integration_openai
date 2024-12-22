@@ -74,6 +74,8 @@ OC.L10N.register(
     "More information about OpenAI models" : "مزيد من المعلومات حول نماذج OpenAI",
     "More information about LocalAI models" : "معلومات أكثر حول نماذج LocalAI",
     "Extra completion model parameters" : "معاملات نموذج الإكمال الإضافية",
+    "Max input tokens per request" : "الحد الأقصى لعدد الأَمَارَات المُدخلة لكل طلب",
+    "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "تجزئة المطالبة بحيث لا يزيد كل جزء عن العدد المحدد من الأَمَارَات (0 لتعطيل التجزئة)",
     "Default image generation model to use" : "النموذج التلقائي لتوليد الصور الذي سيتم استعماله",
     "No models to list" : "لا توجد أي نماذج ",
     "Default image size" : "حجم الصورة التلقائي",

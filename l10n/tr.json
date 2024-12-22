@@ -72,6 +72,8 @@
     "More information about OpenAI models" : "OpenAI modelleri hakkında ayrıntılı bilgi",
     "More information about LocalAI models" : "LocalAI modelleri hakkında ayrıntılı bilgi",
     "Extra completion model parameters" : "Ek tamamlama modeli parametreleri",
+    "Max input tokens per request" : "İstek başına giriş kodu sayısı",
+    "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "İstemi, her biri belirtilen kod sayısından fazla olmayacak şekilde parçalara ayırır (0 olduğunda parçalara ayrılmaz)",
     "Default image generation model to use" : "Kullanılacak varsayılan görsel oluşturma modeli",
     "No models to list" : "Görüntülenecek bir model yok",
     "Default image size" : "Varsayılan görsel boyutu",
