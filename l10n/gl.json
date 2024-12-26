@@ -72,6 +72,8 @@
     "More information about OpenAI models" : "Máis información sobre os modelos OpenAI",
     "More information about LocalAI models" : "Máis información sobre os modelos LocalAI",
     "Extra completion model parameters" : "Parámetros adicionais do modelo de remate",
+    "Max input tokens per request" : "Número máximo de testemuños de entrada por solicitude",
+    "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "Dividir a idicación en anacos, sendo cada anaco non superior ao número especificado de testemuños (0 desactiva a fragmentación)",
     "Default image generation model to use" : "Modelo de xeración de imaxes predeterminado a empregar",
     "No models to list" : "Non hai modelos para enumerar",
     "Default image size" : "Tamaño predeterminado de imaxe",
