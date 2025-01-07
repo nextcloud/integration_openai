@@ -101,7 +101,7 @@ class ProofreadProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$textInput = $input['input'];
-		$prompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list. Here is the text:' . "\n\n" . $textInput;
+		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list.';
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -116,9 +116,10 @@ class ProofreadProvider implements ISynchronousProvider {
 
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $textInput, $systemPrompt, null, 1, $maxTokens);
 				$completion = $completion['messages'];
 			} else {
+				$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $textInput;
 				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 			}
 		} catch (Exception $e) {
