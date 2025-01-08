@@ -36,6 +36,9 @@ class ChangeToneProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
+		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChangeTone')) {
+			return \OCP\TaskProcessing\TaskTypes\TextToTextChangeTone::ID;
+		}
 		return ChangeToneTaskType::ID;
 	}
 
@@ -46,7 +49,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 	public function getInputShapeEnumValues(): array {
 		$toneInputEnumValue = new ShapeEnumValue($this->l->t('Detect language'), 'detect_language');
 		return [
-			'tone_input' => [
+			'tone' => [
 				new ShapeEnumValue($this->l->t('Friendlier'), 'friendler'),
 				new ShapeEnumValue($this->l->t('More formal'), 'more formal'),
 				new ShapeEnumValue($this->l->t('Funnier'), 'funnier'),
@@ -58,7 +61,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 
 	public function getInputShapeDefaults(): array {
 		return [
-			'tone_input' => 'friendler',
+			'tone' => 'friendler',
 		];
 	}
 
@@ -112,7 +115,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid input text');
 		}
 		$textInput = $input['input'];
-		$toneInput = $input['tone_input'];
+		$toneInput = $input['tone'];
 		$prompt = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 
 		$maxTokens = null;
