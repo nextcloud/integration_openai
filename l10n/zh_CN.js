@@ -14,6 +14,8 @@ OC.L10N.register(
     "Bad HTTP method" : "错误的HTTP方法",
     "Bad credentials" : "错误的凭据",
     "Detect language" : "检测语言",
+    "Input text" : "输入文本",
+    "Generated response" : "生成的回复",
     "Size" : "尺寸",
     "OpenAI and LocalAI integration" : "OpenAI和LocalAI集成",
     "Integration of OpenAI and LocalAI services" : "OpenAI和LocalAI服务集成",
