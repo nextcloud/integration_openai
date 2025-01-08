@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.3.0 – 2025-01-07
+
+### Added
+
+- Change tone task type + provider @janepie [#163](https://github.com/nextcloud/integration_openai/pull/163) [#172](https://github.com/nextcloud/integration_openai/pull/172)
+- Proofread provider @janepie [#169](https://github.com/nextcloud/integration_openai/pull/169)
+- ChatWithTools provider @julien-nc [#167](https://github.com/nextcloud/integration_openai/pull/167)
+
+### Changed
+
+- Add ability to summarize by chunks @edward-ly [#157](https://github.com/nextcloud/integration_openai/pull/157)
+
+### Fixed
+
+- Fix headline prompt @janepie [#162](https://github.com/nextcloud/integration_openai/pull/162)
+- Grammar mistake @rakekniven [#165](https://github.com/nextcloud/integration_openai/pull/165)
+
 ## 3.2.0 – 2024-11-18
 
 ### Added
