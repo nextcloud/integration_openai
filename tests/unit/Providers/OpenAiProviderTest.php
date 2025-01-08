@@ -259,7 +259,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone_input' => $toneInput ], fn () => null);
+		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone' => $toneInput ], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
