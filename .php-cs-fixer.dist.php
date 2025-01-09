@@ -1,8 +1,11 @@
 <?php
 
 declare(strict_types=1);
-// SPDX-FileCopyrightText: Sami Finnilä <sami.finnila@nextcloud.com>
-// SPDX-License-Identifier: AGPL-3.0-or-later
+
+/**
+ * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
 
 require_once './vendor/autoload.php';
 require_once './vendor-bin/php-cs-fixer/vendor/autoload.php';

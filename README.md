@@ -1,4 +1,10 @@
+<!--
+  - SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
+  - SPDX-License-Identifier: AGPL-3.0-or-later
+-->
 # OpenAI integration in Nextcloud
+
+[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/integration_openai)](https://api.reuse.software/info/github.com/nextcloud/integration_openai)
 
 :warning: The smart pickers have been removed from this app
 as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).

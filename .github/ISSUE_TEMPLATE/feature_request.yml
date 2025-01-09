@@ -1,4 +1,6 @@
-name: Feature Request
+# SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: 🚀 Feature request
 description: Create a feature request for integration_openai
 labels: ['enhancement']
 body:

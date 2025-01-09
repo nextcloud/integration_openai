@@ -1,5 +1,7 @@
-name: Bug Report
-description: Create a bug report for integration_openai
+# SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: 🐞 Bug report
+description: Help us to improve by reporting a bug for integration_openai
 labels: ['bug']
 body:
   - type: markdown
