@@ -27,6 +27,7 @@ class OpenAiSettingsService {
 		'default_image_size' => 'string',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
+		'use_max_completion_tokens_param' => 'boolean',
 		'llm_extra_params' => 'string',
 		'quota_period' => 'integer',
 		'quotas' => 'array',
@@ -268,6 +269,7 @@ class OpenAiSettingsService {
 			'default_image_size' => $this->getAdminDefaultImageSize(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
+			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
 			'llm_extra_params' => $this->getLlmExtraParams(),
 			// Updated to get max tokens
 			'quota_period' => $this->getQuotaPeriod(),
@@ -299,6 +301,13 @@ class OpenAiSettingsService {
 			'is_custom_service' => $isCustomService,
 
 		];
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getUseMaxCompletionTokensParam(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', '1') === '1';
 	}
 
 	/**
@@ -610,6 +619,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['quotas'])) {
 			$this->setQuotas($adminConfig['quotas']);
 		}
+		if (isset($adminConfig['use_max_completion_tokens_param'])) {
+			$this->setUseMaxCompletionParam($adminConfig['use_max_completion_tokens_param']);
+		}
 		if (isset($adminConfig['translation_provider_enabled'])) {
 			$this->setTranslationProviderEnabled($adminConfig['translation_provider_enabled']);
 		}
@@ -659,6 +671,14 @@ class OpenAiSettingsService {
 		if (isset($userConfig['basic_password'])) {
 			$this->setUserBasicPassword($userId, $userConfig['basic_password']);
 		}
+	}
+
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setUseMaxCompletionParam(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'use_max_completion_tokens_param', $enabled ? '1' : '0');
 	}
 
 	/**

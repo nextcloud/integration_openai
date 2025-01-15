@@ -373,11 +373,6 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
-		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
-		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
-			$maxTokens = $maxTokensLimit;
-		}
-
 		$messages = [];
 		if ($systemPrompt !== null) {
 			$messages[] = ['role' => 'system', 'content' => $systemPrompt];
@@ -419,9 +414,20 @@ class OpenAiAPIService {
 		$params = [
 			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
 			'messages' => $messages,
-			'max_tokens' => $maxTokens,
 			'n' => $n,
 		];
+
+		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
+		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
+			$maxTokens = $maxTokensLimit;
+		}
+		if ($this->openAiSettingsService->getUseMaxCompletionTokensParam()) {
+			// max_tokens is now deprecated https://platform.openai.com/docs/api-reference/chat/create
+			$params['max_completion_tokens'] = $maxTokens;
+		} else {
+			$params['max_tokens'] = $maxTokens;
+		}
+
 		if ($tools !== null) {
 			$params['tools'] = $tools;
 		}
