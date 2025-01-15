@@ -445,6 +445,11 @@
 						</template>
 					</NcButton>
 				</div>
+				<NcCheckboxRadioSwitch
+					:checked="state.use_max_completion_tokens_param"
+					@update:checked="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
+					{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
+				</NcCheckboxRadioSwitch>
 			</div>
 			<div>
 				<h2>
