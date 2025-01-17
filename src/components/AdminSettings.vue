@@ -10,6 +10,18 @@
 		</h2>
 		<div id="openai-content">
 			<div>
+				<NcNoteCard type="info">
+					{{ t('integration_openai', 'Services with an OpenAI-compatible API:') }}
+					<div class="services">
+						<a class="external" href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>
+						<a class="external" href="https://docs.ionos.com/cloud/ai/ai-model-hub" target="_blank">IONOS AI Model Hub</a>
+						<a class="external" href="https://console.groq.com" target="_blank">Groqcloud</a>
+						<a class="external" href="https://localai.io/" target="_blank">LocalAI</a>
+						<a class="external" href="https://ollama.com/" target="_blank">Ollama</a>
+						<a class="external" href="https://mistral.ai" target="_blank">MistralAI</a>
+						<a class="external" href="https://www.plusserver.com/en/ai-platform/" target="_blank">Plusserver</a>
+					</div>
+				</NcNoteCard>
 				<div class="line">
 					<NcTextField
 						id="openai-url"
@@ -30,19 +42,14 @@
 					</NcButton>
 				</div>
 				<NcNoteCard type="info">
-					<p>
-						{{ t('integration_openai', 'With the current configuration, the target URL used to get the models is:') }}
-						<br>
-						<strong>{{ modelEndpointUrl }}</strong>
-					</p>
+					{{ t('integration_openai', 'With the current configuration, the target URL used to get the models is:') }}
+					<br>
+					<strong>{{ modelEndpointUrl }}</strong>
 				</NcNoteCard>
 				<NcNoteCard type="info">
-					<p>
-						{{ t('integration_openai', 'This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
-					</p>
-					<p>
-						{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case, make sure \'allow_local_remote_servers\' is set to true in config.php.', { example: 'http://localhost:8080/v1' }) }}
-					</p>
+					{{ t('integration_openai', 'This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
+					<br>
+					{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case, make sure \'allow_local_remote_servers\' is set to true in config.php.', { example: 'http://localhost:8080/v1' }) }}
 				</NcNoteCard>
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
@@ -750,11 +757,16 @@ export default {
 	}
 
 	h2 {
+		justify-content: start;
 		display: flex;
 		align-items: center;
-		.icon {
-			margin-right: 8px;
-		}
+		gap: 8px;
+		margin-top: 8px;
+	}
+
+	.services {
+		display: flex;
+		gap: 4px;
 	}
 
 	.radios {
