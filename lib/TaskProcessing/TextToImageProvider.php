@@ -158,10 +158,8 @@ class TextToImageProvider implements ISynchronousProvider {
 				$output['images'][] = $imageResponse->getBody();
 			}
 			foreach ($b64s as $b64) {
-				if ($b64 !== null) {
-					$imagePayload = base64_decode($b64);
-					$output['images'][] = $imagePayload;
-				}
+				$imagePayload = base64_decode($b64);
+				$output['images'][] = $imagePayload;
 			}
 			$endTime = time();
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
