@@ -130,6 +130,14 @@ class TextToImageProvider implements ISynchronousProvider {
 
 		try {
 			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $model, $nbImages, $size);
+			$b64s = array_map(static function (array $result) {
+				return $result['b64_json'] ?? null;
+			}, $apiResponse['data']);
+			$b64s = array_filter($b64s, static function (?string $b64) {
+				return $b64 !== null;
+			});
+			$b64s = array_values($b64s);
+
 			$urls = array_map(static function (array $result) {
 				return $result['url'] ?? null;
 			}, $apiResponse['data']);
@@ -137,7 +145,8 @@ class TextToImageProvider implements ISynchronousProvider {
 				return $url !== null;
 			});
 			$urls = array_values($urls);
-			if (empty($urls)) {
+
+			if (empty($urls) && empty($b64s)) {
 				$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
 				throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
 			}
@@ -147,6 +156,10 @@ class TextToImageProvider implements ISynchronousProvider {
 			foreach ($urls as $url) {
 				$imageResponse = $client->get($url, $requestOptions);
 				$output['images'][] = $imageResponse->getBody();
+			}
+			foreach ($b64s as $b64) {
+				$imagePayload = base64_decode($b64);
+				$output['images'][] = $imagePayload;
 			}
 			$endTime = time();
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);

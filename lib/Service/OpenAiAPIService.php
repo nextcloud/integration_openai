@@ -619,7 +619,6 @@ class OpenAiAPIService {
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => $n,
-			'response_format' => 'url',
 			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
 		];
 
