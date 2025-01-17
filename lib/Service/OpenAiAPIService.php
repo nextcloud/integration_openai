@@ -373,9 +373,20 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
+		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
+			? Application::DEFAULT_COMPLETION_MODEL_ID
+			: $model;
+
 		$messages = [];
 		if ($systemPrompt !== null) {
-			$messages[] = ['role' => 'system', 'content' => $systemPrompt];
+			$messages[] = [
+				// o1-* models don't support system messages
+				// system prompts as a user message seems to work fine though
+				'role' => ($this->isUsingOpenAi() && str_starts_with($modelRequestParam, 'o1-'))
+					? 'user'
+					: 'system',
+				'content' => $systemPrompt,
+			];
 		}
 		if ($history !== null) {
 			foreach ($history as $i => $historyEntry) {
@@ -412,7 +423,7 @@ class OpenAiAPIService {
 		}
 
 		$params = [
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
+			'model' => $modelRequestParam,
 			'messages' => $messages,
 			'n' => $n,
 		];
