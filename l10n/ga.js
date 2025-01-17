@@ -89,6 +89,7 @@ OC.L10N.register(
     "A per-user limit for usage of this API type (0 for unlimited)" : "Teorainn in aghaidh an úsáideora maidir le húsáid den chineál API seo (0 le haghaidh neamhtheoranta)",
     "Max new tokens per request" : "Uasmhéid comharthaí nua in aghaidh an iarratais",
     "Maximum number of new tokens generated for a single text generation prompt" : "An líon uasta comharthaí nua ginte le haghaidh leid giniúna téacs amháin",
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Úsáid paraiméadar \"{newParam}\" in ionad an pharaiméadar \"{deprecatedParam}\"",
     "Select enabled features" : "Roghnaigh gnéithe cumasaithe",
     "Translation provider (to translate Talk messages for example)" : "Soláthraí aistriúcháin (chun teachtaireachtaí Talk a aistriú mar shampla)",
     "Text processing providers (to generate text, summarize, context write etc...)" : "Soláthraithe próiseála téacs (chun téacs a ghiniúint, achoimre a dhéanamh, comhthéacs a scríobh srl...)",
