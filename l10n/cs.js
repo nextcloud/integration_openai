@@ -45,6 +45,7 @@ OC.L10N.register(
     "The model used to generate the images" : "Model použitý pro vytvoření obrázků",
     "OpenAI and LocalAI integration" : "Napojení na OpenAI a LocalAI",
     "Integration of OpenAI and LocalAI services" : "Napojení na služby OpenAI a LocalAI",
+    "Services with an OpenAI-compatible API:" : "Služby s API rozhraním, kompatibilním s OpenAI:",
     "Service URL" : "URL adresa služby",
     "Example: {example}" : "Příklad: {example}",
     "Leave empty to use {openaiApiUrl}" : "Pro využití {openaiApiUrl} nevyplňujte",
