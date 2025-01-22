@@ -8,6 +8,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.4.0 – 2025-01-22
+
+### Changed
+
+- Use max_completion_tokens instead of deprecated max_tokens @julien-nc [#176](https://github.com/nextcloud/integration_openai/pull/176)
+
+### Added
+
+- Add reuse compliance @AndyScherzinger [#173](https://github.com/nextcloud/integration_openai/pull/173)
+- Make image generation work with base64 responses (e.g. IONOS) @julien-nc @janepie [#177](https://github.com/nextcloud/integration_openai/pull/177)
+- Mention IONOS as service with an OpenAI-compatible API @julien-nc [#178](https://github.com/nextcloud/integration_openai/pull/178)
+- Support chatting with o1 models @julien-nc [#179](https://github.com/nextcloud/integration_openai/pull/179)
+
+
 ## 3.3.0 – 2025-01-07
 
 ### Added
