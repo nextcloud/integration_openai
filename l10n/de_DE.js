@@ -93,7 +93,7 @@ OC.L10N.register(
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden",
     "Select enabled features" : "Aktivierte Funktionen auswählen",
     "Translation provider (to translate Talk messages for example)" : "Übersetzungsanbieter (zum Beispiel zum Übersetzen von Talk-Nachrichten)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "Textverarbeitungsanbieter (zum Generieren von Text, Zusammenfassen, Schreiben im Kontext usw...)",
+    "Text processing providers (to generate text, summarize, context write etc...)" : "Textverarbeitungsanbieter (zum Generieren von Text, Zusammenfassen, Schreiben im Kontext usw…)",
     "Image generation provider" : "Bilderstellungsanbieter",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Sprache-zu-Text-Anbieter (zum Beispiel zum Transkribieren von Talk-Gesprächsaufzeichnungen)",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON-Objekt. Sehen Sie sich die API-Dokumentation an, um eine Liste aller verfügbaren Parameter zu erhalten. Zum Beispiel: {example}",
