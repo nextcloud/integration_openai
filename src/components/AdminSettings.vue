@@ -10,6 +10,12 @@
 		</h2>
 		<div id="openai-content">
 			<div>
+				<NcNoteCard v-if="!state.assistant_enabled" type="warning">
+					{{ t('integration_openai', 'The Assistant app is not enabled. You need it to use the features provided by the OpenAI/LocalAI integration app.') }}
+					<a class="external" :href="appSettingsAssistantUrl" target="_blank">
+						{{ t('integration_openai', 'Assistant app') }}
+					</a>
+				</NcNoteCard>
 				<NcNoteCard type="info">
 					{{ t('integration_openai', 'Services with an OpenAI-compatible API:') }}
 					<div class="services">
@@ -548,6 +554,7 @@ export default {
 			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
 			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '512x512' }),
 			DEFAULT_MODEL_ITEM,
+			appSettingsAssistantUrl: generateUrl('/settings/apps/integration/assistant'),
 		}
 	},
 
