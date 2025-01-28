@@ -307,7 +307,11 @@ class OpenAiSettingsService {
 	 * @return bool
 	 */
 	public function getUseMaxCompletionTokensParam(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', '1') === '1';
+		$serviceUrl = $this->getServiceUrl();
+		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+		// we know OpenAI expects "use_max_completion_tokens_param", let's assume the other services don't
+		$default = $isUsingOpenAI ? '1' : '0';
+		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', $default) === '1';
 	}
 
 	/**
