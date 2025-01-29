@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Sjálfgefið",
     "Image generation" : "Gerð mynda",
     "Unknown" : "Óþekkt",
     "seconds" : "sekúndum",
