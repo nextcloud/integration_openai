@@ -662,7 +662,7 @@ class OpenAiAPIService {
 			],
 		];
 
-		if (!$this->isUsingOpenAi()) {
+		if ($this->openAiSettingsService->getIsImageRetrievalAuthenticated()) {
 			$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
 			if ($useBasicAuth) {
 				$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);

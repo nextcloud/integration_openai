@@ -25,6 +25,7 @@ class OpenAiSettingsService {
 		'default_stt_model_id' => 'string',
 		'default_image_model_id' => 'string',
 		'default_image_size' => 'string',
+		'image_request_auth' => 'boolean',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
 		'use_max_completion_tokens_param' => 'boolean',
@@ -267,6 +268,7 @@ class OpenAiSettingsService {
 			'default_stt_model_id' => $this->getAdminDefaultSttModelId(),
 			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
 			'default_image_size' => $this->getAdminDefaultImageSize(),
+			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
 			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
@@ -319,6 +321,16 @@ class OpenAiSettingsService {
 	 */
 	public function getTranslationProviderEnabled(): bool {
 		return $this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getIsImageRetrievalAuthenticated(): bool {
+		$serviceUrl = $this->getServiceUrl();
+		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+		$default = $isUsingOpenAI ? '0' : '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default) === '1';
 	}
 
 	/**
@@ -608,6 +620,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['default_image_size'])) {
 			$this->setAdminDefaultImageSize($adminConfig['default_image_size']);
 		}
+		if (isset($adminConfig['image_request_auth'])) {
+			$this->setIsImageRetrievalAuthenticated($adminConfig['image_request_auth']);
+		}
 		if (isset($adminConfig['chunk_size'])) {
 			$this->setChunkSize(intval($adminConfig['chunk_size']));
 		}
@@ -691,6 +706,14 @@ class OpenAiSettingsService {
 	 */
 	public function setTranslationProviderEnabled(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'translation_provider_enabled', $enabled ? '1' : '0');
+	}
+
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setIsImageRetrievalAuthenticated(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'image_request_auth', $enabled ? '1' : '0');
 	}
 
 	/**
