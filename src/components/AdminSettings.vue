@@ -330,6 +330,11 @@
 						</template>
 					</NcButton>
 				</div>
+				<NcCheckboxRadioSwitch
+					:checked="state.image_request_auth"
+					@update:checked="onCheckboxChanged($event, 'image_request_auth', false)">
+					{{ t('integration_openai', 'Use authentication for image retrieval request') }}
+				</NcCheckboxRadioSwitch>
 			</div>
 			<div>
 				<h2>
