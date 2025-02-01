@@ -70,7 +70,7 @@ OC.L10N.register(
     "Chat completions" : "Chat-Vervollständigungen",
     "Completions" : "Vervollständigungen",
     "Selection of chat/completion endpoint is not available for OpenAI since it implicitly uses chat completions for \"instruction following\" fine-tuned models." : "Die Auswahl des Chat-/Vervollständigungsendpunkts ist für OpenAI nicht verfügbar, da es implizit Chatvervollständigungen für fein abgestimmte Modelle verwendet, die \"Anweisungen folgen\".",
-    "Using the chat endpoint may improve text generation quality for \"instruction following\" fine-tuned models." : "Die Verwendung des Chat-Endpunkts kann die Qualität der Texterstellung für fein abgestimmte Modelle zur „Anweisungsbefolgung“ verbessern.",
+    "Using the chat endpoint may improve text generation quality for \"instruction following\" fine-tuned models." : "Die Verwendung des Chat-Endpunkts kann die Qualität der Texterstellung für fein abgestimmte Modelle zur \"Anweisungsbefolgung\" verbessern.",
     "Default completion model to use" : "Zu verwendendes Standard-Vervollständigungsmodell",
     "More information about OpenAI models" : "Weitere Informationen über OpenAI-Modelle",
     "More information about LocalAI models" : "Weitere Informationen über LocalAI-Modelle",
