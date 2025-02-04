@@ -133,10 +133,12 @@
 						class="input"
 						:value.sync="state.api_key"
 						type="password"
+						:readonly="readonly"
 						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
 						:show-trailing-button="!!state.api_key"
 						@update:value="onSensitiveInput(true)"
-						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)">
+						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
+						@focus="readonly = false">
 						<KeyIcon />
 					</NcTextField>
 				</div>
@@ -153,10 +155,12 @@
 							id="openai-basic-user"
 							class="input"
 							:value.sync="state.basic_user"
+							:readonly="readonly"
 							:label="t('integration_openai', 'Basic Auth user')"
 							:show-trailing-button="!!state.basic_user"
 							@update:value="onSensitiveInput(true)"
-							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)">
+							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)"
+							@focus="readonly = false">
 							<AccountIcon />
 						</NcTextField>
 					</div>
@@ -166,10 +170,12 @@
 							class="input"
 							:value.sync="state.basic_password"
 							type="password"
+							:readonly="readonly"
 							:label="t('integration_openai', 'Basic Auth password')"
 							:show-trailing-button="!!state.basic_password"
 							@update:value="onSensitiveInput(true)"
-							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)">
+							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)"
+							@focus="readonly = false">
 							<KeyIcon />
 						</NcTextField>
 					</div>

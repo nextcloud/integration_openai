@@ -22,11 +22,13 @@
 						id="openai-api-key"
 						class="input"
 						:value.sync="state.api_key"
+						:readonly="readonly"
 						type="password"
 						:label="t('integration_openai', 'API key')"
 						:show-trailing-button="!!state.api_key"
 						@update:value="onSensitiveInput"
-						@trailing-button-click="state.api_key = '' ; onSensitiveInput()">
+						@trailing-button-click="state.api_key = '' ; onSensitiveInput()"
+						@focus="readonly = false">
 						<KeyIcon />
 					</NcTextField>
 				</div>
