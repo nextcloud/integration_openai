@@ -1,5 +1,6 @@
 { "translations": {
     "Unknown models error" : "Ismeretlen modell hiba",
+    "Default" : "Alapértelmezett",
     "Text generation" : "Szöveg generálás",
     "Image generation" : "Kép generálás",
     "Audio transcription" : "Hang átírása",
