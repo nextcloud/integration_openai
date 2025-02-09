@@ -1,8 +1,11 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Standard",
+    "Image generation" : "Billedgenerering",
     "Unknown" : "Ukendt",
     "seconds" : "sekunder ",
+    "Bad credentials" : "Forkerte legitimationsoplysninger",
     "Size" : "Størrelse",
     "This name will be displayed as provider name in the AI admin settings" : "Dette navn vil blive vist som udbydernavn i AI-administrator indstillingerne",
     "Request timeout (seconds)" : "Anmodning timeout (sekunder)",
