@@ -24,6 +24,7 @@ OC.L10N.register(
     "More information about OpenAI models" : "Daugiau informacijos apie „OpenAI“ modelius",
     "More information about LocalAI models" : "Daugiau informacijos apie „LocalAI“ modelius",
     "Failed to load models" : "Nepavyko įkelti modelių",
+    "You can create a free API key in your OpenAI account settings" : "Nemokamą API raktą galite susikurti „OpenAI“ paskyros nustatymuose",
     "Username" : "Naudotojo vardas",
     "Password" : "Slaptažodis",
     "Usage" : "Naudojimas",
