@@ -324,7 +324,7 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		if (isset($response['usage'])) {
+		if (isset($response['usage'], $response['usage']['total_tokens'])) {
 			$usage = $response['usage']['total_tokens'];
 			try {
 				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
@@ -461,9 +461,8 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		if (isset($response['usage'])) {
+		if (isset($response['usage'], $response['usage']['total_tokens'])) {
 			$usage = $response['usage']['total_tokens'];
-
 			try {
 				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
