@@ -7,6 +7,7 @@ OC.L10N.register(
     "seconds" : "sekúndum",
     "Bad credentials" : "Gölluð auðkenni",
     "Detect language" : "Greina tungumál",
+    "Input text" : "Inntakstexti",
     "Size" : "Stærð",
     "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Authentication" : "Auðkenning",
