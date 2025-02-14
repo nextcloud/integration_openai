@@ -39,7 +39,7 @@ OC.L10N.register(
     "In which tone should your text be rewritten?" : "I hvilken tone skal din tekst skrives om?",
     "Generated response" : "Genereret respons",
     "The rewritten text in the desired tone, written by the assistant:" : "Den omskrevne tekst i den ønskede tone, skrevet af assistenten:",
-    "OpenAI's DALL-E 2" : "OpenAI 's DALL- E 2",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Size" : "Størrelse",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Valgfrit. Størrelsen af de genererede billeder. Skal være i 256x256 format. Standard er %s",
     "The model used to generate the images" : "Modellen der bruges til at generere billederne",

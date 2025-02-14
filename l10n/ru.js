@@ -14,6 +14,7 @@ OC.L10N.register(
     "Detect language" : "Определить язык",
     "Model" : "Модель",
     "Input text" : "Введите текст",
+    "Generated response" : "Сгенерированный ответ",
     "OpenAI and LocalAI integration" : "OpenAI и локальная интеграция",
     "This name will be displayed as provider name in the AI admin settings" : "Это имя будет отображаться как имя провайдера в настройках администратора ИИ.",
     "Request timeout (seconds)" : "Таймаут запроса (в секундах)",
