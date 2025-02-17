@@ -563,7 +563,7 @@ export default {
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
 			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
-			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '512x512' }),
+			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '1024x1024' }),
 			DEFAULT_MODEL_ITEM,
 			appSettingsAssistantUrl: generateUrl('/settings/apps/integration/assistant'),
 		}
