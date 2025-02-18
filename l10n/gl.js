@@ -93,7 +93,7 @@ OC.L10N.register(
     "A per-user limit for usage of this API type (0 for unlimited)" : "Un límite por usuario para o uso deste tipo de API (0 para ilimitado)",
     "Max new tokens per request" : "Máximo de testemuños novos por solicitude",
     "Maximum number of new tokens generated for a single text generation prompt" : "Número máximo de testemuños novos xerados para unha única indicación de xeración de texto",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Empregue o parámetro «{newParam}» no canto do obsoleto «{deprecatedParam}»",
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Empregue o parámetro «{newParam}» en troques do obsoleto «{deprecatedParam}»",
     "Select enabled features" : "Seleccione as funcionalidades activadas",
     "Translation provider (to translate Talk messages for example)" : "Provedor de tradución (para traducir mensaxes de Parladoiro, por exemplo)",
     "Text processing providers (to generate text, summarize, context write etc...)" : "Provedor de procesamento de texto (para xerar texto, resumir, escribir contexto, etc…)",
