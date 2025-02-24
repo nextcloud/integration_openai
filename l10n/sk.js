@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Default" : "Predvolené",
+    "Text generation" : "Generovanie textu",
     "Image generation" : "Generovanie obrázka",
     "Unknown" : "Neznámy",
     "seconds" : "sekúnd",
