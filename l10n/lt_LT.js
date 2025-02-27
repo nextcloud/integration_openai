@@ -14,6 +14,7 @@ OC.L10N.register(
     "Model" : "Modelis",
     "Size" : "Dydis",
     "OpenAI and LocalAI integration" : "„OpenAI“ ir „LocalAI“ integracija",
+    "Failed to load models" : "Nepavyko įkelti modelių",
     "Example: {example}" : "Pavyzdys: {example}",
     "Request timeout (seconds)" : "Prisijungimo laikas (sekundėmis)",
     "Authentication" : "Tapatybės nustatymas",
@@ -23,12 +24,11 @@ OC.L10N.register(
     "You can create an API key in your OpenAI account settings" : "API raktą galite susikurti „OpenAI“ paskyros nustatymuose",
     "More information about OpenAI models" : "Daugiau informacijos apie „OpenAI“ modelius",
     "More information about LocalAI models" : "Daugiau informacijos apie „LocalAI“ modelius",
-    "Failed to load models" : "Nepavyko įkelti modelių",
+    "OpenAI options saved" : "„OpenAI“ parinktys įrašytos",
+    "Failed to save OpenAI options" : "Nepavyko įrašyti „OpenAI“ parinkčių",
     "You can create a free API key in your OpenAI account settings" : "Nemokamą API raktą galite susikurti „OpenAI“ paskyros nustatymuose",
     "Username" : "Naudotojo vardas",
     "Password" : "Slaptažodis",
-    "Usage" : "Naudojimas",
-    "OpenAI options saved" : "„OpenAI“ parinktys įrašytos",
-    "Failed to save OpenAI options" : "Nepavyko įrašyti „OpenAI“ parinkčių"
+    "Usage" : "Naudojimas"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

@@ -30,6 +30,10 @@ OC.L10N.register(
     "Size" : "Størrelse",
     "OpenAI and LocalAI integration" : "OpenAI og LocalAI integrasjon",
     "Integration of OpenAI and LocalAI services" : "Integrasjon av OpenAI og LocalAI tjenester",
+    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON-objekt. Se API-dokumentasjonen for å få listen over alle tilgjengelige parametere. For eksempel: {example}",
+    "Failed to load quota info" : "Lasting av kvoteinfo feilet",
+    "OpenAI admin options saved" : "OpenAI administratoralternativer lagret",
+    "Failed to save OpenAI admin options" : "Kunne ikke lagre OpenAI-administratoralternativer",
     "Service URL" : "Tjeneste-URL",
     "Example: {example}" : "Eksempel: {example}",
     "Leave empty to use {openaiApiUrl}" : "La stå tomt for å bruke {openaiApiUrl}",
@@ -67,10 +71,8 @@ OC.L10N.register(
     "Text processing providers (to generate text, summarize, context write etc...)" : "Tekstbehandlingsleverandør (for å generere tekst, oppsummere, kontekstskriving osv.)",
     "Image generation provider" : "Leverandør av bildegenerering",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Tale-til-tekst-leverandør (for eksempel for å transkribere Talk-opptak)",
-    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON-objekt. Se API-dokumentasjonen for å få listen over alle tilgjengelige parametere. For eksempel: {example}",
-    "Failed to load quota info" : "Lasting av kvoteinfo feilet",
-    "OpenAI admin options saved" : "OpenAI administratoralternativer lagret",
-    "Failed to save OpenAI admin options" : "Kunne ikke lagre OpenAI-administratoralternativer",
+    "OpenAI options saved" : "OpenAI-alternativer lagret",
+    "Failed to save OpenAI options" : "Kunne ikke lagre OpenAI-alternativer",
     "Your administrator defined a custom service address" : "Administratoren din definerte en tilpasset tjenesteadresse",
     "Leave the API key empty to use the one defined by administrators" : "La API-nøkkelen være tom for å bruke den som er definert av administratorer",
     "You can create a free API key in your OpenAI account settings" : "Du kan opprette en gratis API-nøkkel i OpenAI-kontoinnstillingene:",
@@ -81,8 +83,6 @@ OC.L10N.register(
     "your Basic Auth password" : "ditt grunnleggende auth-passord",
     "Usage quota info" : "Informasjon om brukskvote",
     "Usage" : "Bruk",
-    "Specifying your own API key will allow unlimited usage" : "Å spesifisere din egen API-nøkkel vil tillate ubegrenset bruk",
-    "OpenAI options saved" : "OpenAI-alternativer lagret",
-    "Failed to save OpenAI options" : "Kunne ikke lagre OpenAI-alternativer"
+    "Specifying your own API key will allow unlimited usage" : "Å spesifisere din egen API-nøkkel vil tillate ubegrenset bruk"
 },
 "nplurals=2; plural=(n != 1);");

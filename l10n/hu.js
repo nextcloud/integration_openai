@@ -17,6 +17,8 @@ OC.L10N.register(
     "Size" : "?éret",
     "OpenAI and LocalAI integration" : "OpenAI és LocalAI integráció",
     "Integration of OpenAI and LocalAI services" : "OpenAI és LocalAI szolgáltatások integrációja",
+    "OpenAI admin options saved" : "Az OpenAI rendszergazdai beállításai mentve",
+    "Failed to save OpenAI admin options" : "Nem sikerült az OpenAI rendszergazdai beállításainak mentése",
     "Service name (optional)" : "Szolgáltatás neve (nem kötelező)",
     "Request timeout (seconds)" : "Kérés időtúllépése (másodpercben)",
     "Authentication" : "Hitelesítés",
@@ -34,8 +36,8 @@ OC.L10N.register(
     "Quota type" : "Kvóta típusa",
     "Select enabled features" : "Válassza ki az engedélyezett funkciókat",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Beszédfelismerő szolgáltatás (például a Talk átiratok készítéséhez)",
-    "OpenAI admin options saved" : "Az OpenAI rendszergazdai beállításai mentve",
-    "Failed to save OpenAI admin options" : "Nem sikerült az OpenAI rendszergazdai beállításainak mentése",
+    "OpenAI options saved" : "OpenAI beállítások elmentve",
+    "Failed to save OpenAI options" : "Nem sikerült az OpenAI beállítások mentése",
     "Your administrator defined a custom service address" : "A rendszergazda egyedi szolgáltatási címet adott meg",
     "Leave the API key empty to use the one defined by administrators" : "Hagyja üresen az API kulcsot, hogy az adminisztrátor által beállítottat használja.",
     "Username" : "Felhasználónév",
@@ -44,8 +46,6 @@ OC.L10N.register(
     "your Basic Auth password" : "az általános bejelentkezési jelszavad",
     "Usage quota info" : "Használati kvóta információ",
     "Usage" : "Felhasználás",
-    "Specifying your own API key will allow unlimited usage" : "A saját API-kulcs megadása korlátlan használatot tesz lehetővé",
-    "OpenAI options saved" : "OpenAI beállítások elmentve",
-    "Failed to save OpenAI options" : "Nem sikerült az OpenAI beállítások mentése"
+    "Specifying your own API key will allow unlimited usage" : "A saját API-kulcs megadása korlátlan használatot tesz lehetővé"
 },
 "nplurals=2; plural=(n != 1);");

@@ -8,6 +8,8 @@ OC.L10N.register(
     "Bad credentials" : "Εσφαλμένα διαπιστευτήρια",
     "OpenAI and LocalAI integration" : "Ενσωμάτωση OpenAI και LocalAI",
     "Integration of OpenAI and LocalAI services" : "Ενσωμάτωση υπηρεσιών OpenAI και LocalAI",
+    "OpenAI admin options saved" : "Οι επιλογές διαχειριστή OpenAI αποθηκεύτηκαν",
+    "Failed to save OpenAI admin options" : "Αποτυχία αποθήκευσης των επιλογών διαχειριστή OpenAI",
     "Request timeout (seconds)" : "Χρονικό όριο αιτήματος (δευτερόλεπτα)",
     "Authentication" : "Πιστοποίηση",
     "Authentication method" : "Μέθοδος πιστοποίησης",
@@ -15,13 +17,11 @@ OC.L10N.register(
     "More information about OpenAI models" : "Περισσότερες πληροφορίες σχετικά με τα μοντέλα OpenAI",
     "More information about LocalAI models" : "Περισσότερες πληροφορίες σχετικά με τα μοντέλα LocalAI",
     "Translation provider (to translate Talk messages for example)" : "Πάροχος μετάφρασης (για παράδειγμα για μετάφραση μηνυμάτων του Talk)",
-    "OpenAI admin options saved" : "Οι επιλογές διαχειριστή OpenAI αποθηκεύτηκαν",
-    "Failed to save OpenAI admin options" : "Αποτυχία αποθήκευσης των επιλογών διαχειριστή OpenAI",
+    "OpenAI options saved" : "Οι επιλογές OpenAI αποθηκεύτηκαν",
+    "Failed to save OpenAI options" : "Αποτυχία αποθήκευσης των επιλογών OpenAI",
     "Your administrator defined a custom service address" : "Ο διαχειριστής σας όρισε μια προσαρμοσμένη διεύθυνση υπηρεσίας",
     "Leave the API key empty to use the one defined by administrators" : "Αφήστε το κλειδί API κενό για να χρησιμοποιήσετε αυτό που ορίζουν οι διαχειριστές",
     "Username" : "Όνομα χρήστη",
-    "Password" : "Συνθηματικό",
-    "OpenAI options saved" : "Οι επιλογές OpenAI αποθηκεύτηκαν",
-    "Failed to save OpenAI options" : "Αποτυχία αποθήκευσης των επιλογών OpenAI"
+    "Password" : "Συνθηματικό"
 },
 "nplurals=2; plural=(n != 1);");

@@ -11,6 +11,8 @@ OC.L10N.register(
     "Input text" : "Mata in text",
     "OpenAI and LocalAI integration" : "OpenAI och LocalAI integration",
     "Integration of OpenAI and LocalAI services" : "Integration av OpenAI och LocalAI-tjänster",
+    "OpenAI admin options saved" : "OpenAI administratörsalternativ sparade",
+    "Failed to save OpenAI admin options" : "Det gick inte att spara OpenAI-administratörsalternativ",
     "Request timeout (seconds)" : "Sekunder för anslutningsförsök",
     "Authentication" : "Autentisering",
     "Authentication method" : "Autentiseringsmetod",
@@ -20,13 +22,11 @@ OC.L10N.register(
     "More information about LocalAI models" : "Mer information om LocalAI-modeller",
     "Translation provider (to translate Talk messages for example)" : "Översättningsleverantör (för att till exempel översätta Talk-meddelanden)",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Tal-till-text-leverantör (till exempel för att transkribera Talk-inspelningar)",
-    "OpenAI admin options saved" : "OpenAI administratörsalternativ sparade",
-    "Failed to save OpenAI admin options" : "Det gick inte att spara OpenAI-administratörsalternativ",
+    "OpenAI options saved" : "OpenAI-alternativ sparade",
+    "Failed to save OpenAI options" : "Det gick inte att spara OpenAI-alternativ",
     "Your administrator defined a custom service address" : "Din administratör har definierat en anpassad service-adress",
     "Leave the API key empty to use the one defined by administrators" : "Lämna API-nyckeln tom för att använda den som definierats av administratörer",
     "Username" : "Användarnamn",
-    "Password" : "Lösenord",
-    "OpenAI options saved" : "OpenAI-alternativ sparade",
-    "Failed to save OpenAI options" : "Det gick inte att spara OpenAI-alternativ"
+    "Password" : "Lösenord"
 },
 "nplurals=2; plural=(n != 1);");

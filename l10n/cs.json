@@ -43,6 +43,12 @@
     "The model used to generate the images" : "Model použitý pro vytvoření obrázků",
     "OpenAI and LocalAI integration" : "Napojení na OpenAI a LocalAI",
     "Integration of OpenAI and LocalAI services" : "Napojení na služby OpenAI a LocalAI",
+    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON objekt. Podívejte se do dokumentace k API ohledně seznamu všech dostupných parametrů. Například: {example}",
+    "Must be in 256x256 format (default is {default})" : "Je třeba, aby bylo ve formátu 256x256 (výchozí je {default})",
+    "Failed to load models" : "Nepodařilo se načíst modely",
+    "Failed to load quota info" : "Nepodařilo se načíst informace o kvótě",
+    "OpenAI admin options saved" : "Předvolby správy pro OpenAI uloženy",
+    "Failed to save OpenAI admin options" : "Nepodařilo se uložit předvolby správy pro OpenAI",
     "The Assistant app is not enabled. You need it to use the features provided by the OpenAI/LocalAI integration app." : "Aplikace Asistent není zapnutá. Té je zapotřebí pro používání funkcí poskytovaných aplikací pro napojení na OpenAI/LocalAI.",
     "Assistant app" : "Aplikace asistent",
     "Services with an OpenAI-compatible API:" : "Služby s API rozhraním, kompatibilním s OpenAI:",
@@ -96,12 +102,8 @@
     "Text processing providers (to generate text, summarize, context write etc...)" : "Poskytovatelé zpracovávání textu (pro jeho vytváření, shrnování, kontextové psaní, atd…)",
     "Image generation provider" : "Poskytovatel vytváření obrázků",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Poskytovatel převodu řeči na text (například pro přepis nahrávek z Talk)",
-    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON objekt. Podívejte se do dokumentace k API ohledně seznamu všech dostupných parametrů. Například: {example}",
-    "Must be in 256x256 format (default is {default})" : "Je třeba, aby bylo ve formátu 256x256 (výchozí je {default})",
-    "Failed to load models" : "Nepodařilo se načíst modely",
-    "Failed to load quota info" : "Nepodařilo se načíst informace o kvótě",
-    "OpenAI admin options saved" : "Předvolby správy pro OpenAI uloženy",
-    "Failed to save OpenAI admin options" : "Nepodařilo se uložit předvolby správy pro OpenAI",
+    "OpenAI options saved" : "Předvolby pro OpenAI uloženy",
+    "Failed to save OpenAI options" : "Nepodařilo se uložit předvolby pro OpenAI",
     "Your administrator defined a custom service address" : "Správce definoval jím určenou adresu služby",
     "Leave the API key empty to use the one defined by administrators" : "Pokud chcete využít klíč k API, definovaný správci, pak ho zde nevyplňujte",
     "You can create a free API key in your OpenAI account settings" : "Klíč k API je možné si zdarma vytvořit v nastavení vašeho účtu u OpenAI",
@@ -112,8 +114,6 @@
     "your Basic Auth password" : "vaše heslo pro Basic Auth",
     "Usage quota info" : "Informace o využití kvóty",
     "Usage" : "Využití",
-    "Specifying your own API key will allow unlimited usage" : "Zadání vašeho vlastního klíče k API umožní neomezené využívání",
-    "OpenAI options saved" : "Předvolby pro OpenAI uloženy",
-    "Failed to save OpenAI options" : "Nepodařilo se uložit předvolby pro OpenAI"
+    "Specifying your own API key will allow unlimited usage" : "Zadání vašeho vlastního klíče k API umožní neomezené využívání"
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;"
 }

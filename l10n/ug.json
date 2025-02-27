@@ -31,6 +31,12 @@
     "The model used to generate the images" : "رەسىم ھاسىل قىلىشتا ئىشلىتىلگەن مودېل",
     "OpenAI and LocalAI integration" : "OpenAI بىلەن LocalAI بىرلەشتۈرۈش",
     "Integration of OpenAI and LocalAI services" : "OpenAI ۋە LocalAI مۇلازىمىتىنى بىرلەشتۈرۈش",
+    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON ئوبيېكتى. بارلىق ھۆججەتلەرنىڭ تىزىملىكىنى ئېلىش ئۈچۈن API ھۆججىتىنى تەكشۈرۈڭ. مەسىلەن: {example}",
+    "Must be in 256x256 format (default is {default})" : "چوقۇم 256x256 فورماتىدا بولۇشى كېرەك (سۈكۈتتىكىسى {default})",
+    "Failed to load models" : "مودېللارنى يۈكلىيەلمىدى",
+    "Failed to load quota info" : "نورما ئۇچۇرىنى يۈكلىيەلمىدى",
+    "OpenAI admin options saved" : "OpenAI باشقۇرۇش تاللانمىلىرى ساقلاندى",
+    "Failed to save OpenAI admin options" : "OpenAI باشقۇرۇش تاللانمىلىرىنى ساقلىيالمىدى",
     "Service URL" : "مۇلازىمەت URL",
     "Example: {example}" : "مىسال: {example}",
     "Leave empty to use {openaiApiUrl}" : "{openaiApiUrl} use نى ئىشلىتىش ئۈچۈن بوش قويۇڭ",
@@ -75,12 +81,8 @@
     "Text processing providers (to generate text, summarize, context write etc...)" : "تېكىست بىر تەرەپ قىلىش تەمىنلىگۈچىلىرى (تېكىست ھاسىل قىلىش ، خۇلاسىلەش ، مەزمۇن يېزىش قاتارلىقلار ...)",
     "Image generation provider" : "رەسىم ھاسىل قىلغۇچى",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "سۆزلەشتىن تېكىست تەمىنلىگۈچى (سۆز خاتىرىسىنى خاتىرىلەش ئۈچۈن)",
-    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON ئوبيېكتى. بارلىق ھۆججەتلەرنىڭ تىزىملىكىنى ئېلىش ئۈچۈن API ھۆججىتىنى تەكشۈرۈڭ. مەسىلەن: {example}",
-    "Must be in 256x256 format (default is {default})" : "چوقۇم 256x256 فورماتىدا بولۇشى كېرەك (سۈكۈتتىكىسى {default})",
-    "Failed to load models" : "مودېللارنى يۈكلىيەلمىدى",
-    "Failed to load quota info" : "نورما ئۇچۇرىنى يۈكلىيەلمىدى",
-    "OpenAI admin options saved" : "OpenAI باشقۇرۇش تاللانمىلىرى ساقلاندى",
-    "Failed to save OpenAI admin options" : "OpenAI باشقۇرۇش تاللانمىلىرىنى ساقلىيالمىدى",
+    "OpenAI options saved" : "OpenAI تاللانمىلىرى ساقلاندى",
+    "Failed to save OpenAI options" : "OpenAI تاللانمىلىرىنى ساقلىيالمىدى",
     "Your administrator defined a custom service address" : "باشقۇرغۇچىڭىز خاس مۇلازىمەت ئادرېسىنى بەلگىلىدى",
     "Leave the API key empty to use the one defined by administrators" : "باشقۇرغۇچى بەلگىلىگەن ئاچقۇچنى ئىشلىتىش ئۈچۈن API كۇنۇپكىسىنى بوش قويۇڭ",
     "You can create a free API key in your OpenAI account settings" : "OpenAI ھېسابات تەڭشىكىڭىزدە ھەقسىز API ئاچالايسىز",
@@ -91,8 +93,6 @@
     "your Basic Auth password" : "Basic Auth پارولىڭىز",
     "Usage quota info" : "ئىشلىتىش نورمىسى ئۇچۇرى",
     "Usage" : "ئىشلىتىش",
-    "Specifying your own API key will allow unlimited usage" : "ئۆزىڭىزنىڭ API ئاچقۇچىنى بەلگىلىسىڭىز چەكسىز ئىشلىتىشكە يول قويىدۇ",
-    "OpenAI options saved" : "OpenAI تاللانمىلىرى ساقلاندى",
-    "Failed to save OpenAI options" : "OpenAI تاللانمىلىرىنى ساقلىيالمىدى"
+    "Specifying your own API key will allow unlimited usage" : "ئۆزىڭىزنىڭ API ئاچقۇچىنى بەلگىلىسىڭىز چەكسىز ئىشلىتىشكە يول قويىدۇ"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

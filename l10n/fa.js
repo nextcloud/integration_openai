@@ -12,6 +12,8 @@ OC.L10N.register(
     "Size" : "اندازه",
     "OpenAI and LocalAI integration" : "OpenAI and LocalAI integration",
     "Integration of OpenAI and LocalAI services" : "Integration of OpenAI and LocalAI services",
+    "OpenAI admin options saved" : "OpenAI admin options saved",
+    "Failed to save OpenAI admin options" : "Failed to save OpenAI admin options",
     "Request timeout (seconds)" : "درخواست زمان (ثانیه)",
     "Authentication" : "احراز هویت",
     "Authentication method" : "روش احراز هویت",
@@ -21,13 +23,11 @@ OC.L10N.register(
     "More information about LocalAI models" : "More information about LocalAI models",
     "Translation provider (to translate Talk messages for example)" : "Translation provider (to translate Talk messages for example)",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Speech-to-text provider (to transcribe Talk recordings for example)",
-    "OpenAI admin options saved" : "OpenAI admin options saved",
-    "Failed to save OpenAI admin options" : "Failed to save OpenAI admin options",
+    "OpenAI options saved" : "OpenAI options saved",
+    "Failed to save OpenAI options" : "Failed to save OpenAI options",
     "Your administrator defined a custom service address" : "Your administrator defined a custom service address",
     "Leave the API key empty to use the one defined by administrators" : "Leave the API key empty to use the one defined by administrators",
     "Username" : "نام کاربری",
-    "Password" : "گذرواژه",
-    "OpenAI options saved" : "OpenAI options saved",
-    "Failed to save OpenAI options" : "Failed to save OpenAI options"
+    "Password" : "گذرواژه"
 },
 "nplurals=2; plural=(n > 1);");

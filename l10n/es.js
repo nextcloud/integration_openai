@@ -32,6 +32,10 @@ OC.L10N.register(
     "The rewritten text in the desired tone, written by the assistant:" : "El texto reescrito en el tono deseado, escrito por el asistente:",
     "OpenAI and LocalAI integration" : "Integración de OpenAI y LocalAI",
     "Integration of OpenAI and LocalAI services" : "Integración de los servicios de OpenAI y LocalAI",
+    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Objeto JSON. Chequee la documentación de la API para obtener una lista de todos los parámetros disponibles. Por ejemplo {example}",
+    "Failed to load quota info" : "Fallo al cargar la información de cuotas",
+    "OpenAI admin options saved" : "Las opciones de administrador de OpenAI se han guardado",
+    "Failed to save OpenAI admin options" : "Fallo al guardar las opciones de administrador de OpenAI",
     "Service URL" : "URL del servicio",
     "Example: {example}" : "Ejemplo: {example}",
     "Leave empty to use {openaiApiUrl}" : "Déjelo en blanco para utilziar {openaiApiUrl}",
@@ -67,10 +71,8 @@ OC.L10N.register(
     "Translation provider (to translate Talk messages for example)" : "Proveedor de traducciones (para traducir mensajes de Talk, por ejemplo)",
     "Image generation provider" : "Proveedor de generación de imágenes",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Proveedor de voz a texto (para transcribir grabaciones de Talk, por ejemplo)",
-    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Objeto JSON. Chequee la documentación de la API para obtener una lista de todos los parámetros disponibles. Por ejemplo {example}",
-    "Failed to load quota info" : "Fallo al cargar la información de cuotas",
-    "OpenAI admin options saved" : "Las opciones de administrador de OpenAI se han guardado",
-    "Failed to save OpenAI admin options" : "Fallo al guardar las opciones de administrador de OpenAI",
+    "OpenAI options saved" : "Las opciones de OpenAI fueron guardadas",
+    "Failed to save OpenAI options" : "Fallo al guardar las opciones de OpenAI",
     "Your administrator defined a custom service address" : "Su administrador ha definido una dirección de servicio personalizada",
     "Leave the API key empty to use the one defined by administrators" : "Deje la llave API en blanco para utilizar la que fue definida por los administradores",
     "Leave the username and password empty to use the ones defined by your administrator" : "Deje los campos de usuario y contraseña vacíos para utilizar los que han sido definidos por su administrador",
@@ -80,8 +82,6 @@ OC.L10N.register(
     "your Basic Auth password" : "Su contraseña de autenticación básica",
     "Usage quota info" : "Información de uso de cuotas",
     "Usage" : "Uso",
-    "Specifying your own API key will allow unlimited usage" : "Especificar su propia llave API le permitirá uso ilimitado",
-    "OpenAI options saved" : "Las opciones de OpenAI fueron guardadas",
-    "Failed to save OpenAI options" : "Fallo al guardar las opciones de OpenAI"
+    "Specifying your own API key will allow unlimited usage" : "Especificar su propia llave API le permitirá uso ilimitado"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

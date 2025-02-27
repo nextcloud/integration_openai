@@ -25,6 +25,8 @@ OC.L10N.register(
     "Size" : "尺寸",
     "OpenAI and LocalAI integration" : "OpenAI和LocalAI集成",
     "Integration of OpenAI and LocalAI services" : "OpenAI和LocalAI服务集成",
+    "OpenAI admin options saved" : "已保存OpenAI管理员选项",
+    "Failed to save OpenAI admin options" : "保存OpenAI管理员选项失败",
     "Request timeout (seconds)" : "请求超时时间（秒）",
     "Authentication" : "身份认证",
     "Authentication method" : "认证方法",
@@ -34,13 +36,11 @@ OC.L10N.register(
     "More information about LocalAI models" : "更多关于LocalAI模型的信息",
     "Translation provider (to translate Talk messages for example)" : "翻译提供程序（例如用来翻译通话应用中的信息）",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "语言转文本提供程序（例如用来转写通话应用录制）",
-    "OpenAI admin options saved" : "已保存OpenAI管理员选项",
-    "Failed to save OpenAI admin options" : "保存OpenAI管理员选项失败",
+    "OpenAI options saved" : "已保存OpenAI选项",
+    "Failed to save OpenAI options" : "保存OpenAI选项失败",
     "Your administrator defined a custom service address" : "您的管理员定义了一个自定义服务地址",
     "Leave the API key empty to use the one defined by administrators" : "将API密钥留空以使用管理员定义的API密钥",
     "Username" : "用户名",
-    "Password" : "密码",
-    "OpenAI options saved" : "已保存OpenAI选项",
-    "Failed to save OpenAI options" : "保存OpenAI选项失败"
+    "Password" : "密码"
 },
 "nplurals=1; plural=0;");

@@ -43,6 +43,12 @@
     "The model used to generate the images" : "Le modèle utilisé pour générer les images",
     "OpenAI and LocalAI integration" : "Intégration OpenAI et LocalAI",
     "Integration of OpenAI and LocalAI services" : "Intégration des services OpenAI et LocalAI",
+    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Objet JSON. Vérifiez la documentation de l’API pour récupérer la liste de tous les paramètres disponibles. Par exemple : {example}",
+    "Must be in 256x256 format (default is {default})" : "Doit être au format 256x256 (Par défaut c'est {default})",
+    "Failed to load models" : "Échec du chargement des modèles",
+    "Failed to load quota info" : "Échec du chargement des informations sur le quota",
+    "OpenAI admin options saved" : "Options d'administration OpenAI sauvegardées",
+    "Failed to save OpenAI admin options" : "Impossible de sauvegarder les options d'administration OpenAI",
     "Service URL" : "URL du service",
     "Example: {example}" : "Exemple : {example}",
     "Leave empty to use {openaiApiUrl}" : "Laisser vide pour utiliser {openaiApiUrl}",
@@ -82,12 +88,8 @@
     "Text processing providers (to generate text, summarize, context write etc...)" : "Fournisseurs de traitement de texte (pour générer du texte, résumer, écrire du contexte etc...)",
     "Image generation provider" : "Fournisseur de génération d'images",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Fournisseur de synthèse vocale (pour transcrire des enregistrements de Discussion, par exemple)",
-    "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Objet JSON. Vérifiez la documentation de l’API pour récupérer la liste de tous les paramètres disponibles. Par exemple : {example}",
-    "Must be in 256x256 format (default is {default})" : "Doit être au format 256x256 (Par défaut c'est {default})",
-    "Failed to load models" : "Échec du chargement des modèles",
-    "Failed to load quota info" : "Échec du chargement des informations sur le quota",
-    "OpenAI admin options saved" : "Options d'administration OpenAI sauvegardées",
-    "Failed to save OpenAI admin options" : "Impossible de sauvegarder les options d'administration OpenAI",
+    "OpenAI options saved" : "Options OpenAI sauvegardées",
+    "Failed to save OpenAI options" : "Impossible de sauvegarder les options OpenAI",
     "Your administrator defined a custom service address" : "Votre administrateur a défini une adresse de service spécifique",
     "Leave the API key empty to use the one defined by administrators" : "Laisser la clé d'API vide pour utiliser celle définie par l'administrateur",
     "You can create a free API key in your OpenAI account settings" : "Vous pouvez créer une clé API gratuite dans les paramètres de votre compte OpenAI",
@@ -98,8 +100,6 @@
     "your Basic Auth password" : "votre mot de passe Authentification Basique",
     "Usage quota info" : "Info sur l'utilisation du quota",
     "Usage" : "Usage",
-    "Specifying your own API key will allow unlimited usage" : "Spécifier votre propre clé API permettra une utilisation illimitée",
-    "OpenAI options saved" : "Options OpenAI sauvegardées",
-    "Failed to save OpenAI options" : "Impossible de sauvegarder les options OpenAI"
+    "Specifying your own API key will allow unlimited usage" : "Spécifier votre propre clé API permettra une utilisation illimitée"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
