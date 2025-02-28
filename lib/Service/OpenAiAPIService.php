@@ -111,10 +111,15 @@ class OpenAiAPIService {
 			$this->areCredsValid = false;
 			throw $e;
 		}
-		if (!isset($modelsResponse['data'])) {
+		if (isset($modelsResponse['error'])) {
 			$this->logger->warning('Error retrieving models: ' . \json_encode($modelsResponse));
 			$this->areCredsValid = false;
-			throw new Exception($this->l10n->t('Unknown models error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			throw new Exception($modelsResponse['error'], Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		if (!isset($modelsResponse['data'])) {
+			// also consider responses without 'data' as valid
+			$modelsResponse = ['data' => $modelsResponse];
 		}
 		$cache->set($cacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
 		$this->modelsMemoryCache = $modelsResponse;
