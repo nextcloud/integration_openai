@@ -9,6 +9,7 @@ OC.L10N.register(
     "Bad credentials" : "Ogiltiga inloggningsuppgifter",
     "Detect language" : "Upptäck språk",
     "Input text" : "Mata in text",
+    "Generated response" : "Genererat svar",
     "OpenAI and LocalAI integration" : "OpenAI och LocalAI integration",
     "Integration of OpenAI and LocalAI services" : "Integration av OpenAI och LocalAI-tjänster",
     "OpenAI admin options saved" : "OpenAI administratörsalternativ sparade",
