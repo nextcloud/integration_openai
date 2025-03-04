@@ -2,6 +2,8 @@ OC.L10N.register(
     "integration_openai",
     {
     "Default" : "Προεπιλογή",
+    "Text generation" : "Δημιουργία κειμένου",
+    "Image generation" : "Δημιουργία εικόνας",
     "Unknown" : "Άγνωστο",
     "seconds" : "δευτερόλεπτα",
     "Bad HTTP method" : "Κακή μέθοδος HTTP",
