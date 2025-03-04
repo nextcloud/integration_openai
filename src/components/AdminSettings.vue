@@ -723,14 +723,14 @@ export default {
 		},
 		onSensitiveInput: debounce(async function(getModels = true) {
 			const values = {
-				basic_user: this.state.basic_user,
-				url: this.state.url,
+				basic_user: (this.state.basic_user ?? '').trim(),
+				url: (this.state.url ?? '').trim(),
 			}
 			if (this.state.api_key !== 'dummyApiKey') {
-				values.api_key = this.state.api_key
+				values.api_key = (this.state.api_key ?? '').trim()
 			}
 			if (this.state.basic_password !== 'dummyPassword') {
-				values.basic_password = this.state.basic_password
+				values.basic_password = (this.state.basic_password ?? '').trim()
 			}
 			await this.saveOptions(values, true)
 			if (getModels) {
