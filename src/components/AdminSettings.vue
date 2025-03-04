@@ -661,7 +661,11 @@ export default {
 					this.state.default_image_model_id = imageModelToSelect.id
 				})
 				.catch((error) => {
-					showError(t('integration_openai', 'Failed to load models'))
+					showError(
+						t('integration_openai', 'Failed to load models')
+						+ ': ' + this.reduceStars(error.response?.data?.error),
+						{ timeout: 10000 },
+					)
 					console.error(error)
 				})
 		},
@@ -702,7 +706,8 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to load quota info')
-						+ ': ' + error.response?.request?.responseText,
+						+ ': ' + this.reduceStars(error.response?.data?.error),
+						{ timeout: 10000 },
 					)
 				})
 		},
@@ -761,8 +766,18 @@ export default {
 				}
 			} catch (error) {
 				console.error(error)
-				showError(t('integration_openai', 'Failed to save OpenAI admin options'))
+				showError(
+					t('integration_openai', 'Failed to save OpenAI admin options')
+					+ ': ' + this.reduceStars(error.response?.data?.error),
+					{ timeout: 10000 },
+				)
 			}
+		},
+		reduceStars(text) {
+			if (!text) {
+				return '(none)'
+			}
+			return text.replace(/[*]{4,}/g, '***')
 		},
 	},
 }
