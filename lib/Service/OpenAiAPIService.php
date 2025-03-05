@@ -72,6 +72,22 @@ class OpenAiAPIService {
 		}
 	}
 
+	private function isModelListValid(array $models): bool {
+		if (!is_array($models)) {
+			return false;
+		}
+		if (count($models) === 0) {
+			return false;
+		}
+		foreach ($models as $model) {
+			if (!isset($model['id'])) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	/**
 	 * @param string $userId
 	 * @return array|string[]
@@ -116,11 +132,17 @@ class OpenAiAPIService {
 			$this->areCredsValid = false;
 			throw new Exception($modelsResponse['error'], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
-
 		if (!isset($modelsResponse['data'])) {
 			// also consider responses without 'data' as valid
 			$modelsResponse = ['data' => $modelsResponse];
 		}
+
+		if (!$this->isModelListValid($modelsResponse['data'])) {
+			$this->logger->warning('Invalid models response: ' . \json_encode($modelsResponse));
+			$this->areCredsValid = false;
+			throw new Exception($this->l10n->t('Invalid models response received'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
 		$cache->set($cacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
 		$this->modelsMemoryCache = $modelsResponse;
 		$this->areCredsValid = true;
