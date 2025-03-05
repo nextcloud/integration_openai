@@ -661,7 +661,11 @@ export default {
 					this.state.default_image_model_id = imageModelToSelect.id
 				})
 				.catch((error) => {
-					showError(t('integration_openai', 'Failed to load models'))
+					showError(
+						t('integration_openai', 'Failed to load models')
+						+ ': ' + this.reduceStars(error.response?.data?.error),
+						{ timeout: 10000 },
+					)
 					console.error(error)
 				})
 		},
@@ -702,7 +706,8 @@ export default {
 				.catch((error) => {
 					showError(
 						t('integration_openai', 'Failed to load quota info')
-						+ ': ' + error.response?.request?.responseText,
+						+ ': ' + this.reduceStars(error.response?.data?.error),
+						{ timeout: 10000 },
 					)
 				})
 		},
@@ -718,14 +723,14 @@ export default {
 		},
 		onSensitiveInput: debounce(async function(getModels = true) {
 			const values = {
-				basic_user: this.state.basic_user,
-				url: this.state.url,
+				basic_user: (this.state.basic_user ?? '').trim(),
+				url: (this.state.url ?? '').trim(),
 			}
 			if (this.state.api_key !== 'dummyApiKey') {
-				values.api_key = this.state.api_key
+				values.api_key = (this.state.api_key ?? '').trim()
 			}
 			if (this.state.basic_password !== 'dummyPassword') {
-				values.basic_password = this.state.basic_password
+				values.basic_password = (this.state.basic_password ?? '').trim()
 			}
 			await this.saveOptions(values, true)
 			if (getModels) {
@@ -761,8 +766,18 @@ export default {
 				}
 			} catch (error) {
 				console.error(error)
-				showError(t('integration_openai', 'Failed to save OpenAI admin options'))
+				showError(
+					t('integration_openai', 'Failed to save OpenAI admin options')
+					+ ': ' + this.reduceStars(error.response?.data?.error),
+					{ timeout: 10000 },
+				)
 			}
+		},
+		reduceStars(text) {
+			if (!text) {
+				return '(none)'
+			}
+			return text.replace(/[*]{4,}/g, '***')
 		},
 	},
 }

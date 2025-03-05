@@ -35,6 +35,7 @@ use RuntimeException;
 class OpenAiAPIService {
 	private IClient $client;
 	private ?array $modelsMemoryCache = null;
+	private ?bool $areCredsValid = null;
 
 	public function __construct(
 		private LoggerInterface $logger,
@@ -77,6 +78,19 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function getModels(string $userId): array {
+		// caching against 'getModelEnumValues' calls from all the providers
+		if ($this->areCredsValid === false) {
+			$this->logger->info('Cannot get OpenAI models without an API key');
+			return [];
+		} elseif ($this->areCredsValid === null) {
+			if ($this->isUsingOpenAi() && $this->openAiSettingsService->getUserApiKey($userId, true) === '') {
+				$this->areCredsValid = false;
+				$this->logger->info('Cannot get OpenAI models without an API key');
+				return [];
+			}
+			$this->areCredsValid = true;
+		}
+
 		if ($this->modelsMemoryCache !== null) {
 			$this->logger->debug('Getting OpenAI models from the memory cache');
 			return $this->modelsMemoryCache;
@@ -89,14 +103,22 @@ class OpenAiAPIService {
 			return $cachedModels;
 		}
 
-		$modelsResponse = $this->request($userId, 'models');
-		$this->logger->debug('Actually getting OpenAI models with a network request');
+		try {
+			$this->logger->debug('Actually getting OpenAI models with a network request');
+			$modelsResponse = $this->request($userId, 'models');
+		} catch (Exception $e) {
+			$this->logger->warning('Error retrieving models (exc): ' . $e->getMessage());
+			$this->areCredsValid = false;
+			throw $e;
+		}
 		if (!isset($modelsResponse['data'])) {
-			$this->logger->warning('Error retrieving models: ' . json_encode($modelsResponse));
+			$this->logger->warning('Error retrieving models: ' . \json_encode($modelsResponse));
+			$this->areCredsValid = false;
 			throw new Exception($this->l10n->t('Unknown models error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 		$cache->set($cacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
 		$this->modelsMemoryCache = $modelsResponse;
+		$this->areCredsValid = true;
 		return $modelsResponse;
 	}
 
@@ -133,7 +155,8 @@ class OpenAiAPIService {
 			}
 			return $modelEnumValues;
 		} catch (\Throwable $e) {
-			$this->logger->warning('Error getting model enum values', ['exception' => $e]);
+			// avoid flooding the logs with errors from calls of task processing
+			$this->logger->info('Error getting model enum values', ['exception' => $e]);
 			return [];
 		}
 	}
