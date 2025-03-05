@@ -72,7 +72,11 @@ class OpenAiAPIService {
 		}
 	}
 
-	private function isModelListValid(array $models): bool {
+	/**
+	 * @param mixed $models
+	 * @return boolean
+	 */
+	private function isModelListValid($models): bool {
 		if (!is_array($models)) {
 			return false;
 		}
