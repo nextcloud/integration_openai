@@ -77,7 +77,7 @@ class OpenAiAPIService {
 	 * @return boolean
 	 */
 	private function isModelListValid($models): bool {
-		if (!is_array($models)) {
+		if (!is_array($models) || !array_is_list($models)) {
 			return false;
 		}
 		if (count($models) === 0) {
