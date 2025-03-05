@@ -82,8 +82,7 @@ class OpenAiAPIService {
 		if ($this->areCredsValid === false) {
 			$this->logger->info('Cannot get OpenAI models without an API key');
 			return [];
-		}
-		elseif ($this->areCredsValid === null) {
+		} elseif ($this->areCredsValid === null) {
 			if ($this->isUsingOpenAi() && $this->openAiSettingsService->getUserApiKey($userId, true) === '') {
 				$this->areCredsValid = false;
 				$this->logger->info('Cannot get OpenAI models without an API key');
