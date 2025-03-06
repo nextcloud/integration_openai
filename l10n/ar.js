@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown models error" : "خطأ نماذج غير محدد",
     "Default" : "التلقائي",
     "Text generation" : "توليد النص",
     "Image generation" : "توليد الصورة",

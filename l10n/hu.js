@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown models error" : "Ismeretlen modell hiba",
     "Default" : "Alapértelmezett",
     "Text generation" : "Szöveg generálás",
     "Image generation" : "Kép generálás",

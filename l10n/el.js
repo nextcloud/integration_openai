@@ -6,6 +6,7 @@ OC.L10N.register(
     "Image generation" : "Δημιουργία εικόνας",
     "Unknown" : "Άγνωστο",
     "seconds" : "δευτερόλεπτα",
+    "Unknown image generation error" : "Άγνωστο σφάλμα δημιουργίας εικόνας",
     "Bad HTTP method" : "Κακή μέθοδος HTTP",
     "Bad credentials" : "Εσφαλμένα διαπιστευτήρια",
     "OpenAI and LocalAI integration" : "Ενσωμάτωση OpenAI και LocalAI",

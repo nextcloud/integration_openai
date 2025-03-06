@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown models error" : "Bilinmeyen modeller sorunu",
     "Default" : "Varsayılan",
     "Text generation" : "Metin oluşturma",
     "Image generation" : "Görsel oluşturma",

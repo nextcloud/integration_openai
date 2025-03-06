@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown models error" : "نامەلۇم مودېللارنىڭ خاتالىقى",
     "Default" : "سۈكۈتتىكى",
     "Text generation" : "تېكىست ئەۋلاد",
     "Image generation" : "رەسىم ھاسىل قىلىش",

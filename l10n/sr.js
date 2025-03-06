@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown models error" : "Непозната грешка модела",
     "Default" : "Подразумевано",
     "Text generation" : "Генерисање текста",
     "Image generation" : "Генерисање слике",

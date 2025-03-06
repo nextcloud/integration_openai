@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown models error" : "Earráid samhlacha anaithnid",
     "Default" : "Réamhshocrú",
     "Text generation" : "Giniúint téacs",
     "Image generation" : "Giniúint íomhá",

@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown models error" : "Ukendt modelfejl",
     "Default" : "Standard",
     "Text generation" : "Tekstgenerering",
     "Image generation" : "Billedgenerering",

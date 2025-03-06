@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Unknown models error" : "Neznana napaka modela",
     "Default" : "privzeto",
     "Text generation" : "Ustvarjanje besedila",
     "Image generation" : "Ustvarjanje slik",
