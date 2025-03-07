@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Invalid models response received" : "Obdržena neplatná odpověď modelů",
     "Default" : "Výchozí",
     "Text generation" : "Vytváření textu",
     "Image generation" : "Vytváření obrázků",

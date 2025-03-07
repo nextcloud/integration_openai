@@ -1,4 +1,5 @@
 { "translations": {
+    "Invalid models response received" : "收到無效的模型回應",
     "Default" : "預設",
     "Text generation" : "產生文字",
     "Image generation" : "影像產生",

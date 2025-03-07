@@ -1,4 +1,5 @@
 { "translations": {
+    "Invalid models response received" : "Recibiuse unha resposta non válida dos modelos",
     "Default" : "Predeterminado",
     "Text generation" : "Xeración de texto",
     "Image generation" : "Xeración de imaxes",

@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Invalid models response received" : "收到無效的模型回應",
     "Default" : "默認",
     "Text generation" : "產生文字",
     "Image generation" : "圖像產生",

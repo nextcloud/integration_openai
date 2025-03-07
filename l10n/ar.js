@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Invalid models response received" : "تم استلام استجابة نماذج غير صالحة",
     "Default" : "التلقائي",
     "Text generation" : "توليد النص",
     "Image generation" : "توليد الصورة",
