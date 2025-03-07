@@ -1,9 +1,0 @@
-{ "translations": {
-    "Unknown" : "Desconegut",
-    "seconds" : "segondas",
-    "Bad credentials" : "Marrits identificants",
-    "Authentication" : "Autentificacion",
-    "Username" : "Nom d'utilizaire",
-    "Password" : "Senhal"
-},"pluralForm" :"nplurals=2; plural=(n > 1);"
-}
