@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Invalid models response received" : "Fuarthas freagra samhlacha neamhbhailí",
     "Default" : "Réamhshocrú",
     "Text generation" : "Giniúint téacs",
     "Image generation" : "Giniúint íomhá",

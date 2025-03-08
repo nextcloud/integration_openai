@@ -1,4 +1,5 @@
 { "translations": {
+    "Invalid models response received" : "Fuarthas freagra samhlacha neamhbhailí",
     "Default" : "Réamhshocrú",
     "Text generation" : "Giniúint téacs",
     "Image generation" : "Giniúint íomhá",
