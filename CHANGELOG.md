@@ -8,6 +8,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.5.0 – 2025-03-11
+
+### Added
+
+- Add support for together ai @kyteinsky [#197](https://github.com/nextcloud/integration_openai/pull/197)
+
+### Changed
+
+- Enable use_max_completion_tokens_param by default for OpenAI, disable by default for non-OpenAI @julien-nc [#184](https://github.com/nextcloud/integration_openai/pull/184)
+- Add admin setting to toggle authentication in the image retrieval request @julien-nc [#186](https://github.com/nextcloud/integration_openai/pull/186)
+- Add a warning in the admin settings if the assistant app is not installed @julien-nc [#185](https://github.com/nextcloud/integration_openai/pull/185)
+- Raise the default image size for compatibility @Rello [#193](https://github.com/nextcloud/integration_openai/pull/193)
+- Bump max NC version to 32
+
+### Fixed
+
+- Prevent browser autocomplete for API key inputs and credentials @julien-nc [#187](https://github.com/nextcloud/integration_openai/pull/187)
+- Do not attempt to update local quota if chat/completion response does not have usage.total_tokens set @julien-nc [#189](https://github.com/nextcloud/integration_openai/pull/189)
+- Prevent error log flood when not configured @kyteinsky [#199](https://github.com/nextcloud/integration_openai/pull/199)
+
 ## 3.4.0 – 2025-01-22
 
 ### Changed
