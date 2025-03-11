@@ -1,4 +1,5 @@
 { "translations": {
+    "Invalid models response received" : "Alınan model yanıtı geçersiz",
     "Default" : "Varsayılan",
     "Text generation" : "Metin oluşturma",
     "Image generation" : "Görsel oluşturma",

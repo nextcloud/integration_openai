@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Invalid models response received" : "Alınan model yanıtı geçersiz",
     "Default" : "Varsayılan",
     "Text generation" : "Metin oluşturma",
     "Image generation" : "Görsel oluşturma",
