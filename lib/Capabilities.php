@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi;
+namespace OCA\Watsonx;
 
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Service\OpenAiAPIService;
 use OCP\Capabilities\IPublicCapability;
 
 class Capabilities implements IPublicCapability {

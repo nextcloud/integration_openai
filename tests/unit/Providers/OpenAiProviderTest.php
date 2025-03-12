@@ -10,18 +10,18 @@
  * actual openAI/LocalAI api calls, but rather mocks them.
  */
 
-namespace OCA\OpenAi\Tests\Unit\Provider;
+namespace OCA\Watsonx\Tests\Unit\Provider;
 
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Db\QuotaUsageMapper;
-use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
-use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
-use OCA\OpenAi\TaskProcessing\HeadlineProvider;
-use OCA\OpenAi\TaskProcessing\ProofreadProvider;
-use OCA\OpenAi\TaskProcessing\SummaryProvider;
-use OCA\OpenAi\TaskProcessing\TextToTextProvider;
-use OCA\OpenAi\TaskProcessing\TranslateProvider;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Db\QuotaUsageMapper;
+use OCA\Watsonx\Service\OpenAiAPIService;
+use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\TaskProcessing\ChangeToneProvider;
+use OCA\Watsonx\TaskProcessing\HeadlineProvider;
+use OCA\Watsonx\TaskProcessing\ProofreadProvider;
+use OCA\Watsonx\TaskProcessing\SummaryProvider;
+use OCA\Watsonx\TaskProcessing\TextToTextProvider;
+use OCA\Watsonx\TaskProcessing\TranslateProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;

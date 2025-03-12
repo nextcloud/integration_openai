@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Cron;
+namespace OCA\Watsonx\Cron;
 
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Db\QuotaUsageMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\IAppConfig;

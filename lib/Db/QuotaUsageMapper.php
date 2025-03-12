@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Db;
+namespace OCA\Watsonx\Db;
 
 use DateInterval;
 use DateTime;

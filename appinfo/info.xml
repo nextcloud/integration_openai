@@ -45,7 +45,7 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 	<version>0.1.0</version>
 	<licence>agpl</licence>
 	<author>Edward Ly</author>
-	<namespace>OpenAi</namespace>
+	<namespace>Watsonx</namespace>
 	<documentation>
 		<developer>https://github.com/nextcloud/integration_watsonx</developer>
 	</documentation>
@@ -60,10 +60,10 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 		<nextcloud min-version="30" max-version="32"/>
 	</dependencies>
 	<background-jobs>
-		<job>OCA\OpenAi\Cron\CleanupQuotaDb</job>
+		<job>OCA\Watsonx\Cron\CleanupQuotaDb</job>
 	</background-jobs>
 	<settings>
-		<admin>OCA\OpenAi\Settings\Admin</admin>
-		<personal>OCA\OpenAi\Settings\Personal</personal>
+		<admin>OCA\Watsonx\Settings\Admin</admin>
+		<personal>OCA\Watsonx\Settings\Personal</personal>
 	</settings>
 </info>

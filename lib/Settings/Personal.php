@@ -5,10 +5,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Settings;
+namespace OCA\Watsonx\Settings;
 
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Service\OpenAiSettingsService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\Settings\ISettings;

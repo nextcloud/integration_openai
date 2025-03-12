@@ -5,13 +5,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Service;
+namespace OCA\Watsonx\Service;
 
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Db\QuotaUsageMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;

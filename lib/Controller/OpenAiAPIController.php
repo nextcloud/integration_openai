@@ -5,10 +5,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Controller;
+namespace OCA\Watsonx\Controller;
 
 use Exception;
-use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\Watsonx\Service\OpenAiAPIService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;

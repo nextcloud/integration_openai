@@ -5,10 +5,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Service;
+namespace OCA\Watsonx\Service;
 
 use Exception;
-use OCA\OpenAi\AppInfo\Application;
+use OCA\Watsonx\AppInfo\Application;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
 use OCP\IConfig;

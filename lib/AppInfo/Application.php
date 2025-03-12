@@ -5,22 +5,22 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\AppInfo;
+namespace OCA\Watsonx\AppInfo;
 
-use OCA\OpenAi\Capabilities;
-use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
-use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
-use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
-use OCA\OpenAi\TaskProcessing\ChangeToneTaskType;
-use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
-use OCA\OpenAi\TaskProcessing\HeadlineProvider;
-use OCA\OpenAi\TaskProcessing\ReformulateProvider;
-use OCA\OpenAi\TaskProcessing\SummaryProvider;
-use OCA\OpenAi\TaskProcessing\TextToImageProvider;
-use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
-use OCA\OpenAi\TaskProcessing\TextToTextProvider;
-use OCA\OpenAi\TaskProcessing\TopicsProvider;
-use OCA\OpenAi\TaskProcessing\TranslateProvider;
+use OCA\Watsonx\Capabilities;
+use OCA\Watsonx\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
+use OCA\Watsonx\TaskProcessing\AudioToTextProvider;
+use OCA\Watsonx\TaskProcessing\ChangeToneProvider;
+use OCA\Watsonx\TaskProcessing\ChangeToneTaskType;
+use OCA\Watsonx\TaskProcessing\ContextWriteProvider;
+use OCA\Watsonx\TaskProcessing\HeadlineProvider;
+use OCA\Watsonx\TaskProcessing\ReformulateProvider;
+use OCA\Watsonx\TaskProcessing\SummaryProvider;
+use OCA\Watsonx\TaskProcessing\TextToImageProvider;
+use OCA\Watsonx\TaskProcessing\TextToTextChatProvider;
+use OCA\Watsonx\TaskProcessing\TextToTextProvider;
+use OCA\Watsonx\TaskProcessing\TopicsProvider;
+use OCA\Watsonx\TaskProcessing\TranslateProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 
@@ -102,10 +102,10 @@ class Application extends App implements IBootstrap {
 			}
 			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChatWithTools')) {
-				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
+				$context->registerTaskProcessingProvider(\OCA\Watsonx\TaskProcessing\TextToTextChatWithToolsProvider::class);
 			}
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextProofread')) {
-				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
+				$context->registerTaskProcessingProvider(\OCA\Watsonx\TaskProcessing\ProofreadProvider::class);
 			}
 		}
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {

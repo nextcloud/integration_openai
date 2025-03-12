@@ -7,12 +7,12 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\TaskProcessing;
+namespace OCA\Watsonx\TaskProcessing;
 
 use Exception;
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Service\OpenAiAPIService;
+use OCA\Watsonx\Service\OpenAiSettingsService;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
 use OCP\IL10N;
