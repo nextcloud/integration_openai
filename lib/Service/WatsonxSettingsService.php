@@ -15,7 +15,7 @@ use OCP\IConfig;
 use OCP\PreConditionNotMetException;
 use OCP\Security\ICrypto;
 
-class OpenAiSettingsService {
+class WatsonxSettingsService {
 	private const ADMIN_CONFIG_TYPES = [
 		'request_timeout' => 'integer',
 		'url' => 'string',
@@ -136,7 +136,7 @@ class OpenAiSettingsService {
 	 * @return int
 	 */
 	public function getRequestTimeout(): int {
-		return intval($this->appConfig->getValueString(Application::APP_ID, 'request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT))) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'request_timeout', strval(Application::WATSONX_DEFAULT_REQUEST_TIMEOUT))) ?: Application::WATSONX_DEFAULT_REQUEST_TIMEOUT;
 	}
 
 	/**
@@ -294,7 +294,7 @@ class OpenAiSettingsService {
 	 * @return array{api_key: string, basic_password: string, basic_user: string, is_custom_service: bool, use_basic_auth: bool}
 	 */
 	public function getUserConfig(string $userId): array {
-		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::OPENAI_API_BASE_URL;
+		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::WATSONX_API_BASE_URL;
 		return [
 			'api_key' => $this->getUserApiKey($userId),
 			'basic_user' => $this->getUserBasicUser($userId, false),
@@ -310,9 +310,9 @@ class OpenAiSettingsService {
 	 */
 	public function getUseMaxCompletionTokensParam(): bool {
 		$serviceUrl = $this->getServiceUrl();
-		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-		// we know OpenAI expects "use_max_completion_tokens_param", let's assume the other services don't
-		$default = $isUsingOpenAI ? '1' : '0';
+		$isUsingWatsonx = $serviceUrl === '' || $serviceUrl === Application::WATSONX_API_BASE_URL;
+		// we know Watsonx expects "use_max_completion_tokens_param", let's assume the other services don't
+		$default = $isUsingWatsonx ? '1' : '0';
 		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', $default) === '1';
 	}
 
@@ -328,8 +328,8 @@ class OpenAiSettingsService {
 	 */
 	public function getIsImageRetrievalAuthenticated(): bool {
 		$serviceUrl = $this->getServiceUrl();
-		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-		$default = $isUsingOpenAI ? '0' : '1';
+		$isUsingWatsonx = $serviceUrl === '' || $serviceUrl === Application::WATSONX_API_BASE_URL;
+		$default = $isUsingWatsonx ? '0' : '1';
 		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default) === '1';
 	}
 

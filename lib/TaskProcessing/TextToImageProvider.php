@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OCA\Watsonx\TaskProcessing;
 
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiAPIService;
+use OCA\Watsonx\Service\WatsonxAPIService;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\IL10N;
@@ -24,7 +24,7 @@ use RuntimeException;
 class TextToImageProvider implements ISynchronousProvider {
 
 	public function __construct(
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private IClientService $clientService,
@@ -38,9 +38,9 @@ class TextToImageProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? $this->l->t('OpenAI\'s DALL-E 2')
-			: $this->openAiAPIService->getServiceName();
+		return $this->watsonxAPIService->isUsingWatsonx()
+			? $this->l->t('Watsonx\'s DALL-E 2')
+			: $this->watsonxAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -48,7 +48,7 @@ class TextToImageProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->watsonxAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -79,12 +79,12 @@ class TextToImageProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeEnumValues(): array {
 		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
+			'model' => $this->watsonxAPIService->getModelEnumValues($this->userId),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi()
+		$adminModel = $this->watsonxAPIService->isUsingWatsonx()
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id');
 		return [
@@ -129,7 +129,7 @@ class TextToImageProvider implements ISynchronousProvider {
 		}
 
 		try {
-			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $model, $nbImages, $size);
+			$apiResponse = $this->watsonxAPIService->requestImageCreation($userId, $prompt, $model, $nbImages, $size);
 			$b64s = array_map(static function (array $result) {
 				return $result['b64_json'] ?? null;
 			}, $apiResponse['data']);
@@ -147,11 +147,11 @@ class TextToImageProvider implements ISynchronousProvider {
 			$urls = array_values($urls);
 
 			if (empty($urls) && empty($b64s)) {
-				$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
-				throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
+				$this->logger->warning('Watsonx\'s text to image generation failed: no image returned');
+				throw new RuntimeException('Watsonx\'s text to image generation failed: no image returned');
 			}
 			$client = $this->clientService->newClient();
-			$requestOptions = $this->openAiAPIService->getImageRequestOptions($userId);
+			$requestOptions = $this->watsonxAPIService->getImageRequestOptions($userId);
 			$output = ['images' => []];
 			foreach ($urls as $url) {
 				$imageResponse = $client->get($url, $requestOptions);
@@ -162,12 +162,12 @@ class TextToImageProvider implements ISynchronousProvider {
 				$output['images'][] = $imagePayload;
 			}
 			$endTime = time();
-			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
+			$this->watsonxAPIService->updateExpImgProcessingTime($endTime - $startTime);
 			/** @var array<string, list<numeric|string>|numeric|string> $output */
 			return $output;
 		} catch (\Exception $e) {
-			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
+			$this->logger->warning('Watsonx\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
+			throw new RuntimeException('Watsonx\'s text to image generation failed with: ' . $e->getMessage());
 		}
 	}
 }

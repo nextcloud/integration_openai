@@ -11,8 +11,8 @@ namespace OCA\Watsonx\TaskProcessing;
 
 use Exception;
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiAPIService;
-use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxAPIService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -24,9 +24,9 @@ use RuntimeException;
 class TextToTextProvider implements ISynchronousProvider {
 
 	public function __construct(
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 		private IAppConfig $appConfig,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		private IL10N $l,
 		private ?string $userId,
 	) {
@@ -37,7 +37,7 @@ class TextToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->watsonxAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -45,7 +45,7 @@ class TextToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->watsonxAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -73,12 +73,12 @@ class TextToTextProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeEnumValues(): array {
 		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
+			'model' => $this->watsonxAPIService->getModelEnumValues($this->userId),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi()
+		$adminModel = $this->watsonxAPIService->isUsingWatsonx()
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id');
 		return [
@@ -125,21 +125,21 @@ class TextToTextProvider implements ISynchronousProvider {
 		}
 
 		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+			if ($this->watsonxAPIService->isUsingWatsonx() || $this->watsonxSettingsService->getChatEndpointEnabled()) {
+				$completion = $this->watsonxAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 				$completion = $completion['messages'];
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+				$completion = $this->watsonxAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 			}
 		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			throw new RuntimeException('Watsonx request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			$this->watsonxAPIService->updateExpTextProcessingTime($endTime - $startTime);
 			return ['output' => array_pop($completion)];
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		throw new RuntimeException('No result in watsonx response.');
 	}
 }

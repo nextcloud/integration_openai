@@ -11,8 +11,8 @@ namespace OCA\Watsonx\TaskProcessing;
 
 use Exception;
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiAPIService;
-use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxAPIService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -24,9 +24,9 @@ use RuntimeException;
 class SummaryProvider implements ISynchronousProvider {
 
 	public function __construct(
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 		private IAppConfig $appConfig,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		private IL10N $l,
 		private ?string $userId,
 	) {
@@ -37,7 +37,7 @@ class SummaryProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->watsonxAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -45,7 +45,7 @@ class SummaryProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->watsonxAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -73,12 +73,12 @@ class SummaryProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeEnumValues(): array {
 		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
+			'model' => $this->watsonxAPIService->getModelEnumValues($this->userId),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi()
+		$adminModel = $this->watsonxAPIService->isUsingWatsonx()
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id');
 		return [
@@ -107,12 +107,12 @@ class SummaryProvider implements ISynchronousProvider {
 		}
 		$prompt = $input['input'];
 
-		$maxTokens = $this->openAiSettingsService->getMaxTokens();
+		$maxTokens = $this->watsonxSettingsService->getMaxTokens();
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
+		$model = $this->watsonxSettingsService->getAdminDefaultCompletionModelId();
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		}
@@ -125,11 +125,11 @@ class SummaryProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->watsonxAPIService->isUsingWatsonx() || $this->watsonxSettingsService->getChatEndpointEnabled()) {
 					$summarySystemPrompt = 'Summarize the following text in the same language as the text.';
 
 					foreach ($prompts as $p) {
-						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
+						$completion = $this->watsonxAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
 						$completions[] = $completion['messages'];
 					}
 				} else {
@@ -138,17 +138,17 @@ class SummaryProvider implements ISynchronousProvider {
 					};
 
 					foreach (array_map($wrapSummaryPrompt, $prompts) as $p) {
-						$completions[] = $this->openAiAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
+						$completions[] = $this->watsonxAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
 					}
 				}
 			} catch (Exception $e) {
-				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+				throw new RuntimeException('Watsonx request failed: ' . $e->getMessage());
 			}
 
 			// Each prompt chunk should return a non-empty array of completions, this will return false if at least one array is empty
 			$allPromptsHaveCompletions = array_reduce($completions, fn (bool $prev, array $next): bool => $prev && count($next), true);
 			if (!$allPromptsHaveCompletions) {
-				throw new RuntimeException('No result in OpenAI/LocalAI response.');
+				throw new RuntimeException('No result in watsonx response.');
 			}
 
 			// Take only one completion for each chunk and combine them into a single summary (which may be used as the next prompt)
@@ -160,15 +160,14 @@ class SummaryProvider implements ISynchronousProvider {
 		} while ($oldNumChunks > $newNumChunks);
 
 		$endTime = time();
-		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		$this->watsonxAPIService->updateExpTextProcessingTime($endTime - $startTime);
 		return ['output' => $summary];
 	}
 
 	private function chunkSplitPrompt(string $prompt): array {
-		$chunkSize = $this->openAiSettingsService->getChunkSize();
+		$chunkSize = $this->watsonxSettingsService->getChunkSize();
 
-		// https://platform.openai.com/tokenizer
-		// Rough approximation, 1 token is approximately 4 bytes for OpenAI models
+		// Rough approximation, 1 token is approximately 4 bytes for Watsonx models
 		// It's safer to have a lower estimate on the max number of tokens, so consider 3 bytes per token instead of 4 (to account for some multibyte characters)
 		$maxChars = $chunkSize * 3;
 

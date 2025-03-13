@@ -8,4 +8,4 @@ import PersonalSettings from './components/PersonalSettings.vue'
 Vue.mixin({ methods: { t, n } })
 
 const View = Vue.extend(PersonalSettings)
-new View().$mount('#openai_prefs')
+new View().$mount('#watsonx_prefs')

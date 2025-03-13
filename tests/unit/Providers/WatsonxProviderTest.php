@@ -7,15 +7,15 @@
  *
  * This unit test is designed to test the functionality of all providers
  * exposed by the app. It does not test the
- * actual openAI/LocalAI api calls, but rather mocks them.
+ * actual watsonx.ai API calls, but rather mocks them.
  */
 
 namespace OCA\Watsonx\Tests\Unit\Provider;
 
 use OCA\Watsonx\AppInfo\Application;
 use OCA\Watsonx\Db\QuotaUsageMapper;
-use OCA\Watsonx\Service\OpenAiAPIService;
-use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxAPIService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCA\Watsonx\TaskProcessing\ChangeToneProvider;
 use OCA\Watsonx\TaskProcessing\HeadlineProvider;
 use OCA\Watsonx\TaskProcessing\ProofreadProvider;
@@ -34,14 +34,14 @@ use Test\Util\User\Dummy;
 /**
  * @group DB
  */
-class OpenAiProviderTest extends TestCase {
-	public const APP_NAME = 'integration_openai';
+class WatsonxProviderTest extends TestCase {
+	public const APP_NAME = 'integration_watsonx';
 	public const TEST_USER1 = 'testuser';
-	public const OPENAI_API_BASE = 'https://api.openai.com/v1/';
+	public const WATSONX_API_BASE = 'https://us-south.ml.cloud.ibm.com/ml/v1/';
 	public const AUTHORIZATION_HEADER = 'Bearer This is a PHPUnit test API key';
 
-	private OpenAiAPIService $openAiApiService;
-	private OpenAiSettingsService $openAiSettingsService;
+	private WatsonxAPIService $watsonxApiService;
+	private WatsonxSettingsService $watsonxSettingsService;
 	/**
 	 * @var MockObject|IClient
 	 */
@@ -60,26 +60,26 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->loginAsUser(self::TEST_USER1);
 
-		$this->openAiSettingsService = \OC::$server->get(OpenAiSettingsService::class);
+		$this->watsonxSettingsService = \OC::$server->get(WatsonxSettingsService::class);
 
 		$this->quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
 
-		// We'll hijack the client service and subsequently iClient to return a mock response from the OpenAI API
+		// We'll hijack the client service and subsequently iClient to return a mock response from the Watsonx API
 		$clientService = $this->createMock(IClientService::class);
 		$this->iClient = $this->createMock(IClient::class);
 		$clientService->method('newClient')->willReturn($this->iClient);
 
-		$this->openAiApiService = new OpenAiAPIService(
+		$this->watsonxApiService = new WatsonxAPIService(
 			\OC::$server->get(\Psr\Log\LoggerInterface::class),
 			$this->createMock(\OCP\IL10N::class),
 			\OC::$server->get(IAppConfig::class),
 			\OC::$server->get(ICacheFactory::class),
 			\OC::$server->get(QuotaUsageMapper::class),
-			$this->openAiSettingsService,
+			$this->watsonxSettingsService,
 			$clientService,
 		);
 
-		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
+		$this->watsonxSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
 	}
 
 	public static function tearDownAfterClass(): void {
@@ -100,9 +100,9 @@ class OpenAiProviderTest extends TestCase {
 
 	public function testFreePromptProvider(): void {
 		$freePromptProvider = new TextToTextProvider(
-			$this->openAiApiService,
+			$this->watsonxApiService,
 			\OC::$server->get(IAppConfig::class),
-			$this->openAiSettingsService,
+			$this->watsonxSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 			\OCP\Server::get(LoggerInterface::class),
@@ -134,8 +134,8 @@ class OpenAiProviderTest extends TestCase {
 			}
 		  }';
 
-		$url = self::OPENAI_API_BASE . 'chat/completions';
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$url = self::WATSONX_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $prompt]],
@@ -163,9 +163,9 @@ class OpenAiProviderTest extends TestCase {
 
 	public function testHeadlineProvider(): void {
 		$headlineProvider = new HeadlineProvider(
-			$this->openAiApiService,
+			$this->watsonxApiService,
 			\OC::$server->get(IAppConfig::class),
-			$this->openAiSettingsService,
+			$this->watsonxSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 		);
@@ -196,9 +196,9 @@ class OpenAiProviderTest extends TestCase {
 			}
 		}';
 
-		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . 'chat/completions';
 
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$message = 'Give me the headline of the following text in its original language. Do not output the language. Output only the headline without any quotes or additional punctuation.' . "\n\n" . $prompt;
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
@@ -226,9 +226,9 @@ class OpenAiProviderTest extends TestCase {
 
 	public function testChangeToneProvider(): void {
 		$changeToneProvider = new ChangeToneProvider(
-			$this->openAiApiService,
+			$this->watsonxApiService,
 			\OC::$server->get(IAppConfig::class),
-			$this->openAiSettingsService,
+			$this->watsonxSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 		);
@@ -260,9 +260,9 @@ class OpenAiProviderTest extends TestCase {
 			}
 		}';
 
-		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . 'chat/completions';
 
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$message = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
@@ -291,9 +291,9 @@ class OpenAiProviderTest extends TestCase {
 
 	public function testSummaryProvider(): void {
 		$summaryProvider = new SummaryProvider(
-			$this->openAiApiService,
+			$this->watsonxApiService,
 			\OC::$server->get(IAppConfig::class),
-			$this->openAiSettingsService,
+			$this->watsonxSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 		);
@@ -324,9 +324,9 @@ class OpenAiProviderTest extends TestCase {
             }
         }';
 
-		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . 'chat/completions';
 
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$systemPrompt = 'Summarize the following text in the same language as the text.';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
@@ -355,9 +355,9 @@ class OpenAiProviderTest extends TestCase {
 
 	public function testProofreadProvider(): void {
 		$proofreadProvider = new ProofreadProvider(
-			$this->openAiApiService,
+			$this->watsonxApiService,
 			\OC::$server->get(IAppConfig::class),
-			$this->openAiSettingsService,
+			$this->watsonxSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
 		);
@@ -388,9 +388,9 @@ class OpenAiProviderTest extends TestCase {
             }
         }';
 
-		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . 'chat/completions';
 
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list.';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
@@ -418,9 +418,9 @@ class OpenAiProviderTest extends TestCase {
 
 	public function testTranslationProvider(): void {
 		$translationProvider = new TranslateProvider(
-			$this->openAiApiService,
+			$this->watsonxApiService,
 			\OC::$server->get(IAppConfig::class),
-			$this->openAiSettingsService,
+			$this->watsonxSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			\OC::$server->get(\OCP\L10N\IFactory::class),
 			$this->createMock(\OCP\ICacheFactory::class),
@@ -456,9 +456,9 @@ class OpenAiProviderTest extends TestCase {
             }
         }';
 
-		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . 'chat/completions';
 
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => 'Translate from ' . $fromLang . ' to English (US): ' . $inputText]],

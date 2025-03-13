@@ -10,19 +10,19 @@ declare(strict_types=1);
 namespace OCA\Watsonx;
 
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiAPIService;
+use OCA\Watsonx\Service\WatsonxAPIService;
 use OCP\Capabilities\IPublicCapability;
 
 class Capabilities implements IPublicCapability {
 	public function __construct(
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 	) {
 	}
 
 	public function getCapabilities(): array {
 		return [
 			Application::APP_ID => [
-				'uses_openai' => $this->openAiAPIService->isUsingOpenAi(),
+				'uses_watsonx' => $this->watsonxAPIService->isUsingWatsonx(),
 			],
 		];
 	}

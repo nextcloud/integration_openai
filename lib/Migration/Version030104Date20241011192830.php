@@ -10,14 +10,14 @@ declare(strict_types=1);
 namespace OCA\Watsonx\Migration;
 
 use Closure;
-use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version030104Date20241011192830 extends SimpleMigrationStep {
 
 	public function __construct(
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 	) {
 	}
 
@@ -27,10 +27,10 @@ class Version030104Date20241011192830 extends SimpleMigrationStep {
 	 * @param array $options
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
-		$value = $this->openAiSettingsService->getServiceUrl();
+		$value = $this->watsonxSettingsService->getServiceUrl();
 		if ($value !== '') {
 			$newValue = rtrim($value, '/') . '/v1';
-			$this->openAiSettingsService->setServiceUrl($newValue);
+			$this->watsonxSettingsService->setServiceUrl($newValue);
 		}
 	}
 }

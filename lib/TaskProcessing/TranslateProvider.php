@@ -11,8 +11,8 @@ namespace OCA\Watsonx\TaskProcessing;
 
 use Exception;
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiAPIService;
-use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxAPIService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
 use OCP\IL10N;
@@ -28,9 +28,9 @@ use RuntimeException;
 class TranslateProvider implements ISynchronousProvider {
 
 	public function __construct(
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 		private IAppConfig $appConfig,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		private IL10N $l,
 		private IFactory $l10nFactory,
 		private ICacheFactory $cacheFactory,
@@ -44,7 +44,7 @@ class TranslateProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->watsonxAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -52,7 +52,7 @@ class TranslateProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->watsonxAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -91,12 +91,12 @@ class TranslateProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeEnumValues(): array {
 		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
+			'model' => $this->watsonxAPIService->getModelEnumValues($this->userId),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi()
+		$adminModel = $this->watsonxAPIService->isUsingWatsonx()
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id');
 		return [
@@ -153,7 +153,7 @@ class TranslateProvider implements ISynchronousProvider {
 
 		$cacheKey = ($input['origin_language'] ?? '') . '/' . $input['target_language'] . '/' . md5($inputText);
 
-		$cache = $this->cacheFactory->createDistributed('integration_openai');
+		$cache = $this->cacheFactory->createDistributed('integration_watsonx');
 		if ($cached = $cache->get($cacheKey)) {
 			return ['output' => $cached];
 		}
@@ -164,23 +164,23 @@ class TranslateProvider implements ISynchronousProvider {
 			$toLanguage = $coreLanguages[$input['target_language']] ?? $input['target_language'];
 			if ($input['origin_language'] !== 'detect_language') {
 				$fromLanguage = $coreLanguages[$input['origin_language']] ?? $input['origin_language'];
-				$this->logger->debug('OpenAI translation FROM[' . $fromLanguage . '] TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
+				$this->logger->debug('Watsonx translation FROM[' . $fromLanguage . '] TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ' . $inputText;
 			} else {
-				$this->logger->debug('OpenAI translation TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
+				$this->logger->debug('Watsonx translation TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $inputText;
 			}
 
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+			if ($this->watsonxAPIService->isUsingWatsonx() || $this->watsonxSettingsService->getChatEndpointEnabled()) {
+				$completion = $this->watsonxAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 				$completion = $completion['messages'];
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+				$completion = $this->watsonxAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 			}
 
 			if (count($completion) > 0) {
 				$endTime = time();
-				$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+				$this->watsonxAPIService->updateExpTextProcessingTime($endTime - $startTime);
 				return ['output' => array_pop($completion)];
 			}
 

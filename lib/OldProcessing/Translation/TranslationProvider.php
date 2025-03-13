@@ -11,8 +11,8 @@ namespace OCA\Watsonx\OldProcessing\Translation;
 
 use Exception;
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiAPIService;
-use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxAPIService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\ICacheFactory;
 use OCP\IConfig;
 use OCP\L10N\IFactory;
@@ -26,20 +26,20 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 	public function __construct(
 		private ICacheFactory $cacheFactory,
 		private IFactory $l10nFactory,
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 		private LoggerInterface $logger,
 		private IConfig $config,
 		private ?string $userId,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 	) {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->watsonxAPIService->getServiceName();
 	}
 
 	public function getAvailableLanguages(): array {
-		$cache = $this->cacheFactory->createDistributed('integration_openai');
+		$cache = $this->cacheFactory->createDistributed('integration_watsonx');
 		if ($cached = $cache->get('languages')) {
 			return array_map(function ($entry) {
 				return $entry instanceof LanguageTuple ? $entry : LanguageTuple::fromArray($entry);
@@ -73,11 +73,11 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		$prompt = 'What language is this (answer with the language name only, in English): ' . $text;
 		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, 100);
+			if ($this->watsonxAPIService->isUsingWatsonx() || $this->watsonxSettingsService->getChatEndpointEnabled()) {
+				$completion = $this->watsonxAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, 100);
 				$completion = $completion['messages'];
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 100);
+				$completion = $this->watsonxAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 100);
 			}
 		} catch (Exception $e) {
 			throw new RuntimeException('Failed to detect language for input', 0, $e);
@@ -101,7 +101,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 	public function translate(?string $fromLanguage, string $toLanguage, string $text): string {
 		$cacheKey = ($fromLanguage ?? '') . '/' . $toLanguage . '/' . md5($text);
 
-		$cache = $this->cacheFactory->createDistributed('integration_openai');
+		$cache = $this->cacheFactory->createDistributed('integration_watsonx');
 		if ($cached = $cache->get($cacheKey)) {
 			return $cached;
 		}
@@ -111,20 +111,20 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 
 			$toLanguage = $coreLanguages[$toLanguage];
 			if ($fromLanguage !== null) {
-				$this->logger->debug('OpenAI translation FROM[' . $fromLanguage . '] TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
+				$this->logger->debug('Watsonx translation FROM[' . $fromLanguage . '] TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$fromLanguage = $coreLanguages[$fromLanguage] ?? $fromLanguage;
 				$prompt = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ' . $text;
 			} else {
-				$this->logger->debug('OpenAI translation TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
+				$this->logger->debug('Watsonx translation TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $text;
 			}
 			$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, PHP_INT_MAX);
+			if ($this->watsonxAPIService->isUsingWatsonx() || $this->watsonxSettingsService->getChatEndpointEnabled()) {
+				$completion = $this->watsonxAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, PHP_INT_MAX);
 				$completion = $completion['messages'];
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 4000);
+				$completion = $this->watsonxAPIService->createCompletion($this->userId, $prompt, 1, $adminModel, 4000);
 			}
 
 			if (count($completion) > 0) {

@@ -11,7 +11,7 @@ namespace OCA\Watsonx\TaskProcessing;
 
 use Exception;
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiAPIService;
+use OCA\Watsonx\Service\WatsonxAPIService;
 use OCP\Files\File;
 use OCP\IAppConfig;
 use OCP\TaskProcessing\ISynchronousProvider;
@@ -22,7 +22,7 @@ use RuntimeException;
 class AudioToTextProvider implements ISynchronousProvider {
 
 	public function __construct(
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 		private LoggerInterface $logger,
 		private IAppConfig $appConfig,
 	) {
@@ -33,7 +33,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->watsonxAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -41,7 +41,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->watsonxAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -85,11 +85,11 @@ class AudioToTextProvider implements ISynchronousProvider {
 		$model = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 
 		try {
-			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model);
+			$transcription = $this->watsonxAPIService->transcribeFile($userId, $inputFile, false, $model);
 			return ['output' => $transcription];
 		} catch (Exception $e) {
-			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
+			$this->logger->warning('Watsonx\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
+			throw new RuntimeException('Watsonx\'s Whisper transcription failed with: ' . $e->getMessage());
 		}
 	}
 }

@@ -1,7 +1,7 @@
 {
-	"name": "integration_openai",
+	"name": "integration_watsonx",
 	"version": "1.2.0",
-	"description": "OpenAI integration",
+	"description": "Watsonx integration",
 	"main": "index.js",
 	"directories": {
 		"test": "tests"
@@ -18,19 +18,19 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/julien-nc/integration_openai"
+		"url": "https://github.com/julien-nc/integration_watsonx"
 	},
 	"keywords": [
-		"openai",
+		"watsonx",
 		"dall-e",
 		"chatgpt"
 	],
 	"author": "Julien Veyssier",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://github.com/julien-nc/integration_openai/issues"
+		"url": "https://github.com/julien-nc/integration_watsonx/issues"
 	},
-	"homepage": "https://github.com/julien-nc/integration_openai",
+	"homepage": "https://github.com/julien-nc/integration_watsonx",
 	"browserslist": [
 		"extends @nextcloud/browserslist-config"
 	],

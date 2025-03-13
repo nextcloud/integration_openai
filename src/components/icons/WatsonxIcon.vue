@@ -5,7 +5,7 @@
 <template>
 	<span :aria-hidden="!title"
 		:aria-label="title"
-		class="material-design-icon openai-icon"
+		class="material-design-icon watsonx-icon"
 		role="img"
 		v-bind="$attrs"
 		@click="$emit('click', $event)">
@@ -25,7 +25,7 @@
 
 <script>
 export default {
-	name: 'OpenAiIcon',
+	name: 'WatsonxIcon',
 	props: {
 		title: {
 			type: String,

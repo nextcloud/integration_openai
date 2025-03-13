@@ -37,8 +37,8 @@ class Version010100Date20231008173034 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable('openai_quota_usage')) {
-			$table = $schema->createTable('openai_quota_usage');
+		if (!$schema->hasTable('watsonx_quota_usage')) {
+			$table = $schema->createTable('watsonx_quota_usage');
 			$table->addColumn('id', Types::BIGINT, [
 				'autoincrement' => true,
 				'notnull' => true,

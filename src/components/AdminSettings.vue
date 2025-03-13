@@ -3,26 +3,24 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div id="openai_prefs" class="section">
+	<div id="watsonx_prefs" class="section">
 		<h2>
-			<OpenAiIcon class="icon" />
-			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
+			<WatsonxIcon class="icon" />
+			{{ t('integration_watsonx', 'IBM watsonx AI integration') }}
 		</h2>
-		<div id="openai-content">
+		<div id="watsonx-content">
 			<div>
 				<NcNoteCard v-if="!state.assistant_enabled" type="warning">
-					{{ t('integration_openai', 'The Assistant app is not enabled. You need it to use the features provided by the OpenAI/LocalAI integration app.') }}
+					{{ t('integration_watsonx', 'The Assistant app is not enabled. You need it to use the features provided by the watsonx integration app.') }}
 					<a class="external" :href="appSettingsAssistantUrl" target="_blank">
-						{{ t('integration_openai', 'Assistant app') }}
+						{{ t('integration_watsonx', 'Assistant app') }}
 					</a>
 				</NcNoteCard>
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Services with an OpenAI-compatible API:') }}
+					{{ t('integration_watsonx', 'Services with a watsonx.ai-compatible API:') }}
 					<div class="services">
-						<a class="external" href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>
 						<a class="external" href="https://docs.ionos.com/cloud/ai/ai-model-hub" target="_blank">IONOS AI Model Hub</a>
 						<a class="external" href="https://console.groq.com" target="_blank">Groqcloud</a>
-						<a class="external" href="https://localai.io/" target="_blank">LocalAI</a>
 						<a class="external" href="https://ollama.com/" target="_blank">Ollama</a>
 						<a class="external" href="https://mistral.ai" target="_blank">MistralAI</a>
 						<a class="external" href="https://www.plusserver.com/en/ai-platform/" target="_blank">Plusserver</a>
@@ -30,45 +28,45 @@
 				</NcNoteCard>
 				<div class="line">
 					<NcTextField
-						id="openai-url"
+						id="watsonx-url"
 						class="input"
 						:value.sync="state.url"
-						:label="t('integration_openai', 'Service URL')"
-						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080/v1' })"
+						:label="t('integration_watsonx', 'Service URL')"
+						:placeholder="t('integration_watsonx', 'Example: {example}', { example: 'http://localhost:8080/v1' })"
 						:show-trailing-button="!!state.url"
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
 						<EarthIcon />
 					</NcTextField>
 					<NcButton type="tertiary"
-						:title="t('integration_openai', 'Leave empty to use {openaiApiUrl}', { openaiApiUrl: 'https://api.openai.com/v1' })">
+						:title="t('integration_watsonx', 'Leave empty to use {watsonxApiUrl}', { watsonxApiUrl: 'https://us-south.ml.cloud.ibm.com/ml/v1' })">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
 					</NcButton>
 				</div>
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'With the current configuration, the target URL used to get the models is:') }}
+					{{ t('integration_watsonx', 'With the current configuration, the target URL used to get the models is:') }}
 					<br>
 					<strong>{{ modelEndpointUrl }}</strong>
 				</NcNoteCard>
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
+					{{ t('integration_watsonx', 'This should include the address of your Watsonx instance (or any service implementing an API similar to Watsonx) along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
 					<br>
-					{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case, make sure \'allow_local_remote_servers\' is set to true in config.php.', { example: 'http://localhost:8080/v1' }) }}
+					{{ t('integration_watsonx', 'This can be a local address with a port like {example}. In this case, make sure \'allow_local_remote_servers\' is set to true in config.php.', { example: 'http://localhost:8080/v1' }) }}
 				</NcNoteCard>
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
-						id="openai-service-name"
+						id="watsonx-service-name"
 						class="input"
 						:value.sync="state.service_name"
-						:label="t('integration_openai', 'Service name (optional)')"
-						:placeholder="t('integration_openai', 'Example: LocalAI of university ABC')"
+						:label="t('integration_watsonx', 'Service name (optional)')"
+						:placeholder="t('integration_watsonx', 'Example: Watsonx of university ABC')"
 						:show-trailing-button="!!state.service_name"
 						@update:value="onInput()"
 						@trailing-button-click="state.service_name = '' ; onInput()" />
 					<NcButton type="tertiary"
-						:title="t('integration_openai', 'This name will be displayed as provider name in the AI admin settings')">
+						:title="t('integration_watsonx', 'This name will be displayed as provider name in the AI admin settings')">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -76,12 +74,12 @@
 				</div>
 				<div class="line">
 					<NcInputField
-						id="openai-api-timeout"
+						id="watsonx-api-timeout"
 						class="input"
 						:value.sync="state.request_timeout"
 						type="number"
-						:label="t('integration_openai', 'Request timeout (seconds)')"
-						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
+						:label="t('integration_watsonx', 'Request timeout (seconds)')"
+						:placeholder="t('integration_watsonx', 'Example: {example}', { example: '240' })"
 						:show-trailing-button="!!state.request_timeout"
 						@update:value="onInput()"
 						@trailing-button-click="state.request_timeout = '' ; onInput()">
@@ -91,7 +89,7 @@
 						</template>
 					</NcInputField>
 					<NcButton type="tertiary"
-						:title="t('integration_openai', 'Timeout for the request to the external API')">
+						:title="t('integration_watsonx', 'Timeout for the request to the external API')">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -100,11 +98,11 @@
 			</div>
 			<div>
 				<h2>
-					{{ t('integration_openai', 'Authentication') }}
+					{{ t('integration_watsonx', 'Authentication') }}
 				</h2>
 				<div v-show="state.url !== ''" class="line column">
 					<label>
-						{{ t('integration_openai', 'Authentication method') }}
+						{{ t('integration_watsonx', 'Authentication method') }}
 					</label>
 					<div class="radios">
 						<NcCheckboxRadioSwitch
@@ -129,12 +127,12 @@
 				</div>
 				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
 					<NcTextField
-						id="openai-api-key"
+						id="watsonx-api-key"
 						class="input"
 						:value.sync="state.api_key"
 						type="password"
 						:readonly="readonly"
-						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
+						:label="t('integration_watsonx', 'API key (mandatory with Watsonx)')"
 						:show-trailing-button="!!state.api_key"
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
@@ -143,7 +141,7 @@
 					</NcTextField>
 				</div>
 				<NcNoteCard v-show="state.url === ''" type="info">
-					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings') }}:
+					{{ t('integration_watsonx', 'You can create an API key in your IBM Cloud IAM account settings') }}:
 					&nbsp;
 					<a :href="apiKeyUrl" target="_blank" class="external">
 						{{ apiKeyUrl }}
@@ -152,11 +150,11 @@
 				<div v-show="state.url !== '' && state.use_basic_auth">
 					<div class="line">
 						<NcTextField
-							id="openai-basic-user"
+							id="watsonx-basic-user"
 							class="input"
 							:value.sync="state.basic_user"
 							:readonly="readonly"
-							:label="t('integration_openai', 'Basic Auth user')"
+							:label="t('integration_watsonx', 'Basic Auth user')"
 							:show-trailing-button="!!state.basic_user"
 							@update:value="onSensitiveInput(true)"
 							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)"
@@ -166,12 +164,12 @@
 					</div>
 					<div class="line">
 						<NcTextField
-							id="openai-basic-password"
+							id="watsonx-basic-password"
 							class="input"
 							:value.sync="state.basic_password"
 							type="password"
 							:readonly="readonly"
-							:label="t('integration_openai', 'Basic Auth password')"
+							:label="t('integration_watsonx', 'Basic Auth password')"
 							:show-trailing-button="!!state.basic_password"
 							@update:value="onSensitiveInput(true)"
 							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)"
@@ -183,12 +181,12 @@
 			</div>
 			<div>
 				<h2>
-					{{ t('integration_openai', 'Text generation') }}
+					{{ t('integration_watsonx', 'Text generation') }}
 				</h2>
 				<div v-if="state.url !== ''" class="line column">
 					<label>
 						<EarthIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Text completion endpoint') }}
+						{{ t('integration_watsonx', 'Text completion endpoint') }}
 					</label>
 					<div class="radios">
 						<NcCheckboxRadioSwitch
@@ -213,8 +211,8 @@
 				</div>
 				<NcNoteCard type="info">
 					{{ state.url === ''
-						? t('integration_openai', 'Selection of chat/completion endpoint is not available for OpenAI since it implicitly uses chat completions for "instruction following" fine-tuned models.')
-						: t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
+						? t('integration_watsonx', 'Selection of chat/completion endpoint is not available for Watsonx since it implicitly uses chat completions for "instruction following" fine-tuned models.')
+						: t('integration_watsonx', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
 				</NcNoteCard>
 				<div v-if="models"
 					class="line line-select">
@@ -223,25 +221,25 @@
 						class="model-select"
 						:clearable="state.default_completion_model_id !== DEFAULT_MODEL_ITEM.id"
 						:options="formattedModels"
-						:input-label="t('integration_openai', 'Default completion model to use')"
+						:input-label="t('integration_watsonx', 'Default completion model to use')"
 						:no-wrap="true"
-						input-id="openai-model-select"
+						input-id="watsonx-model-select"
 						@input="onModelSelected('text', $event)" />
 					<a v-if="state.url === ''"
-						:title="t('integration_openai', 'More information about OpenAI models')"
-						href="https://beta.openai.com/docs/models"
+						:title="t('integration_watsonx', 'More information about IBM watsonx.ai as a Service')"
+						href="https://cloud.ibm.com/apidocs/watsonx-ai"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="openai-info">
+						<NcButton type="tertiary" aria-label="watsonx-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
 						</NcButton>
 					</a>
 					<a v-else
-						:title="t('integration_openai', 'More information about LocalAI models')"
-						href="https://localai.io/model-compatibility/index.html"
+						:title="t('integration_watsonx', 'More information about the IBM watsonx.ai software')"
+						href="https://cloud.ibm.com/apidocs/watsonx-ai-cp"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="localai-info">
+						<NcButton type="tertiary" aria-label="watsonx-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -253,7 +251,7 @@
 						id="llm-extra-params"
 						class="input"
 						:value.sync="state.llm_extra_params"
-						:label="t('integration_openai', 'Extra completion model parameters')"
+						:label="t('integration_watsonx', 'Extra completion model parameters')"
 						:show-trailing-button="!!state.llm_extra_params"
 						@update:value="onInput()"
 						@trailing-button-click="state.llm_extra_params = '' ; onInput()" />
@@ -267,11 +265,11 @@
 				<div class="line">
 					<!--Input for max chunk size (prompt length) for a single request-->
 					<NcInputField
-						id="openai-chunk-size"
+						id="watsonx-chunk-size"
 						class="input"
 						type="number"
 						:value.sync="state.chunk_size"
-						:label="t('integration_openai', 'Max input tokens per request')"
+						:label="t('integration_watsonx', 'Max input tokens per request')"
 						:show-trailing-button="!!state.chunk_size"
 						@update:value="onInput()"
 						@trailing-button-click="state.chunk_size = '' ; onInput()">
@@ -280,7 +278,7 @@
 						</template>
 					</NcInputField>
 					<NcButton type="tertiary"
-						:title="t('integration_openai', 'Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)')">
+						:title="t('integration_watsonx', 'Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)')">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -289,7 +287,7 @@
 			</div>
 			<div>
 				<h2>
-					{{ t('integration_openai', 'Image generation') }}
+					{{ t('integration_watsonx', 'Image generation') }}
 				</h2>
 				<div v-if="models"
 					class="line line-select">
@@ -298,25 +296,25 @@
 						class="model-select"
 						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
 						:options="formattedModels"
-						:input-label="t('integration_openai', 'Default image generation model to use')"
+						:input-label="t('integration_watsonx', 'Default image generation model to use')"
 						:no-wrap="true"
-						input-id="openai-model-select"
+						input-id="watsonx-model-select"
 						@input="onModelSelected('image', $event)" />
 					<a v-if="state.url === ''"
-						:title="t('integration_openai', 'More information about OpenAI models')"
-						href="https://beta.openai.com/docs/models"
+						:title="t('integration_watsonx', 'More information about IBM watsonx.ai as a Service')"
+						href="https://cloud.ibm.com/apidocs/watsonx-ai"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="openai-info">
+						<NcButton type="tertiary" aria-label="watsonx-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
 						</NcButton>
 					</a>
 					<a v-else
-						:title="t('integration_openai', 'More information about LocalAI models')"
-						href="https://localai.io/model-compatibility/index.html"
+						:title="t('integration_watsonx', 'More information about the IBM watsonx.ai software')"
+						href="https://cloud.ibm.com/apidocs/watsonx-ai-cp"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="localai-info">
+						<NcButton type="tertiary" aria-label="watsonx-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -324,14 +322,14 @@
 					</a>
 				</div>
 				<NcNoteCard v-else type="info">
-					{{ t('integration_openai', 'No models to list') }}
+					{{ t('integration_watsonx', 'No models to list') }}
 				</NcNoteCard>
 				<div class="line">
 					<NcTextField
 						id="default-image-size"
 						class="input"
 						:value.sync="state.default_image_size"
-						:label="t('integration_openai', 'Default image size')"
+						:label="t('integration_watsonx', 'Default image size')"
 						:show-trailing-button="!!state.default_image_size"
 						@update:value="onInput()"
 						@trailing-button-click="state.default_image_size = '' ; onInput()" />
@@ -345,12 +343,12 @@
 				<NcCheckboxRadioSwitch
 					:checked="state.image_request_auth"
 					@update:checked="onCheckboxChanged($event, 'image_request_auth', false)">
-					{{ t('integration_openai', 'Use authentication for image retrieval request') }}
+					{{ t('integration_watsonx', 'Use authentication for image retrieval request') }}
 				</NcCheckboxRadioSwitch>
 			</div>
 			<div>
 				<h2>
-					{{ t('integration_openai', 'Audio transcription') }}
+					{{ t('integration_watsonx', 'Audio transcription') }}
 				</h2>
 				<div v-if="models"
 					class="line line-select">
@@ -359,25 +357,25 @@
 						class="model-select"
 						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
 						:options="formattedModels"
-						:input-label="t('integration_openai', 'Default transcription model to use')"
+						:input-label="t('integration_watsonx', 'Default transcription model to use')"
 						:no-wrap="true"
-						input-id="openai-stt-model-select"
+						input-id="watsonx-stt-model-select"
 						@input="onModelSelected('stt', $event)" />
 					<a v-if="state.url === ''"
-						:title="t('integration_openai', 'More information about OpenAI models')"
-						href="https://beta.openai.com/docs/models"
+						:title="t('integration_watsonx', 'More information about IBM watsonx.ai as a Service')"
+						href="https://cloud.ibm.com/apidocs/watsonx-ai"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="openai-info">
+						<NcButton type="tertiary" aria-label="watsonx-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
 						</NcButton>
 					</a>
 					<a v-else
-						:title="t('integration_openai', 'More information about LocalAI models')"
-						href="https://localai.io/model-compatibility/index.html"
+						:title="t('integration_watsonx', 'More information about the IBM watsonx.ai software')"
+						href="https://cloud.ibm.com/apidocs/watsonx-ai-cp"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="localai-info">
+						<NcButton type="tertiary" aria-label="watsonx-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -385,21 +383,21 @@
 					</a>
 				</div>
 				<NcNoteCard v-else type="info">
-					{{ t('integration_openai', 'No models to list') }}
+					{{ t('integration_watsonx', 'No models to list') }}
 				</NcNoteCard>
 			</div>
 			<div>
 				<h2>
-					{{ t('integration_openai', 'Usage limits') }}
+					{{ t('integration_watsonx', 'Usage limits') }}
 				</h2>
 				<div class="line">
 					<!--Time period in days for the token usage-->
 					<NcInputField
-						id="openai-api-quota-period"
+						id="watsonx-api-quota-period"
 						class="input"
 						type="number"
 						:value.sync="state.quota_period"
-						:label="t('integration_openai', 'Quota enforcement time period (days)')"
+						:label="t('integration_watsonx', 'Quota enforcement time period (days)')"
 						:show-trailing-button="!!state.quota_period"
 						@update:value="onInput()"
 						@trailing-button-click="state.quota_period = '' ; onInput()">
@@ -409,19 +407,19 @@
 					</NcInputField>
 				</div>
 				<h4>
-					{{ t('integration_openai', 'Usage quotas per time period') }}
+					{{ t('integration_watsonx', 'Usage quotas per time period') }}
 				</h4>
 				<!--Loop through all quota types and list an input for them on this line-->
-				<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
+				<!--Only enforced if the user has not provided an own API key (in the case of Watsonx)-->
 				<table class="quota-table">
 					<thead>
 						<tr>
 							<th width="120px">
-								{{ t('integration_openai', 'Quota type') }}
+								{{ t('integration_watsonx', 'Quota type') }}
 							</th>
-							<th>{{ t('integration_openai', 'Per-user quota / period') }}</th>
+							<th>{{ t('integration_watsonx', 'Per-user quota / period') }}</th>
 							<th v-if="quotaInfo !== null">
-								{{ t('integration_openai', 'Current system-wide usage / period') }}
+								{{ t('integration_watsonx', 'Current system-wide usage / period') }}
 							</th>
 						</tr>
 					</thead>
@@ -431,9 +429,9 @@
 								{{ quotaInfo[index].type }}
 							</td>
 							<td>
-								<input :id="'openai-api-quota-' + index"
+								<input :id="'watsonx-api-quota-' + index"
 									v-model.number="state.quotas[index]"
-									:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
+									:title="t('integration_watsonx', 'A per-user limit for usage of this API type (0 for unlimited)')"
 									type="number"
 									@input="onInput()">
 								<span v-if="quotaInfo !== null" class="text-cell">
@@ -448,13 +446,13 @@
 				</table>
 				<div class="line">
 					<!--Input for max number of tokens to generate for a single request-->
-					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
+					<!--Only enforced if the user has not provided an own API key (in the case of Watsonx)-->
 					<NcInputField
-						id="openai-api-max-tokens"
+						id="watsonx-api-max-tokens"
 						class="input"
 						type="number"
 						:value.sync="state.max_tokens"
-						:label="t('integration_openai', 'Max new tokens per request')"
+						:label="t('integration_watsonx', 'Max new tokens per request')"
 						:show-trailing-button="!!state.max_tokens"
 						@update:value="onInput()"
 						@trailing-button-click="state.max_tokens = '' ; onInput()">
@@ -463,7 +461,7 @@
 						</template>
 					</NcInputField>
 					<NcButton type="tertiary"
-						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')">
+						:title="t('integration_watsonx', 'Maximum number of new tokens generated for a single text generation prompt')">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -472,32 +470,32 @@
 				<NcCheckboxRadioSwitch
 					:checked="state.use_max_completion_tokens_param"
 					@update:checked="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
-					{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
+					{{ t('integration_watsonx', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
 				</NcCheckboxRadioSwitch>
 			</div>
 			<div>
 				<h2>
-					{{ t('integration_openai', 'Select enabled features') }}
+					{{ t('integration_watsonx', 'Select enabled features') }}
 				</h2>
 				<NcCheckboxRadioSwitch
 					:checked="state.translation_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'translation_provider_enabled', false)">
-					{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
+					{{ t('integration_watsonx', 'Translation provider (to translate Talk messages for example)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
 					:checked="state.llm_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'llm_provider_enabled', false)">
-					{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write etc...)') }}
+					{{ t('integration_watsonx', 'Text processing providers (to generate text, summarize, context write etc...)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
 					:checked="state.t2i_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 't2i_provider_enabled', false)">
-					{{ t('integration_openai', 'Image generation provider') }}
+					{{ t('integration_watsonx', 'Image generation provider') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
 					:checked="state.stt_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'stt_provider_enabled', false)">
-					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
+					{{ t('integration_watsonx', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
 				</NcCheckboxRadioSwitch>
 			</div>
 		</div>
@@ -512,7 +510,7 @@ import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
 import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 
-import OpenAiIcon from './icons/OpenAiIcon.vue'
+import WatsonxIcon from './icons/WatsonxIcon.vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
@@ -534,7 +532,7 @@ export default {
 	name: 'AdminSettings',
 
 	components: {
-		OpenAiIcon,
+		WatsonxIcon,
 		KeyIcon,
 		CloseIcon,
 		AccountIcon,
@@ -551,7 +549,7 @@ export default {
 
 	data() {
 		return {
-			state: loadState('integration_openai', 'admin-config'),
+			state: loadState('integration_watsonx', 'admin-config'),
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
 			models: null,
@@ -560,10 +558,10 @@ export default {
 				image: null,
 				stt: null,
 			},
-			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
+			apiKeyUrl: 'https://cloud.ibm.com/docs/account?topic=account-iamtoken_from_apikey',
 			quotaInfo: null,
-			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
-			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '1024x1024' }),
+			llmExtraParamHint: t('integration_watsonx', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
+			defaultImageSizeParamHint: t('integration_watsonx', 'Must be in 256x256 format (default is {default})', { default: '1024x1024' }),
 			DEFAULT_MODEL_ITEM,
 			appSettingsAssistantUrl: generateUrl('/settings/apps/integration/assistant'),
 		}
@@ -572,11 +570,11 @@ export default {
 	computed: {
 		modelEndpointUrl() {
 			if (this.state.url === '') {
-				return 'https://api.openai.com/v1/models'
+				return 'https://us-south.ml.cloud.ibm.com/ml/v1/text/generation'
 			}
-			return this.state.url.replace(/\/*$/, '/models')
+			return this.state.url.replace(/\/*$/, '/text/generation')
 		},
-		isUsingOpenAI() {
+		isUsingWatsonx() {
 			return this.state.url === ''
 		},
 		configured() {
@@ -618,11 +616,11 @@ export default {
 			if (!this.configured) {
 				return
 			}
-			const url = generateUrl('/apps/integration_openai/models')
+			const url = generateUrl('/apps/integration_watsonx/models')
 			return axios.get(url)
 				.then((response) => {
 					this.models = response.data?.data ?? []
-					if (this.isUsingOpenAI) {
+					if (this.isUsingWatsonx) {
 						this.models.unshift(DEFAULT_MODEL_ITEM)
 					}
 					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
@@ -662,7 +660,7 @@ export default {
 				})
 				.catch((error) => {
 					showError(
-						t('integration_openai', 'Failed to load models')
+						t('integration_watsonx', 'Failed to load models')
 						+ ': ' + this.reduceStars(error.response?.data?.error),
 						{ timeout: 10000 },
 					)
@@ -698,14 +696,14 @@ export default {
 			})
 		},
 		loadQuotaInfo() {
-			const url = generateUrl('/apps/integration_openai/admin-quota-info')
+			const url = generateUrl('/apps/integration_watsonx/admin-quota-info')
 			return axios.get(url)
 				.then((response) => {
 					this.quotaInfo = response.data
 				})
 				.catch((error) => {
 					showError(
-						t('integration_openai', 'Failed to load quota info')
+						t('integration_watsonx', 'Failed to load quota info')
 						+ ': ' + this.reduceStars(error.response?.data?.error),
 						{ timeout: 10000 },
 					)
@@ -758,16 +756,16 @@ export default {
 			const req = {
 				values,
 			}
-			const url = sensitive ? generateUrl('/apps/integration_openai/admin-config/sensitive') : generateUrl('/apps/integration_openai/admin-config')
+			const url = sensitive ? generateUrl('/apps/integration_watsonx/admin-config/sensitive') : generateUrl('/apps/integration_watsonx/admin-config')
 			try {
 				await axios.put(url, req)
 				if (notify) {
-					showSuccess(t('integration_openai', 'OpenAI admin options saved'))
+					showSuccess(t('integration_watsonx', 'Watsonx admin options saved'))
 				}
 			} catch (error) {
 				console.error(error)
 				showError(
-					t('integration_openai', 'Failed to save OpenAI admin options')
+					t('integration_watsonx', 'Failed to save Watsonx admin options')
 					+ ': ' + this.reduceStars(error.response?.data?.error),
 					{ timeout: 10000 },
 				)
@@ -784,8 +782,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-#openai_prefs {
-	#openai-content {
+#watsonx_prefs {
+	#watsonx-content {
 		margin-left: 40px;
 	}
 

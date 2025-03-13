@@ -8,7 +8,7 @@
 namespace OCA\Watsonx\Controller;
 
 use Exception;
-use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -21,7 +21,7 @@ class ConfigController extends Controller {
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		private ?string $userId,
 	) {
 		parent::__construct($appName, $request);
@@ -39,7 +39,7 @@ class ConfigController extends Controller {
 			return new DataResponse('', Http::STATUS_BAD_REQUEST);
 		}
 		try {
-			$this->openAiSettingsService->setUserConfig($this->userId, $values);
+			$this->watsonxSettingsService->setUserConfig($this->userId, $values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
@@ -56,7 +56,7 @@ class ConfigController extends Controller {
 	#[PasswordConfirmationRequired]
 	public function setSensitiveUserConfig(array $values): DataResponse {
 		try {
-			$this->openAiSettingsService->setUserConfig($this->userId, $values);
+			$this->watsonxSettingsService->setUserConfig($this->userId, $values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
@@ -74,7 +74,7 @@ class ConfigController extends Controller {
 			return new DataResponse('', Http::STATUS_BAD_REQUEST);
 		}
 		try {
-			$this->openAiSettingsService->setAdminConfig($values);
+			$this->watsonxSettingsService->setAdminConfig($values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
@@ -91,7 +91,7 @@ class ConfigController extends Controller {
 	#[PasswordConfirmationRequired]
 	public function setSensitiveAdminConfig(array $values): DataResponse {
 		try {
-			$this->openAiSettingsService->setAdminConfig($values);
+			$this->watsonxSettingsService->setAdminConfig($values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}

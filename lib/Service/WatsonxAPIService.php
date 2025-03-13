@@ -30,9 +30,9 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 /**
- * Service to make requests to OpenAI/LocalAI REST API
+ * Service to make requests to watsonx.ai REST API
  */
-class OpenAiAPIService {
+class WatsonxAPIService {
 	private IClient $client;
 	private ?array $modelsMemoryCache = null;
 	private ?bool $areCredsValid = null;
@@ -43,7 +43,7 @@ class OpenAiAPIService {
 		private IAppConfig $appConfig,
 		private ICacheFactory $cacheFactory,
 		private QuotaUsageMapper $quotaUsageMapper,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		IClientService $clientService,
 	) {
 		$this->client = $clientService->newClient();
@@ -52,21 +52,21 @@ class OpenAiAPIService {
 	/**
 	 * @return bool
 	 */
-	public function isUsingOpenAi(): bool {
-		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+	public function isUsingWatsonx(): bool {
+		$serviceUrl = $this->watsonxSettingsService->getServiceUrl();
+		return $serviceUrl === '' || $serviceUrl === Application::WATSONX_API_BASE_URL;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getServiceName(): string {
-		if ($this->isUsingOpenAi()) {
-			return 'OpenAI';
+		if ($this->isUsingWatsonx()) {
+			return 'Watsonx';
 		} else {
-			$serviceName = $this->openAiSettingsService->getServiceName();
+			$serviceName = $this->watsonxSettingsService->getServiceName();
 			if ($serviceName === '') {
-				return 'LocalAI';
+				return 'Watsonx';
 			}
 			return $serviceName;
 		}
@@ -100,31 +100,31 @@ class OpenAiAPIService {
 	public function getModels(string $userId): array {
 		// caching against 'getModelEnumValues' calls from all the providers
 		if ($this->areCredsValid === false) {
-			$this->logger->info('Cannot get OpenAI models without an API key');
+			$this->logger->info('Cannot get Watsonx models without an API key');
 			return [];
 		} elseif ($this->areCredsValid === null) {
-			if ($this->isUsingOpenAi() && $this->openAiSettingsService->getUserApiKey($userId, true) === '') {
+			if ($this->isUsingWatsonx() && $this->watsonxSettingsService->getUserApiKey($userId, true) === '') {
 				$this->areCredsValid = false;
-				$this->logger->info('Cannot get OpenAI models without an API key');
+				$this->logger->info('Cannot get Watsonx models without an API key');
 				return [];
 			}
 			$this->areCredsValid = true;
 		}
 
 		if ($this->modelsMemoryCache !== null) {
-			$this->logger->debug('Getting OpenAI models from the memory cache');
+			$this->logger->debug('Getting Watsonx models from the memory cache');
 			return $this->modelsMemoryCache;
 		}
 
 		$cacheKey = Application::MODELS_CACHE_KEY;
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
 		if ($cachedModels = $cache->get($cacheKey)) {
-			$this->logger->debug('Getting OpenAI models from distributed cache');
+			$this->logger->debug('Getting Watsonx models from distributed cache');
 			return $cachedModels;
 		}
 
 		try {
-			$this->logger->debug('Actually getting OpenAI models with a network request');
+			$this->logger->debug('Actually getting Watsonx models with a network request');
 			$modelsResponse = $this->request($userId, 'models');
 		} catch (Exception $e) {
 			$this->logger->warning('Error retrieving models (exc): ' . $e->getMessage());
@@ -156,12 +156,12 @@ class OpenAiAPIService {
 	/**
 	 * @param string $userId
 	 */
-	private function hasOwnOpenAiApiKey(string $userId): bool {
-		if (!$this->isUsingOpenAi()) {
+	private function hasOwnWatsonxApiKey(string $userId): bool {
+		if (!$this->isUsingWatsonx()) {
 			return false;
 		}
 
-		if ($this->openAiSettingsService->getUserApiKey($userId) !== '') {
+		if ($this->watsonxSettingsService->getUserApiKey($userId) !== '') {
 			return true;
 		}
 
@@ -181,7 +181,7 @@ class OpenAiAPIService {
 			$modelEnumValues = array_map(function (array $model) {
 				return new ShapeEnumValue($model['id'], $model['id']);
 			}, $modelResponse['data'] ?? []);
-			if ($this->isUsingOpenAi()) {
+			if ($this->isUsingWatsonx()) {
 				array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
 			}
 			return $modelEnumValues;
@@ -210,20 +210,20 @@ class OpenAiAPIService {
 			throw new Exception('Invalid quota type', Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($this->hasOwnOpenAiApiKey($userId)) {
-			// User has specified own OpenAI API key, no quota limit:
+		if ($this->hasOwnWatsonxApiKey($userId)) {
+			// User has specified own Watsonx API key, no quota limit:
 			return false;
 		}
 
 		// Get quota limits
-		$quota = $this->openAiSettingsService->getQuotas()[$type];
+		$quota = $this->watsonxSettingsService->getQuotas()[$type];
 
 		if ($quota === 0) {
 			//  Unlimited quota:
 			return false;
 		}
 
-		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
+		$quotaPeriod = $this->watsonxSettingsService->getQuotaPeriod();
 
 		try {
 			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
@@ -277,10 +277,10 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function getUserQuotaInfo(string $userId): array {
-		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit, just supply default values as fillers)
-		$quotas = $this->hasOwnOpenAiApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->openAiSettingsService->getQuotas();
+		// Get quota limits (if the user has specified an own Watsonx API key, no quota limit, just supply default values as fillers)
+		$quotas = $this->hasOwnWatsonxApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->watsonxSettingsService->getQuotas();
 		// Get quota period
-		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
+		$quotaPeriod = $this->watsonxSettingsService->getQuotaPeriod();
 		// Get quota usage for each quota type:
 		$quotaInfo = [];
 		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
@@ -307,7 +307,7 @@ class OpenAiAPIService {
 	 */
 	public function getAdminQuotaInfo(): array {
 		// Get quota period
-		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
+		$quotaPeriod = $this->watsonxSettingsService->getQuotaPeriod();
 		// Get quota usage of all users for each quota type:
 		$quotaInfo = [];
 		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
@@ -348,7 +348,7 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
-		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
+		$maxTokensLimit = $this->watsonxSettingsService->getMaxTokens();
 		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
 			$maxTokens = $maxTokensLimit;
 		}
@@ -436,7 +436,7 @@ class OpenAiAPIService {
 			$messages[] = [
 				// o1-* models don't support system messages
 				// system prompts as a user message seems to work fine though
-				'role' => ($this->isUsingOpenAi() && str_starts_with($modelRequestParam, 'o1-'))
+				'role' => ($this->isUsingWatsonx() && str_starts_with($modelRequestParam, 'o1-'))
 					? 'user'
 					: 'system',
 				'content' => $systemPrompt,
@@ -482,12 +482,12 @@ class OpenAiAPIService {
 			'n' => $n,
 		];
 
-		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
+		$maxTokensLimit = $this->watsonxSettingsService->getMaxTokens();
 		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
 			$maxTokens = $maxTokensLimit;
 		}
-		if ($this->openAiSettingsService->getUseMaxCompletionTokensParam()) {
-			// max_tokens is now deprecated https://platform.openai.com/docs/api-reference/chat/create
+		if ($this->watsonxSettingsService->getUseMaxCompletionTokensParam()) {
+			// max_tokens is now deprecated
 			$params['max_completion_tokens'] = $maxTokens;
 		} else {
 			$params['max_tokens'] = $maxTokens;
@@ -496,7 +496,7 @@ class OpenAiAPIService {
 		if ($tools !== null) {
 			$params['tools'] = $tools;
 		}
-		if ($userId !== null && $this->isUsingOpenAi()) {
+		if ($userId !== null && $this->isUsingWatsonx()) {
 			$params['user'] = $userId;
 		}
 
@@ -629,8 +629,8 @@ class OpenAiAPIService {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
-		// enforce whisper for OpenAI
-		if ($this->isUsingOpenAi()) {
+		// enforce whisper for Watsonx
+		if ($this->isUsingWatsonx()) {
 			$model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID;
 		}
 
@@ -689,7 +689,7 @@ class OpenAiAPIService {
 		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
 
 		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
-			$this->logger->warning('OpenAI image generation error', ['api_response' => $apiResponse]);
+			$this->logger->warning('Watsonx image generation error', ['api_response' => $apiResponse]);
 			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 
 		} else {
@@ -707,7 +707,7 @@ class OpenAiAPIService {
 	 * @return array
 	 */
 	public function getImageRequestOptions(?string $userId): array {
-		$timeout = $this->openAiSettingsService->getRequestTimeout();
+		$timeout = $this->watsonxSettingsService->getRequestTimeout();
 		$requestOptions = [
 			'timeout' => $timeout,
 			'headers' => [
@@ -715,16 +715,16 @@ class OpenAiAPIService {
 			],
 		];
 
-		if ($this->openAiSettingsService->getIsImageRetrievalAuthenticated()) {
-			$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
+		if ($this->watsonxSettingsService->getIsImageRetrievalAuthenticated()) {
+			$useBasicAuth = $this->watsonxSettingsService->getUseBasicAuth();
 			if ($useBasicAuth) {
-				$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
-				$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
+				$basicUser = $this->watsonxSettingsService->getUserBasicUser($userId, true);
+				$basicPassword = $this->watsonxSettingsService->getUserBasicPassword($userId, true);
 				if ($basicUser !== '' && $basicPassword !== '') {
 					$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
 				}
 			} else {
-				$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
+				$apiKey = $this->watsonxSettingsService->getUserApiKey($userId, true);
 				$requestOptions['headers']['Authorization'] = 'Bearer ' . $apiKey;
 			}
 		}
@@ -735,9 +735,9 @@ class OpenAiAPIService {
 	 * @return int
 	 */
 	public function getExpTextProcessingTime(): int {
-		return $this->isUsingOpenAi()
-			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME)))
-			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME)));
+		return $this->isUsingWatsonx()
+			? intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(Application::DEFAULT_WATSONX_TEXT_GENERATION_TIME)))
+			: intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(Application::LOCAL_WATSONX_TEXT_GENERATION_TIME)));
 	}
 
 	/**
@@ -748,10 +748,10 @@ class OpenAiAPIService {
 		$oldTime = $this->getExpTextProcessingTime();
 		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
 
-		if ($this->isUsingOpenAi()) {
-			$this->appConfig->setValueString(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)));
+		if ($this->isUsingWatsonx()) {
+			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(intval($newTime)));
 		} else {
-			$this->appConfig->setValueString(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(intval($newTime)));
 		}
 	}
 
@@ -759,9 +759,9 @@ class OpenAiAPIService {
 	 * @return int
 	 */
 	public function getExpImgProcessingTime(): int {
-		return $this->isUsingOpenAi()
-			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME)))
-			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME)));
+		return $this->isUsingWatsonx()
+			? intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_image_generation_time', strval(Application::DEFAULT_WATSONX_IMAGE_GENERATION_TIME)))
+			: intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_image_generation_time', strval(Application::LOCAL_WATSONX_IMAGE_GENERATION_TIME)));
 	}
 
 	/**
@@ -772,15 +772,15 @@ class OpenAiAPIService {
 		$oldTime = $this->getExpImgProcessingTime();
 		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
 
-		if ($this->isUsingOpenAi()) {
-			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)));
+		if ($this->isUsingWatsonx()) {
+			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_image_generation_time', strval(intval($newTime)));
 		} else {
-			$this->appConfig->setValueString(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_image_generation_time', strval(intval($newTime)));
 		}
 	}
 
 	/**
-	 * Make an HTTP request to the OpenAI API
+	 * Make an HTTP request to the Watsonx API
 	 * @param string|null $userId
 	 * @param string $endPoint The path to reach
 	 * @param array $params Query parameters (key/val pairs)
@@ -791,12 +791,12 @@ class OpenAiAPIService {
 	 */
 	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
 		try {
-			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+			$serviceUrl = $this->watsonxSettingsService->getServiceUrl();
 			if ($serviceUrl === '') {
-				$serviceUrl = Application::OPENAI_API_BASE_URL;
+				$serviceUrl = Application::WATSONX_API_BASE_URL;
 			}
 
-			$timeout = $this->openAiSettingsService->getRequestTimeout();
+			$timeout = $this->watsonxSettingsService->getRequestTimeout();
 
 			$url = rtrim($serviceUrl, '/') . '/' . $endPoint;
 			$options = [
@@ -806,20 +806,20 @@ class OpenAiAPIService {
 				],
 			];
 
-			// an API key is mandatory when using OpenAI
-			$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
+			// an API key is mandatory when using Watsonx
+			$apiKey = $this->watsonxSettingsService->getUserApiKey($userId, true);
 
 			// We can also use basic authentication
-			$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
-			$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
+			$basicUser = $this->watsonxSettingsService->getUserBasicUser($userId, true);
+			$basicPassword = $this->watsonxSettingsService->getUserBasicPassword($userId, true);
 
-			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
-				return ['error' => 'An API key is required for api.openai.com'];
+			if ($serviceUrl === Application::WATSONX_API_BASE_URL && $apiKey === '') {
+				return ['error' => 'An API key is required for watsonx.ai'];
 			}
 
-			$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
+			$useBasicAuth = $this->watsonxSettingsService->getUseBasicAuth();
 
-			if ($this->isUsingOpenAi() || !$useBasicAuth) {
+			if ($this->isUsingWatsonx() || !$useBasicAuth) {
 				if ($apiKey !== '') {
 					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
 				}
@@ -829,7 +829,7 @@ class OpenAiAPIService {
 				}
 			}
 
-			if (!$this->isUsingOpenAi()) {
+			if (!$this->isUsingWatsonx()) {
 				$options['nextcloud']['allow_local_address'] = true;
 			}
 

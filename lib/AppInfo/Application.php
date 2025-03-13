@@ -29,11 +29,11 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\IAppConfig;
 
 class Application extends App implements IBootstrap {
-	public const APP_ID = 'integration_openai';
+	public const APP_ID = 'integration_watsonx';
 
-	public const OPENAI_API_BASE_URL = 'https://api.openai.com/v1';
-	public const OPENAI_DEFAULT_REQUEST_TIMEOUT = 60 * 4;
-	public const USER_AGENT = 'Nextcloud OpenAI/LocalAI integration';
+	public const WATSONX_API_BASE_URL = 'https://us-south.ml.cloud.ibm.com/ml/v1';
+	public const WATSONX_DEFAULT_REQUEST_TIMEOUT = 60 * 4;
+	public const USER_AGENT = 'Nextcloud IBM watsonx AI integration';
 
 	public const DEFAULT_MODEL_ID = 'Default';
 	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
@@ -46,10 +46,10 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_MAX_NUM_OF_TOKENS = 1000;
 	public const DEFAULT_QUOTA_PERIOD = 30;
 
-	public const DEFAULT_OPENAI_TEXT_GENERATION_TIME = 10; // seconds
-	public const DEFAULT_LOCALAI_TEXT_GENERATION_TIME = 60; // seconds
-	public const DEFAULT_OPENAI_IMAGE_GENERATION_TIME = 20; // seconds
-	public const DEFAULT_LOCALAI_IMAGE_GENERATION_TIME = 90; // seconds
+	public const DEFAULT_WATSONX_TEXT_GENERATION_TIME = 10; // seconds
+	public const LOCAL_WATSONX_TEXT_GENERATION_TIME = 60; // seconds
+	public const DEFAULT_WATSONX_IMAGE_GENERATION_TIME = 20; // seconds
+	public const LOCAL_WATSONX_IMAGE_GENERATION_TIME = 90; // seconds
 	public const EXPECTED_RUNTIME_LOWPASS_FACTOR = 0.1;
 
 	public const QUOTA_TYPE_TEXT = 0;

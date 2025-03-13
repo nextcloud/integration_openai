@@ -11,7 +11,7 @@ namespace OCA\Watsonx\TaskProcessing;
 
 use Exception;
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiAPIService;
+use OCA\Watsonx\Service\WatsonxAPIService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -23,7 +23,7 @@ use RuntimeException;
 class TextToTextChatProvider implements ISynchronousProvider {
 
 	public function __construct(
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 		private IAppConfig $appConfig,
 		private IL10N $l,
 	) {
@@ -34,7 +34,7 @@ class TextToTextChatProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->watsonxAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -42,7 +42,7 @@ class TextToTextChatProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->watsonxAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -108,17 +108,17 @@ class TextToTextChatProvider implements ISynchronousProvider {
 		}
 
 		try {
-			$completion = $this->openAiAPIService->createChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+			$completion = $this->watsonxAPIService->createChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
 			$completion = $completion['messages'];
 		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			throw new RuntimeException('Watsonx request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			$this->watsonxAPIService->updateExpTextProcessingTime($endTime - $startTime);
 			return ['output' => array_pop($completion)];
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		throw new RuntimeException('No result in watsonx response.');
 	}
 }

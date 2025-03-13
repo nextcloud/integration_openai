@@ -9,4 +9,4 @@ $appId = OCA\Watsonx\AppInfo\Application::APP_ID;
 \OCP\Util::addScript($appId, $appId . '-adminSettings');
 ?>
 
-<div id="openai_prefs"></div>
+<div id="watsonx_prefs"></div>

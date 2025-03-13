@@ -8,7 +8,7 @@
 namespace OCA\Watsonx\Settings;
 
 use OCA\Watsonx\AppInfo\Application;
-use OCA\Watsonx\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
@@ -17,7 +17,7 @@ use OCP\Settings\ISettings;
 class Admin implements ISettings {
 	public function __construct(
 		private IInitialState $initialStateService,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		private IAppManager $appManager,
 	) {
 	}
@@ -26,7 +26,7 @@ class Admin implements ISettings {
 	 * @return TemplateResponse
 	 */
 	public function getForm(): TemplateResponse {
-		$adminConfig = $this->openAiSettingsService->getAdminConfig();
+		$adminConfig = $this->watsonxSettingsService->getAdminConfig();
 		$adminConfig['api_key'] = $adminConfig['api_key'] === '' ? '' : 'dummyApiKey';
 		$adminConfig['basic_password'] = $adminConfig['basic_password'] === '' ? '' : 'dummyPassword';
 		$isAssistantEnabled = $this->appManager->isEnabledForUser('assistant');

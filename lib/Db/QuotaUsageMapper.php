@@ -23,7 +23,7 @@ use OCP\IDBConnection;
  */
 class QuotaUsageMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'openai_quota_usage', QuotaUsage::class);
+		parent::__construct($db, 'watsonx_quota_usage', QuotaUsage::class);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 name: 🐞 Bug report
-description: Help us to improve by reporting a bug for integration_openai
+description: Help us to improve by reporting a bug for integration_watsonx
 labels: ['bug']
 body:
   - type: markdown
@@ -9,7 +9,7 @@ body:
       value: Thanks for taking the time to file a bug report! Please fill out this form as completely as possible.
   - type: input
     attributes:
-      label: Which version of integration_openai are you using?
+      label: Which version of integration_watsonx are you using?
       description: 'Please specify the exact version instead of "latest". For example: 2.0.2'
     validations:
       required: true

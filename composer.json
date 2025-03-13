@@ -1,5 +1,5 @@
 {
-	"name": "nextcloud/integration_openai",
+	"name": "nextcloud/integration_watsonx",
 	"authors": [
 		{
 			"name": "Julien Veyssier",
