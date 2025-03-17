@@ -1,9 +1,12 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Per defecte",
     "Image generation" : "Generació d'imatges",
+    "Audio transcription" : "Transcripció d'àudio",
     "Unknown" : "Desconegut",
     "seconds" : "segons",
+    "Unknown image generation error" : "Error de generació d'imatge desconegut",
     "Bad HTTP method" : "Mètode HTTP incorrecte",
     "Bad credentials" : "Credencials dolentes",
     "Detect language" : "Detecta la llengua",

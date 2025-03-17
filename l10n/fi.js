@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Oletus",
     "Image generation" : "Kuvien generointi",
     "Unknown" : "Tuntematon",
     "seconds" : "sekuntia",
