@@ -22,7 +22,6 @@ class WatsonxSettingsService {
 		'service_name' => 'string',
 		'api_key' => 'string',
 		'default_completion_model_id' => 'string',
-		'default_stt_model_id' => 'string',
 		'default_image_model_id' => 'string',
 		'default_image_size' => 'string',
 		'image_request_auth' => 'boolean',
@@ -35,7 +34,6 @@ class WatsonxSettingsService {
 		'translation_provider_enabled' => 'boolean',
 		'llm_provider_enabled' => 'boolean',
 		't2i_provider_enabled' => 'boolean',
-		'stt_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
@@ -95,13 +93,6 @@ class WatsonxSettingsService {
 	 */
 	public function getAdminDefaultCompletionModelId(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminDefaultSttModelId(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id') ?: Application::DEFAULT_MODEL_ID;
 	}
 
 	/**
@@ -265,7 +256,6 @@ class WatsonxSettingsService {
 			'service_name' => $this->getServiceName(),
 			'api_key' => $this->getAdminApiKey(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
-			'default_stt_model_id' => $this->getAdminDefaultSttModelId(),
 			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
 			'default_image_size' => $this->getAdminDefaultImageSize(),
 			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
@@ -281,7 +271,6 @@ class WatsonxSettingsService {
 			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
 			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
-			'stt_provider_enabled' => $this->getSttProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
 			'basic_password' => $this->getAdminBasicPassword(),
@@ -347,13 +336,6 @@ class WatsonxSettingsService {
 		return $this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1';
 	}
 
-	/**
-	 * @return bool
-	 */
-	public function getSttProviderEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
-	}
-
 	////////////////////////////////////////////
 	//////////// Setters for settings //////////
 
@@ -414,15 +396,6 @@ class WatsonxSettingsService {
 	public function setAdminDefaultCompletionModelId(string $defaultCompletionModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->appConfig->setValueString(Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId);
-	}
-
-	/**
-	 * @param string $defaultSttModelId
-	 * @return void
-	 */
-	public function setAdminDefaultSttModelId(string $defaultSttModelId): void {
-		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'default_stt_model_id', $defaultSttModelId);
 	}
 
 	/**
@@ -611,9 +584,6 @@ class WatsonxSettingsService {
 		if (isset($adminConfig['default_completion_model_id'])) {
 			$this->setAdminDefaultCompletionModelId($adminConfig['default_completion_model_id']);
 		}
-		if (isset($adminConfig['default_stt_model_id'])) {
-			$this->setAdminDefaultSttModelId($adminConfig['default_stt_model_id']);
-		}
 		if (isset($adminConfig['default_image_model_id'])) {
 			$this->setAdminDefaultImageModelId($adminConfig['default_image_model_id']);
 		}
@@ -649,9 +619,6 @@ class WatsonxSettingsService {
 		}
 		if (isset($adminConfig['t2i_provider_enabled'])) {
 			$this->setT2iProviderEnabled($adminConfig['t2i_provider_enabled']);
-		}
-		if (isset($adminConfig['stt_provider_enabled'])) {
-			$this->setSttProviderEnabled($adminConfig['stt_provider_enabled']);
 		}
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
@@ -730,14 +697,6 @@ class WatsonxSettingsService {
 	 */
 	public function setT2iProviderEnabled(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 't2i_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setSttProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**

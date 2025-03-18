@@ -9,7 +9,6 @@ namespace OCA\Watsonx\AppInfo;
 
 use OCA\Watsonx\Capabilities;
 use OCA\Watsonx\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
-use OCA\Watsonx\TaskProcessing\AudioToTextProvider;
 use OCA\Watsonx\TaskProcessing\ChangeToneProvider;
 use OCA\Watsonx\TaskProcessing\ChangeToneTaskType;
 use OCA\Watsonx\TaskProcessing\ContextWriteProvider;
@@ -38,7 +37,6 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_MODEL_ID = 'Default';
 	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
 	public const DEFAULT_IMAGE_MODEL_ID = 'dall-e-2';
-	public const DEFAULT_TRANSCRIPTION_MODEL_ID = 'whisper-1';
 	public const DEFAULT_DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
 	public const DEFAULT_CHUNK_SIZE = 10000;
@@ -54,12 +52,10 @@ class Application extends App implements IBootstrap {
 
 	public const QUOTA_TYPE_TEXT = 0;
 	public const QUOTA_TYPE_IMAGE = 1;
-	public const QUOTA_TYPE_TRANSCRIPTION = 2;
 
 	public const DEFAULT_QUOTAS = [
 		self::QUOTA_TYPE_TEXT => 0, // 0 = unlimited
 		self::QUOTA_TYPE_IMAGE => 0, // 0 = unlimited
-		self::QUOTA_TYPE_TRANSCRIPTION => 0, // 0 = unlimited
 
 	];
 
@@ -84,9 +80,6 @@ class Application extends App implements IBootstrap {
 		// Task processing
 		if ($this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TranslateProvider::class);
-		}
-		if ($this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
-			$context->registerTaskProcessingProvider(AudioToTextProvider::class);
 		}
 
 		if ($this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {

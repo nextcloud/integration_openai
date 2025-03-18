@@ -16,15 +16,11 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
 use OCP\Db\Exception as DBException;
-use OCP\Files\File;
-use OCP\Files\GenericFileException;
-use OCP\Files\NotPermittedException;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
 use OCP\IL10N;
-use OCP\Lock\LockedException;
 use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -246,8 +242,6 @@ class WatsonxAPIService {
 				return $this->l10n->t('Text generation');
 			case Application::QUOTA_TYPE_IMAGE:
 				return $this->l10n->t('Image generation');
-			case Application::QUOTA_TYPE_TRANSCRIPTION:
-				return $this->l10n->t('Audio transcription');
 			default:
 				return $this->l10n->t('Unknown');
 		}
@@ -264,8 +258,6 @@ class WatsonxAPIService {
 				return $this->l10n->t('tokens');
 			case Application::QUOTA_TYPE_IMAGE:
 				return $this->l10n->t('images');
-			case Application::QUOTA_TYPE_TRANSCRIPTION:
-				return $this->l10n->t('seconds');
 			default:
 				return $this->l10n->t('Unknown');
 		}
@@ -566,101 +558,6 @@ class WatsonxAPIService {
 			return null;
 		}
 		return $arrayValue;
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param string $audioBase64
-	 * @param bool $translate
-	 * @return string
-	 * @throws Exception
-	 */
-	public function transcribeBase64Mp3(
-		?string $userId,
-		string $audioBase64,
-		bool $translate = true,
-		string $model = Application::DEFAULT_MODEL_ID,
-	): string {
-		return $this->transcribe(
-			$userId,
-			base64_decode(str_replace('data:audio/mp3;base64,', '', $audioBase64)),
-			$translate,
-			$model
-		);
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param File $file
-	 * @param bool $translate
-	 * @return string
-	 * @throws Exception
-	 */
-	public function transcribeFile(
-		?string $userId,
-		File $file,
-		bool $translate = false,
-		string $model = Application::DEFAULT_MODEL_ID,
-	): string {
-		try {
-			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
-		} catch (NotPermittedException|LockedException|GenericFileException $e) {
-			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-
-		return $transcriptionResponse;
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param string $audioFileContent
-	 * @param bool $translate
-	 * @param string $model
-	 * @return string
-	 * @throws Exception
-	 */
-	public function transcribe(
-		?string $userId,
-		string $audioFileContent,
-		bool $translate = true,
-		string $model = Application::DEFAULT_MODEL_ID,
-	): string {
-		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
-			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
-		}
-		// enforce whisper for Watsonx
-		if ($this->isUsingWatsonx()) {
-			$model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID;
-		}
-
-		$params = [
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_TRANSCRIPTION_MODEL_ID : $model,
-			'file' => $audioFileContent,
-			'response_format' => 'verbose_json',
-			// Verbose needed for extraction of audio duration
-		];
-		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
-		$contentType = 'multipart/form-data';
-
-		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType);
-
-		if (!isset($response['text'])) {
-			$this->logger->warning('Audio transcription error: ' . json_encode($response));
-			throw new Exception($this->l10n->t('Unknown audio trancription error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-
-		// Extract audio duration from response and store it as quota usage:
-		if (isset($response['segments'])) {
-			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
-
-			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
-			} catch (DBException $e) {
-				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			}
-		}
-		return $response['text'];
 	}
 
 	/**

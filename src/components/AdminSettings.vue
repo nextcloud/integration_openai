@@ -348,46 +348,6 @@
 			</div>
 			<div>
 				<h2>
-					{{ t('integration_watsonx', 'Audio transcription') }}
-				</h2>
-				<div v-if="models"
-					class="line line-select">
-					<NcSelect
-						v-model="selectedModel.stt"
-						class="model-select"
-						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels"
-						:input-label="t('integration_watsonx', 'Default transcription model to use')"
-						:no-wrap="true"
-						input-id="watsonx-stt-model-select"
-						@input="onModelSelected('stt', $event)" />
-					<a v-if="state.url === ''"
-						:title="t('integration_watsonx', 'More information about IBM watsonx.ai as a Service')"
-						href="https://cloud.ibm.com/apidocs/watsonx-ai"
-						target="_blank">
-						<NcButton type="tertiary" aria-label="watsonx-info">
-							<template #icon>
-								<HelpCircleIcon />
-							</template>
-						</NcButton>
-					</a>
-					<a v-else
-						:title="t('integration_watsonx', 'More information about the IBM watsonx.ai software')"
-						href="https://cloud.ibm.com/apidocs/watsonx-ai-cp"
-						target="_blank">
-						<NcButton type="tertiary" aria-label="watsonx-info">
-							<template #icon>
-								<HelpCircleIcon />
-							</template>
-						</NcButton>
-					</a>
-				</div>
-				<NcNoteCard v-else type="info">
-					{{ t('integration_watsonx', 'No models to list') }}
-				</NcNoteCard>
-			</div>
-			<div>
-				<h2>
 					{{ t('integration_watsonx', 'Usage limits') }}
 				</h2>
 				<div class="line">
@@ -492,11 +452,6 @@
 					@update:checked="onCheckboxChanged($event, 't2i_provider_enabled', false)">
 					{{ t('integration_watsonx', 'Image generation provider') }}
 				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:checked="state.stt_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 'stt_provider_enabled', false)">
-					{{ t('integration_watsonx', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
-				</NcCheckboxRadioSwitch>
 			</div>
 		</div>
 	</div>
@@ -556,7 +511,6 @@ export default {
 			selectedModel: {
 				text: null,
 				image: null,
-				stt: null,
 			},
 			apiKeyUrl: 'https://cloud.ibm.com/docs/account?topic=account-iamtoken_from_apikey',
 			quotaInfo: null,
@@ -635,15 +589,8 @@ export default {
 						|| this.models[1]
 						|| this.models[0]
 
-					const defaultSttModelId = this.state.default_stt_model_id || response.data?.default_stt_model_id
-					const sttModelToSelect = this.models.find(m => m.id === defaultSttModelId)
-						|| this.models.find(m => m.id.match(/whisper/i))
-						|| this.models[1]
-						|| this.models[0]
-
 					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
 					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
-					this.selectedModel.stt = this.modelToNcSelectObject(sttModelToSelect)
 
 					// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
 					if (shouldSave
@@ -676,23 +623,17 @@ export default {
 				} else if (type === 'text') {
 					this.selectedModel.text = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
 					this.state.default_completion_model_id = DEFAULT_MODEL_ITEM.id
-				} else if (type === 'stt') {
-					this.selectedModel.stt = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
-					this.state.default_stt_model_id = DEFAULT_MODEL_ITEM.id
 				}
 			} else {
 				if (type === 'image') {
 					this.state.default_image_model_id = selected.id
 				} else if (type === 'text') {
 					this.state.default_completion_model_id = selected.id
-				} else if (type === 'stt') {
-					this.state.default_stt_model_id = selected.id
 				}
 			}
 			this.saveOptions({
 				default_completion_model_id: this.state.default_completion_model_id,
 				default_image_model_id: this.state.default_image_model_id,
-				default_stt_model_id: this.state.default_stt_model_id,
 			})
 		},
 		loadQuotaInfo() {
