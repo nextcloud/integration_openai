@@ -377,11 +377,6 @@
 					{{ t('integration_watsonx', 'Select enabled features') }}
 				</h2>
 				<NcCheckboxRadioSwitch
-					:checked="state.translation_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 'translation_provider_enabled', false)">
-					{{ t('integration_watsonx', 'Translation provider (to translate Talk messages for example)') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
 					:checked="state.llm_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'llm_provider_enabled', false)">
 					{{ t('integration_watsonx', 'Text processing providers (to generate text, summarize, context write etc...)') }}

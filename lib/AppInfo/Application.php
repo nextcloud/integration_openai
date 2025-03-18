@@ -8,7 +8,6 @@
 namespace OCA\Watsonx\AppInfo;
 
 use OCA\Watsonx\Capabilities;
-use OCA\Watsonx\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
 use OCA\Watsonx\TaskProcessing\ChangeToneProvider;
 use OCA\Watsonx\TaskProcessing\ChangeToneTaskType;
 use OCA\Watsonx\TaskProcessing\ContextWriteProvider;
@@ -18,7 +17,6 @@ use OCA\Watsonx\TaskProcessing\SummaryProvider;
 use OCA\Watsonx\TaskProcessing\TextToTextChatProvider;
 use OCA\Watsonx\TaskProcessing\TextToTextProvider;
 use OCA\Watsonx\TaskProcessing\TopicsProvider;
-use OCA\Watsonx\TaskProcessing\TranslateProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 
@@ -65,16 +63,7 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function register(IRegistrationContext $context): void {
-		// deprecated APIs
-		if ($this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
-			$context->registerTranslationProvider(OldTranslationProvider::class);
-		}
-
 		// Task processing
-		if ($this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
-			$context->registerTaskProcessingProvider(TranslateProvider::class);
-		}
-
 		if ($this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToTextProvider::class);
 			$context->registerTaskProcessingProvider(TextToTextChatProvider::class);

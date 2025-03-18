@@ -21,7 +21,6 @@ use OCA\Watsonx\TaskProcessing\HeadlineProvider;
 use OCA\Watsonx\TaskProcessing\ProofreadProvider;
 use OCA\Watsonx\TaskProcessing\SummaryProvider;
 use OCA\Watsonx\TaskProcessing\TextToTextProvider;
-use OCA\Watsonx\TaskProcessing\TranslateProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
@@ -415,72 +414,4 @@ class WatsonxProviderTest extends TestCase {
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
-
-	public function testTranslationProvider(): void {
-		$translationProvider = new TranslateProvider(
-			$this->watsonxApiService,
-			\OC::$server->get(IAppConfig::class),
-			$this->watsonxSettingsService,
-			$this->createMock(\OCP\IL10N::class),
-			\OC::$server->get(\OCP\L10N\IFactory::class),
-			$this->createMock(\OCP\ICacheFactory::class),
-			$this->createMock(\Psr\Log\LoggerInterface::class),
-			self::TEST_USER1,
-		);
-
-		$inputText = 'This is a test prompt';
-		$n = 1;
-		$fromLang = 'Swedish';
-		$toLang = 'en';
-
-		$response = '{
-            "id": "chatcmpl-123",
-            "object": "chat.completion",
-            "created": 1677652288,
-            "model": "gpt-3.5-turbo-0613",
-            "system_fingerprint": "fp_44709d6fcb",
-            "choices": [
-              {
-                "index": 0,
-                "message": {
-                  "role": "assistant",
-                  "content": "This is a test response."
-                },
-                "finish_reason": "stop"
-              }
-            ],
-            "usage": {
-              "prompt_tokens": 9,
-              "completion_tokens": 12,
-              "total_tokens": 21
-            }
-        }';
-
-		$url = self::WATSONX_API_BASE . 'chat/completions';
-
-		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
-		$options['body'] = json_encode([
-			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'user', 'content' => 'Translate from ' . $fromLang . ' to English (US): ' . $inputText]],
-			'n' => $n,
-			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'user' => self::TEST_USER1,
-		]);
-
-		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
-		$iResponse->method('getBody')->willReturn($response);
-		$iResponse->method('getStatusCode')->willReturn(200);
-
-		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
-
-		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => null);
-		$this->assertEquals(['output' => 'This is a test response.'], $result);
-
-		// Check that token usage is logged properly
-		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
-		$this->assertEquals(21, $usage);
-		// Clear quota usage
-		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
-	}
-
 }

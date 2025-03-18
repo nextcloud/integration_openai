@@ -28,7 +28,6 @@ class WatsonxSettingsService {
 		'llm_extra_params' => 'string',
 		'quota_period' => 'integer',
 		'quotas' => 'array',
-		'translation_provider_enabled' => 'boolean',
 		'llm_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
@@ -247,7 +246,6 @@ class WatsonxSettingsService {
 			// Updated to get quota period
 			'quotas' => $this->getQuotas(),
 			// Get quotas from the config value and return it
-			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
@@ -281,13 +279,6 @@ class WatsonxSettingsService {
 		// we know Watsonx expects "use_max_completion_tokens_param", let's assume the other services don't
 		$default = $isUsingWatsonx ? '1' : '0';
 		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', $default) === '1';
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getTranslationProviderEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
 	}
 
 	/**
@@ -542,9 +533,6 @@ class WatsonxSettingsService {
 		if (isset($adminConfig['use_max_completion_tokens_param'])) {
 			$this->setUseMaxCompletionParam($adminConfig['use_max_completion_tokens_param']);
 		}
-		if (isset($adminConfig['translation_provider_enabled'])) {
-			$this->setTranslationProviderEnabled($adminConfig['translation_provider_enabled']);
-		}
 		if (isset($adminConfig['llm_provider_enabled'])) {
 			$this->setLlmProviderEnabled($adminConfig['llm_provider_enabled']);
 		}
@@ -593,14 +581,6 @@ class WatsonxSettingsService {
 	 */
 	public function setUseMaxCompletionParam(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'use_max_completion_tokens_param', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setTranslationProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'translation_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**
