@@ -22,9 +22,6 @@ class WatsonxSettingsService {
 		'service_name' => 'string',
 		'api_key' => 'string',
 		'default_completion_model_id' => 'string',
-		'default_image_model_id' => 'string',
-		'default_image_size' => 'string',
-		'image_request_auth' => 'boolean',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
 		'use_max_completion_tokens_param' => 'boolean',
@@ -33,7 +30,6 @@ class WatsonxSettingsService {
 		'quotas' => 'array',
 		'translation_provider_enabled' => 'boolean',
 		'llm_provider_enabled' => 'boolean',
-		't2i_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
@@ -93,20 +89,6 @@ class WatsonxSettingsService {
 	 */
 	public function getAdminDefaultCompletionModelId(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminDefaultImageModelId(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminDefaultImageSize(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 	}
 
 	/**
@@ -256,9 +238,6 @@ class WatsonxSettingsService {
 			'service_name' => $this->getServiceName(),
 			'api_key' => $this->getAdminApiKey(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
-			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
-			'default_image_size' => $this->getAdminDefaultImageSize(),
-			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
 			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
@@ -270,7 +249,6 @@ class WatsonxSettingsService {
 			// Get quotas from the config value and return it
 			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
-			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
 			'basic_password' => $this->getAdminBasicPassword(),
@@ -315,25 +293,8 @@ class WatsonxSettingsService {
 	/**
 	 * @return bool
 	 */
-	public function getIsImageRetrievalAuthenticated(): bool {
-		$serviceUrl = $this->getServiceUrl();
-		$isUsingWatsonx = $serviceUrl === '' || $serviceUrl === Application::WATSONX_API_BASE_URL;
-		$default = $isUsingWatsonx ? '0' : '1';
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default) === '1';
-	}
-
-	/**
-	 * @return bool
-	 */
 	public function getLlmProviderEnabled(): bool {
 		return $this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1';
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getT2iProviderEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1';
 	}
 
 	////////////////////////////////////////////
@@ -396,27 +357,6 @@ class WatsonxSettingsService {
 	public function setAdminDefaultCompletionModelId(string $defaultCompletionModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->appConfig->setValueString(Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId);
-	}
-
-	/**
-	 * @param string $defaultImageModelId
-	 * @return void
-	 */
-	public function setAdminDefaultImageModelId(string $defaultImageModelId): void {
-		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'default_image_model_id', $defaultImageModelId);
-	}
-
-	/**
-	 * @param string $defaultImageSize
-	 * @return void
-	 * @throws Exception
-	 */
-	public function setAdminDefaultImageSize(string $defaultImageSize): void {
-		if ($defaultImageSize !== '' && preg_match('/^\d+x\d+$/', $defaultImageSize) !== 1) {
-			throw new Exception('Invalid image size value');
-		}
-		$this->appConfig->setValueString(Application::APP_ID, 'default_image_size', $defaultImageSize);
 	}
 
 	/**
@@ -584,15 +524,6 @@ class WatsonxSettingsService {
 		if (isset($adminConfig['default_completion_model_id'])) {
 			$this->setAdminDefaultCompletionModelId($adminConfig['default_completion_model_id']);
 		}
-		if (isset($adminConfig['default_image_model_id'])) {
-			$this->setAdminDefaultImageModelId($adminConfig['default_image_model_id']);
-		}
-		if (isset($adminConfig['default_image_size'])) {
-			$this->setAdminDefaultImageSize($adminConfig['default_image_size']);
-		}
-		if (isset($adminConfig['image_request_auth'])) {
-			$this->setIsImageRetrievalAuthenticated($adminConfig['image_request_auth']);
-		}
 		if (isset($adminConfig['chunk_size'])) {
 			$this->setChunkSize(intval($adminConfig['chunk_size']));
 		}
@@ -616,9 +547,6 @@ class WatsonxSettingsService {
 		}
 		if (isset($adminConfig['llm_provider_enabled'])) {
 			$this->setLlmProviderEnabled($adminConfig['llm_provider_enabled']);
-		}
-		if (isset($adminConfig['t2i_provider_enabled'])) {
-			$this->setT2iProviderEnabled($adminConfig['t2i_provider_enabled']);
 		}
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
@@ -679,24 +607,8 @@ class WatsonxSettingsService {
 	 * @param bool $enabled
 	 * @return void
 	 */
-	public function setIsImageRetrievalAuthenticated(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'image_request_auth', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
 	public function setLlmProviderEnabled(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'llm_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setT2iProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 't2i_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**

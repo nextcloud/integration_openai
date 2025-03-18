@@ -237,14 +237,7 @@ class WatsonxAPIService {
 	 * @param int $type
 	 */
 	public function translatedQuotaType(int $type): string {
-		switch ($type) {
-			case Application::QUOTA_TYPE_TEXT:
-				return $this->l10n->t('Text generation');
-			case Application::QUOTA_TYPE_IMAGE:
-				return $this->l10n->t('Image generation');
-			default:
-				return $this->l10n->t('Unknown');
-		}
+		return $this->l10n->t($type === Application::QUOTA_TYPE_TEXT ? 'Text generation' : 'Unknown');
 	}
 
 	/**
@@ -253,14 +246,7 @@ class WatsonxAPIService {
 	 * @param int $type
 	 */
 	public function translatedQuotaUnit(int $type): string {
-		switch ($type) {
-			case Application::QUOTA_TYPE_TEXT:
-				return $this->l10n->t('tokens');
-			case Application::QUOTA_TYPE_IMAGE:
-				return $this->l10n->t('images');
-			default:
-				return $this->l10n->t('Unknown');
-		}
+		return $this->l10n->t($type === Application::QUOTA_TYPE_TEXT ? 'tokens' : 'Unknown');
 	}
 
 	/**
@@ -561,74 +547,6 @@ class WatsonxAPIService {
 	}
 
 	/**
-	 * @param string|null $userId
-	 * @param string $prompt
-	 * @param string $model
-	 * @param int $n
-	 * @param string $size
-	 * @return array
-	 * @throws Exception
-	 */
-	public function requestImageCreation(
-		?string $userId, string $prompt, string $model, int $n = 1, string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE,
-	): array {
-		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
-			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
-		}
-
-		$params = [
-			'prompt' => $prompt,
-			'size' => $size,
-			'n' => $n,
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
-		];
-
-		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST');
-
-		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
-			$this->logger->warning('Watsonx image generation error', ['api_response' => $apiResponse]);
-			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-
-		} else {
-			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
-			} catch (DBException $e) {
-				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			}
-		}
-		return $apiResponse;
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @return array
-	 */
-	public function getImageRequestOptions(?string $userId): array {
-		$timeout = $this->watsonxSettingsService->getRequestTimeout();
-		$requestOptions = [
-			'timeout' => $timeout,
-			'headers' => [
-				'User-Agent' => Application::USER_AGENT,
-			],
-		];
-
-		if ($this->watsonxSettingsService->getIsImageRetrievalAuthenticated()) {
-			$useBasicAuth = $this->watsonxSettingsService->getUseBasicAuth();
-			if ($useBasicAuth) {
-				$basicUser = $this->watsonxSettingsService->getUserBasicUser($userId, true);
-				$basicPassword = $this->watsonxSettingsService->getUserBasicPassword($userId, true);
-				if ($basicUser !== '' && $basicPassword !== '') {
-					$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
-				}
-			} else {
-				$apiKey = $this->watsonxSettingsService->getUserApiKey($userId, true);
-				$requestOptions['headers']['Authorization'] = 'Bearer ' . $apiKey;
-			}
-		}
-		return $requestOptions;
-	}
-
-	/**
 	 * @return int
 	 */
 	public function getExpTextProcessingTime(): int {
@@ -649,30 +567,6 @@ class WatsonxAPIService {
 			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(intval($newTime)));
 		} else {
 			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(intval($newTime)));
-		}
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getExpImgProcessingTime(): int {
-		return $this->isUsingWatsonx()
-			? intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_image_generation_time', strval(Application::DEFAULT_WATSONX_IMAGE_GENERATION_TIME)))
-			: intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_image_generation_time', strval(Application::LOCAL_WATSONX_IMAGE_GENERATION_TIME)));
-	}
-
-	/**
-	 * @param int $runtime
-	 * @return void
-	 */
-	public function updateExpImgProcessingTime(int $runtime): void {
-		$oldTime = $this->getExpImgProcessingTime();
-		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
-
-		if ($this->isUsingWatsonx()) {
-			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_image_generation_time', strval(intval($newTime)));
-		} else {
-			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_image_generation_time', strval(intval($newTime)));
 		}
 	}
 

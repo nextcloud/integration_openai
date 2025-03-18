@@ -15,7 +15,6 @@ use OCA\Watsonx\TaskProcessing\ContextWriteProvider;
 use OCA\Watsonx\TaskProcessing\HeadlineProvider;
 use OCA\Watsonx\TaskProcessing\ReformulateProvider;
 use OCA\Watsonx\TaskProcessing\SummaryProvider;
-use OCA\Watsonx\TaskProcessing\TextToImageProvider;
 use OCA\Watsonx\TaskProcessing\TextToTextChatProvider;
 use OCA\Watsonx\TaskProcessing\TextToTextProvider;
 use OCA\Watsonx\TaskProcessing\TopicsProvider;
@@ -36,8 +35,6 @@ class Application extends App implements IBootstrap {
 
 	public const DEFAULT_MODEL_ID = 'Default';
 	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
-	public const DEFAULT_IMAGE_MODEL_ID = 'dall-e-2';
-	public const DEFAULT_DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
 	public const DEFAULT_CHUNK_SIZE = 10000;
 	public const MIN_CHUNK_SIZE = 500;
@@ -46,16 +43,12 @@ class Application extends App implements IBootstrap {
 
 	public const DEFAULT_WATSONX_TEXT_GENERATION_TIME = 10; // seconds
 	public const LOCAL_WATSONX_TEXT_GENERATION_TIME = 60; // seconds
-	public const DEFAULT_WATSONX_IMAGE_GENERATION_TIME = 20; // seconds
-	public const LOCAL_WATSONX_IMAGE_GENERATION_TIME = 90; // seconds
 	public const EXPECTED_RUNTIME_LOWPASS_FACTOR = 0.1;
 
 	public const QUOTA_TYPE_TEXT = 0;
-	public const QUOTA_TYPE_IMAGE = 1;
 
 	public const DEFAULT_QUOTAS = [
 		self::QUOTA_TYPE_TEXT => 0, // 0 = unlimited
-		self::QUOTA_TYPE_IMAGE => 0, // 0 = unlimited
 
 	];
 
@@ -100,9 +93,6 @@ class Application extends App implements IBootstrap {
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextProofread')) {
 				$context->registerTaskProcessingProvider(\OCA\Watsonx\TaskProcessing\ProofreadProvider::class);
 			}
-		}
-		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
-			$context->registerTaskProcessingProvider(TextToImageProvider::class);
 		}
 
 		$context->registerCapability(Capabilities::class);

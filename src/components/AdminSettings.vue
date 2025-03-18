@@ -287,67 +287,6 @@
 			</div>
 			<div>
 				<h2>
-					{{ t('integration_watsonx', 'Image generation') }}
-				</h2>
-				<div v-if="models"
-					class="line line-select">
-					<NcSelect
-						v-model="selectedModel.image"
-						class="model-select"
-						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels"
-						:input-label="t('integration_watsonx', 'Default image generation model to use')"
-						:no-wrap="true"
-						input-id="watsonx-model-select"
-						@input="onModelSelected('image', $event)" />
-					<a v-if="state.url === ''"
-						:title="t('integration_watsonx', 'More information about IBM watsonx.ai as a Service')"
-						href="https://cloud.ibm.com/apidocs/watsonx-ai"
-						target="_blank">
-						<NcButton type="tertiary" aria-label="watsonx-info">
-							<template #icon>
-								<HelpCircleIcon />
-							</template>
-						</NcButton>
-					</a>
-					<a v-else
-						:title="t('integration_watsonx', 'More information about the IBM watsonx.ai software')"
-						href="https://cloud.ibm.com/apidocs/watsonx-ai-cp"
-						target="_blank">
-						<NcButton type="tertiary" aria-label="watsonx-info">
-							<template #icon>
-								<HelpCircleIcon />
-							</template>
-						</NcButton>
-					</a>
-				</div>
-				<NcNoteCard v-else type="info">
-					{{ t('integration_watsonx', 'No models to list') }}
-				</NcNoteCard>
-				<div class="line">
-					<NcTextField
-						id="default-image-size"
-						class="input"
-						:value.sync="state.default_image_size"
-						:label="t('integration_watsonx', 'Default image size')"
-						:show-trailing-button="!!state.default_image_size"
-						@update:value="onInput()"
-						@trailing-button-click="state.default_image_size = '' ; onInput()" />
-					<NcButton type="tertiary"
-						:title="defaultImageSizeParamHint">
-						<template #icon>
-							<HelpCircleIcon />
-						</template>
-					</NcButton>
-				</div>
-				<NcCheckboxRadioSwitch
-					:checked="state.image_request_auth"
-					@update:checked="onCheckboxChanged($event, 'image_request_auth', false)">
-					{{ t('integration_watsonx', 'Use authentication for image retrieval request') }}
-				</NcCheckboxRadioSwitch>
-			</div>
-			<div>
-				<h2>
 					{{ t('integration_watsonx', 'Usage limits') }}
 				</h2>
 				<div class="line">
@@ -447,11 +386,6 @@
 					@update:checked="onCheckboxChanged($event, 'llm_provider_enabled', false)">
 					{{ t('integration_watsonx', 'Text processing providers (to generate text, summarize, context write etc...)') }}
 				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:checked="state.t2i_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 't2i_provider_enabled', false)">
-					{{ t('integration_watsonx', 'Image generation provider') }}
-				</NcCheckboxRadioSwitch>
 			</div>
 		</div>
 	</div>
@@ -510,12 +444,10 @@ export default {
 			models: null,
 			selectedModel: {
 				text: null,
-				image: null,
 			},
 			apiKeyUrl: 'https://cloud.ibm.com/docs/account?topic=account-iamtoken_from_apikey',
 			quotaInfo: null,
 			llmExtraParamHint: t('integration_watsonx', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
-			defaultImageSizeParamHint: t('integration_watsonx', 'Must be in 256x256 format (default is {default})', { default: '1024x1024' }),
 			DEFAULT_MODEL_ITEM,
 			appSettingsAssistantUrl: generateUrl('/settings/apps/integration/assistant'),
 		}
@@ -583,27 +515,17 @@ export default {
 						|| this.models[1]
 						|| this.models[0]
 
-					const defaultImageModelId = this.state.default_image_model_id || response.data?.default_image_model_id
-					const imageModelToSelect = this.models.find(m => m.id === defaultImageModelId)
-						|| this.models.find(m => m.id === 'dall-e-2')
-						|| this.models[1]
-						|| this.models[0]
-
 					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
-					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
 
 					// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
 					if (shouldSave
-						|| this.state.default_completion_model_id !== this.selectedModel.text.id
-						|| this.state.default_image_model_id !== this.selectedModel.image.id) {
+						|| this.state.default_completion_model_id !== this.selectedModel.text.id) {
 						this.saveOptions({
 							default_completion_model_id: this.selectedModel.text.id,
-							default_image_model_id: this.selectedModel.image.id,
 						}, false)
 					}
 
 					this.state.default_completion_model_id = completionModelToSelect.id
-					this.state.default_image_model_id = imageModelToSelect.id
 				})
 				.catch((error) => {
 					showError(
@@ -617,23 +539,17 @@ export default {
 		onModelSelected(type, selected) {
 			console.debug(`Selected model: ${type}: ${selected}`)
 			if (selected == null) {
-				if (type === 'image') {
-					this.selectedModel.image = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
-					this.state.default_image_model_id = DEFAULT_MODEL_ITEM.id
-				} else if (type === 'text') {
+				if (type === 'text') {
 					this.selectedModel.text = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
 					this.state.default_completion_model_id = DEFAULT_MODEL_ITEM.id
 				}
 			} else {
-				if (type === 'image') {
-					this.state.default_image_model_id = selected.id
-				} else if (type === 'text') {
+				if (type === 'text') {
 					this.state.default_completion_model_id = selected.id
 				}
 			}
 			this.saveOptions({
 				default_completion_model_id: this.state.default_completion_model_id,
-				default_image_model_id: this.state.default_image_model_id,
 			})
 		},
 		loadQuotaInfo() {
@@ -683,7 +599,6 @@ export default {
 				chunk_size: parseInt(this.state.chunk_size),
 				max_tokens: parseInt(this.state.max_tokens),
 				llm_extra_params: this.state.llm_extra_params,
-				default_image_size: this.state.default_image_size,
 				quota_period: parseInt(this.state.quota_period),
 				quotas: this.state.quotas,
 			}
