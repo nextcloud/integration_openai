@@ -603,9 +603,10 @@ class OpenAiAPIService {
 		string $model = Application::DEFAULT_MODEL_ID,
 	): string {
 
+		$inputFilePath = '/mnt/ncdata' . $file->getPath();
+		$tempFilePath = preg_replace('/\.webm$/', '.ogg', $inputFilePath);
+
 		if (str_ends_with($file->getName(), '.webm')) {
-			$inputFilePath = '/mnt/ncdata' . $file->getPath();
-			$tempFilePath = preg_replace('/\.webm$/', '.ogg', $inputFilePath);
 			$command = "ffmpeg -i '$inputFilePath' -vn -map_metadata -1 -ac 1 -c:a libopus -b:a 12k -application voip '$tempFilePath'";
 			exec($command, $output, $returnVar);
 	
