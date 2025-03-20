@@ -6,6 +6,7 @@
     "Authentication" : "Autentimine",
     "Authentication method" : "Autentimise meetod",
     "API key" : "API võti",
-    "Username" : "Kasutajanimi"
+    "Username" : "Kasutajanimi",
+    "Password" : "Salasõna"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

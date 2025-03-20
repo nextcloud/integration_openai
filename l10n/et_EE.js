@@ -8,6 +8,7 @@ OC.L10N.register(
     "Authentication" : "Autentimine",
     "Authentication method" : "Autentimise meetod",
     "API key" : "API võti",
-    "Username" : "Kasutajanimi"
+    "Username" : "Kasutajanimi",
+    "Password" : "Salasõna"
 },
 "nplurals=2; plural=(n != 1);");
