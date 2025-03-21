@@ -57,10 +57,10 @@ class Version010100Date20231008173034 extends SimpleMigrationStep {
 				'notnull' => true,
 			]);
 			$table->setPrimaryKey(['id']);
-			$table->addIndex(['user_id'], 'oai_quota_userid');
-			$table->addIndex(['type'], 'oai_quota_type');
-			$table->addIndex(['timestamp'], 'oai_quota_timestamp');
-			$table->addIndex(['type','timestamp'], 'oai_quota_type_ts');
+			$table->addIndex(['user_id'], 'watsonx_quota_userid');
+			$table->addIndex(['type'], 'watsonx_quota_type');
+			$table->addIndex(['timestamp'], 'watsonx_quota_timestamp');
+			$table->addIndex(['type','timestamp'], 'watsonx_quota_type_ts');
 		}
 
 		return $schema;
