@@ -5,7 +5,7 @@
 -->
 <info>
 	<id>integration_watsonx</id>
-	<name>IBM watsonx AI integration</name>
+	<name>Watsonx integration</name>
 	<summary>Integration of IBM watsonx AI services</summary>
 	<description><![CDATA[
 This app implements the following text generation providers

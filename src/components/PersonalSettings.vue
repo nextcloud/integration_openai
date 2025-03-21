@@ -6,7 +6,7 @@
 	<div id="watsonx_prefs" class="section">
 		<h2>
 			<WatsonxIcon class="icon" />
-			{{ t('integration_watsonx', 'IBM watsonx AI integration') }}
+			{{ t('integration_watsonx', 'Watsonx integration') }}
 		</h2>
 		<div id="watsonx-content">
 			<p v-if="state.is_custom_service" class="settings-hint">

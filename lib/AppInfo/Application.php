@@ -29,7 +29,7 @@ class Application extends App implements IBootstrap {
 
 	public const WATSONX_API_BASE_URL = 'https://us-south.ml.cloud.ibm.com/ml/v1';
 	public const WATSONX_DEFAULT_REQUEST_TIMEOUT = 60 * 4;
-	public const USER_AGENT = 'Nextcloud IBM watsonx AI integration';
+	public const USER_AGENT = 'Nextcloud watsonx integration';
 
 	public const DEFAULT_MODEL_ID = 'Default';
 	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
