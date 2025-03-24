@@ -16,6 +16,7 @@
 					</a>
 				</NcNoteCard>
 				<div class="line">
+					<!-- TODO: select from multiple IBM locations -->
 					<NcTextField
 						id="watsonx-url"
 						class="input"
@@ -199,12 +200,14 @@
 					</div>
 				</div>
 				<NcNoteCard type="info">
+					<!-- TODO: confirm this -->
 					{{ state.url === ''
 						? t('integration_watsonx', 'Selection of chat/completion endpoint is not available for Watsonx since it implicitly uses chat completions for "instruction following" fine-tuned models.')
 						: t('integration_watsonx', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
 				</NcNoteCard>
 				<div v-if="models"
 					class="line line-select">
+					<!-- TODO: select different models for different tasks? -->
 					<NcSelect
 						v-model="selectedModel.text"
 						class="model-select"

@@ -38,6 +38,10 @@ Positive:
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
 
+<!-- ## Limitations -->
+
+<!-- TODO: mark limitations -->
+
 ## 🔧 Configuration
 
 ### Admin settings

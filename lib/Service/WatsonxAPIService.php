@@ -601,6 +601,7 @@ class WatsonxAPIService {
 			$apiKey = $this->watsonxSettingsService->getUserApiKey($userId, true);
 
 			// We can also use basic authentication
+			// TODO: confirm this
 			$basicUser = $this->watsonxSettingsService->getUserBasicUser($userId, true);
 			$basicPassword = $this->watsonxSettingsService->getUserBasicPassword($userId, true);
 
