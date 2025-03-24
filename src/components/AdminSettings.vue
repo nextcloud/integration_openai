@@ -5,7 +5,6 @@
 <template>
 	<div id="watsonx_prefs" class="section">
 		<h2>
-			<WatsonxIcon class="icon" />
 			{{ t('integration_watsonx', 'Watsonx integration') }}
 		</h2>
 		<div id="watsonx-content">
@@ -394,8 +393,6 @@ import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
 import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 
-import WatsonxIcon from './icons/WatsonxIcon.vue'
-
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
 import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
@@ -416,7 +413,6 @@ export default {
 	name: 'AdminSettings',
 
 	components: {
-		WatsonxIcon,
 		KeyIcon,
 		CloseIcon,
 		AccountIcon,

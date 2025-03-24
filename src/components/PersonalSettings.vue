@@ -5,7 +5,6 @@
 <template>
 	<div id="watsonx_prefs" class="section">
 		<h2>
-			<WatsonxIcon class="icon" />
 			{{ t('integration_watsonx', 'Watsonx integration') }}
 		</h2>
 		<div id="watsonx-content">
@@ -114,8 +113,6 @@
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
 
-import WatsonxIcon from './icons/WatsonxIcon.vue'
-
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
 
@@ -130,7 +127,6 @@ export default {
 	name: 'PersonalSettings',
 
 	components: {
-		WatsonxIcon,
 		KeyIcon,
 		InformationOutlineIcon,
 		NcNoteCard,
