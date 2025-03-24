@@ -15,16 +15,6 @@
 						{{ t('integration_watsonx', 'Assistant app') }}
 					</a>
 				</NcNoteCard>
-				<NcNoteCard type="info">
-					{{ t('integration_watsonx', 'Services with a watsonx.ai-compatible API:') }}
-					<div class="services">
-						<a class="external" href="https://docs.ionos.com/cloud/ai/ai-model-hub" target="_blank">IONOS AI Model Hub</a>
-						<a class="external" href="https://console.groq.com" target="_blank">Groqcloud</a>
-						<a class="external" href="https://ollama.com/" target="_blank">Ollama</a>
-						<a class="external" href="https://mistral.ai" target="_blank">MistralAI</a>
-						<a class="external" href="https://www.plusserver.com/en/ai-platform/" target="_blank">Plusserver</a>
-					</div>
-				</NcNoteCard>
 				<div class="line">
 					<NcTextField
 						id="watsonx-url"
