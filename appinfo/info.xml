@@ -12,12 +12,8 @@ This app implements the following text generation providers
 using any freely-available large language model:
 Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate.
 
-⚠️ This app is mainly tested with IBM watsonx.ai as a Service.
-We do not guarantee it works perfectly with other services
-that implement watsonx.ai-compatible APIs with slight differences.
-
-Instead of connecting to the serviced watsonx.ai, you can also connect to a self-hosted instance
-or to any service that implements an API similar to watsonx.ai.
+You can connect to the watsonx.ai service provided by IBM
+or to a self-hosted cluster running IBM Software Hub and related services.
 
 ## Improve AI task pickup speed
 
