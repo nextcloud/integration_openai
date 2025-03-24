@@ -2,12 +2,12 @@
 	"name": "nextcloud/integration_watsonx",
 	"authors": [
 		{
-			"name": "Julien Veyssier",
-			"email": "julien-nc@posteo.net"
+			"name": "Edward Ly",
+			"email": "contact@edward.ly"
 		},
 		{
-			"name": "Sami Finnilä",
-			"email": "sami.finnila@gmail.com"
+			"name": "Julien Veyssier",
+			"email": "julien-nc@posteo.net"
 		}
 	],
 	"require": {
