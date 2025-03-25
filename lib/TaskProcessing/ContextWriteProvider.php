@@ -78,9 +78,7 @@ class ContextWriteProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->watsonxAPIService->isUsingWatsonx()
-			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id');
+		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		return [
 			'max_tokens' => 1000,
 			'model' => $adminModel,
@@ -132,7 +130,7 @@ class ContextWriteProvider implements ISynchronousProvider {
 		}
 
 		try {
-			if ($this->watsonxAPIService->isUsingWatsonx() || $this->watsonxSettingsService->getChatEndpointEnabled()) {
+			if ($this->watsonxSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->watsonxAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 				$completion = $completion['messages'];
 			} else {

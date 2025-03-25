@@ -46,26 +46,10 @@ class WatsonxAPIService {
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function isUsingWatsonx(): bool {
-		$serviceUrl = $this->watsonxSettingsService->getServiceUrl();
-		return $serviceUrl === '' || $serviceUrl === Application::WATSONX_API_BASE_URL;
-	}
-
-	/**
 	 * @return string
 	 */
 	public function getServiceName(): string {
-		if ($this->isUsingWatsonx()) {
-			return 'Watsonx';
-		} else {
-			$serviceName = $this->watsonxSettingsService->getServiceName();
-			if ($serviceName === '') {
-				return 'Watsonx';
-			}
-			return $serviceName;
-		}
+		return $this->watsonxSettingsService->getServiceName() ?: 'IBM watsonx';
 	}
 
 	/**
@@ -99,7 +83,7 @@ class WatsonxAPIService {
 			$this->logger->info('Cannot get Watsonx models without an API key');
 			return [];
 		} elseif ($this->areCredsValid === null) {
-			if ($this->isUsingWatsonx() && $this->watsonxSettingsService->getUserApiKey($userId, true) === '') {
+			if ($this->watsonxSettingsService->getUserApiKey($userId, true) === '') {
 				$this->areCredsValid = false;
 				$this->logger->info('Cannot get Watsonx models without an API key');
 				return [];
@@ -153,15 +137,7 @@ class WatsonxAPIService {
 	 * @param string $userId
 	 */
 	private function hasOwnWatsonxApiKey(string $userId): bool {
-		if (!$this->isUsingWatsonx()) {
-			return false;
-		}
-
-		if ($this->watsonxSettingsService->getUserApiKey($userId) !== '') {
-			return true;
-		}
-
-		return false;
+		return $this->watsonxSettingsService->getUserApiKey($userId) !== '';
 	}
 
 	/**
@@ -177,9 +153,7 @@ class WatsonxAPIService {
 			$modelEnumValues = array_map(function (array $model) {
 				return new ShapeEnumValue($model['id'], $model['id']);
 			}, $modelResponse['data'] ?? []);
-			if ($this->isUsingWatsonx()) {
-				array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
-			}
+			array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
 			return $modelEnumValues;
 		} catch (\Throwable $e) {
 			// avoid flooding the logs with errors from calls of task processing
@@ -412,11 +386,7 @@ class WatsonxAPIService {
 		$messages = [];
 		if ($systemPrompt !== null) {
 			$messages[] = [
-				// o1-* models don't support system messages
-				// system prompts as a user message seems to work fine though
-				'role' => ($this->isUsingWatsonx() && str_starts_with($modelRequestParam, 'o1-'))
-					? 'user'
-					: 'system',
+				'role' => 'system',
 				'content' => $systemPrompt,
 			];
 		}
@@ -474,7 +444,7 @@ class WatsonxAPIService {
 		if ($tools !== null) {
 			$params['tools'] = $tools;
 		}
-		if ($userId !== null && $this->isUsingWatsonx()) {
+		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
 
@@ -550,9 +520,7 @@ class WatsonxAPIService {
 	 * @return int
 	 */
 	public function getExpTextProcessingTime(): int {
-		return $this->isUsingWatsonx()
-			? intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(Application::DEFAULT_WATSONX_TEXT_GENERATION_TIME)))
-			: intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(Application::LOCAL_WATSONX_TEXT_GENERATION_TIME)));
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(Application::DEFAULT_WATSONX_TEXT_GENERATION_TIME)));
 	}
 
 	/**
@@ -563,11 +531,7 @@ class WatsonxAPIService {
 		$oldTime = $this->getExpTextProcessingTime();
 		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
 
-		if ($this->isUsingWatsonx()) {
-			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(intval($newTime)));
-		} else {
-			$this->appConfig->setValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(intval($newTime)));
-		}
+		$this->appConfig->setValueString(Application::APP_ID, 'watsonx_text_generation_time', strval(intval($newTime)));
 	}
 
 	/**
@@ -611,7 +575,7 @@ class WatsonxAPIService {
 
 			$useBasicAuth = $this->watsonxSettingsService->getUseBasicAuth();
 
-			if ($this->isUsingWatsonx() || !$useBasicAuth) {
+			if (!$useBasicAuth) {
 				if ($apiKey !== '') {
 					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
 				}
@@ -619,10 +583,6 @@ class WatsonxAPIService {
 				if ($basicUser !== '' && $basicPassword !== '') {
 					$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
 				}
-			}
-
-			if (!$this->isUsingWatsonx()) {
-				$options['nextcloud']['allow_local_address'] = true;
 			}
 
 			if ($contentType === null) {

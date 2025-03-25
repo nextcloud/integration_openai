@@ -274,11 +274,7 @@ class WatsonxSettingsService {
 	 * @return bool
 	 */
 	public function getUseMaxCompletionTokensParam(): bool {
-		$serviceUrl = $this->getServiceUrl();
-		$isUsingWatsonx = $serviceUrl === '' || $serviceUrl === Application::WATSONX_API_BASE_URL;
-		// we know Watsonx expects "use_max_completion_tokens_param", let's assume the other services don't
-		$default = $isUsingWatsonx ? '1' : '0';
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', $default) === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', '0') === '1';
 	}
 
 	/**

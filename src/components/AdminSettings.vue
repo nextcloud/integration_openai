@@ -444,9 +444,6 @@ export default {
 			}
 			return this.state.url.replace(/\/*$/, '/text/generation')
 		},
-		isUsingWatsonx() {
-			return this.state.url === ''
-		},
 		configured() {
 			return !!this.state.url || !!this.state.api_key || !!this.state.basic_user || !!this.state.basic_password
 		},
@@ -490,9 +487,8 @@ export default {
 			return axios.get(url)
 				.then((response) => {
 					this.models = response.data?.data ?? []
-					if (this.isUsingWatsonx) {
-						this.models.unshift(DEFAULT_MODEL_ITEM)
-					}
+					this.models.unshift(DEFAULT_MODEL_ITEM)
+
 					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
 					const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
 						|| this.models.find(m => m.id === 'ibm/granite-3-8b-instruct')

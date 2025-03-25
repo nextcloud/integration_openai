@@ -7,7 +7,6 @@
 
 namespace OCA\Watsonx\AppInfo;
 
-use OCA\Watsonx\Capabilities;
 use OCA\Watsonx\TaskProcessing\ChangeToneProvider;
 use OCA\Watsonx\TaskProcessing\ChangeToneTaskType;
 use OCA\Watsonx\TaskProcessing\ContextWriteProvider;
@@ -40,7 +39,6 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_QUOTA_PERIOD = 30;
 
 	public const DEFAULT_WATSONX_TEXT_GENERATION_TIME = 10; // seconds
-	public const LOCAL_WATSONX_TEXT_GENERATION_TIME = 60; // seconds
 	public const EXPECTED_RUNTIME_LOWPASS_FACTOR = 0.1;
 
 	public const QUOTA_TYPE_TEXT = 0;
@@ -83,8 +81,6 @@ class Application extends App implements IBootstrap {
 				$context->registerTaskProcessingProvider(\OCA\Watsonx\TaskProcessing\ProofreadProvider::class);
 			}
 		}
-
-		$context->registerCapability(Capabilities::class);
 	}
 
 	public function boot(IBootContext $context): void {
