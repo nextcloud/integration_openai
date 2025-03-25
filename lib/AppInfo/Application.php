@@ -32,7 +32,7 @@ class Application extends App implements IBootstrap {
 	public const USER_AGENT = 'Nextcloud watsonx integration';
 
 	public const DEFAULT_MODEL_ID = 'Default';
-	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
+	public const DEFAULT_COMPLETION_MODEL_ID = 'ibm/granite-3-8b-instruct';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
 	public const DEFAULT_CHUNK_SIZE = 10000;
 	public const MIN_CHUNK_SIZE = 500;

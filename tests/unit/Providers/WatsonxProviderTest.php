@@ -114,7 +114,7 @@ class WatsonxProviderTest extends TestCase {
 			"id": "chatcmpl-123",
 			"object": "chat.completion",
 			"created": 1677652288,
-			"model": "gpt-3.5-turbo-0613",
+			"model": "ibm/granite-3-8b-instruct",
 			"system_fingerprint": "fp_44709d6fcb",
 			"choices": [
 			  {
@@ -176,7 +176,7 @@ class WatsonxProviderTest extends TestCase {
 			"id": "chatcmpl-123",
 			"object": "chat.completion",
 			"created": 1677652288,
-			"model": "gpt-3.5-turbo-0613",
+			"model": "ibm/granite-3-8b-instruct",
 			"system_fingerprint": "fp_44709d6fcb",
 			"choices": [
 			  {
@@ -240,7 +240,7 @@ class WatsonxProviderTest extends TestCase {
 			"id": "chatcmpl-123",
 			"object": "chat.completion",
 			"created": 1677652288,
-			"model": "gpt-3.5-turbo-0613",
+			"model": "ibm/granite-3-8b-instruct",
 			"system_fingerprint": "fp_44709d6fcb",
 			"choices": [
 			  {
@@ -304,7 +304,7 @@ class WatsonxProviderTest extends TestCase {
             "id": "chatcmpl-123",
             "object": "chat.completion",
             "created": 1677652288,
-            "model": "gpt-3.5-turbo-0613",
+            "model": "ibm/granite-3-8b-instruct",
             "system_fingerprint": "fp_44709d6fcb",
             "choices": [
               {
@@ -368,7 +368,7 @@ class WatsonxProviderTest extends TestCase {
             "id": "chatcmpl-123",
             "object": "chat.completion",
             "created": 1677652288,
-            "model": "gpt-3.5-turbo-0613",
+            "model": "ibm/granite-3-8b-instruct",
             "system_fingerprint": "fp_44709d6fcb",
             "choices": [
               {
