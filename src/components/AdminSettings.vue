@@ -22,7 +22,7 @@
 						class="input"
 						:value.sync="state.url"
 						:label="t('integration_watsonx', 'Service URL')"
-						:placeholder="t('integration_watsonx', 'Example: {example}', { example: 'http://localhost:8080/v1' })"
+						:placeholder="t('integration_watsonx', 'Example: {example}', { example: 'http://your-cluster.domain/ml/v1' })"
 						:show-trailing-button="!!state.url"
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
@@ -41,9 +41,7 @@
 					<strong>{{ modelEndpointUrl }}</strong>
 				</NcNoteCard>
 				<NcNoteCard type="info">
-					{{ t('integration_watsonx', 'This should include the address of your Watsonx instance (or any service implementing an API similar to Watsonx) along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
-					<br>
-					{{ t('integration_watsonx', 'This can be a local address with a port like {example}. In this case, make sure \'allow_local_remote_servers\' is set to true in config.php.', { example: 'http://localhost:8080/v1' }) }}
+					{{ t('integration_watsonx', 'This should include the address of your Watsonx instance along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
 				</NcNoteCard>
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
