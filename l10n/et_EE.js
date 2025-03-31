@@ -3,6 +3,8 @@ OC.L10N.register(
     {
     "Unknown" : "Teadmata",
     "seconds" : "sekundit",
+    "Bad HTTP method" : "Vigane HTTP-meetod",
+    "Bad credentials" : "Vale kasutajanimi, salasõna või tunnusluba",
     "Detect language" : "Tuvasta keel",
     "Size" : "Suurus",
     "Authentication" : "Autentimine",
