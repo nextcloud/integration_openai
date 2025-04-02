@@ -28,7 +28,7 @@ class Version030104Date20241011192830 extends SimpleMigrationStep {
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
 		$value = $this->openAiSettingsService->getServiceUrl();
-		if ($value !== '') {
+		if ($value !== '' && strpos($value, '/v1') === false) {
 			$newValue = rtrim($value, '/') . '/v1';
 			$this->openAiSettingsService->setServiceUrl($newValue);
 		}
