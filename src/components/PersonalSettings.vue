@@ -12,7 +12,7 @@
 				<InformationOutlineIcon :size="20" class="icon" />
 				{{ t('integration_watsonx', 'Your administrator defined a custom service address') }}
 			</p>
-			<div v-if="!state.is_custom_service || !state.use_basic_auth">
+			<div>
 				<NcNoteCard type="info">
 					{{ t('integration_watsonx', 'Leave the API key empty to use the one defined by administrators') }}
 				</NcNoteCard>
@@ -39,37 +39,6 @@
 							{{ apiKeyUrl }}
 						</a>
 					</NcNoteCard>
-				</div>
-			</div>
-			<div v-else>
-				<NcNoteCard type="info">
-					{{ t('integration_watsonx', 'Leave the username and password empty to use the ones defined by your administrator') }}
-				</NcNoteCard>
-				<div class="line">
-					<label for="basic-user">
-						<KeyIcon :size="20" class="icon" />
-						{{ t('integration_watsonx', 'Username') }}
-					</label>
-					<input id="watsonx-basic-user"
-						v-model="state.basic_user"
-						type="text"
-						:readonly="readonly"
-						:placeholder="t('integration_watsonx', 'your Basic Auth user')"
-						@input="onSensitiveInput"
-						@focus="readonly = false">
-				</div>
-				<div class="line">
-					<label for="basic-password">
-						<KeyIcon :size="20" class="icon" />
-						{{ t('integration_watsonx', 'Password') }}
-					</label>
-					<input id="watsonx-basic-password"
-						v-model="state.basic_password"
-						type="password"
-						:readonly="readonly"
-						:placeholder="t('integration_watsonx', 'your Basic Auth password')"
-						@input="onSensitiveInput"
-						@focus="readonly = false">
 				</div>
 			</div>
 			<div v-if="quotaInfo !== null">
@@ -162,16 +131,12 @@ export default {
 			})
 		}, 2000),
 		onSensitiveInput: debounce(function() {
-			const values = {
-				basic_user: this.state.basic_user,
-			}
 			if (this.state.api_key !== 'dummyApiKey') {
-				values.api_key = this.state.api_key
+				const values = {
+					api_key: this.state.api_key,
+				}
+				this.saveOptions(values, true)
 			}
-			if (this.state.basic_password !== 'dummyPassword') {
-				values.basic_password = this.state.basic_password
-			}
-			this.saveOptions(values, true)
 		}, 2000),
 		async loadQuotaInfo() {
 			const url = generateUrl('/apps/integration_watsonx/quota-info')

@@ -561,26 +561,20 @@ class WatsonxAPIService {
 			// an API key is mandatory when using Watsonx
 			$apiKey = $this->watsonxSettingsService->getUserApiKey($userId, true);
 
-			// We can also use basic authentication
-			// TODO: confirm this
-			$basicUser = $this->watsonxSettingsService->getUserBasicUser($userId, true);
-			$basicPassword = $this->watsonxSettingsService->getUserBasicPassword($userId, true);
-
-			if ($serviceUrl === Application::WATSONX_API_BASE_URL && $apiKey === '') {
+			if (!$apiKey) {
 				return ['error' => 'An API key is required for watsonx.ai'];
 			}
 
-			$useBasicAuth = $this->watsonxSettingsService->getUseBasicAuth();
+			$options['headers']['Authorization'] = 'Basic ' . base64_encode('apikey:' . $apiKey);
 
-			if (!$useBasicAuth) {
-				if ($apiKey !== '') {
-					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
-				}
-			} else {
-				if ($basicUser !== '' && $basicPassword !== '') {
-					$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
-				}
-			}
+			// TODO: generate access token from API key
+			// $useBasicAuth = $this->watsonxSettingsService->getUseBasicAuth();
+
+			// if ($useBasicAuth) {
+			// 	$options['headers']['Authorization'] = 'Basic ' . base64_encode('apikey:' . $apiKey);
+			// } else {
+			// 	$options['headers']['Authorization'] = 'Bearer ' . $accessToken;
+			// }
 
 			if ($contentType === null) {
 				$options['headers']['Content-Type'] = 'application/json';

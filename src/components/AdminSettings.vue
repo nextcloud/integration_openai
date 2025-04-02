@@ -88,7 +88,7 @@
 				<h2>
 					{{ t('integration_watsonx', 'Authentication') }}
 				</h2>
-				<div v-show="state.url !== ''" class="line column">
+				<!-- <div class="line column">
 					<label>
 						{{ t('integration_watsonx', 'Authentication method') }}
 					</label>
@@ -100,7 +100,7 @@
 							button-variant-grouped="horizontal"
 							name="auth_method"
 							@update:checked="onCheckboxChanged(false, 'use_basic_auth')">
-							{{ t('assistant', 'API key') }}
+							{{ t('integration_watsonx', 'Access Token') }}
 						</NcCheckboxRadioSwitch>
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
@@ -109,11 +109,11 @@
 							button-variant-grouped="horizontal"
 							name="auth_method"
 							@update:checked="onCheckboxChanged(true, 'use_basic_auth')">
-							{{ t('assistant', 'Basic Authentication') }}
+							{{ t('integration_watsonx', 'Basic Authentication') }}
 						</NcCheckboxRadioSwitch>
 					</div>
-				</div>
-				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
+				</div> -->
+				<div class="line">
 					<NcTextField
 						id="watsonx-api-key"
 						class="input"
@@ -135,37 +135,6 @@
 						{{ apiKeyUrl }}
 					</a>
 				</NcNoteCard>
-				<div v-show="state.url !== '' && state.use_basic_auth">
-					<div class="line">
-						<NcTextField
-							id="watsonx-basic-user"
-							class="input"
-							:value.sync="state.basic_user"
-							:readonly="readonly"
-							:label="t('integration_watsonx', 'Basic Auth user')"
-							:show-trailing-button="!!state.basic_user"
-							@update:value="onSensitiveInput(true)"
-							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)"
-							@focus="readonly = false">
-							<AccountIcon />
-						</NcTextField>
-					</div>
-					<div class="line">
-						<NcTextField
-							id="watsonx-basic-password"
-							class="input"
-							:value.sync="state.basic_password"
-							type="password"
-							:readonly="readonly"
-							:label="t('integration_watsonx', 'Basic Auth password')"
-							:show-trailing-button="!!state.basic_password"
-							@update:value="onSensitiveInput(true)"
-							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)"
-							@focus="readonly = false">
-							<KeyIcon />
-						</NcTextField>
-					</div>
-				</div>
 			</div>
 			<div>
 				<h2>
@@ -377,7 +346,6 @@
 </template>
 
 <script>
-import AccountIcon from 'vue-material-design-icons/Account.vue'
 import CloseIcon from 'vue-material-design-icons/Close.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
@@ -406,7 +374,6 @@ export default {
 	components: {
 		KeyIcon,
 		CloseIcon,
-		AccountIcon,
 		EarthIcon,
 		TimerAlertOutlineIcon,
 		HelpCircleIcon,
@@ -443,7 +410,7 @@ export default {
 			return this.state.url.replace(/\/*$/, '/text/generation')
 		},
 		configured() {
-			return !!this.state.url || !!this.state.api_key || !!this.state.basic_user || !!this.state.basic_password
+			return !!this.state.url || !!this.state.api_key
 		},
 		formattedModels() {
 			if (this.models) {
@@ -555,14 +522,10 @@ export default {
 		},
 		onSensitiveInput: debounce(async function(getModels = true) {
 			const values = {
-				basic_user: (this.state.basic_user ?? '').trim(),
 				url: (this.state.url ?? '').trim(),
 			}
 			if (this.state.api_key !== 'dummyApiKey') {
 				values.api_key = (this.state.api_key ?? '').trim()
-			}
-			if (this.state.basic_password !== 'dummyPassword') {
-				values.basic_password = (this.state.basic_password ?? '').trim()
 			}
 			await this.saveOptions(values, true)
 			if (getModels) {

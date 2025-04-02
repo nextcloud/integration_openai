@@ -30,15 +30,11 @@ class WatsonxSettingsService {
 		'quotas' => 'array',
 		'llm_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
-		'basic_user' => 'string',
-		'basic_password' => 'string',
 		'use_basic_auth' => 'boolean'
 	];
 
 	private const USER_CONFIG_TYPES = [
 		'api_key' => 'string',
-		'basic_user' => 'string',
-		'basic_password' => 'string',
 	];
 
 
@@ -174,52 +170,6 @@ class WatsonxSettingsService {
 	}
 
 	/**
-	 * @param string|null $userId
-	 * @param bool $fallBackOnAdminValue
-	 * @return string
-	 */
-	public function getUserBasicUser(?string $userId, bool $fallBackOnAdminValue = true): string {
-		$fallBackBasicUser = $fallBackOnAdminValue ? $this->getAdminBasicUser() : '';
-		$basicUser = $userId === null
-			? $fallBackBasicUser
-			: ($this->config->getUserValue($userId, Application::APP_ID, 'basic_user', $fallBackBasicUser) ?: $fallBackBasicUser);
-		return $basicUser;
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param bool $fallBackOnAdminValue
-	 * @return string
-	 * @throws Exception
-	 */
-	public function getUserBasicPassword(?string $userId, bool $fallBackOnAdminValue = true): string {
-		$fallBackBasicPassword = $fallBackOnAdminValue ? $this->getAdminBasicPassword() : '';
-		if ($userId === null) {
-			return $fallBackBasicPassword;
-		}
-		$encryptedUserBasicPassword = $this->config->getUserValue($userId, Application::APP_ID, 'basic_password');
-		$userBasicPassword = $encryptedUserBasicPassword === '' ? '' : $this->crypto->decrypt($encryptedUserBasicPassword);
-		return $userBasicPassword ?: $fallBackBasicPassword;
-	}
-
-	/**
-	 * Get admin basic user
-	 * @return string
-	 */
-	public function getAdminBasicUser(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'basic_user');
-	}
-
-	/**
-	 * Get admin basic password
-	 * @return string
-	 * @throws Exception
-	 */
-	public function getAdminBasicPassword(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'basic_password');
-	}
-
-	/**
 	 * @return boolean
 	 */
 	public function getUseBasicAuth(): bool {
@@ -248,22 +198,18 @@ class WatsonxSettingsService {
 			// Get quotas from the config value and return it
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
-			'basic_user' => $this->getAdminBasicUser(),
-			'basic_password' => $this->getAdminBasicPassword(),
 			'use_basic_auth' => $this->getUseBasicAuth()
 		];
 	}
 
 	/**
 	 * Get the user config for the settings page
-	 * @return array{api_key: string, basic_password: string, basic_user: string, is_custom_service: bool, use_basic_auth: bool}
+	 * @return array{api_key: string, is_custom_service: bool, use_basic_auth: bool}
 	 */
 	public function getUserConfig(string $userId): array {
 		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::WATSONX_API_BASE_URL;
 		return [
 			'api_key' => $this->getUserApiKey($userId),
-			'basic_user' => $this->getUserBasicUser($userId, false),
-			'basic_password' => $this->getUserBasicPassword($userId, false),
 			'use_basic_auth' => $this->getUseBasicAuth(),
 			'is_custom_service' => $isCustomService,
 
@@ -426,47 +372,6 @@ class WatsonxSettingsService {
 	}
 
 	/**
-	 * @param string $basicUser
-	 * @return void
-	 */
-	public function setAdminBasicUser(string $basicUser): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'basic_user', $basicUser);
-		$this->invalidateModelsCache();
-	}
-
-	/**
-	 * @param string $basicPassword
-	 * @return void
-	 */
-	public function setAdminBasicPassword(string $basicPassword): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'basic_password', $basicPassword, false, true);
-		$this->invalidateModelsCache();
-	}
-
-	/**
-	 * @param string $userId
-	 * @param string $basicUser
-	 * @return void
-	 * @throws PreConditionNotMetException
-	 */
-	public function setUserBasicUser(string $userId, string $basicUser): void {
-		$this->config->setUserValue($userId, Application::APP_ID, 'basic_user', $basicUser);
-		$this->invalidateModelsCache();
-	}
-
-	/**
-	 * @param string $userId
-	 * @param string $basicPassword
-	 * @return void
-	 * @throws PreConditionNotMetException
-	 */
-	public function setUserBasicPassword(string $userId, string $basicPassword): void {
-		$encryptedBasicPassword = $basicPassword === '' ? '' : $this->crypto->encrypt($basicPassword);
-		$this->config->setUserValue($userId, Application::APP_ID, 'basic_password', $encryptedBasicPassword);
-		$this->invalidateModelsCache();
-	}
-
-	/**
 	 * @param bool $useBasicAuth
 	 * @return void
 	 */
@@ -535,12 +440,6 @@ class WatsonxSettingsService {
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
 		}
-		if (isset($adminConfig['basic_user'])) {
-			$this->setAdminBasicUser($adminConfig['basic_user']);
-		}
-		if (isset($adminConfig['basic_password'])) {
-			$this->setAdminBasicPassword($adminConfig['basic_password']);
-		}
 		if (isset($adminConfig['use_basic_auth'])) {
 			$this->setUseBasicAuth($adminConfig['use_basic_auth']);
 		}
@@ -562,12 +461,6 @@ class WatsonxSettingsService {
 		// Validation of the input values is done in the individual setters
 		if (isset($userConfig['api_key'])) {
 			$this->setUserApiKey($userId, $userConfig['api_key']);
-		}
-		if (isset($userConfig['basic_user'])) {
-			$this->setUserBasicUser($userId, $userConfig['basic_user']);
-		}
-		if (isset($userConfig['basic_password'])) {
-			$this->setUserBasicPassword($userId, $userConfig['basic_password']);
 		}
 	}
 
