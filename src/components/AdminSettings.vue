@@ -209,7 +209,7 @@
 					<NcSelect
 						v-model="selectedModel.text"
 						class="model-select"
-						:clearable="state.default_completion_model_id !== DEFAULT_MODEL_ITEM.id"
+						:clearable="state.default_completion_model_id !== DEFAULT_MODEL_ITEM.model_id"
 						:options="formattedModels"
 						:input-label="t('integration_watsonx', 'Default completion model to use')"
 						:no-wrap="true"
@@ -398,7 +398,7 @@ import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 
-const DEFAULT_MODEL_ITEM = { id: 'Default' }
+const DEFAULT_MODEL_ITEM = { model_id: 'Default' }
 
 export default {
 	name: 'AdminSettings',
@@ -449,10 +449,9 @@ export default {
 			if (this.models) {
 				return this.models.map(m => {
 					return {
-						id: m.id,
-						value: m.id,
-						label: m.id
-							+ (m.owned_by ? ' (' + m.owned_by + ')' : ''),
+						model_id: m.model_id,
+						value: m.model_id,
+						label: m.label + (m.provider ? ' (' + m.provider + ')' : ''),
 					}
 				})
 			}
@@ -470,9 +469,9 @@ export default {
 	methods: {
 		modelToNcSelectObject(model) {
 			return {
-				id: model.id,
-				value: model.id,
-				label: model.id + (model.owned_by ? ' (' + model.owned_by + ')' : ''),
+				model_id: model.model_id,
+				value: model.model_id,
+				label: model.label + (model.provider ? ' (' + model.provider + ')' : ''),
 			}
 		},
 
@@ -488,8 +487,8 @@ export default {
 					this.models.unshift(DEFAULT_MODEL_ITEM)
 
 					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
-					const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
-						|| this.models.find(m => m.id === 'ibm/granite-3-8b-instruct')
+					const completionModelToSelect = this.models.find(m => m.model_id === defaultCompletionModelId)
+						|| this.models.find(m => m.model_id === 'ibm/granite-3-8b-instruct')
 						|| this.models[1]
 						|| this.models[0]
 
@@ -497,13 +496,13 @@ export default {
 
 					// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
 					if (shouldSave
-						|| this.state.default_completion_model_id !== this.selectedModel.text.id) {
+						|| this.state.default_completion_model_id !== this.selectedModel.text.model_id) {
 						this.saveOptions({
-							default_completion_model_id: this.selectedModel.text.id,
+							default_completion_model_id: this.selectedModel.text.model_id,
 						}, false)
 					}
 
-					this.state.default_completion_model_id = completionModelToSelect.id
+					this.state.default_completion_model_id = completionModelToSelect.model_id
 				})
 				.catch((error) => {
 					showError(
@@ -519,11 +518,11 @@ export default {
 			if (selected == null) {
 				if (type === 'text') {
 					this.selectedModel.text = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
-					this.state.default_completion_model_id = DEFAULT_MODEL_ITEM.id
+					this.state.default_completion_model_id = DEFAULT_MODEL_ITEM.model_id
 				}
 			} else {
 				if (type === 'text') {
-					this.state.default_completion_model_id = selected.id
+					this.state.default_completion_model_id = selected.model_id
 				}
 			}
 			this.saveOptions({

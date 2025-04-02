@@ -105,7 +105,8 @@ class WatsonxAPIService {
 
 		try {
 			$this->logger->debug('Actually getting Watsonx models with a network request');
-			$modelsResponse = $this->request($userId, 'models');
+			// TODO: retrieve access token from cache or generate new token
+			$modelsResponse = $this->request($userId, 'foundation_model_specs');
 		} catch (Exception $e) {
 			$this->logger->warning('Error retrieving models (exc): ' . $e->getMessage());
 			$this->areCredsValid = false;
@@ -116,12 +117,8 @@ class WatsonxAPIService {
 			$this->areCredsValid = false;
 			throw new Exception($modelsResponse['error'], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
-		if (!isset($modelsResponse['data'])) {
-			// also consider responses without 'data' as valid
-			$modelsResponse = ['data' => $modelsResponse];
-		}
 
-		if (!$this->isModelListValid($modelsResponse['data'])) {
+		if (!$this->isModelListValid($modelsResponse['resources'])) {
 			$this->logger->warning('Invalid models response: ' . \json_encode($modelsResponse));
 			$this->areCredsValid = false;
 			throw new Exception($this->l10n->t('Invalid models response received'), Http::STATUS_INTERNAL_SERVER_ERROR);
