@@ -107,7 +107,7 @@ class WatsonxAPIService {
 			$this->logger->debug('Actually getting Watsonx models with a network request');
 			// TODO: retrieve access token from cache or generate new token
 			$params = [
-				'version' => '2024-03-14',
+				'version' => Application::WATSONX_API_VERSION,
 			];
 			$modelsResponse = $this->request($userId, '/ml/v1/foundation_model_specs', $params);
 		} catch (Exception $e) {
@@ -309,14 +309,13 @@ class WatsonxAPIService {
 		}
 
 		$params = [
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
-			'prompt' => $prompt,
-			'max_tokens' => $maxTokens,
-			'n' => $n,
+			'model_id' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
+			'input' => $prompt,
+			'parameters' => [
+				'max_new_tokens' => $maxTokens,
+			],
+			// 'n' => $n,
 		];
-		if ($userId !== null) {
-			$params['user'] = $userId;
-		}
 
 		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
 		if ($adminExtraParams !== null) {
@@ -326,27 +325,23 @@ class WatsonxAPIService {
 			$params = array_merge($extraParams, $params);
 		}
 
-		$response = $this->request($userId, 'completions', $params, 'POST');
+		$response = $this->request($userId, '/ml/v1/text/generation?version=' . Application::WATSONX_API_VERSION, $params, 'POST');
 
-		if (!isset($response['choices'])) {
+		if (!isset($response['results'])) {
 			$this->logger->warning('Text generation error: ' . json_encode($response));
 			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		if (isset($response['usage'], $response['usage']['total_tokens'])) {
-			$usage = $response['usage']['total_tokens'];
+		if (isset($response['results']['generated_token_count'])) {
+			$usage = $response['results']['generated_token_count'];
 			try {
 				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
 		}
-		$completions = [];
 
-		foreach ($response['choices'] as $choice) {
-			$completions[] = $choice['text'];
-		}
-
+		$completions = array_map(static fn (array $result): string => $result['generated_text'], $response['results']);
 		return $completions;
 	}
 
@@ -417,8 +412,17 @@ class WatsonxAPIService {
 			}
 		}
 		if ($userPrompt !== null) {
-			$messages[] = ['role' => 'user', 'content' => $userPrompt];
+			$messages[] = [
+				'role' => 'user',
+				'content' => [
+					[
+						'type' => 'text',
+						'text' => $userPrompt,
+					],
+				]
+			];
 		}
+
 		if ($toolMessage !== null) {
 			$msgs = json_decode($toolMessage, true);
 			foreach ($msgs as $msg) {
@@ -428,7 +432,7 @@ class WatsonxAPIService {
 		}
 
 		$params = [
-			'model' => $modelRequestParam,
+			'model_id' => $modelRequestParam,
 			'messages' => $messages,
 			'n' => $n,
 		];
@@ -437,18 +441,10 @@ class WatsonxAPIService {
 		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
 			$maxTokens = $maxTokensLimit;
 		}
-		if ($this->watsonxSettingsService->getUseMaxCompletionTokensParam()) {
-			// max_tokens is now deprecated
-			$params['max_completion_tokens'] = $maxTokens;
-		} else {
-			$params['max_tokens'] = $maxTokens;
-		}
+		$params['max_tokens'] = $maxTokens;
 
 		if ($tools !== null) {
 			$params['tools'] = $tools;
-		}
-		if ($userId !== null) {
-			$params['user'] = $userId;
 		}
 
 		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
@@ -459,7 +455,7 @@ class WatsonxAPIService {
 			$params = array_merge($extraParams, $params);
 		}
 
-		$response = $this->request($userId, 'chat/completions', $params, 'POST');
+		$response = $this->request($userId, '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION, $params, 'POST');
 
 		if (!isset($response['choices'])) {
 			$this->logger->warning('Text generation error: ' . json_encode($response));

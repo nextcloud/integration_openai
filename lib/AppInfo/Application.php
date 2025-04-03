@@ -27,6 +27,7 @@ class Application extends App implements IBootstrap {
 	public const APP_ID = 'integration_watsonx';
 
 	public const WATSONX_API_BASE_URL = 'https://us-south.ml.cloud.ibm.com';
+	public const WATSONX_API_VERSION = '2024-03-14';
 	public const WATSONX_DEFAULT_REQUEST_TIMEOUT = 60 * 4;
 	public const USER_AGENT = 'Nextcloud watsonx integration';
 
