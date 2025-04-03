@@ -450,7 +450,13 @@ export default {
 			const url = generateUrl('/apps/integration_watsonx/models')
 			return axios.get(url)
 				.then((response) => {
-					this.models = response.data ?? []
+					this.models = response.data?.filter((model) => {
+						// only show models that support text generation, chat completion, and tool calling
+						const functions = model.functions.map((func) => func.id)
+						return functions.includes('text_generation')
+							&& functions.includes('text_chat')
+							&& model.task_ids.includes('function_calling')
+					}) ?? []
 					this.models.unshift(DEFAULT_MODEL_ITEM)
 
 					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
