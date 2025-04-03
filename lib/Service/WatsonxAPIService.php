@@ -64,7 +64,7 @@ class WatsonxAPIService {
 			return false;
 		}
 		foreach ($models as $model) {
-			if (!isset($model['id'])) {
+			if (!isset($model['model_id'])) {
 				return false;
 			}
 		}
@@ -121,7 +121,10 @@ class WatsonxAPIService {
 			throw new Exception($modelsResponse['error'], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		if (!$this->isModelListValid($modelsResponse['resources'])) {
+		// Assume all models are listed on first page
+		// TODO: Retrieve additional models past the first page
+		$modelsResponse = $modelsResponse['resources'];
+		if (!$this->isModelListValid($modelsResponse)) {
 			$this->logger->warning('Invalid models response: ' . \json_encode($modelsResponse));
 			$this->areCredsValid = false;
 			throw new Exception($this->l10n->t('Invalid models response received'), Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -151,8 +154,8 @@ class WatsonxAPIService {
 		try {
 			$modelResponse = $this->getModels($userId);
 			$modelEnumValues = array_map(function (array $model) {
-				return new ShapeEnumValue($model['id'], $model['id']);
-			}, $modelResponse['data'] ?? []);
+				return new ShapeEnumValue($model['model_id'], $model['model_id']);
+			}, $modelResponse);
 			array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
 			return $modelEnumValues;
 		} catch (\Throwable $e) {
