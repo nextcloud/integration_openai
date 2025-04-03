@@ -402,10 +402,7 @@ class WatsonxSettingsService {
 			$this->setRequestTimeout($adminConfig['request_timeout']);
 		}
 		if (isset($adminConfig['url'])) {
-			if (str_ends_with($adminConfig['url'], '/')) {
-				$adminConfig['url'] = substr($adminConfig['url'], 0, -1) ?: $adminConfig['url'];
-			}
-			$this->setServiceUrl($adminConfig['url']);
+			$this->setServiceUrl(rtrim($adminConfig['url'], '/'));
 		}
 		if (isset($adminConfig['service_name'])) {
 			$this->setServiceName($adminConfig['service_name']);
