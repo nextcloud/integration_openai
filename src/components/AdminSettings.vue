@@ -22,14 +22,14 @@
 						class="input"
 						:value.sync="state.url"
 						:label="t('integration_watsonx', 'Service URL')"
-						:placeholder="t('integration_watsonx', 'Example: {example}', { example: 'http://your-cluster.domain/ml/v1' })"
+						:placeholder="t('integration_watsonx', 'Example: {example}', { example: 'http://your-cluster.domain/wx' })"
 						:show-trailing-button="!!state.url"
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
 						<EarthIcon />
 					</NcTextField>
 					<NcButton type="tertiary"
-						:title="t('integration_watsonx', 'Leave empty to use {watsonxApiUrl}', { watsonxApiUrl: 'https://us-south.ml.cloud.ibm.com/ml/v1' })">
+						:title="t('integration_watsonx', 'Leave empty to use {watsonxApiUrl}', { watsonxApiUrl: 'https://us-south.ml.cloud.ibm.com' })">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -41,7 +41,7 @@
 					<strong>{{ modelEndpointUrl }}</strong>
 				</NcNoteCard>
 				<NcNoteCard type="info">
-					{{ t('integration_watsonx', 'This should include the address of your Watsonx instance along with the root path of the API. This URL will be accessed by your Nextcloud server.') }}
+					{{ t('integration_watsonx', 'This should include the domain name and API base path of your Watsonx instance. This URL will be accessed by your Nextcloud server.') }}
 				</NcNoteCard>
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
@@ -130,7 +130,7 @@
 				</div>
 				<NcNoteCard v-show="state.url === ''" type="info">
 					{{ t('integration_watsonx', 'You can create an API key in your IBM Cloud IAM account settings') }}:
-					&nbsp;
+					<br>
 					<a :href="apiKeyUrl" target="_blank" class="external">
 						{{ apiKeyUrl }}
 					</a>
@@ -405,9 +405,9 @@ export default {
 	computed: {
 		modelEndpointUrl() {
 			if (this.state.url === '') {
-				return 'https://us-south.ml.cloud.ibm.com/ml/v1/text/generation'
+				return 'https://us-south.ml.cloud.ibm.com/ml/v1/foundation_model_specs'
 			}
-			return this.state.url.replace(/\/*$/, '/text/generation')
+			return this.state.url.replace(/\/*$/, '/ml/v1/foundation_model_specs')
 		},
 		configured() {
 			return !!this.state.url || !!this.state.api_key

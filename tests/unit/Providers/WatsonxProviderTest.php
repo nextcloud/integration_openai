@@ -36,7 +36,7 @@ use Test\Util\User\Dummy;
 class WatsonxProviderTest extends TestCase {
 	public const APP_NAME = 'integration_watsonx';
 	public const TEST_USER1 = 'testuser';
-	public const WATSONX_API_BASE = 'https://us-south.ml.cloud.ibm.com/ml/v1/';
+	public const WATSONX_API_BASE = 'https://us-south.ml.cloud.ibm.com';
 	public const AUTHORIZATION_HEADER = 'Bearer This is a PHPUnit test API key';
 
 	private WatsonxAPIService $watsonxApiService;
@@ -133,7 +133,7 @@ class WatsonxProviderTest extends TestCase {
 			}
 		  }';
 
-		$url = self::WATSONX_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
 		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
@@ -195,7 +195,7 @@ class WatsonxProviderTest extends TestCase {
 			}
 		}';
 
-		$url = self::WATSONX_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
 
 		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$message = 'Give me the headline of the following text in its original language. Do not output the language. Output only the headline without any quotes or additional punctuation.' . "\n\n" . $prompt;
@@ -259,7 +259,7 @@ class WatsonxProviderTest extends TestCase {
 			}
 		}';
 
-		$url = self::WATSONX_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
 
 		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$message = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
@@ -323,7 +323,7 @@ class WatsonxProviderTest extends TestCase {
             }
         }';
 
-		$url = self::WATSONX_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
 
 		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$systemPrompt = 'Summarize the following text in the same language as the text.';
@@ -387,7 +387,7 @@ class WatsonxProviderTest extends TestCase {
             }
         }';
 
-		$url = self::WATSONX_API_BASE . 'chat/completions';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
 
 		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list.';

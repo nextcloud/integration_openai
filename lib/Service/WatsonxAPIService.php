@@ -106,7 +106,10 @@ class WatsonxAPIService {
 		try {
 			$this->logger->debug('Actually getting Watsonx models with a network request');
 			// TODO: retrieve access token from cache or generate new token
-			$modelsResponse = $this->request($userId, 'foundation_model_specs');
+			$params = [
+				'version' => '2024-03-14',
+			];
+			$modelsResponse = $this->request($userId, '/ml/v1/foundation_model_specs', $params);
 		} catch (Exception $e) {
 			$this->logger->warning('Error retrieving models (exc): ' . $e->getMessage());
 			$this->areCredsValid = false;
@@ -550,7 +553,7 @@ class WatsonxAPIService {
 
 			$timeout = $this->watsonxSettingsService->getRequestTimeout();
 
-			$url = rtrim($serviceUrl, '/') . '/' . $endPoint;
+			$url = rtrim($serviceUrl, '/') . $endPoint;
 			$options = [
 				'timeout' => $timeout,
 				'headers' => [
