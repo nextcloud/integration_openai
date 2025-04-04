@@ -198,7 +198,7 @@ class OpenAiSettingsService {
 	 * @return boolean
 	 */
 	public function getChatEndpointEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'chat_endpoint_enabled', '0') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'chat_endpoint_enabled', '1') === '1';
 	}
 
 	/**
