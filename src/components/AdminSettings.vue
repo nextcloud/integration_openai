@@ -138,6 +138,44 @@
 			</div>
 			<div>
 				<h2>
+					{{ t('integration_watsonx', 'Cloud Resources') }}
+				</h2>
+				<NcNoteCard type="info">
+					{{ t('integration_watsonx', 'A watsonx.ai project ID or space ID is required to generate text') }}.
+				</NcNoteCard>
+				<div class="line">
+					<NcTextField
+						id="watsonx-project-id"
+						class="input"
+						:value.sync="state.project_id"
+						type="password"
+						:readonly="readonly"
+						:label="t('integration_watsonx', 'Project ID')"
+						:show-trailing-button="!!state.project_id"
+						@update:value="onSensitiveInput(true)"
+						@trailing-button-click="state.project_id = '' ; onSensitiveInput(true)"
+						@focus="readonly = false">
+						<KeyIcon />
+					</NcTextField>
+				</div>
+				<div class="line">
+					<NcTextField
+						id="watsonx-space-id"
+						class="input"
+						:value.sync="state.space_id"
+						type="password"
+						:readonly="readonly"
+						:label="t('integration_watsonx', 'Space ID')"
+						:show-trailing-button="!!state.space_id"
+						@update:value="onSensitiveInput(true)"
+						@trailing-button-click="state.space_id = '' ; onSensitiveInput(true)"
+						@focus="readonly = false">
+						<KeyIcon />
+					</NcTextField>
+				</div>
+			</div>
+			<div>
+				<h2>
 					{{ t('integration_watsonx', 'Text generation') }}
 				</h2>
 				<div v-if="state.url !== ''" class="line column">
@@ -532,6 +570,12 @@ export default {
 			}
 			if (this.state.api_key !== 'dummyApiKey') {
 				values.api_key = (this.state.api_key ?? '').trim()
+			}
+			if (this.state.project_id !== 'dummyProject') {
+				values.project_id = (this.state.project_id ?? '').trim()
+			}
+			if (this.state.space_id !== 'dummySpaceId') {
+				values.space_id = (this.state.space_id ?? '').trim()
 			}
 			await this.saveOptions(values, true)
 			if (getModels) {

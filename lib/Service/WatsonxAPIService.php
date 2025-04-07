@@ -317,6 +317,26 @@ class WatsonxAPIService {
 			// 'n' => $n,
 		];
 
+		if ($this->watsonxSettingsService->getUserApiKey($userId)) {
+			$userProjectId = $this->watsonxSettingsService->getUserProjectId($userId);
+			if ($userProjectId) {
+				$params['project_id'] = $userProjectId;
+			}
+			$userSpaceId = $this->watsonxSettingsService->getUserSpaceId($userId);
+			if ($userSpaceId) {
+				$params['space_id'] = $userSpaceId;
+			}
+		} else {
+			$adminProjectId = $this->watsonxSettingsService->getAdminProjectId();
+			if ($adminProjectId) {
+				$params['project_id'] = $adminProjectId;
+			}
+			$adminSpaceId = $this->watsonxSettingsService->getAdminSpaceId();
+			if ($adminSpaceId) {
+				$params['space_id'] = $adminSpaceId;
+			}
+		}
+
 		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
 		if ($adminExtraParams !== null) {
 			$params = array_merge($adminExtraParams, $params);
@@ -445,6 +465,26 @@ class WatsonxAPIService {
 
 		if ($tools !== null) {
 			$params['tools'] = $tools;
+		}
+
+		if ($this->watsonxSettingsService->getUserApiKey($userId)) {
+			$userProjectId = $this->watsonxSettingsService->getUserProjectId($userId);
+			if ($userProjectId) {
+				$params['project_id'] = $userProjectId;
+			}
+			$userSpaceId = $this->watsonxSettingsService->getUserSpaceId($userId);
+			if ($userSpaceId) {
+				$params['space_id'] = $userSpaceId;
+			}
+		} else {
+			$adminProjectId = $this->watsonxSettingsService->getAdminProjectId();
+			if ($adminProjectId) {
+				$params['project_id'] = $adminProjectId;
+			}
+			$adminSpaceId = $this->watsonxSettingsService->getAdminSpaceId();
+			if ($adminSpaceId) {
+				$params['space_id'] = $adminSpaceId;
+			}
 		}
 
 		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');

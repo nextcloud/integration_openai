@@ -30,6 +30,8 @@ class Personal implements ISettings {
 		}
 		$userConfig = $this->watsonxSettingsService->getUserConfig($this->userId);
 		$userConfig['api_key'] = $userConfig['api_key'] === '' ? '' : 'dummyApiKey';
+		$userConfig['project_id'] = $userConfig['project_id'] === '' ? '' : 'dummyProject';
+		$userConfig['space_id'] = $userConfig['space_id'] === '' ? '' : 'dummySpaceId';
 		$this->initialStateService->provideInitialState('config', $userConfig);
 		return new TemplateResponse(Application::APP_ID, 'personalSettings');
 	}

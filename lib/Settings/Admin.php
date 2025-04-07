@@ -28,6 +28,8 @@ class Admin implements ISettings {
 	public function getForm(): TemplateResponse {
 		$adminConfig = $this->watsonxSettingsService->getAdminConfig();
 		$adminConfig['api_key'] = $adminConfig['api_key'] === '' ? '' : 'dummyApiKey';
+		$adminConfig['project_id'] = $adminConfig['project_id'] === '' ? '' : 'dummyProject';
+		$adminConfig['space_id'] = $adminConfig['space_id'] === '' ? '' : 'dummySpaceId';
 		$isAssistantEnabled = $this->appManager->isEnabledForUser('assistant');
 		$adminConfig['assistant_enabled'] = $isAssistantEnabled;
 		$this->initialStateService->provideInitialState('admin-config', $adminConfig);

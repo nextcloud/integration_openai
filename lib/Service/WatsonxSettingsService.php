@@ -21,6 +21,8 @@ class WatsonxSettingsService {
 		'url' => 'string',
 		'service_name' => 'string',
 		'api_key' => 'string',
+		'project_id' => 'string',
+		'space_id' => 'string',
 		'default_completion_model_id' => 'string',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
@@ -35,6 +37,8 @@ class WatsonxSettingsService {
 
 	private const USER_CONFIG_TYPES = [
 		'api_key' => 'string',
+		'project_id' => 'string',
+		'space_id' => 'string',
 	];
 
 
@@ -77,6 +81,54 @@ class WatsonxSettingsService {
 		$encryptedUserApiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key');
 		$userApiKey = $encryptedUserApiKey === '' ? '' : $this->crypto->decrypt($encryptedUserApiKey);
 		return $userApiKey ?: $fallBackApiKey;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminProjectId(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'project_id');
+	}
+
+	/**
+	 * SIC! Does not fall back on the admin api by default
+	 * @param null|string $userId
+	 * @param boolean $fallBackOnAdminValue
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getUserProjectId(?string $userId, bool $fallBackOnAdminValue = false): string {
+		$fallBackProjectId = $fallBackOnAdminValue ? $this->getAdminProjectId() : '';
+		if ($userId === null) {
+			return $fallBackProjectId;
+		}
+		$encryptedUserProjectId = $this->config->getUserValue($userId, Application::APP_ID, 'project_id');
+		$userProjectId = $encryptedUserProjectId === '' ? '' : $this->crypto->decrypt($encryptedUserProjectId);
+		return $userProjectId ?: $fallBackProjectId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminSpaceId(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'space_id');
+	}
+
+	/**
+	 * SIC! Does not fall back on the admin api by default
+	 * @param null|string $userId
+	 * @param boolean $fallBackOnAdminValue
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getUserSpaceId(?string $userId, bool $fallBackOnAdminValue = false): string {
+		$fallBackSpaceId = $fallBackOnAdminValue ? $this->getAdminSpaceId() : '';
+		if ($userId === null) {
+			return $fallBackSpaceId;
+		}
+		$encryptedUserSpaceId = $this->config->getUserValue($userId, Application::APP_ID, 'space_id');
+		$userSpaceId = $encryptedUserSpaceId === '' ? '' : $this->crypto->decrypt($encryptedUserSpaceId);
+		return $userSpaceId ?: $fallBackSpaceId;
 	}
 
 	/**
@@ -186,6 +238,8 @@ class WatsonxSettingsService {
 			'url' => $this->getServiceUrl(),
 			'service_name' => $this->getServiceName(),
 			'api_key' => $this->getAdminApiKey(),
+			'project_id' => $this->getAdminProjectId(),
+			'space_id' => $this->getAdminSpaceId(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
@@ -204,12 +258,14 @@ class WatsonxSettingsService {
 
 	/**
 	 * Get the user config for the settings page
-	 * @return array{api_key: string, is_custom_service: bool, use_basic_auth: bool}
+	 * @return array{api_key: string, project_id: string, space_id: string, is_custom_service: bool, use_basic_auth: bool}
 	 */
 	public function getUserConfig(string $userId): array {
 		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::WATSONX_API_BASE_URL;
 		return [
 			'api_key' => $this->getUserApiKey($userId),
+			'project_id' => $this->getUserProjectId($userId),
+			'space_id' => $this->getUserSpaceId($userId),
 			'use_basic_auth' => $this->getUseBasicAuth(),
 			'is_custom_service' => $isCustomService,
 
@@ -281,6 +337,54 @@ class WatsonxSettingsService {
 			$this->config->setUserValue($userId, Application::APP_ID, 'api_key', $encryptedApiKey);
 		}
 		$this->invalidateModelsCache();
+	}
+
+	/**
+	 * @param string $projectId
+	 * @return void
+	 */
+	public function setAdminProjectId(string $projectId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		$this->appConfig->setValueString(Application::APP_ID, 'project_id', $projectId, false, true);
+	}
+
+	/**
+	 * @param string $userId
+	 * @param string $projectId
+	 * @throws PreConditionNotMetException
+	 */
+	public function setUserProjectId(string $userId, string $projectId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		if ($projectId === '') {
+			$this->config->setUserValue($userId, Application::APP_ID, 'project_id', '');
+		} else {
+			$encryptedProjectId = $this->crypto->encrypt($projectId);
+			$this->config->setUserValue($userId, Application::APP_ID, 'project_id', $encryptedProjectId);
+		}
+	}
+
+	/**
+	 * @param string $spaceId
+	 * @return void
+	 */
+	public function setAdminSpaceId(string $spaceId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		$this->appConfig->setValueString(Application::APP_ID, 'space_id', $spaceId, false, true);
+	}
+
+	/**
+	 * @param string $userId
+	 * @param string $spaceId
+	 * @throws PreConditionNotMetException
+	 */
+	public function setUserSpaceId(string $userId, string $spaceId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		if ($spaceId === '') {
+			$this->config->setUserValue($userId, Application::APP_ID, 'space_id', '');
+		} else {
+			$encryptedSpaceId = $this->crypto->encrypt($spaceId);
+			$this->config->setUserValue($userId, Application::APP_ID, 'space_id', $encryptedSpaceId);
+		}
 	}
 
 	/**
@@ -410,6 +514,12 @@ class WatsonxSettingsService {
 		if (isset($adminConfig['api_key'])) {
 			$this->setAdminApiKey($adminConfig['api_key']);
 		}
+		if (isset($adminConfig['project_id'])) {
+			$this->setAdminProjectId($adminConfig['project_id']);
+		}
+		if (isset($adminConfig['space_id'])) {
+			$this->setAdminSpaceId($adminConfig['space_id']);
+		}
 		if (isset($adminConfig['default_completion_model_id'])) {
 			$this->setAdminDefaultCompletionModelId($adminConfig['default_completion_model_id']);
 		}
@@ -458,6 +568,12 @@ class WatsonxSettingsService {
 		// Validation of the input values is done in the individual setters
 		if (isset($userConfig['api_key'])) {
 			$this->setUserApiKey($userId, $userConfig['api_key']);
+		}
+		if (isset($userConfig['project_id'])) {
+			$this->setUserProjectId($userId, $userConfig['project_id']);
+		}
+		if (isset($userConfig['space_id'])) {
+			$this->setUserSpaceId($userId, $userConfig['space_id']);
 		}
 	}
 

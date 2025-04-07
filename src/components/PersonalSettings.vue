@@ -31,6 +31,39 @@
 						<KeyIcon />
 					</NcTextField>
 				</div>
+				<NcNoteCard type="info">
+					{{ t('integration_watsonx', 'A watsonx.ai project ID or space ID is required if an API key is specified') }}
+				</NcNoteCard>
+				<div class="line">
+					<NcTextField
+						id="watsonx-project-id"
+						class="input"
+						:value.sync="state.project_id"
+						:readonly="readonly"
+						type="password"
+						:label="t('integration_watsonx', 'Project ID')"
+						:show-trailing-button="!!state.project_id"
+						@update:value="onSensitiveInput"
+						@trailing-button-click="state.project_id = '' ; onSensitiveInput()"
+						@focus="readonly = false">
+						<KeyIcon />
+					</NcTextField>
+				</div>
+				<div class="line">
+					<NcTextField
+						id="watsonx-space-id"
+						class="input"
+						:value.sync="state.space_id"
+						:readonly="readonly"
+						type="password"
+						:label="t('integration_watsonx', 'Space ID')"
+						:show-trailing-button="!!state.space_id"
+						@update:value="onSensitiveInput"
+						@trailing-button-click="state.space_id = '' ; onSensitiveInput()"
+						@focus="readonly = false">
+						<KeyIcon />
+					</NcTextField>
+				</div>
 				<div v-if="!state.is_custom_service">
 					<NcNoteCard type="info">
 						{{ t('integration_watsonx', 'You can create an API key in your IBM Cloud IAM account settings') }}:
@@ -134,6 +167,12 @@ export default {
 			if (this.state.api_key !== 'dummyApiKey') {
 				const values = {
 					api_key: this.state.api_key,
+				}
+				if (this.state.project_id !== 'dummyProject') {
+					values.project_id = (this.state.project_id ?? '').trim()
+				}
+				if (this.state.space_id !== 'dummySpaceId') {
+					values.space_id = (this.state.space_id ?? '').trim()
 				}
 				this.saveOptions(values, true)
 			}
