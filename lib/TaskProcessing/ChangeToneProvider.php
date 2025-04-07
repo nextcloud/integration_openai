@@ -140,7 +140,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 				$completion = $this->watsonxAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 			}
 		} catch (Exception $e) {
-			throw new RuntimeException('Watsonx request failed: ' . $e->getMessage());
+			throw new RuntimeException('Watsonx.ai request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
@@ -148,6 +148,6 @@ class ChangeToneProvider implements ISynchronousProvider {
 			return ['output' => array_pop($completion)];
 		}
 
-		throw new RuntimeException('No result in watsonx response.');
+		throw new RuntimeException('No result in watsonx.ai response.');
 	}
 }

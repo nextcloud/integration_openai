@@ -49,7 +49,7 @@ class WatsonxAPIService {
 	 * @return string
 	 */
 	public function getServiceName(): string {
-		return $this->watsonxSettingsService->getServiceName() ?: 'IBM watsonx';
+		return $this->watsonxSettingsService->getServiceName() ?: 'IBM watsonx.ai';
 	}
 
 	/**
@@ -80,31 +80,31 @@ class WatsonxAPIService {
 	public function getModels(string $userId): array {
 		// caching against 'getModelEnumValues' calls from all the providers
 		if ($this->areCredsValid === false) {
-			$this->logger->info('Cannot get Watsonx models without an API key');
+			$this->logger->info('Cannot get watsonx.ai models without an API key');
 			return [];
 		} elseif ($this->areCredsValid === null) {
 			if ($this->watsonxSettingsService->getUserApiKey($userId, true) === '') {
 				$this->areCredsValid = false;
-				$this->logger->info('Cannot get Watsonx models without an API key');
+				$this->logger->info('Cannot get watsonx.ai models without an API key');
 				return [];
 			}
 			$this->areCredsValid = true;
 		}
 
 		if ($this->modelsMemoryCache !== null) {
-			$this->logger->debug('Getting Watsonx models from the memory cache');
+			$this->logger->debug('Getting watsonx.ai models from the memory cache');
 			return $this->modelsMemoryCache;
 		}
 
 		$cacheKey = Application::MODELS_CACHE_KEY;
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
 		if ($cachedModels = $cache->get($cacheKey)) {
-			$this->logger->debug('Getting Watsonx models from distributed cache');
+			$this->logger->debug('Getting watsonx.ai models from distributed cache');
 			return $cachedModels;
 		}
 
 		try {
-			$this->logger->debug('Actually getting Watsonx models with a network request');
+			$this->logger->debug('Actually getting watsonx.ai models with a network request');
 			// TODO: retrieve access token from cache or generate new token
 			$params = [
 				'version' => Application::WATSONX_API_VERSION,
@@ -184,7 +184,7 @@ class WatsonxAPIService {
 		}
 
 		if ($this->hasOwnWatsonxApiKey($userId)) {
-			// User has specified own Watsonx API key, no quota limit:
+			// User has specified own watsonx.ai API key, no quota limit:
 			return false;
 		}
 
@@ -232,7 +232,7 @@ class WatsonxAPIService {
 	 * @throws Exception
 	 */
 	public function getUserQuotaInfo(string $userId): array {
-		// Get quota limits (if the user has specified an own Watsonx API key, no quota limit, just supply default values as fillers)
+		// Get quota limits (if the user has specified an own watsonx.ai API key, no quota limit, just supply default values as fillers)
 		$quotas = $this->hasOwnWatsonxApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->watsonxSettingsService->getQuotas();
 		// Get quota period
 		$quotaPeriod = $this->watsonxSettingsService->getQuotaPeriod();
@@ -574,7 +574,7 @@ class WatsonxAPIService {
 	}
 
 	/**
-	 * Make an HTTP request to the Watsonx API
+	 * Make an HTTP request to the watsonx.ai API
 	 * @param string|null $userId
 	 * @param string $endPoint The path to reach
 	 * @param array $params Query parameters (key/val pairs)
@@ -600,7 +600,7 @@ class WatsonxAPIService {
 				],
 			];
 
-			// an API key is mandatory when using Watsonx
+			// an API key is mandatory when using watsonx.ai
 			$apiKey = $this->watsonxSettingsService->getUserApiKey($userId, true);
 
 			if (!$apiKey) {

@@ -63,7 +63,7 @@ class WatsonxProviderTest extends TestCase {
 
 		$this->quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
 
-		// We'll hijack the client service and subsequently iClient to return a mock response from the Watsonx API
+		// We'll hijack the client service and subsequently iClient to return a mock response from the watsonx.ai API
 		$clientService = $this->createMock(IClientService::class);
 		$this->iClient = $this->createMock(IClient::class);
 		$clientService->method('newClient')->willReturn($this->iClient);

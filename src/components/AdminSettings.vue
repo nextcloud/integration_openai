@@ -5,12 +5,12 @@
 <template>
 	<div id="watsonx_prefs" class="section">
 		<h2>
-			{{ t('integration_watsonx', 'Watsonx integration') }}
+			{{ t('integration_watsonx', 'IBM watsonx.ai integration') }}
 		</h2>
 		<div id="watsonx-content">
 			<div>
 				<NcNoteCard v-if="!state.assistant_enabled" type="warning">
-					{{ t('integration_watsonx', 'The Assistant app is not enabled. You need it to use the features provided by the watsonx integration app.') }}
+					{{ t('integration_watsonx', 'The Assistant app is not enabled. You need it to use the features provided by the watsonx.ai integration app.') }}
 					<a class="external" :href="appSettingsAssistantUrl" target="_blank">
 						{{ t('integration_watsonx', 'Assistant app') }}
 					</a>
@@ -41,7 +41,7 @@
 					<strong>{{ modelEndpointUrl }}</strong>
 				</NcNoteCard>
 				<NcNoteCard type="info">
-					{{ t('integration_watsonx', 'This should include the domain name and API base path of your Watsonx instance. This URL will be accessed by your Nextcloud server.') }}
+					{{ t('integration_watsonx', 'This should include the domain name and API base path of your watsonx.ai instance. This URL will be accessed by your Nextcloud server.') }}
 				</NcNoteCard>
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
@@ -49,7 +49,7 @@
 						class="input"
 						:value.sync="state.service_name"
 						:label="t('integration_watsonx', 'Service name (optional)')"
-						:placeholder="t('integration_watsonx', 'Example: Watsonx of university ABC')"
+						:placeholder="t('integration_watsonx', 'Example: watsonx.ai of university ABC')"
 						:show-trailing-button="!!state.service_name"
 						@update:value="onInput()"
 						@trailing-button-click="state.service_name = '' ; onInput()" />
@@ -120,7 +120,7 @@
 						:value.sync="state.api_key"
 						type="password"
 						:readonly="readonly"
-						:label="t('integration_watsonx', 'API key (mandatory with Watsonx)')"
+						:label="t('integration_watsonx', 'API key (mandatory with watsonx.ai)')"
 						:show-trailing-button="!!state.api_key"
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
@@ -207,7 +207,7 @@
 				<NcNoteCard type="info">
 					<!-- TODO: confirm this -->
 					{{ state.url === ''
-						? t('integration_watsonx', 'Selection of chat/completion endpoint is not available for Watsonx since it implicitly uses chat completions for "instruction following" fine-tuned models.')
+						? t('integration_watsonx', 'Selection of chat/completion endpoint is not available for watsonx.ai since it implicitly uses chat completions for "instruction following" fine-tuned models.')
 						: t('integration_watsonx', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
 				</NcNoteCard>
 				<div v-if="models"
@@ -306,7 +306,7 @@
 					{{ t('integration_watsonx', 'Usage quotas per time period') }}
 				</h4>
 				<!--Loop through all quota types and list an input for them on this line-->
-				<!--Only enforced if the user has not provided an own API key (in the case of Watsonx)-->
+				<!--Only enforced if the user has not provided an own API key-->
 				<table class="quota-table">
 					<thead>
 						<tr>
@@ -342,7 +342,7 @@
 				</table>
 				<div class="line">
 					<!--Input for max number of tokens to generate for a single request-->
-					<!--Only enforced if the user has not provided an own API key (in the case of Watsonx)-->
+					<!--Only enforced if the user has not provided an own API key-->
 					<NcInputField
 						id="watsonx-api-max-tokens"
 						class="input"
@@ -606,12 +606,12 @@ export default {
 			try {
 				await axios.put(url, req)
 				if (notify) {
-					showSuccess(t('integration_watsonx', 'Watsonx admin options saved'))
+					showSuccess(t('integration_watsonx', 'Watsonx.ai admin options saved'))
 				}
 			} catch (error) {
 				console.error(error)
 				showError(
-					t('integration_watsonx', 'Failed to save Watsonx admin options')
+					t('integration_watsonx', 'Failed to save watsonx.ai admin options')
 					+ ': ' + this.reduceStars(error.response?.data?.error),
 					{ timeout: 10000 },
 				)

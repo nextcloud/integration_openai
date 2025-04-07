@@ -1,7 +1,7 @@
 {
 	"name": "integration_watsonx",
 	"version": "1.0.0",
-	"description": "IBM watsonx AI integration",
+	"description": "IBM watsonx.ai integration",
 	"main": "index.js",
 	"directories": {
 		"test": "tests"

@@ -140,13 +140,13 @@ class SummaryProvider implements ISynchronousProvider {
 					}
 				}
 			} catch (Exception $e) {
-				throw new RuntimeException('Watsonx request failed: ' . $e->getMessage());
+				throw new RuntimeException('Watsonx.ai request failed: ' . $e->getMessage());
 			}
 
 			// Each prompt chunk should return a non-empty array of completions, this will return false if at least one array is empty
 			$allPromptsHaveCompletions = array_reduce($completions, fn (bool $prev, array $next): bool => $prev && count($next), true);
 			if (!$allPromptsHaveCompletions) {
-				throw new RuntimeException('No result in watsonx response.');
+				throw new RuntimeException('No result in watsonx.ai response.');
 			}
 
 			// Take only one completion for each chunk and combine them into a single summary (which may be used as the next prompt)
@@ -165,7 +165,7 @@ class SummaryProvider implements ISynchronousProvider {
 	private function chunkSplitPrompt(string $prompt): array {
 		$chunkSize = $this->watsonxSettingsService->getChunkSize();
 
-		// Rough approximation, 1 token is approximately 4 bytes for Watsonx models
+		// Rough approximation, 1 token is approximately 4 bytes for watsonx.ai models
 		// It's safer to have a lower estimate on the max number of tokens, so consider 3 bytes per token instead of 4 (to account for some multibyte characters)
 		$maxChars = $chunkSize * 3;
 

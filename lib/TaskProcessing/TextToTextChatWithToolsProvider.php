@@ -131,7 +131,7 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 				$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
 			);
 		} catch (Exception $e) {
-			throw new RuntimeException('Watsonx request failed: ' . $e->getMessage());
+			throw new RuntimeException('Watsonx.ai request failed: ' . $e->getMessage());
 		}
 		if (count($completion['messages']) > 0 || count($completion['tool_calls']) > 0) {
 			$endTime = time();
@@ -142,6 +142,6 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 			];
 		}
 
-		throw new RuntimeException('No result in watsonx response.');
+		throw new RuntimeException('No result in watsonx.ai response.');
 	}
 }

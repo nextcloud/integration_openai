@@ -9,7 +9,7 @@
       <clover outputFile="./clover.xml"/>
     </report>
   </coverage>
-  <testsuite name="Watsonx integration App Tests">
+  <testsuite name="Watsonx.ai integration App Tests">
     <directory suffix="Test.php">.</directory>
   </testsuite>
   <!-- filters for code coverage -->

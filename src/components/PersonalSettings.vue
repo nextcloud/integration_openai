@@ -5,7 +5,7 @@
 <template>
 	<div id="watsonx_prefs" class="section">
 		<h2>
-			{{ t('integration_watsonx', 'Watsonx integration') }}
+			{{ t('integration_watsonx', 'IBM watsonx.ai integration') }}
 		</h2>
 		<div id="watsonx-content">
 			<p v-if="state.is_custom_service" class="settings-hint">
@@ -211,9 +211,9 @@ export default {
 				}
 				const url = sensitive ? generateUrl('/apps/integration_watsonx/config/sensitive') : generateUrl('/apps/integration_watsonx/config')
 				await axios.put(url, req)
-				showSuccess(t('integration_watsonx', 'Watsonx options saved'))
+				showSuccess(t('integration_watsonx', 'Watsonx.ai options saved'))
 			} catch (error) {
-				showError(t('integration_watsonx', 'Failed to save Watsonx options'))
+				showError(t('integration_watsonx', 'Failed to save watsonx.ai options'))
 				console.error(error)
 			}
 		},
