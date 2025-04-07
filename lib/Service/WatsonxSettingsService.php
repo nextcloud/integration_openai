@@ -26,7 +26,6 @@ class WatsonxSettingsService {
 		'default_completion_model_id' => 'string',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
-		'use_max_completion_tokens_param' => 'boolean',
 		'llm_extra_params' => 'string',
 		'quota_period' => 'integer',
 		'quotas' => 'array',
@@ -243,7 +242,6 @@ class WatsonxSettingsService {
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
-			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
 			'llm_extra_params' => $this->getLlmExtraParams(),
 			// Updated to get max tokens
 			'quota_period' => $this->getQuotaPeriod(),
@@ -270,13 +268,6 @@ class WatsonxSettingsService {
 			'is_custom_service' => $isCustomService,
 
 		];
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getUseMaxCompletionTokensParam(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', '0') === '1';
 	}
 
 	/**
@@ -538,9 +529,6 @@ class WatsonxSettingsService {
 		if (isset($adminConfig['quotas'])) {
 			$this->setQuotas($adminConfig['quotas']);
 		}
-		if (isset($adminConfig['use_max_completion_tokens_param'])) {
-			$this->setUseMaxCompletionParam($adminConfig['use_max_completion_tokens_param']);
-		}
 		if (isset($adminConfig['llm_provider_enabled'])) {
 			$this->setLlmProviderEnabled($adminConfig['llm_provider_enabled']);
 		}
@@ -575,14 +563,6 @@ class WatsonxSettingsService {
 		if (isset($userConfig['space_id'])) {
 			$this->setUserSpaceId($userId, $userConfig['space_id']);
 		}
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setUseMaxCompletionParam(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'use_max_completion_tokens_param', $enabled ? '1' : '0');
 	}
 
 	/**

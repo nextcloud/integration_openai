@@ -139,7 +139,7 @@ class WatsonxProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
-			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
 
@@ -203,7 +203,7 @@ class WatsonxProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
-			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
 
@@ -267,7 +267,7 @@ class WatsonxProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
-			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
 
@@ -332,7 +332,7 @@ class WatsonxProviderTest extends TestCase {
 			'messages' => [['role' => 'system', 'content' => $systemPrompt],
 				['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
-			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
 
@@ -395,7 +395,7 @@ class WatsonxProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'system', 'content' => $systemPrompt],['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
-			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
 
