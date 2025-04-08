@@ -255,7 +255,7 @@ class WatsonxSettingsService {
 	 * @return array{api_key: string, project_id: string, space_id: string, is_custom_service: bool}
 	 */
 	public function getUserConfig(string $userId): array {
-		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::WATSONX_API_BASE_URL;
+		$isCustomService = $this->getServiceUrl() !== '' && !str_contains($this->getServiceUrl(), 'cloud.ibm.com');
 		return [
 			'api_key' => $this->getUserApiKey($userId),
 			'project_id' => $this->getUserProjectId($userId),
