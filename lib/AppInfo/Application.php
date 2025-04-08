@@ -76,9 +76,9 @@ class Application extends App implements IBootstrap {
 				$context->registerTaskProcessingTaskType(ChangeToneTaskType::class);
 			}
 			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
-			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChatWithTools')) {
-				$context->registerTaskProcessingProvider(\OCA\Watsonx\TaskProcessing\TextToTextChatWithToolsProvider::class);
-			}
+			// if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChatWithTools')) {
+			// 	$context->registerTaskProcessingProvider(\OCA\Watsonx\TaskProcessing\TextToTextChatWithToolsProvider::class);
+			// }
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextProofread')) {
 				$context->registerTaskProcessingProvider(\OCA\Watsonx\TaskProcessing\ProofreadProvider::class);
 			}
