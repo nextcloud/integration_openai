@@ -31,6 +31,7 @@ use RuntimeException;
 class WatsonxAPIService {
 	private IClient $client;
 	private ?array $modelsMemoryCache = null;
+	private ?string $accessTokenMemoryCache = null;
 	private ?bool $areCredsValid = null;
 
 	public function __construct(
@@ -105,7 +106,6 @@ class WatsonxAPIService {
 
 		try {
 			$this->logger->debug('Actually getting watsonx.ai models with a network request');
-			// TODO: retrieve access token from cache or generate new token
 			$params = [
 				'version' => Application::WATSONX_API_VERSION,
 			];
@@ -134,6 +134,49 @@ class WatsonxAPIService {
 		$this->modelsMemoryCache = $modelsResponse;
 		$this->areCredsValid = true;
 		return $modelsResponse;
+	}
+
+	/**
+	 * @param string $apiKey
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getAccessToken(string $apiKey): string {
+		if ($this->accessTokenMemoryCache !== null) {
+			$this->logger->debug('Getting watsonx.ai access token from the memory cache');
+			return $this->accessTokenMemoryCache;
+		}
+
+		$cacheKey = Application::ACCESS_TOKEN_CACHE_KEY;
+		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
+		if ($cachedAccessToken = $cache->get($cacheKey)) {
+			$this->logger->debug('Getting watsonx.ai access token from distributed cache');
+			return $cachedAccessToken;
+		}
+
+		try {
+			$this->logger->debug('Actually getting IBM access token with a network request');
+			$params = [
+				'grant_type' => 'urn:ibm:params:oauth:grant-type:apikey',
+				'apikey' => $apiKey,
+			];
+			$accessTokenResponse = $this->requestIAM('/identity/token', $params, 'POST');
+		} catch (Exception $e) {
+			$this->logger->warning('Error retrieving access token (exc): ' . $e->getMessage());
+			$this->areCredsValid = false;
+			throw $e;
+		}
+		if (isset($accessTokenResponse['error'])) {
+			$this->logger->warning('Error retrieving access token: ' . \json_encode($accessTokenResponse));
+			$this->areCredsValid = false;
+			throw new Exception($accessTokenResponse['error'], Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		$accessToken = $accessTokenResponse['access_token'];
+		$cache->set($cacheKey, $accessToken, $accessTokenResponse['expires_in']);
+		$this->accessTokenMemoryCache = $accessToken;
+		$this->areCredsValid = true;
+		return $accessToken;
 	}
 
 	/**
@@ -587,6 +630,13 @@ class WatsonxAPIService {
 	 */
 	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
 		try {
+			// an API key is mandatory when using watsonx.ai
+			$apiKey = $this->watsonxSettingsService->getUserApiKey($userId, true);
+
+			if (!$apiKey) {
+				return ['error' => 'An API key is required for watsonx.ai'];
+			}
+
 			$serviceUrl = $this->watsonxSettingsService->getServiceUrl();
 			if ($serviceUrl === '') {
 				$serviceUrl = Application::WATSONX_API_BASE_URL;
@@ -595,27 +645,10 @@ class WatsonxAPIService {
 			$url = rtrim($serviceUrl, '/') . $endPoint;
 			$options = [
 				'headers' => [
+					'Authorization' => 'Bearer ' . $this->getAccessToken($apiKey),
 					'User-Agent' => Application::USER_AGENT,
 				],
 			];
-
-			// an API key is mandatory when using watsonx.ai
-			$apiKey = $this->watsonxSettingsService->getUserApiKey($userId, true);
-
-			if (!$apiKey) {
-				return ['error' => 'An API key is required for watsonx.ai'];
-			}
-
-			$options['headers']['Authorization'] = 'Basic ' . base64_encode('apikey:' . $apiKey);
-
-			// TODO: generate access token from API key
-			// $useBasicAuth = $this->watsonxSettingsService->getUseBasicAuth();
-
-			// if ($useBasicAuth) {
-			// 	$options['headers']['Authorization'] = 'Basic ' . base64_encode('apikey:' . $apiKey);
-			// } else {
-			// 	$options['headers']['Authorization'] = 'Bearer ' . $accessToken;
-			// }
 
 			if ($contentType === null) {
 				$options['headers']['Content-Type'] = 'application/json';
@@ -647,6 +680,70 @@ class WatsonxAPIService {
 					} else {
 						$options['body'] = json_encode($params);
 					}
+				}
+			}
+
+			if ($method === 'GET') {
+				$response = $this->client->get($url, $options);
+			} elseif ($method === 'POST') {
+				$response = $this->client->post($url, $options);
+			} elseif ($method === 'PUT') {
+				$response = $this->client->put($url, $options);
+			} elseif ($method === 'DELETE') {
+				$response = $this->client->delete($url, $options);
+			} else {
+				return ['error' => $this->l10n->t('Bad HTTP method')];
+			}
+			$body = $response->getBody();
+			$respCode = $response->getStatusCode();
+
+			if ($respCode >= 400) {
+				return ['error' => $this->l10n->t('Bad credentials')];
+			} else {
+				return json_decode($body, true) ?: [];
+			}
+		} catch (ClientException|ServerException $e) {
+			$responseBody = $e->getResponse()->getBody();
+			$parsedResponseBody = json_decode($responseBody, true);
+			if ($e->getResponse()->getStatusCode() === 404) {
+				$this->logger->debug('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
+			} else {
+				$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
+			}
+			if (isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])) {
+				throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], intval($e->getCode()));
+			} else {
+				throw new Exception($this->l10n->t('API request error: ') . $e->getMessage(), intval($e->getCode()));
+			}
+		}
+	}
+
+	/**
+	 * Make an HTTP request to the IAM Identity Services API
+	 * @param string $endPoint The path to reach
+	 * @param array $params Query parameters (key/val pairs)
+	 * @param string $method HTTP query method
+	 * @return array decoded request result or error
+	 * @throws Exception
+	 */
+	public function requestIAM(string $endPoint, array $params = [], string $method = 'GET'): array {
+		try {
+			$serviceUrl = 'https://iam.cloud.ibm.com';
+
+			$url = rtrim($serviceUrl, '/') . $endPoint;
+			$options = [
+				'headers' => [
+					'Content-Type' => 'application/x-www-form-urlencoded',
+					'User-Agent' => Application::USER_AGENT,
+				],
+			];
+
+			if (count($params) > 0) {
+				if ($method === 'GET') {
+					$paramsContent = http_build_query($params);
+					$url .= '?' . $paramsContent;
+				} else {
+					$options['body'] = $params;
 				}
 			}
 

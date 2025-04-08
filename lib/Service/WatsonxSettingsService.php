@@ -54,6 +54,11 @@ class WatsonxSettingsService {
 		$cache->remove(Application::MODELS_CACHE_KEY);
 	}
 
+	public function invalidateAccessTokenCache(): void {
+		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
+		$cache->remove(Application::ACCESS_TOKEN_CACHE_KEY);
+	}
+
 	////////////////////////////////////////////
 	//////////// Getters for settings //////////
 
@@ -312,6 +317,7 @@ class WatsonxSettingsService {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->appConfig->setValueString(Application::APP_ID, 'api_key', $apiKey, false, true);
 		$this->invalidateModelsCache();
+		$this->invalidateAccessTokenCache();
 	}
 
 	/**
@@ -328,6 +334,7 @@ class WatsonxSettingsService {
 			$this->config->setUserValue($userId, Application::APP_ID, 'api_key', $encryptedApiKey);
 		}
 		$this->invalidateModelsCache();
+		$this->invalidateAccessTokenCache();
 	}
 
 	/**
@@ -399,6 +406,7 @@ class WatsonxSettingsService {
 		}
 		$this->appConfig->setValueString(Application::APP_ID, 'url', $serviceUrl);
 		$this->invalidateModelsCache();
+		$this->invalidateAccessTokenCache();
 	}
 
 	/**
@@ -473,6 +481,7 @@ class WatsonxSettingsService {
 	public function setUseBasicAuth(bool $useBasicAuth): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
 		$this->invalidateModelsCache();
+		$this->invalidateAccessTokenCache();
 	}
 
 	/**

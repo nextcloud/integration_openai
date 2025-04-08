@@ -51,6 +51,7 @@ class Application extends App implements IBootstrap {
 
 	public const MODELS_CACHE_KEY = 'models';
 	public const MODELS_CACHE_TTL = 60 * 30;
+	public const ACCESS_TOKEN_CACHE_KEY = 'access_token';
 
 	private IAppConfig $appConfig;
 
