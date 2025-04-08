@@ -178,7 +178,7 @@
 				<h2>
 					{{ t('integration_watsonx', 'Text generation') }}
 				</h2>
-				<div v-if="state.url !== ''" class="line column">
+				<div class="line column">
 					<label>
 						<EarthIcon :size="20" class="icon" />
 						{{ t('integration_watsonx', 'Text completion endpoint') }}
@@ -205,10 +205,7 @@
 					</div>
 				</div>
 				<NcNoteCard type="info">
-					<!-- TODO: confirm this -->
-					{{ state.url === ''
-						? t('integration_watsonx', 'Selection of chat/completion endpoint is not available for watsonx.ai since it implicitly uses chat completions for "instruction following" fine-tuned models.')
-						: t('integration_watsonx', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
+					{{ t('integration_watsonx', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
 				</NcNoteCard>
 				<div v-if="models"
 					class="line line-select">
