@@ -43,7 +43,7 @@
 				<NcNoteCard type="info">
 					{{ t('integration_watsonx', 'This should include the domain name and API base path of your watsonx.ai instance. This URL will be accessed by your Nextcloud server.') }}
 				</NcNoteCard>
-				<div v-if="state.url !== ''" class="line">
+				<div v-if="state.url !== '' && !state.url.includes('cloud.ibm.com')" class="line">
 					<NcTextField
 						id="watsonx-service-name"
 						class="input"
@@ -128,7 +128,7 @@
 						<KeyIcon />
 					</NcTextField>
 				</div>
-				<NcNoteCard v-show="state.url === ''" type="info">
+				<NcNoteCard v-show="state.url === '' || state.url.includes('cloud.ibm.com')" type="info">
 					{{ t('integration_watsonx', 'You can create an API key in your IBM Cloud IAM account settings') }}:
 					<br>
 					<a :href="apiKeyUrl" target="_blank" class="external">
@@ -219,7 +219,7 @@
 						:no-wrap="true"
 						input-id="watsonx-model-select"
 						@input="onModelSelected('text', $event)" />
-					<a v-if="state.url === ''"
+					<a v-if="state.url === '' || state.url.includes('cloud.ibm.com')"
 						:title="t('integration_watsonx', 'More information about IBM watsonx.ai as a Service')"
 						href="https://cloud.ibm.com/apidocs/watsonx-ai"
 						target="_blank">
@@ -440,7 +440,7 @@ export default {
 			return this.state.url.replace(/\/*$/, '/ml/v1/foundation_model_specs')
 		},
 		configured() {
-			return !!this.state.url || !!this.state.api_key
+			return !!this.state.api_key
 		},
 		formattedModels() {
 			if (this.models) {
