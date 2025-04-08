@@ -88,31 +88,6 @@
 				<h2>
 					{{ t('integration_watsonx', 'Authentication') }}
 				</h2>
-				<!-- <div class="line column">
-					<label>
-						{{ t('integration_watsonx', 'Authentication method') }}
-					</label>
-					<div class="radios">
-						<NcCheckboxRadioSwitch
-							:button-variant="true"
-							:checked="!state.use_basic_auth"
-							type="radio"
-							button-variant-grouped="horizontal"
-							name="auth_method"
-							@update:checked="onCheckboxChanged(false, 'use_basic_auth')">
-							{{ t('integration_watsonx', 'Access Token') }}
-						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch
-							:button-variant="true"
-							:checked="state.use_basic_auth"
-							type="radio"
-							button-variant-grouped="horizontal"
-							name="auth_method"
-							@update:checked="onCheckboxChanged(true, 'use_basic_auth')">
-							{{ t('integration_watsonx', 'Basic Authentication') }}
-						</NcCheckboxRadioSwitch>
-					</div>
-				</div> -->
 				<div class="line">
 					<NcTextField
 						id="watsonx-api-key"

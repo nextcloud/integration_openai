@@ -31,7 +31,6 @@ class WatsonxSettingsService {
 		'quotas' => 'array',
 		'llm_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
-		'use_basic_auth' => 'boolean'
 	];
 
 	private const USER_CONFIG_TYPES = [
@@ -226,13 +225,6 @@ class WatsonxSettingsService {
 	}
 
 	/**
-	 * @return boolean
-	 */
-	public function getUseBasicAuth(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_basic_auth', '0') === '1';
-	}
-
-	/**
 	 * Get the admin config for the settings page
 	 * @return mixed[]
 	 */
@@ -255,13 +247,12 @@ class WatsonxSettingsService {
 			// Get quotas from the config value and return it
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
-			'use_basic_auth' => $this->getUseBasicAuth()
 		];
 	}
 
 	/**
 	 * Get the user config for the settings page
-	 * @return array{api_key: string, project_id: string, space_id: string, is_custom_service: bool, use_basic_auth: bool}
+	 * @return array{api_key: string, project_id: string, space_id: string, is_custom_service: bool}
 	 */
 	public function getUserConfig(string $userId): array {
 		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::WATSONX_API_BASE_URL;
@@ -269,9 +260,7 @@ class WatsonxSettingsService {
 			'api_key' => $this->getUserApiKey($userId),
 			'project_id' => $this->getUserProjectId($userId),
 			'space_id' => $this->getUserSpaceId($userId),
-			'use_basic_auth' => $this->getUseBasicAuth(),
 			'is_custom_service' => $isCustomService,
-
 		];
 	}
 
@@ -475,16 +464,6 @@ class WatsonxSettingsService {
 	}
 
 	/**
-	 * @param bool $useBasicAuth
-	 * @return void
-	 */
-	public function setUseBasicAuth(bool $useBasicAuth): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
-		$this->invalidateModelsCache();
-		$this->invalidateAccessTokenCache();
-	}
-
-	/**
 	 * Set the admin config for the settings page
 	 * @param mixed[] $config
 	 * @return void
@@ -543,9 +522,6 @@ class WatsonxSettingsService {
 		}
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
-		}
-		if (isset($adminConfig['use_basic_auth'])) {
-			$this->setUseBasicAuth($adminConfig['use_basic_auth']);
 		}
 	}
 
