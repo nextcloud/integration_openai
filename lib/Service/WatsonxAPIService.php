@@ -313,6 +313,7 @@ class WatsonxAPIService {
 			'input' => $prompt,
 			'parameters' => [
 				'max_new_tokens' => $maxTokens,
+				'time_limit' => $this->watsonxSettingsService->getRequestTimeout() * 1000,
 			],
 			// 'n' => $n,
 		];
@@ -455,6 +456,7 @@ class WatsonxAPIService {
 			'model_id' => $modelRequestParam,
 			'messages' => $messages,
 			'n' => $n,
+			'time_limit' => $this->watsonxSettingsService->getRequestTimeout() * 1000,
 		];
 
 		$maxTokensLimit = $this->watsonxSettingsService->getMaxTokens();
@@ -590,11 +592,8 @@ class WatsonxAPIService {
 				$serviceUrl = Application::WATSONX_API_BASE_URL;
 			}
 
-			$timeout = $this->watsonxSettingsService->getRequestTimeout();
-
 			$url = rtrim($serviceUrl, '/') . $endPoint;
 			$options = [
-				'timeout' => $timeout,
 				'headers' => [
 					'User-Agent' => Application::USER_AGENT,
 				],
