@@ -140,9 +140,6 @@
 				<h2>
 					{{ t('integration_watsonx', 'Cloud Resources') }}
 				</h2>
-				<NcNoteCard type="info">
-					{{ t('integration_watsonx', 'A watsonx.ai project ID or space ID is required to generate text') }}.
-				</NcNoteCard>
 				<div class="line">
 					<NcTextField
 						id="watsonx-project-id"
@@ -173,6 +170,9 @@
 						<KeyIcon />
 					</NcTextField>
 				</div>
+				<NcNoteCard type="info">
+					{{ t('integration_watsonx', 'A watsonx.ai project ID or space ID is required to generate text') }}.
+				</NcNoteCard>
 			</div>
 			<div>
 				<h2>
