@@ -37,7 +37,8 @@ class WatsonxProviderTest extends TestCase {
 	public const APP_NAME = 'integration_watsonx';
 	public const TEST_USER1 = 'testuser';
 	public const WATSONX_API_BASE = 'https://us-south.ml.cloud.ibm.com';
-	public const AUTHORIZATION_HEADER = 'Bearer This is a PHPUnit test API key';
+	public const TEST_API_KEY = 'This is a PHPUnit test API key';
+	public const AUTHORIZATION_HEADER = 'Bearer ' . self::TEST_API_KEY;
 
 	private WatsonxAPIService $watsonxApiService;
 	private WatsonxSettingsService $watsonxSettingsService;
@@ -78,7 +79,7 @@ class WatsonxProviderTest extends TestCase {
 			$clientService,
 		);
 
-		$this->watsonxSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
+		$this->watsonxSettingsService->setUserApiKey(self::TEST_USER1, self::TEST_API_KEY);
 	}
 
 	public static function tearDownAfterClass(): void {
@@ -111,11 +112,9 @@ class WatsonxProviderTest extends TestCase {
 		$n = 1;
 
 		$response = '{
-			"id": "chatcmpl-123",
-			"object": "chat.completion",
-			"created": 1677652288,
+			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
+			"created": 1689958352,
 			"model": "ibm/granite-3-8b-instruct",
-			"system_fingerprint": "fp_44709d6fcb",
 			"choices": [
 			  {
 				"index": 0,
@@ -133,14 +132,21 @@ class WatsonxProviderTest extends TestCase {
 			}
 		  }';
 
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
-		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
+		$options = [
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Authorization' => self::AUTHORIZATION_HEADER,
+				'Content-Type' => 'application/json',
+			],
+		];
+
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'user' => self::TEST_USER1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -173,11 +179,9 @@ class WatsonxProviderTest extends TestCase {
 		$n = 1;
 
 		$response = '{
-			"id": "chatcmpl-123",
-			"object": "chat.completion",
-			"created": 1677652288,
+			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
+			"created": 1689958352,
 			"model": "ibm/granite-3-8b-instruct",
-			"system_fingerprint": "fp_44709d6fcb",
 			"choices": [
 			  {
 				"index": 0,
@@ -195,16 +199,22 @@ class WatsonxProviderTest extends TestCase {
 			}
 		}';
 
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
+		$options = [
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Authorization' => self::AUTHORIZATION_HEADER,
+				'Content-Type' => 'application/json',
+			],
+		];
 
-		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$message = 'Give me the headline of the following text in its original language. Do not output the language. Output only the headline without any quotes or additional punctuation.' . "\n\n" . $prompt;
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'user' => self::TEST_USER1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -237,11 +247,9 @@ class WatsonxProviderTest extends TestCase {
 		$n = 1;
 
 		$response = '{
-			"id": "chatcmpl-123",
-			"object": "chat.completion",
-			"created": 1677652288,
+			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
+			"created": 1689958352,
 			"model": "ibm/granite-3-8b-instruct",
-			"system_fingerprint": "fp_44709d6fcb",
 			"choices": [
 			  {
 				"index": 0,
@@ -259,16 +267,22 @@ class WatsonxProviderTest extends TestCase {
 			}
 		}';
 
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
+		$options = [
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Authorization' => self::AUTHORIZATION_HEADER,
+				'Content-Type' => 'application/json',
+			],
+		];
 
-		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$message = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'user' => self::TEST_USER1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -301,11 +315,9 @@ class WatsonxProviderTest extends TestCase {
 		$n = 1;
 
 		$response = '{
-            "id": "chatcmpl-123",
-            "object": "chat.completion",
-            "created": 1677652288,
+			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
+			"created": 1689958352,
             "model": "ibm/granite-3-8b-instruct",
-            "system_fingerprint": "fp_44709d6fcb",
             "choices": [
               {
                 "index": 0,
@@ -323,9 +335,15 @@ class WatsonxProviderTest extends TestCase {
             }
         }';
 
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
+		$options = [
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Authorization' => self::AUTHORIZATION_HEADER,
+				'Content-Type' => 'application/json',
+			],
+		];
 
-		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$systemPrompt = 'Summarize the following text in the same language as the text.';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
@@ -333,7 +351,7 @@ class WatsonxProviderTest extends TestCase {
 				['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'user' => self::TEST_USER1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -365,11 +383,9 @@ class WatsonxProviderTest extends TestCase {
 		$n = 1;
 
 		$response = '{
-            "id": "chatcmpl-123",
-            "object": "chat.completion",
-            "created": 1677652288,
+			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
+			"created": 1689958352,
             "model": "ibm/granite-3-8b-instruct",
-            "system_fingerprint": "fp_44709d6fcb",
             "choices": [
               {
                 "index": 0,
@@ -387,16 +403,22 @@ class WatsonxProviderTest extends TestCase {
             }
         }';
 
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat';
+		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
+		$options = [
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Authorization' => self::AUTHORIZATION_HEADER,
+				'Content-Type' => 'application/json',
+			],
+		];
 
-		$options = ['timeout' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list.';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'system', 'content' => $systemPrompt],['role' => 'user', 'content' => $prompt]],
+			'messages' => [['role' => 'system', 'content' => $systemPrompt], ['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'user' => self::TEST_USER1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
