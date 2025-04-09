@@ -36,9 +36,61 @@ use Test\Util\User\Dummy;
 class WatsonxProviderTest extends TestCase {
 	public const APP_NAME = 'integration_watsonx';
 	public const TEST_USER1 = 'testuser';
-	public const WATSONX_API_BASE = 'https://us-south.ml.cloud.ibm.com';
+	public const WATSONX_API_CHAT_ENDPOINT = Application::WATSONX_API_BASE_URL . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
+	public const WATSONX_API_IAM_ENDPOINT = 'https://iam.cloud.ibm.com/identity/token';
 	public const TEST_API_KEY = 'This is a PHPUnit test API key';
-	public const AUTHORIZATION_HEADER = 'Bearer ' . self::TEST_API_KEY;
+	public const TEST_ACCESS_TOKEN = 'This is a PHPUnit test access token';
+	public const AUTHORIZATION_HEADER = 'Bearer ' . self::TEST_ACCESS_TOKEN;
+
+	public const BASE_OPTIONS = [
+		'headers' => [
+			'Authorization' => self::AUTHORIZATION_HEADER,
+			'User-Agent' => Application::USER_AGENT,
+			'Content-Type' => 'application/json',
+		],
+	];
+
+	public const TEXT_CHAT_RESPONSE = '{
+		"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
+		"model_id": "ibm/granite-3-8b-instruct",
+		"created": 1689958352,
+		"choices": [
+			{
+				"index": 0,
+				"message": {
+					"role": "assistant",
+					"content": "This is a test response."
+				},
+				"finish_reason": "stop"
+			}
+		],
+		"usage": {
+			"completion_tokens": 12,
+			"prompt_tokens": 9,
+			"total_tokens": 21
+		}
+	}';
+
+	public const IAM_OPTIONS = [
+		'headers' => [
+			'Content-Type' => 'application/x-www-form-urlencoded',
+			'User-Agent' => Application::USER_AGENT,
+		],
+		'body' => [
+			'grant_type' => 'urn:ibm:params:oauth:grant-type:apikey',
+			'apikey' => self::TEST_API_KEY,
+		],
+	];
+
+	public const IAM_RESPONSE = '{
+		"access_token": "This is a PHPUnit test access token",
+		"refresh_token": "not_supported",
+		"ims_user_id": 11890,
+		"token_type": "Bearer",
+		"expires_in": 3600,
+		"expiration": 1473188353,
+		"scope": "ibm openid"
+	}';
 
 	private WatsonxAPIService $watsonxApiService;
 	private WatsonxSettingsService $watsonxSettingsService;
@@ -46,6 +98,14 @@ class WatsonxProviderTest extends TestCase {
 	 * @var MockObject|IClient
 	 */
 	private $iClient;
+	/**
+	 * @var MockObject|IResponse
+	 */
+	private $iResponse;
+	/**
+	 * @var MockObject|IResponse
+	 */
+	private $iamResponse;
 	private QuotaUsageMapper $quotaUsageMapper;
 
 	public static function setUpBeforeClass(): void {
@@ -79,6 +139,14 @@ class WatsonxProviderTest extends TestCase {
 			$clientService,
 		);
 
+		$this->iamResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$this->iamResponse->method('getBody')->willReturn(self::IAM_RESPONSE);
+		$this->iamResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$this->iResponse->method('getBody')->willReturn(self::TEXT_CHAT_RESPONSE);
+		$this->iResponse->method('getStatusCode')->willReturn(200);
+
 		$this->watsonxSettingsService->setUserApiKey(self::TEST_USER1, self::TEST_API_KEY);
 	}
 
@@ -109,51 +177,38 @@ class WatsonxProviderTest extends TestCase {
 		);
 
 		$prompt = 'This is a test prompt';
-		$n = 1;
 
-		$response = '{
-			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
-			"created": 1689958352,
-			"model": "ibm/granite-3-8b-instruct",
-			"choices": [
-			  {
-				"index": 0,
-				"message": {
-				  "role": "assistant",
-				  "content": "This is a test response."
-				},
-				"finish_reason": "stop"
-			  }
-			],
-			"usage": {
-			  "prompt_tokens": 9,
-			  "completion_tokens": 12,
-			  "total_tokens": 21
-			}
-		  }';
-
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
-		$options = [
-			'headers' => [
-				'User-Agent' => Application::USER_AGENT,
-				'Authorization' => self::AUTHORIZATION_HEADER,
-				'Content-Type' => 'application/json',
-			],
-		];
-
+		$options = self::BASE_OPTIONS;
 		$options['body'] = json_encode([
-			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'user', 'content' => $prompt]],
-			'n' => $n,
+			'model_id' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				[
+					'role' => 'user',
+					'content' => [['type' => 'text', 'text' => $prompt]],
+				],
+			],
+			'n' => 1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT * 1000,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
-		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
-		$iResponse->method('getBody')->willReturn($response);
-		$iResponse->method('getStatusCode')->willReturn(200);
+		$this->iClient
+			->expects($this->exactly(2))
+			->method('post')
+			->willReturnCallback(function ($url, $opts) use ($options) {
+				static $invocationCount = 0;
+				$invocationCount++;
 
-		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+				if ($invocationCount === 1) {
+					$this->assertSame([self::WATSONX_API_IAM_ENDPOINT, self::IAM_OPTIONS], [$url, $opts]);
+					return $this->iamResponse;
+				}
+
+				if ($invocationCount === 2) {
+					$this->assertSame([self::WATSONX_API_CHAT_ENDPOINT, $options], [$url, $opts]);
+					return $this->iResponse;
+				}
+			});
 
 		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
@@ -176,52 +231,39 @@ class WatsonxProviderTest extends TestCase {
 		);
 
 		$prompt = 'This is a test prompt';
-		$n = 1;
-
-		$response = '{
-			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
-			"created": 1689958352,
-			"model": "ibm/granite-3-8b-instruct",
-			"choices": [
-			  {
-				"index": 0,
-				"message": {
-				  "role": "assistant",
-				  "content": "This is a test response."
-				},
-				"finish_reason": "stop"
-			  }
-			],
-			"usage": {
-			  "prompt_tokens": 9,
-			  "completion_tokens": 12,
-			  "total_tokens": 21
-			}
-		}';
-
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
-		$options = [
-			'headers' => [
-				'User-Agent' => Application::USER_AGENT,
-				'Authorization' => self::AUTHORIZATION_HEADER,
-				'Content-Type' => 'application/json',
-			],
-		];
-
 		$message = 'Give me the headline of the following text in its original language. Do not output the language. Output only the headline without any quotes or additional punctuation.' . "\n\n" . $prompt;
+
+		$options = self::BASE_OPTIONS;
 		$options['body'] = json_encode([
-			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'user', 'content' => $message]],
-			'n' => $n,
+			'model_id' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				[
+					'role' => 'user',
+					'content' => [['type' => 'text', 'text' => $message]],
+				],
+			],
+			'n' => 1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT * 1000,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
-		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
-		$iResponse->method('getBody')->willReturn($response);
-		$iResponse->method('getStatusCode')->willReturn(200);
+		$this->iClient
+			->expects($this->exactly(2))
+			->method('post')
+			->willReturnCallback(function ($url, $opts) use ($options) {
+				static $invocationCount = 0;
+				$invocationCount++;
 
-		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+				if ($invocationCount === 1) {
+					$this->assertSame([self::WATSONX_API_IAM_ENDPOINT, self::IAM_OPTIONS], [$url, $opts]);
+					return $this->iamResponse;
+				}
+
+				if ($invocationCount === 2) {
+					$this->assertSame([self::WATSONX_API_CHAT_ENDPOINT, $options], [$url, $opts]);
+					return $this->iResponse;
+				}
+			});
 
 		$result = $headlineProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
@@ -244,52 +286,39 @@ class WatsonxProviderTest extends TestCase {
 
 		$textInput = 'This is a test prompt';
 		$toneInput = 'friendlier';
-		$n = 1;
-
-		$response = '{
-			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
-			"created": 1689958352,
-			"model": "ibm/granite-3-8b-instruct",
-			"choices": [
-			  {
-				"index": 0,
-				"message": {
-				  "role": "assistant",
-				  "content": "This is a test response."
-				},
-				"finish_reason": "stop"
-			  }
-			],
-			"usage": {
-			  "prompt_tokens": 9,
-			  "completion_tokens": 12,
-			  "total_tokens": 21
-			}
-		}';
-
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
-		$options = [
-			'headers' => [
-				'User-Agent' => Application::USER_AGENT,
-				'Authorization' => self::AUTHORIZATION_HEADER,
-				'Content-Type' => 'application/json',
-			],
-		];
-
 		$message = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
+
+		$options = self::BASE_OPTIONS;
 		$options['body'] = json_encode([
-			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'user', 'content' => $message]],
-			'n' => $n,
+			'model_id' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				[
+					'role' => 'user',
+					'content' => [['type' => 'text', 'text' => $message]],
+				],
+			],
+			'n' => 1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT * 1000,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
-		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
-		$iResponse->method('getBody')->willReturn($response);
-		$iResponse->method('getStatusCode')->willReturn(200);
+		$this->iClient
+			->expects($this->exactly(2))
+			->method('post')
+			->willReturnCallback(function ($url, $opts) use ($options) {
+				static $invocationCount = 0;
+				$invocationCount++;
 
-		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+				if ($invocationCount === 1) {
+					$this->assertSame([self::WATSONX_API_IAM_ENDPOINT, self::IAM_OPTIONS], [$url, $opts]);
+					return $this->iamResponse;
+				}
+
+				if ($invocationCount === 2) {
+					$this->assertSame([self::WATSONX_API_CHAT_ENDPOINT, $options], [$url, $opts]);
+					return $this->iResponse;
+				}
+			});
 
 		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone' => $toneInput ], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
@@ -312,53 +341,43 @@ class WatsonxProviderTest extends TestCase {
 		);
 
 		$prompt = 'This is a test prompt';
-		$n = 1;
-
-		$response = '{
-			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
-			"created": 1689958352,
-            "model": "ibm/granite-3-8b-instruct",
-            "choices": [
-              {
-                "index": 0,
-                "message": {
-                  "role": "assistant",
-                  "content": "This is a test response."
-                },
-                "finish_reason": "stop"
-              }
-            ],
-            "usage": {
-              "prompt_tokens": 9,
-              "completion_tokens": 12,
-              "total_tokens": 21
-            }
-        }';
-
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
-		$options = [
-			'headers' => [
-				'User-Agent' => Application::USER_AGENT,
-				'Authorization' => self::AUTHORIZATION_HEADER,
-				'Content-Type' => 'application/json',
-			],
-		];
-
 		$systemPrompt = 'Summarize the following text in the same language as the text.';
+
+		$options = self::BASE_OPTIONS;
 		$options['body'] = json_encode([
-			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'system', 'content' => $systemPrompt],
-				['role' => 'user', 'content' => $prompt]],
-			'n' => $n,
+			'model_id' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				[
+					'role' => 'system',
+					'content' => $systemPrompt,
+				],
+				[
+					'role' => 'user',
+					'content' => [['type' => 'text', 'text' => $prompt]],
+				],
+			],
+			'n' => 1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT * 1000,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
-		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
-		$iResponse->method('getBody')->willReturn($response);
-		$iResponse->method('getStatusCode')->willReturn(200);
+		$this->iClient
+			->expects($this->exactly(2))
+			->method('post')
+			->willReturnCallback(function ($url, $opts) use ($options) {
+				static $invocationCount = 0;
+				$invocationCount++;
 
-		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+				if ($invocationCount === 1) {
+					$this->assertSame([self::WATSONX_API_IAM_ENDPOINT, self::IAM_OPTIONS], [$url, $opts]);
+					return $this->iamResponse;
+				}
+
+				if ($invocationCount === 2) {
+					$this->assertSame([self::WATSONX_API_CHAT_ENDPOINT, $options], [$url, $opts]);
+					return $this->iResponse;
+				}
+			});
 
 		$result = $summaryProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
@@ -380,52 +399,43 @@ class WatsonxProviderTest extends TestCase {
 		);
 
 		$prompt = 'This is a test prompt';
-		$n = 1;
-
-		$response = '{
-			"id": "cmpl-15475d0dea9b4429a55843c77997f8a9",
-			"created": 1689958352,
-            "model": "ibm/granite-3-8b-instruct",
-            "choices": [
-              {
-                "index": 0,
-                "message": {
-                  "role": "assistant",
-                  "content": "This is a test response."
-                },
-                "finish_reason": "stop"
-              }
-            ],
-            "usage": {
-              "prompt_tokens": 9,
-              "completion_tokens": 12,
-              "total_tokens": 21
-            }
-        }';
-
-		$url = self::WATSONX_API_BASE . '/ml/v1/text/chat?version=' . Application::WATSONX_API_VERSION;
-		$options = [
-			'headers' => [
-				'User-Agent' => Application::USER_AGENT,
-				'Authorization' => self::AUTHORIZATION_HEADER,
-				'Content-Type' => 'application/json',
-			],
-		];
-
 		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list.';
+
+		$options = self::BASE_OPTIONS;
 		$options['body'] = json_encode([
-			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'system', 'content' => $systemPrompt], ['role' => 'user', 'content' => $prompt]],
-			'n' => $n,
+			'model_id' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				[
+					'role' => 'system',
+					'content' => $systemPrompt,
+				],
+				[
+					'role' => 'user',
+					'content' => [['type' => 'text', 'text' => $prompt]],
+				],
+			],
+			'n' => 1,
+			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT * 1000,
 			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
-			'time_limit' => Application::WATSONX_DEFAULT_REQUEST_TIMEOUT,
 		]);
 
-		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
-		$iResponse->method('getBody')->willReturn($response);
-		$iResponse->method('getStatusCode')->willReturn(200);
+		$this->iClient
+			->expects($this->exactly(2))
+			->method('post')
+			->willReturnCallback(function ($url, $opts) use ($options) {
+				static $invocationCount = 0;
+				$invocationCount++;
 
-		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+				if ($invocationCount === 1) {
+					$this->assertSame([self::WATSONX_API_IAM_ENDPOINT, self::IAM_OPTIONS], [$url, $opts]);
+					return $this->iamResponse;
+				}
+
+				if ($invocationCount === 2) {
+					$this->assertSame([self::WATSONX_API_CHAT_ENDPOINT, $options], [$url, $opts]);
+					return $this->iResponse;
+				}
+			});
 
 		$result = $proofreadProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
 		$this->assertEquals('This is a test response.', $result['output']);
