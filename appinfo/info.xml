@@ -44,10 +44,6 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 	<category>integration</category>
 	<website>https://github.com/nextcloud/integration_watsonx</website>
 	<bugs>https://github.com/nextcloud/integration_watsonx/issues</bugs>
-	<screenshot>https://github.com/nextcloud/integration_watsonx/raw/main/img/screenshot1.jpg</screenshot>
-	<screenshot>https://github.com/nextcloud/integration_watsonx/raw/main/img/screenshot2.jpg</screenshot>
-	<screenshot>https://github.com/nextcloud/integration_watsonx/raw/main/img/screenshot3.jpg</screenshot>
-	<screenshot>https://github.com/nextcloud/integration_watsonx/raw/main/img/screenshot4.jpg</screenshot>
 	<dependencies>
 		<nextcloud min-version="30" max-version="32"/>
 	</dependencies>
