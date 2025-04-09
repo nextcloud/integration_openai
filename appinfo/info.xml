@@ -8,6 +8,9 @@
 	<name>IBM watsonx.ai integration</name>
 	<summary>Integration of IBM watsonx AI services</summary>
 	<description><![CDATA[
+⚠ This app is still in early development
+and has only been tested with IBM watsonx.ai as a Service.
+
 This app implements the following text generation providers
 using any freely-available large language model:
 Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate.
@@ -20,21 +23,14 @@ or to a self-hosted cluster running IBM Software Hub and related services.
 To avoid task processing execution delay, setup at 4 background job workers in the main server (where Nextcloud is installed). The setup process is documented here: https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed
 
 ## Ethical AI Rating
-### Rating for Text generation via IBM watsonx.ai as a Service: 🔴
-
-Negative:
-* The software for training and inference of this model is proprietary, limiting running it locally or training by yourself
-* The trained model is not freely available, so the model can not be run on-premises
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
-
-
-### Rating for Text generation via self-hosted IBM watsonx.ai: 🟢
+### Rating for Text generation via IBM watsonx.ai: 🟡
 
 Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can be ran on-premises
-* The training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage.
+* The trained models are freely available, and thus can be ran on-premises
+* The training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage
 
+Negative:
+* The software for training and inference of models is proprietary, limiting modifications to the API or other functionality
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
 ]]>	</description>
