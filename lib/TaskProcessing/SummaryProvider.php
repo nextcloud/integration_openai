@@ -152,7 +152,10 @@ class SummaryProvider implements ISynchronousProvider {
 			}
 
 			// Take only one completion for each chunk and combine them into a single summary (which may be used as the next prompt)
-			$completionStrings = array_map(fn (array $val): string => end($val), $completions);
+			$completionStrings = array_values(array_filter(
+				array_map(fn (array $val): false|string => end($val), $completions),
+				fn (false|string $val): bool => $val !== false,
+			));
 			$summary = implode(' ', $completionStrings);
 
 			$prompts = self::chunkSplitPrompt($summary);

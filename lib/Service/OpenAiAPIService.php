@@ -332,7 +332,7 @@ class OpenAiAPIService {
 	 * @param string $model
 	 * @param int|null $maxTokens
 	 * @param array|null $extraParams
-	 * @return array|string[]
+	 * @return string[]
 	 * @throws Exception
 	 */
 	public function createCompletion(
@@ -389,6 +389,10 @@ class OpenAiAPIService {
 		$completions = [];
 
 		foreach ($response['choices'] as $choice) {
+			if (!isset($choice['text']) || !is_string($choice['text'])) {
+				$this->logger->debug('Text generation yielded empty or invalid response: ' . json_encode($choice));
+				continue;
+			}
 			$completions[] = $choice['text'];
 		}
 
@@ -408,7 +412,7 @@ class OpenAiAPIService {
 	 * @param array|null $extraParams
 	 * @param string|null $toolMessage JSON string with role, content, tool_call_id
 	 * @param array|null $tools
-	 * @return array<string, array<string>>
+	 * @return array{messages: array<string>, tool_calls: array<string>}
 	 * @throws Exception
 	 */
 	public function createChatCompletion(
@@ -537,12 +541,19 @@ class OpenAiAPIService {
 				// fix the tool_calls format, make it like expected by the context_agent app
 				$choice['message']['tool_calls'] = array_map(static function ($toolCall) {
 					$toolCall['function']['id'] = $toolCall['id'];
-					$toolCall['function']['args'] = json_decode($toolCall['function']['arguments']);
+					$toolCall['function']['args'] = json_decode($toolCall['function']['arguments']) ?: (object)[];
 					unset($toolCall['function']['arguments']);
 					return $toolCall['function'];
 				}, $choice['message']['tool_calls']);
-				$completions['tool_calls'][] = json_encode($choice['message']['tool_calls']);
+
+				$toolCalls = json_encode($choice['message']['tool_calls']);
+				if ($toolCalls === false) {
+					$this->logger->debug('Tool calls JSON encoding error: ' . json_last_error_msg());
+				} else {
+					$completions['tool_calls'][] = $toolCalls;
+				}
 			}
+
 			// always try to get a message
 			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
 				$completions['messages'][] = $choice['message']['content'];
@@ -745,8 +756,8 @@ class OpenAiAPIService {
 	 * @return void
 	 */
 	public function updateExpTextProcessingTime(int $runtime): void {
-		$oldTime = $this->getExpTextProcessingTime();
-		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
+		$oldTime = floatval($this->getExpImgProcessingTime());
+		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
 		if ($this->isUsingOpenAi()) {
 			$this->appConfig->setValueString(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)));
@@ -769,8 +780,8 @@ class OpenAiAPIService {
 	 * @return void
 	 */
 	public function updateExpImgProcessingTime(int $runtime): void {
-		$oldTime = $this->getExpImgProcessingTime();
-		$newTime = (1 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * $runtime;
+		$oldTime = floatval($this->getExpImgProcessingTime());
+		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
 		if ($this->isUsingOpenAi()) {
 			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)));
