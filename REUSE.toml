@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
 # SPDX-License-Identifier: AGPL-3.0-or-later
 version = 1
-SPDX-PackageName = "integration_openai"
+SPDX-PackageName = "integration_watsonx"
 SPDX-PackageSupplier = "Nextcloud <info@nextcloud.com>"
-SPDX-PackageDownloadLocation = "https://github.com/nextcloud/integration_openai"
+SPDX-PackageDownloadLocation = "https://github.com/nextcloud/integration_watsonx"
 
 [[annotations]]
 path = ["l10n/**.js", "l10n/**.json"]
@@ -22,9 +22,3 @@ path = ["vendor-bin/php-cs-fixer/composer.json", "vendor-bin/php-cs-fixer/compos
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2024 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
-
-[[annotations]]
-path = ["img/app.svg", "img/app-dark.svg"]
-precedence = "aggregate"
-SPDX-FileCopyrightText = "2025 OpenAI LLC"
-SPDX-License-Identifier = "LicenseRef-OpenAITrademarks"

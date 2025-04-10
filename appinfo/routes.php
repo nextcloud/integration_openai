@@ -12,8 +12,8 @@ return [
 		['name' => 'config#setAdminConfig', 'url' => '/admin-config', 'verb' => 'PUT'],
 		['name' => 'config#setSensitiveAdminConfig', 'url' => '/admin-config/sensitive', 'verb' => 'PUT'],
 
-		['name' => 'openAiAPI#getModels', 'url' => '/models', 'verb' => 'GET'],
-		['name' => 'openAiAPI#getUserQuotaInfo', 'url' => '/quota-info', 'verb' => 'GET'],
-		['name' => 'openAiAPI#getAdminQuotaInfo', 'url' => '/admin-quota-info', 'verb' => 'GET'],
+		['name' => 'watsonxAPI#getModels', 'url' => '/models', 'verb' => 'GET'],
+		['name' => 'watsonxAPI#getUserQuotaInfo', 'url' => '/quota-info', 'verb' => 'GET'],
+		['name' => 'watsonxAPI#getAdminQuotaInfo', 'url' => '/admin-quota-info', 'verb' => 'GET'],
 	],
 ];

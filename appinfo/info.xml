@@ -4,118 +4,54 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <info>
-	<id>integration_openai</id>
-	<name>OpenAI and LocalAI integration</name>
-	<summary>Integration of OpenAI and LocalAI services</summary>
+	<id>integration_watsonx</id>
+	<name>IBM watsonx.ai integration</name>
+	<summary>Integration of IBM watsonx AI services</summary>
 	<description><![CDATA[
-⚠️ The smart pickers have been removed from this app
-as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
+⚠ This app is still in early development
+and has only been tested with IBM watsonx.ai as a Service.
 
-This app implements:
+This app implements the following text generation providers
+using any freely-available large language model:
+Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate.
 
-* Text generation providers: Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate (using any available large language model)
-* A Translation provider (using any available language model)
-* A SpeechToText provider (using Whisper)
-* An image generation provider
-
-⚠️ Context Write, Summarize, Headline and Reformulate have mainly been tested with OpenAI.
-They might work when connecting to other services, without any guarantee.
-
-Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance or [Ollama](https://ollama.com/) instance
-or to any service that implements an API similar to the OpenAI one, for example:
-[IONOS AI Model Hub](https://docs.ionos.com/cloud/ai/ai-model-hub), [Plusserver](https://www.plusserver.com/en/ai-platform/) or [MistralAI](https://mistral.ai).
-
-⚠️ This app is mainly tested with OpenAI. We do not guarantee it works perfectly
-with other services that implement OpenAI-compatible APIs with slight differences.
+You can connect to the watsonx.ai service provided by IBM
+or to a self-hosted cluster running IBM Software Hub and related services.
 
 ## Improve AI task pickup speed
 
 To avoid task processing execution delay, setup at 4 background job workers in the main server (where Nextcloud is installed). The setup process is documented here: https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed
 
 ## Ethical AI Rating
-### Rating for Text generation using ChatGPT via the OpenAI API: 🔴
-
-Negative:
-* The software for training and inference of this model is proprietary, limiting running it locally or training by yourself
-* The trained model is not freely available, so the model can not be run on-premises
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
-
-
-### Rating for Translation using ChatGPT via the OpenAI API: 🔴
-
-Negative:
-* The software for training and inference of this model is proprietary, limiting running it locally or training by yourself
-* The trained model is not freely available, so the model can not be run on-premises
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
-
-### Rating for Image generation using DALL·E via the OpenAI API: 🔴
-
-Negative:
-* The software for training and inferencing of this model is proprietary, limiting running it locally or training by yourself
-* The trained model is not freely available, so the model can not be ran on-premises
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
-
-
-### Rating for Speech-To-Text using Whisper via the OpenAI API: 🟡
+### Rating for Text generation via IBM watsonx.ai: 🟡
 
 Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can run on-premise
+* The trained models are freely available, and thus can be ran on-premises
+* The training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage
 
 Negative:
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
-
-### Rating for Text generation via LocalAI: 🟢
-
-Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can be ran on-premises
-* The training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage.
-
-
-### Rating for Image generation using Stable Diffusion via LocalAI : 🟡
-
-Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can be ran on-premises
-
-Negative:
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
-
-
-### Rating for Speech-To-Text using Whisper via LocalAI: 🟡
-
-Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can be ran on-premises
-
-Negative:
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
+* The software for training and inference of models is proprietary, limiting modifications to the API or other functionality
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
 ]]>	</description>
-	<version>3.5.0</version>
+	<version>1.0.0</version>
 	<licence>agpl</licence>
-	<author>Julien Veyssier</author>
-	<namespace>OpenAi</namespace>
+	<author>Edward Ly</author>
+	<namespace>Watsonx</namespace>
 	<documentation>
-		<developer>https://github.com/nextcloud/integration_openai</developer>
+		<developer>https://github.com/nextcloud/integration_watsonx</developer>
 	</documentation>
 	<category>integration</category>
-	<website>https://github.com/nextcloud/integration_openai</website>
-	<bugs>https://github.com/nextcloud/integration_openai/issues</bugs>
-	<screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot1.jpg</screenshot>
-	<screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot2.jpg</screenshot>
-	<screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot3.jpg</screenshot>
-	<screenshot>https://github.com/nextcloud/integration_openai/raw/main/img/screenshot4.jpg</screenshot>
+	<website>https://github.com/nextcloud/integration_watsonx</website>
+	<bugs>https://github.com/nextcloud/integration_watsonx/issues</bugs>
 	<dependencies>
 		<nextcloud min-version="30" max-version="32"/>
 	</dependencies>
 	<background-jobs>
-		<job>OCA\OpenAi\Cron\CleanupQuotaDb</job>
+		<job>OCA\Watsonx\Cron\CleanupQuotaDb</job>
 	</background-jobs>
 	<settings>
-		<admin>OCA\OpenAi\Settings\Admin</admin>
-		<personal>OCA\OpenAi\Settings\Personal</personal>
+		<admin>OCA\Watsonx\Settings\Admin</admin>
+		<personal>OCA\Watsonx\Settings\Personal</personal>
 	</settings>
 </info>

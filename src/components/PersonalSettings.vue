@@ -3,28 +3,27 @@
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 <template>
-	<div id="openai_prefs" class="section">
+	<div id="watsonx_prefs" class="section">
 		<h2>
-			<OpenAiIcon class="icon" />
-			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
+			{{ t('integration_watsonx', 'IBM watsonx.ai integration') }}
 		</h2>
-		<div id="openai-content">
+		<div id="watsonx-content">
 			<p v-if="state.is_custom_service" class="settings-hint">
 				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'Your administrator defined a custom service address') }}
+				{{ t('integration_watsonx', 'Your administrator defined a custom service address') }}
 			</p>
-			<div v-if="!state.is_custom_service || !state.use_basic_auth">
+			<div>
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Leave the API key empty to use the one defined by administrators') }}
+					{{ t('integration_watsonx', 'Leave the API key empty to use the one defined by administrators') }}
 				</NcNoteCard>
 				<div class="line">
 					<NcTextField
-						id="openai-api-key"
+						id="watsonx-api-key"
 						class="input"
 						:value.sync="state.api_key"
 						:readonly="readonly"
 						type="password"
-						:label="t('integration_openai', 'API key')"
+						:label="t('integration_watsonx', 'API key')"
 						:show-trailing-button="!!state.api_key"
 						@update:value="onSensitiveInput"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput()"
@@ -32,9 +31,42 @@
 						<KeyIcon />
 					</NcTextField>
 				</div>
+				<NcNoteCard type="info">
+					{{ t('integration_watsonx', 'A watsonx.ai project ID or space ID is required if an API key is specified') }}
+				</NcNoteCard>
+				<div class="line">
+					<NcTextField
+						id="watsonx-project-id"
+						class="input"
+						:value.sync="state.project_id"
+						:readonly="readonly"
+						type="password"
+						:label="t('integration_watsonx', 'Project ID')"
+						:show-trailing-button="!!state.project_id"
+						@update:value="onSensitiveInput"
+						@trailing-button-click="state.project_id = '' ; onSensitiveInput()"
+						@focus="readonly = false">
+						<KeyIcon />
+					</NcTextField>
+				</div>
+				<div class="line">
+					<NcTextField
+						id="watsonx-space-id"
+						class="input"
+						:value.sync="state.space_id"
+						:readonly="readonly"
+						type="password"
+						:label="t('integration_watsonx', 'Space ID')"
+						:show-trailing-button="!!state.space_id"
+						@update:value="onSensitiveInput"
+						@trailing-button-click="state.space_id = '' ; onSensitiveInput()"
+						@focus="readonly = false">
+						<KeyIcon />
+					</NcTextField>
+				</div>
 				<div v-if="!state.is_custom_service">
 					<NcNoteCard type="info">
-						{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings') }}:
+						{{ t('integration_watsonx', 'You can create an API key in your IBM Cloud IAM account settings') }}:
 						&nbsp;
 						<a :href="apiKeyUrl" target="_blank" class="external">
 							{{ apiKeyUrl }}
@@ -42,55 +74,24 @@
 					</NcNoteCard>
 				</div>
 			</div>
-			<div v-else>
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Leave the username and password empty to use the ones defined by your administrator') }}
-				</NcNoteCard>
-				<div class="line">
-					<label for="basic-user">
-						<KeyIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Username') }}
-					</label>
-					<input id="openai-basic-user"
-						v-model="state.basic_user"
-						type="text"
-						:readonly="readonly"
-						:placeholder="t('integration_openai', 'your Basic Auth user')"
-						@input="onSensitiveInput"
-						@focus="readonly = false">
-				</div>
-				<div class="line">
-					<label for="basic-password">
-						<KeyIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Password') }}
-					</label>
-					<input id="openai-basic-password"
-						v-model="state.basic_password"
-						type="password"
-						:readonly="readonly"
-						:placeholder="t('integration_openai', 'your Basic Auth password')"
-						@input="onSensitiveInput"
-						@focus="readonly = false">
-				</div>
-			</div>
 			<div v-if="quotaInfo !== null">
 				<!-- Show quota info -->
 				<h4>
-					{{ t('integration_openai', 'Usage quota info') }}
+					{{ t('integration_watsonx', 'Usage quota info') }}
 				</h4>
 				<!-- Loop through all quota types-->
 				<table class="quota-table">
 					<thead>
 						<tr>
 							<th width="120px">
-								{{ t('integration_openai', 'Quota type') }}
+								{{ t('integration_watsonx', 'Quota type') }}
 							</th>
-							<th>{{ t('integration_openai', 'Usage') }}</th>
+							<th>{{ t('integration_watsonx', 'Usage') }}</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="quota in quotaInfo.quota_usage" :key="quota.type">
-							<td>{{ t('integration_openai', capitalizedWord(quota.type)) }} </td>
+							<td>{{ t('integration_watsonx', capitalizedWord(quota.type)) }} </td>
 							<td v-if="quota.limit > 0">
 								{{ Math.round(quota.used / quota.limit * 100) + ' %' }}
 							</td>
@@ -103,7 +104,7 @@
 			</div>
 			<div v-if="!state.is_custom_service">
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Specifying your own API key will allow unlimited usage') }}
+					{{ t('integration_watsonx', 'Specifying your own API key will allow unlimited usage') }}
 				</NcNoteCard>
 			</div>
 		</div>
@@ -113,8 +114,6 @@
 <script>
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import KeyIcon from 'vue-material-design-icons/Key.vue'
-
-import OpenAiIcon from './icons/OpenAiIcon.vue'
 
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
@@ -130,7 +129,6 @@ export default {
 	name: 'PersonalSettings',
 
 	components: {
-		OpenAiIcon,
 		KeyIcon,
 		InformationOutlineIcon,
 		NcNoteCard,
@@ -141,10 +139,10 @@ export default {
 
 	data() {
 		return {
-			state: loadState('integration_openai', 'config'),
+			state: loadState('integration_watsonx', 'config'),
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
-			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
+			apiKeyUrl: 'https://cloud.ibm.com/docs/account?topic=account-iamtoken_from_apikey',
 			quotaInfo: null,
 			showQuotaRemovalInfo: false,
 		}
@@ -166,19 +164,21 @@ export default {
 			})
 		}, 2000),
 		onSensitiveInput: debounce(function() {
-			const values = {
-				basic_user: this.state.basic_user,
-			}
 			if (this.state.api_key !== 'dummyApiKey') {
-				values.api_key = this.state.api_key
+				const values = {
+					api_key: this.state.api_key,
+				}
+				if (this.state.project_id !== 'dummyProject') {
+					values.project_id = (this.state.project_id ?? '').trim()
+				}
+				if (this.state.space_id !== 'dummySpaceId') {
+					values.space_id = (this.state.space_id ?? '').trim()
+				}
+				this.saveOptions(values, true)
 			}
-			if (this.state.basic_password !== 'dummyPassword') {
-				values.basic_password = this.state.basic_password
-			}
-			this.saveOptions(values, true)
 		}, 2000),
 		async loadQuotaInfo() {
-			const url = generateUrl('/apps/integration_openai/quota-info')
+			const url = generateUrl('/apps/integration_watsonx/quota-info')
 			try {
 				const response = await axios.get(url)
 				this.quotaInfo = response.data
@@ -194,7 +194,7 @@ export default {
 					}
 				}
 			} catch (error) {
-				showError(t('integration_openai', 'Failed to load quota info'))
+				showError(t('integration_watsonx', 'Failed to load quota info'))
 				console.error(error)
 			}
 		},
@@ -209,11 +209,11 @@ export default {
 				const req = {
 					values,
 				}
-				const url = sensitive ? generateUrl('/apps/integration_openai/config/sensitive') : generateUrl('/apps/integration_openai/config')
+				const url = sensitive ? generateUrl('/apps/integration_watsonx/config/sensitive') : generateUrl('/apps/integration_watsonx/config')
 				await axios.put(url, req)
-				showSuccess(t('integration_openai', 'OpenAI options saved'))
+				showSuccess(t('integration_watsonx', 'Watsonx.ai options saved'))
 			} catch (error) {
-				showError(t('integration_openai', 'Failed to save OpenAI options'))
+				showError(t('integration_watsonx', 'Failed to save watsonx.ai options'))
 				console.error(error)
 			}
 		},
@@ -222,8 +222,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-#openai_prefs {
-	#openai-content {
+#watsonx_prefs {
+	#watsonx-content {
 		margin-left: 40px;
 	}
 	h2,

@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Migration;
+namespace OCA\Watsonx\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -37,8 +37,8 @@ class Version010100Date20231008173034 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable('openai_quota_usage')) {
-			$table = $schema->createTable('openai_quota_usage');
+		if (!$schema->hasTable('watsonx_quota_usage')) {
+			$table = $schema->createTable('watsonx_quota_usage');
 			$table->addColumn('id', Types::BIGINT, [
 				'autoincrement' => true,
 				'notnull' => true,
@@ -57,10 +57,10 @@ class Version010100Date20231008173034 extends SimpleMigrationStep {
 				'notnull' => true,
 			]);
 			$table->setPrimaryKey(['id']);
-			$table->addIndex(['user_id'], 'oai_quota_userid');
-			$table->addIndex(['type'], 'oai_quota_type');
-			$table->addIndex(['timestamp'], 'oai_quota_timestamp');
-			$table->addIndex(['type','timestamp'], 'oai_quota_type_ts');
+			$table->addIndex(['user_id'], 'watsonx_quota_userid');
+			$table->addIndex(['type'], 'watsonx_quota_type');
+			$table->addIndex(['timestamp'], 'watsonx_quota_timestamp');
+			$table->addIndex(['type','timestamp'], 'watsonx_quota_type_ts');
 		}
 
 		return $schema;

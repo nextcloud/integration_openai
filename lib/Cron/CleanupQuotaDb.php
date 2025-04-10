@@ -7,10 +7,10 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Cron;
+namespace OCA\Watsonx\Cron;
 
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Db\QuotaUsageMapper;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\IAppConfig;
@@ -28,7 +28,7 @@ class CleanupQuotaDb extends TimedJob {
 	}
 
 	protected function run($argument) {
-		$this->logger->debug('Run cleanup job for OpenAI quota db');
+		$this->logger->debug('Run cleanup job for watsonx.ai quota db');
 		$this->quotaUsageMapper->cleanupQuotaUsages(
 			// The mimimum period is limited to DEFAULT_QUOTA_PERIOD to not lose
 			// the stored quota usage data below this limit.

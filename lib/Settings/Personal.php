@@ -5,10 +5,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Settings;
+namespace OCA\Watsonx\Settings;
 
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\Settings\ISettings;
@@ -16,7 +16,7 @@ use OCP\Settings\ISettings;
 class Personal implements ISettings {
 	public function __construct(
 		private IInitialState $initialStateService,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		private ?string $userId,
 	) {
 	}
@@ -28,9 +28,10 @@ class Personal implements ISettings {
 		if ($this->userId === null) {
 			return new TemplateResponse(Application::APP_ID, 'personalSettings');
 		}
-		$userConfig = $this->openAiSettingsService->getUserConfig($this->userId);
+		$userConfig = $this->watsonxSettingsService->getUserConfig($this->userId);
 		$userConfig['api_key'] = $userConfig['api_key'] === '' ? '' : 'dummyApiKey';
-		$userConfig['basic_password'] = $userConfig['basic_password'] === '' ? '' : 'dummyPassword';
+		$userConfig['project_id'] = $userConfig['project_id'] === '' ? '' : 'dummyProject';
+		$userConfig['space_id'] = $userConfig['space_id'] === '' ? '' : 'dummySpaceId';
 		$this->initialStateService->provideInitialState('config', $userConfig);
 		return new TemplateResponse(Application::APP_ID, 'personalSettings');
 	}

@@ -5,10 +5,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Controller;
+namespace OCA\Watsonx\Controller;
 
 use Exception;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -21,7 +21,7 @@ class ConfigController extends Controller {
 	public function __construct(
 		string $appName,
 		IRequest $request,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		private ?string $userId,
 	) {
 		parent::__construct($appName, $request);
@@ -35,11 +35,11 @@ class ConfigController extends Controller {
 	 */
 	#[NoAdminRequired]
 	public function setUserConfig(array $values): DataResponse {
-		if (isset($values['api_key']) || isset($values['basic_password']) || isset($values['basic_user'])) {
+		if (isset($values['api_key'])) {
 			return new DataResponse('', Http::STATUS_BAD_REQUEST);
 		}
 		try {
-			$this->openAiSettingsService->setUserConfig($this->userId, $values);
+			$this->watsonxSettingsService->setUserConfig($this->userId, $values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
@@ -56,7 +56,7 @@ class ConfigController extends Controller {
 	#[PasswordConfirmationRequired]
 	public function setSensitiveUserConfig(array $values): DataResponse {
 		try {
-			$this->openAiSettingsService->setUserConfig($this->userId, $values);
+			$this->watsonxSettingsService->setUserConfig($this->userId, $values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
@@ -70,11 +70,11 @@ class ConfigController extends Controller {
 	 * @return DataResponse
 	 */
 	public function setAdminConfig(array $values): DataResponse {
-		if (isset($values['api_key']) || isset($values['basic_password']) || isset($values['basic_user']) || isset($values['url'])) {
+		if (isset($values['api_key']) || isset($values['url'])) {
 			return new DataResponse('', Http::STATUS_BAD_REQUEST);
 		}
 		try {
-			$this->openAiSettingsService->setAdminConfig($values);
+			$this->watsonxSettingsService->setAdminConfig($values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}
@@ -91,7 +91,7 @@ class ConfigController extends Controller {
 	#[PasswordConfirmationRequired]
 	public function setSensitiveAdminConfig(array $values): DataResponse {
 		try {
-			$this->openAiSettingsService->setAdminConfig($values);
+			$this->watsonxSettingsService->setAdminConfig($values);
 		} catch (Exception $e) {
 			return new DataResponse($e->getMessage(), Http::STATUS_BAD_REQUEST);
 		}

@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Migration;
+namespace OCA\Watsonx\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -34,30 +34,30 @@ class Version020000Date20240325142435 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 		$schemaChanged = false;
 
-		if ($schema->hasTable('openai_prompts')) {
-			$table = $schema->getTable('openai_prompts');
-			if ($table->hasIndex('openai_prompt_userid')) {
-				$table->dropIndex('openai_prompt_userid');
+		if ($schema->hasTable('watsonx_prompts')) {
+			$table = $schema->getTable('watsonx_prompts');
+			if ($table->hasIndex('watsonx_prompt_userid')) {
+				$table->dropIndex('watsonx_prompt_userid');
 			}
-			$schema->dropTable('openai_prompts');
+			$schema->dropTable('watsonx_prompts');
 			$schemaChanged = true;
 		}
 
-		if ($schema->hasTable('openai_i_gen')) {
-			$table = $schema->getTable('openai_i_gen');
-			if ($table->hasIndex('openai_i_gen_hash')) {
-				$table->dropIndex('openai_i_gen_hash');
+		if ($schema->hasTable('watsonx_i_gen')) {
+			$table = $schema->getTable('watsonx_i_gen');
+			if ($table->hasIndex('watsonx_i_gen_hash')) {
+				$table->dropIndex('watsonx_i_gen_hash');
 			}
-			$schema->dropTable('openai_i_gen');
+			$schema->dropTable('watsonx_i_gen');
 			$schemaChanged = true;
 		}
 
-		if ($schema->hasTable('openai_i_url')) {
-			$table = $schema->getTable('openai_i_url');
-			if ($table->hasIndex('openai_i_url_gen_id')) {
-				$table->dropIndex('openai_i_url_gen_id');
+		if ($schema->hasTable('watsonx_i_url')) {
+			$table = $schema->getTable('watsonx_i_url');
+			if ($table->hasIndex('watsonx_i_url_gen_id')) {
+				$table->dropIndex('watsonx_i_url_gen_id');
 			}
-			$schema->dropTable('openai_i_url');
+			$schema->dropTable('watsonx_i_url');
 			$schemaChanged = true;
 		}
 

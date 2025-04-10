@@ -5,47 +5,38 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Service;
+namespace OCA\Watsonx\Service;
 
 use Exception;
-use OCA\OpenAi\AppInfo\Application;
+use OCA\Watsonx\AppInfo\Application;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
 use OCP\IConfig;
 use OCP\PreConditionNotMetException;
 use OCP\Security\ICrypto;
 
-class OpenAiSettingsService {
+class WatsonxSettingsService {
 	private const ADMIN_CONFIG_TYPES = [
 		'request_timeout' => 'integer',
 		'url' => 'string',
 		'service_name' => 'string',
 		'api_key' => 'string',
+		'project_id' => 'string',
+		'space_id' => 'string',
 		'default_completion_model_id' => 'string',
-		'default_stt_model_id' => 'string',
-		'default_image_model_id' => 'string',
-		'default_image_size' => 'string',
-		'image_request_auth' => 'boolean',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
-		'use_max_completion_tokens_param' => 'boolean',
 		'llm_extra_params' => 'string',
 		'quota_period' => 'integer',
 		'quotas' => 'array',
-		'translation_provider_enabled' => 'boolean',
 		'llm_provider_enabled' => 'boolean',
-		't2i_provider_enabled' => 'boolean',
-		'stt_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
-		'basic_user' => 'string',
-		'basic_password' => 'string',
-		'use_basic_auth' => 'boolean'
 	];
 
 	private const USER_CONFIG_TYPES = [
 		'api_key' => 'string',
-		'basic_user' => 'string',
-		'basic_password' => 'string',
+		'project_id' => 'string',
+		'space_id' => 'string',
 	];
 
 
@@ -60,6 +51,11 @@ class OpenAiSettingsService {
 	public function invalidateModelsCache(): void {
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
 		$cache->remove(Application::MODELS_CACHE_KEY);
+	}
+
+	public function invalidateAccessTokenCache(): void {
+		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
+		$cache->remove(Application::ACCESS_TOKEN_CACHE_KEY);
 	}
 
 	////////////////////////////////////////////
@@ -93,29 +89,56 @@ class OpenAiSettingsService {
 	/**
 	 * @return string
 	 */
+	public function getAdminProjectId(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'project_id');
+	}
+
+	/**
+	 * SIC! Does not fall back on the admin api by default
+	 * @param null|string $userId
+	 * @param boolean $fallBackOnAdminValue
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getUserProjectId(?string $userId, bool $fallBackOnAdminValue = false): string {
+		$fallBackProjectId = $fallBackOnAdminValue ? $this->getAdminProjectId() : '';
+		if ($userId === null) {
+			return $fallBackProjectId;
+		}
+		$encryptedUserProjectId = $this->config->getUserValue($userId, Application::APP_ID, 'project_id');
+		$userProjectId = $encryptedUserProjectId === '' ? '' : $this->crypto->decrypt($encryptedUserProjectId);
+		return $userProjectId ?: $fallBackProjectId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminSpaceId(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'space_id');
+	}
+
+	/**
+	 * SIC! Does not fall back on the admin api by default
+	 * @param null|string $userId
+	 * @param boolean $fallBackOnAdminValue
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getUserSpaceId(?string $userId, bool $fallBackOnAdminValue = false): string {
+		$fallBackSpaceId = $fallBackOnAdminValue ? $this->getAdminSpaceId() : '';
+		if ($userId === null) {
+			return $fallBackSpaceId;
+		}
+		$encryptedUserSpaceId = $this->config->getUserValue($userId, Application::APP_ID, 'space_id');
+		$userSpaceId = $encryptedUserSpaceId === '' ? '' : $this->crypto->decrypt($encryptedUserSpaceId);
+		return $userSpaceId ?: $fallBackSpaceId;
+	}
+
+	/**
+	 * @return string
+	 */
 	public function getAdminDefaultCompletionModelId(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminDefaultSttModelId(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id') ?: Application::DEFAULT_MODEL_ID;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminDefaultImageModelId(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminDefaultImageSize(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 	}
 
 	/**
@@ -136,7 +159,7 @@ class OpenAiSettingsService {
 	 * @return int
 	 */
 	public function getRequestTimeout(): int {
-		return intval($this->appConfig->getValueString(Application::APP_ID, 'request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT))) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'request_timeout', strval(Application::WATSONX_DEFAULT_REQUEST_TIMEOUT))) ?: Application::WATSONX_DEFAULT_REQUEST_TIMEOUT;
 	}
 
 	/**
@@ -198,60 +221,7 @@ class OpenAiSettingsService {
 	 * @return boolean
 	 */
 	public function getChatEndpointEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'chat_endpoint_enabled', '0') === '1';
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param bool $fallBackOnAdminValue
-	 * @return string
-	 */
-	public function getUserBasicUser(?string $userId, bool $fallBackOnAdminValue = true): string {
-		$fallBackBasicUser = $fallBackOnAdminValue ? $this->getAdminBasicUser() : '';
-		$basicUser = $userId === null
-			? $fallBackBasicUser
-			: ($this->config->getUserValue($userId, Application::APP_ID, 'basic_user', $fallBackBasicUser) ?: $fallBackBasicUser);
-		return $basicUser;
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param bool $fallBackOnAdminValue
-	 * @return string
-	 * @throws Exception
-	 */
-	public function getUserBasicPassword(?string $userId, bool $fallBackOnAdminValue = true): string {
-		$fallBackBasicPassword = $fallBackOnAdminValue ? $this->getAdminBasicPassword() : '';
-		if ($userId === null) {
-			return $fallBackBasicPassword;
-		}
-		$encryptedUserBasicPassword = $this->config->getUserValue($userId, Application::APP_ID, 'basic_password');
-		$userBasicPassword = $encryptedUserBasicPassword === '' ? '' : $this->crypto->decrypt($encryptedUserBasicPassword);
-		return $userBasicPassword ?: $fallBackBasicPassword;
-	}
-
-	/**
-	 * Get admin basic user
-	 * @return string
-	 */
-	public function getAdminBasicUser(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'basic_user');
-	}
-
-	/**
-	 * Get admin basic password
-	 * @return string
-	 * @throws Exception
-	 */
-	public function getAdminBasicPassword(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'basic_password');
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function getUseBasicAuth(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_basic_auth', '0') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'chat_endpoint_enabled', '1') === '1';
 	}
 
 	/**
@@ -264,73 +234,34 @@ class OpenAiSettingsService {
 			'url' => $this->getServiceUrl(),
 			'service_name' => $this->getServiceName(),
 			'api_key' => $this->getAdminApiKey(),
+			'project_id' => $this->getAdminProjectId(),
+			'space_id' => $this->getAdminSpaceId(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
-			'default_stt_model_id' => $this->getAdminDefaultSttModelId(),
-			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
-			'default_image_size' => $this->getAdminDefaultImageSize(),
-			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
-			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
 			'llm_extra_params' => $this->getLlmExtraParams(),
 			// Updated to get max tokens
 			'quota_period' => $this->getQuotaPeriod(),
 			// Updated to get quota period
 			'quotas' => $this->getQuotas(),
 			// Get quotas from the config value and return it
-			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
-			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
-			'stt_provider_enabled' => $this->getSttProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
-			'basic_user' => $this->getAdminBasicUser(),
-			'basic_password' => $this->getAdminBasicPassword(),
-			'use_basic_auth' => $this->getUseBasicAuth()
 		];
 	}
 
 	/**
 	 * Get the user config for the settings page
-	 * @return array{api_key: string, basic_password: string, basic_user: string, is_custom_service: bool, use_basic_auth: bool}
+	 * @return array{api_key: string, project_id: string, space_id: string, is_custom_service: bool}
 	 */
 	public function getUserConfig(string $userId): array {
-		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::OPENAI_API_BASE_URL;
+		$isCustomService = $this->getServiceUrl() !== '' && !str_contains($this->getServiceUrl(), 'cloud.ibm.com');
 		return [
 			'api_key' => $this->getUserApiKey($userId),
-			'basic_user' => $this->getUserBasicUser($userId, false),
-			'basic_password' => $this->getUserBasicPassword($userId, false),
-			'use_basic_auth' => $this->getUseBasicAuth(),
+			'project_id' => $this->getUserProjectId($userId),
+			'space_id' => $this->getUserSpaceId($userId),
 			'is_custom_service' => $isCustomService,
-
 		];
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getUseMaxCompletionTokensParam(): bool {
-		$serviceUrl = $this->getServiceUrl();
-		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-		// we know OpenAI expects "use_max_completion_tokens_param", let's assume the other services don't
-		$default = $isUsingOpenAI ? '1' : '0';
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', $default) === '1';
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getTranslationProviderEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getIsImageRetrievalAuthenticated(): bool {
-		$serviceUrl = $this->getServiceUrl();
-		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-		$default = $isUsingOpenAI ? '0' : '1';
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default) === '1';
 	}
 
 	/**
@@ -338,20 +269,6 @@ class OpenAiSettingsService {
 	 */
 	public function getLlmProviderEnabled(): bool {
 		return $this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1';
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getT2iProviderEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1';
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getSttProviderEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
 	}
 
 	////////////////////////////////////////////
@@ -389,6 +306,7 @@ class OpenAiSettingsService {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->appConfig->setValueString(Application::APP_ID, 'api_key', $apiKey, false, true);
 		$this->invalidateModelsCache();
+		$this->invalidateAccessTokenCache();
 	}
 
 	/**
@@ -405,6 +323,55 @@ class OpenAiSettingsService {
 			$this->config->setUserValue($userId, Application::APP_ID, 'api_key', $encryptedApiKey);
 		}
 		$this->invalidateModelsCache();
+		$this->invalidateAccessTokenCache();
+	}
+
+	/**
+	 * @param string $projectId
+	 * @return void
+	 */
+	public function setAdminProjectId(string $projectId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		$this->appConfig->setValueString(Application::APP_ID, 'project_id', $projectId, false, true);
+	}
+
+	/**
+	 * @param string $userId
+	 * @param string $projectId
+	 * @throws PreConditionNotMetException
+	 */
+	public function setUserProjectId(string $userId, string $projectId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		if ($projectId === '') {
+			$this->config->setUserValue($userId, Application::APP_ID, 'project_id', '');
+		} else {
+			$encryptedProjectId = $this->crypto->encrypt($projectId);
+			$this->config->setUserValue($userId, Application::APP_ID, 'project_id', $encryptedProjectId);
+		}
+	}
+
+	/**
+	 * @param string $spaceId
+	 * @return void
+	 */
+	public function setAdminSpaceId(string $spaceId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		$this->appConfig->setValueString(Application::APP_ID, 'space_id', $spaceId, false, true);
+	}
+
+	/**
+	 * @param string $userId
+	 * @param string $spaceId
+	 * @throws PreConditionNotMetException
+	 */
+	public function setUserSpaceId(string $userId, string $spaceId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		if ($spaceId === '') {
+			$this->config->setUserValue($userId, Application::APP_ID, 'space_id', '');
+		} else {
+			$encryptedSpaceId = $this->crypto->encrypt($spaceId);
+			$this->config->setUserValue($userId, Application::APP_ID, 'space_id', $encryptedSpaceId);
+		}
 	}
 
 	/**
@@ -414,36 +381,6 @@ class OpenAiSettingsService {
 	public function setAdminDefaultCompletionModelId(string $defaultCompletionModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->appConfig->setValueString(Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId);
-	}
-
-	/**
-	 * @param string $defaultSttModelId
-	 * @return void
-	 */
-	public function setAdminDefaultSttModelId(string $defaultSttModelId): void {
-		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'default_stt_model_id', $defaultSttModelId);
-	}
-
-	/**
-	 * @param string $defaultImageModelId
-	 * @return void
-	 */
-	public function setAdminDefaultImageModelId(string $defaultImageModelId): void {
-		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'default_image_model_id', $defaultImageModelId);
-	}
-
-	/**
-	 * @param string $defaultImageSize
-	 * @return void
-	 * @throws Exception
-	 */
-	public function setAdminDefaultImageSize(string $defaultImageSize): void {
-		if ($defaultImageSize !== '' && preg_match('/^\d+x\d+$/', $defaultImageSize) !== 1) {
-			throw new Exception('Invalid image size value');
-		}
-		$this->appConfig->setValueString(Application::APP_ID, 'default_image_size', $defaultImageSize);
 	}
 
 	/**
@@ -458,6 +395,7 @@ class OpenAiSettingsService {
 		}
 		$this->appConfig->setValueString(Application::APP_ID, 'url', $serviceUrl);
 		$this->invalidateModelsCache();
+		$this->invalidateAccessTokenCache();
 	}
 
 	/**
@@ -526,56 +464,6 @@ class OpenAiSettingsService {
 	}
 
 	/**
-	 * @param string $basicUser
-	 * @return void
-	 */
-	public function setAdminBasicUser(string $basicUser): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'basic_user', $basicUser);
-		$this->invalidateModelsCache();
-	}
-
-	/**
-	 * @param string $basicPassword
-	 * @return void
-	 */
-	public function setAdminBasicPassword(string $basicPassword): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'basic_password', $basicPassword, false, true);
-		$this->invalidateModelsCache();
-	}
-
-	/**
-	 * @param string $userId
-	 * @param string $basicUser
-	 * @return void
-	 * @throws PreConditionNotMetException
-	 */
-	public function setUserBasicUser(string $userId, string $basicUser): void {
-		$this->config->setUserValue($userId, Application::APP_ID, 'basic_user', $basicUser);
-		$this->invalidateModelsCache();
-	}
-
-	/**
-	 * @param string $userId
-	 * @param string $basicPassword
-	 * @return void
-	 * @throws PreConditionNotMetException
-	 */
-	public function setUserBasicPassword(string $userId, string $basicPassword): void {
-		$encryptedBasicPassword = $basicPassword === '' ? '' : $this->crypto->encrypt($basicPassword);
-		$this->config->setUserValue($userId, Application::APP_ID, 'basic_password', $encryptedBasicPassword);
-		$this->invalidateModelsCache();
-	}
-
-	/**
-	 * @param bool $useBasicAuth
-	 * @return void
-	 */
-	public function setUseBasicAuth(bool $useBasicAuth): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
-		$this->invalidateModelsCache();
-	}
-
-	/**
 	 * Set the admin config for the settings page
 	 * @param mixed[] $config
 	 * @return void
@@ -597,10 +485,7 @@ class OpenAiSettingsService {
 			$this->setRequestTimeout($adminConfig['request_timeout']);
 		}
 		if (isset($adminConfig['url'])) {
-			if (str_ends_with($adminConfig['url'], '/')) {
-				$adminConfig['url'] = substr($adminConfig['url'], 0, -1) ?: $adminConfig['url'];
-			}
-			$this->setServiceUrl($adminConfig['url']);
+			$this->setServiceUrl(rtrim($adminConfig['url'], '/'));
 		}
 		if (isset($adminConfig['service_name'])) {
 			$this->setServiceName($adminConfig['service_name']);
@@ -608,20 +493,14 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['api_key'])) {
 			$this->setAdminApiKey($adminConfig['api_key']);
 		}
+		if (isset($adminConfig['project_id'])) {
+			$this->setAdminProjectId($adminConfig['project_id']);
+		}
+		if (isset($adminConfig['space_id'])) {
+			$this->setAdminSpaceId($adminConfig['space_id']);
+		}
 		if (isset($adminConfig['default_completion_model_id'])) {
 			$this->setAdminDefaultCompletionModelId($adminConfig['default_completion_model_id']);
-		}
-		if (isset($adminConfig['default_stt_model_id'])) {
-			$this->setAdminDefaultSttModelId($adminConfig['default_stt_model_id']);
-		}
-		if (isset($adminConfig['default_image_model_id'])) {
-			$this->setAdminDefaultImageModelId($adminConfig['default_image_model_id']);
-		}
-		if (isset($adminConfig['default_image_size'])) {
-			$this->setAdminDefaultImageSize($adminConfig['default_image_size']);
-		}
-		if (isset($adminConfig['image_request_auth'])) {
-			$this->setIsImageRetrievalAuthenticated($adminConfig['image_request_auth']);
 		}
 		if (isset($adminConfig['chunk_size'])) {
 			$this->setChunkSize(intval($adminConfig['chunk_size']));
@@ -638,32 +517,11 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['quotas'])) {
 			$this->setQuotas($adminConfig['quotas']);
 		}
-		if (isset($adminConfig['use_max_completion_tokens_param'])) {
-			$this->setUseMaxCompletionParam($adminConfig['use_max_completion_tokens_param']);
-		}
-		if (isset($adminConfig['translation_provider_enabled'])) {
-			$this->setTranslationProviderEnabled($adminConfig['translation_provider_enabled']);
-		}
 		if (isset($adminConfig['llm_provider_enabled'])) {
 			$this->setLlmProviderEnabled($adminConfig['llm_provider_enabled']);
 		}
-		if (isset($adminConfig['t2i_provider_enabled'])) {
-			$this->setT2iProviderEnabled($adminConfig['t2i_provider_enabled']);
-		}
-		if (isset($adminConfig['stt_provider_enabled'])) {
-			$this->setSttProviderEnabled($adminConfig['stt_provider_enabled']);
-		}
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
-		}
-		if (isset($adminConfig['basic_user'])) {
-			$this->setAdminBasicUser($adminConfig['basic_user']);
-		}
-		if (isset($adminConfig['basic_password'])) {
-			$this->setAdminBasicPassword($adminConfig['basic_password']);
-		}
-		if (isset($adminConfig['use_basic_auth'])) {
-			$this->setUseBasicAuth($adminConfig['use_basic_auth']);
 		}
 	}
 
@@ -684,36 +542,12 @@ class OpenAiSettingsService {
 		if (isset($userConfig['api_key'])) {
 			$this->setUserApiKey($userId, $userConfig['api_key']);
 		}
-		if (isset($userConfig['basic_user'])) {
-			$this->setUserBasicUser($userId, $userConfig['basic_user']);
+		if (isset($userConfig['project_id'])) {
+			$this->setUserProjectId($userId, $userConfig['project_id']);
 		}
-		if (isset($userConfig['basic_password'])) {
-			$this->setUserBasicPassword($userId, $userConfig['basic_password']);
+		if (isset($userConfig['space_id'])) {
+			$this->setUserSpaceId($userId, $userConfig['space_id']);
 		}
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setUseMaxCompletionParam(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'use_max_completion_tokens_param', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setTranslationProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'translation_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setIsImageRetrievalAuthenticated(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'image_request_auth', $enabled ? '1' : '0');
 	}
 
 	/**
@@ -722,22 +556,6 @@ class OpenAiSettingsService {
 	 */
 	public function setLlmProviderEnabled(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'llm_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setT2iProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 't2i_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setSttProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**

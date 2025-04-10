@@ -2,107 +2,63 @@
   - SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-# OpenAI integration in Nextcloud
+# IBM watsonx AI integration in Nextcloud
 
-[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/integration_openai)](https://api.reuse.software/info/github.com/nextcloud/integration_openai)
+<!-- [![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/integration_watsonx)](https://api.reuse.software/info/github.com/nextcloud/integration_watsonx) -->
 
-:warning: The smart pickers have been removed from this app
-as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
+This app implements the following text generation providers
+using any freely-available large language model:
+Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate.
 
-This app implements:
-
-* Text generation providers: Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate (using any available large language model)
-* A Translation provider (using any available language model)
-* A SpeechToText provider (using Whisper)
-* An image generation provider
-
-:warning: Context Write, Summarize, Headline and Reformulate have mainly been tested with OpenAI.
-They might work when connecting to other services, without any guarantee.
-
-Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance or [Ollama](https://ollama.com/) instance
-or to any service that implements an API similar to the OpenAI one, for example:
-[IONOS AI Model Hub](https://docs.ionos.com/cloud/ai/ai-model-hub), [Plusserver](https://www.plusserver.com/en/ai-platform/) or [MistralAI](https://mistral.ai).
-
-:warning: This app is mainly tested with OpenAI. We do not guarantee it works perfectly
-with other services that implement OpenAI-compatible APIs with slight differences.
+You can connect to the watsonx.ai service provided by IBM
+or to a self-hosted cluster running IBM Software Hub and related services.
 
 ## Improve AI task pickup speed
 
-To avoid task processing execution delay, setup at 4 background job workers in the main server (where Nextcloud is installed). The setup process is documented here: https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed
+To avoid task processing execution delay,
+setup at 4 background job workers in the main server (where Nextcloud is installed).
+The setup process is documented here:
+https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-ai-task-pickup-speed
 
 ## Ethical AI Rating
-### Rating for Text generation using ChatGPT via the OpenAI API: 🔴
 
-Negative:
-* The software for training and inference of this model is proprietary, limiting running it locally or training by yourself
-* The trained model is not freely available, so the model can not be run on-premises
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
-
-
-### Rating for Translation using ChatGPT via the OpenAI API: 🔴
-
-Negative:
-* The software for training and inference of this model is proprietary, limiting running it locally or training by yourself
-* The trained model is not freely available, so the model can not be run on-premises
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model's performance and CO2 usage.
-
-### Rating for Image generation using DALL·E via the OpenAI API: 🔴
-
-Negative:
-* The software for training and inferencing of this model is proprietary, limiting running it locally or training by yourself
-* The trained model is not freely available, so the model can not be ran on-premises
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
-
-
-### Rating for Speech-To-Text using Whisper via the OpenAI API: 🟡
+### Rating for Text generation via IBM watsonx.ai: 🟡
 
 Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can run on-premise
+* The trained models are freely available, and thus can be ran on-premises
+* The training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage
 
 Negative:
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
-
-### Rating for Text generation via LocalAI: 🟢
-
-Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can be ran on-premises
-* The training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage.
-
-
-### Rating for Image generation using Stable Diffusion via LocalAI : 🟡
-
-Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can be ran on-premises
-
-Negative:
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
-
-
-### Rating for Speech-To-Text using Whisper via LocalAI: 🟡
-
-Positive:
-* The software for training and inferencing of this model is open source
-* The trained model is freely available, and thus can be ran on-premises
-
-Negative:
-* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
-
+* The software for training and inference of models is proprietary, limiting modifications to the API or other functionality
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
+
+## Limitations
+
+> [!WARNING]
+> This app is still in early development
+> and has only been tested with IBM watsonx.ai as a Service.
+> The following list details some missing features that may be added in a future release.
+
+* Support for agency features (i.e. IBM watsonx as chat with tools provider)
+* Support for additional models without complete API functionality
+  (see: https://www.ibm.com/watsonx/developer/get-started/models/)
+* Support for IBM Cloud Pak for Data Platform API
+  (for identity management on self-hosted instances)
+* Support for more than 100 models deployed in IBM watsonx.ai
+* Ability to select an IBM Cloud location from a dropdown list
+  (as a workaround, enter the location's API URL manually)
 
 ## 🔧 Configuration
 
 ### Admin settings
 
 There is a "Artificial intelligence" **admin** settings section where you can:
-* Choose whether you use OpenAI, a LocalAI instance or another remote service
-* Set a global API key (or basic auth credentials) for the Nextcloud instance
+* Choose whether you use an IBM-hosted watsonx.ai instance or another remote service
+* Set a global API key and cloud resource for the Nextcloud instance
 * Configure default models and quota settings
 
 ### Personal settings
 
-There is a "Artificial intelligence" **personal** settings section to let users set their personal API key or basic auth credentials.
+There is a "Artificial intelligence" **personal** settings section to let users set their personal API key and cloud resources.
 Users can also see their quota information there.

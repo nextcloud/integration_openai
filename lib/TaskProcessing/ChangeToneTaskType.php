@@ -7,9 +7,9 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\TaskProcessing;
+namespace OCA\Watsonx\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
+use OCA\Watsonx\AppInfo\Application;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ITaskType;

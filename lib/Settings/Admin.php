@@ -5,10 +5,10 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Settings;
+namespace OCA\Watsonx\Settings;
 
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Service\WatsonxSettingsService;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
@@ -17,7 +17,7 @@ use OCP\Settings\ISettings;
 class Admin implements ISettings {
 	public function __construct(
 		private IInitialState $initialStateService,
-		private OpenAiSettingsService $openAiSettingsService,
+		private WatsonxSettingsService $watsonxSettingsService,
 		private IAppManager $appManager,
 	) {
 	}
@@ -26,9 +26,10 @@ class Admin implements ISettings {
 	 * @return TemplateResponse
 	 */
 	public function getForm(): TemplateResponse {
-		$adminConfig = $this->openAiSettingsService->getAdminConfig();
+		$adminConfig = $this->watsonxSettingsService->getAdminConfig();
 		$adminConfig['api_key'] = $adminConfig['api_key'] === '' ? '' : 'dummyApiKey';
-		$adminConfig['basic_password'] = $adminConfig['basic_password'] === '' ? '' : 'dummyPassword';
+		$adminConfig['project_id'] = $adminConfig['project_id'] === '' ? '' : 'dummyProject';
+		$adminConfig['space_id'] = $adminConfig['space_id'] === '' ? '' : 'dummySpaceId';
 		$isAssistantEnabled = $this->appManager->isEnabledForUser('assistant');
 		$adminConfig['assistant_enabled'] = $isAssistantEnabled;
 		$this->initialStateService->provideInitialState('admin-config', $adminConfig);

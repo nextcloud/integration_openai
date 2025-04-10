@@ -6,10 +6,10 @@ declare(strict_types=1);
  * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
-namespace OCA\OpenAi\Migration;
+namespace OCA\Watsonx\Migration;
 
 use Closure;
-use OCA\OpenAi\AppInfo\Application;
+use OCA\Watsonx\AppInfo\Application;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IAppConfig;
 use OCP\IDBConnection;
@@ -32,15 +32,6 @@ class Version030102Date20241003155512 extends SimpleMigrationStep {
 	 * @param array $options
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options) {
-		// app config
-		foreach (['api_key', 'basic_password'] as $key) {
-			$value = $this->appConfig->getValueString(Application::APP_ID, $key);
-			if ($value !== '') {
-				$encryptedValue = $this->crypto->encrypt($value);
-				$this->appConfig->setValueString(Application::APP_ID, $key, $encryptedValue);
-			}
-		}
-
 		// user api keys and passwords
 		$qbUpdate = $this->connection->getQueryBuilder();
 		$qbUpdate->update('preferences')

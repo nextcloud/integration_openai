@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\Db;
+namespace OCA\Watsonx\Db;
 
 use DateInterval;
 use DateTime;
@@ -23,7 +23,7 @@ use OCP\IDBConnection;
  */
 class QuotaUsageMapper extends QBMapper {
 	public function __construct(IDBConnection $db) {
-		parent::__construct($db, 'openai_quota_usage', QuotaUsage::class);
+		parent::__construct($db, 'watsonx_quota_usage', QuotaUsage::class);
 	}
 
 	/**

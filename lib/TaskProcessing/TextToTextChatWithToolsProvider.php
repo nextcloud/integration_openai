@@ -7,11 +7,11 @@ declare(strict_types=1);
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-namespace OCA\OpenAi\TaskProcessing;
+namespace OCA\Watsonx\TaskProcessing;
 
 use Exception;
-use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\Watsonx\AppInfo\Application;
+use OCA\Watsonx\Service\WatsonxAPIService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -23,7 +23,7 @@ use RuntimeException;
 class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 
 	public function __construct(
-		private OpenAiAPIService $openAiAPIService,
+		private WatsonxAPIService $watsonxAPIService,
 		private IAppConfig $appConfig,
 		private IL10N $l,
 	) {
@@ -34,7 +34,7 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->watsonxAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -42,7 +42,7 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->watsonxAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -127,21 +127,21 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 		}
 
 		try {
-			$completion = $this->openAiAPIService->createChatCompletion(
+			$completion = $this->watsonxAPIService->createChatCompletion(
 				$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
 			);
 		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			throw new RuntimeException('Watsonx.ai request failed: ' . $e->getMessage());
 		}
 		if (count($completion['messages']) > 0 || count($completion['tool_calls']) > 0) {
 			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			$this->watsonxAPIService->updateExpTextProcessingTime($endTime - $startTime);
 			return [
 				'output' => array_pop($completion['messages']) ?? '',
 				'tool_calls' => array_pop($completion['tool_calls']) ?? '',
 			];
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		throw new RuntimeException('No result in watsonx.ai response.');
 	}
 }
