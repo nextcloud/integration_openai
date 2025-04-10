@@ -2,14 +2,20 @@
   - SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
   - SPDX-License-Identifier: AGPL-3.0-or-later
 -->
-# Change Log
+# Changelog
+
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/)
-and this project adheres to [Semantic Versioning](http://semver.org/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.0.0 – 2022-12-19
+## [Unreleased]
+
+## [1.0.0] - 2025-04-11
 
 ### Added
 
-* the app
+- Initial app release.
+
+[Unreleased]: https://github.com/nextcloud/integration_watsonx/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/nextcloud/integration_watsonx/releases/tag/v1.0.0
