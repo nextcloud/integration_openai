@@ -22,14 +22,14 @@ https://docs.nextcloud.com/server/latest/admin_manual/ai/overview.html#improve-a
 
 ## Ethical AI Rating
 
-### Rating for Text generation via IBM watsonx.ai: 🟡
+### Rating for Text generation via IBM watsonx.ai: 🟠
 
 Positive:
-* The trained models are freely available, and thus can be ran on-premises
-* The training data is freely available, making it possible to check or correct for bias or optimise the performance and CO2 usage
+* The provided foundation models are freely available, and thus can be ran on-premises
 
 Negative:
 * The software for training and inference of models is proprietary, limiting modifications to the API or other functionality
+* Some foundation models are trained on data that is not freely available, limiting the ability to fine tune them
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
 
