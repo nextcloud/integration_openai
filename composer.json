@@ -9,8 +9,8 @@
 			"homepage": "https://edward.ly/"
 		},
 		{
-			"name": "Julien Veyssier",
-			"email": "julien-nc@posteo.net"
+			"name": "Anupam Kumar",
+			"email": "kyteinsky@gmail.com"
 		}
 	],
 	"autoload": {
@@ -55,6 +55,7 @@
 	"extra": {
 		"bamarni-bin": {
 			"bin-links": true,
+			"target-directory": "vendor-bin",
 			"forward-command": true
 		}
 	}
