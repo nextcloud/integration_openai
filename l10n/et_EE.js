@@ -6,6 +6,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Vigane HTTP-meetod",
     "Bad credentials" : "Vale kasutajanimi, salasõna või tunnusluba",
     "Detect language" : "Tuvasta keel",
+    "Input text" : "Sisendtekst",
     "Size" : "Suurus",
     "Authentication" : "Autentimine",
     "Authentication method" : "Autentimise meetod",
