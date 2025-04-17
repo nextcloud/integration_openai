@@ -7,7 +7,7 @@ OC.L10N.register(
     "Bad credentials" : "Nederīgi pieteikšanās dati",
     "Size" : "Izmērs",
     "Authentication" : "Autentifikācija",
-    "Authentication method" : "Autentifikācijas metode",
+    "Authentication method" : "Autentificēšanās veids",
     "API key" : "API atslēga",
     "Username" : "Lietotājvārds",
     "Password" : "Parole"
