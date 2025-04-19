@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "デフォルト",
     "Text generation" : "テキスト生成",
     "Image generation" : "画像の生成",
     "Audio transcription" : "音声の文字起こし",
