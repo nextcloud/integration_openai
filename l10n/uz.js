@@ -2,7 +2,9 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown" : "Noma'lum",
-    "seconds" : "sekund",
+    "seconds" : "sekundlar",
+    "Bad HTTP method" : "Yomon HTTP usuli",
+    "Bad credentials" : "Akkaunt ma'lumotlari xato",
     "Size" : "Size",
     "Authentication" : "Autentifikatsiya",
     "Username" : "Username",

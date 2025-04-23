@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Vaikimisi",
     "Unknown" : "Teadmata",
     "seconds" : "sekundit",
     "Bad HTTP method" : "Vigane HTTP-meetod",
