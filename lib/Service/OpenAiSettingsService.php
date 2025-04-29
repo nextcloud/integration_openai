@@ -36,6 +36,8 @@ class OpenAiSettingsService {
 		'llm_provider_enabled' => 'boolean',
 		't2i_provider_enabled' => 'boolean',
 		'stt_provider_enabled' => 'boolean',
+        'tts_provider_exists' => 'boolean',
+        'tts_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
@@ -282,6 +284,8 @@ class OpenAiSettingsService {
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
 			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
+            'tts_provider_exists' => $this->getTtsProviderExists(),
+            'tts_provider_enabled' => $this->getTtsProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
 			'basic_password' => $this->getAdminBasicPassword(),
@@ -353,6 +357,20 @@ class OpenAiSettingsService {
 	public function getSttProviderEnabled(): bool {
 		return $this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
 	}
+
+    /**
+     * @return bool
+     */
+    public function getTtsProviderEnabled(): bool {
+        return $this->getTtsProviderExists() && $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTtsProviderExists(): bool {
+        return class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech');
+    }
 
 	////////////////////////////////////////////
 	//////////// Setters for settings //////////
@@ -653,6 +671,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['stt_provider_enabled'])) {
 			$this->setSttProviderEnabled($adminConfig['stt_provider_enabled']);
 		}
+        if (isset($adminConfig['tts_provider_enabled'])) {
+            $this->setTtsProviderEnabled($adminConfig['tts_provider_enabled']);
+        }
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
 		}
@@ -740,6 +761,14 @@ class OpenAiSettingsService {
 	public function setSttProviderEnabled(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
 	}
+
+    /**
+     * @param bool $enabled
+     * @return void
+     */
+    public function setTtsProviderEnabled(bool $enabled): void {
+        $this->appConfig->setValueString(Application::APP_ID, 'tts_provider_enabled', $enabled ? '1' : '0');
+    }
 
 	/**
 	 * @param bool $enabled
