@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Типово",
     "Image generation" : "Створення зображення",
     "Unknown" : "Невідомо",
     "seconds" : "секунд",
