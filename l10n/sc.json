@@ -1,0 +1,9 @@
+{ "translations": {
+    "Default" : "Predefinidu",
+    "Bad HTTP method" : "Mètodu HTTP no bàlidu",
+    "Bad credentials" : "Credentziales non bàlidas",
+    "Request timeout (seconds)" : "Tempus màssimu de sa rechesta (segundos)",
+    "Authentication" : "Autenticatzione",
+    "API key" : "Crae API"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

@@ -1,0 +1,24 @@
+{ "translations": {
+    "Default" : "默认",
+    "Text generation" : "文本生成",
+    "tokens" : "令牌",
+    "Unknown error while retrieving quota usage." : "提取额度使用量时发生未知错误",
+    "Bad HTTP method" : "错误的 HTTP 方法",
+    "Bad credentials" : "错误的凭据",
+    "Detect language" : "检测语言",
+    "Change Tone" : "更改语气",
+    "Input text" : "输入文本",
+    "Write a text that you want the assistant to rewrite in another tone." : "写一篇您想让助手用另一种语气重写的文本。",
+    "Desired tone" : "期望的语气",
+    "In which tone should your text be rewritten?" : "您的文本应该以何种语气重写？",
+    "Generated response" : "生成的回复",
+    "The rewritten text in the desired tone, written by the assistant:" : "由助手以所需的语气重写的文本：",
+    "Example: {example}" : "例子：{example}",
+    "Request timeout (seconds)" : "请求超时时间（秒）",
+    "Authentication" : "身份认证",
+    "Default completion model to use" : "默认使用的补全模型",
+    "Your administrator defined a custom service address" : "您的管理员定义了一个自定义服务地址",
+    "Leave the API key empty to use the one defined by administrators" : "将API密钥留空以使用管理员定义的API密钥",
+    "API key" : "API密钥"
+},"pluralForm" :"nplurals=1; plural=0;"
+}

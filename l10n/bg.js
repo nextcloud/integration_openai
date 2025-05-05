@@ -1,0 +1,15 @@
+OC.L10N.register(
+    "integration_watsonx",
+    {
+    "Default" : "По подразбиране",
+    "Bad HTTP method" : "Лош HTTP метод",
+    "Bad credentials" : "Лоши идентификационни данни",
+    "Detect language" : "Разпознаване на език",
+    "Example: {example}" : "Пример: {example}",
+    "Request timeout (seconds)" : "Време за изчакване на заявката (секунди)",
+    "Authentication" : "Удостоверяване",
+    "Default completion model to use" : "Модел на изпълнение по подразбиране, който да използвате",
+    "Leave the API key empty to use the one defined by administrators" : "Оставяне на празен API ключ, за да се използва този, определен от администраторите",
+    "API key" : "API ключ"
+},
+"nplurals=2; plural=(n != 1);");

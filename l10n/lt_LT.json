@@ -1,0 +1,17 @@
+{ "translations": {
+    "Default" : "Numatytasis",
+    "Text generation" : "Teksto generavimas",
+    "Unknown text generation error" : "Nežinoma teksto generavimo klaida",
+    "Bad HTTP method" : "Blogas HTTP metodas",
+    "Bad credentials" : "Blogi prisijungimo duomenys",
+    "API request error: " : "API užklausos klaida: ",
+    "Detect language" : "Aptikti kalbą",
+    "Model" : "Modelis",
+    "Failed to load models" : "Nepavyko įkelti modelių",
+    "Example: {example}" : "Pavyzdys: {example}",
+    "Request timeout (seconds)" : "Prisijungimo laikas (sekundėmis)",
+    "Authentication" : "Tapatybės nustatymas",
+    "API key" : "API raktas",
+    "Usage" : "Naudojimas"
+},"pluralForm" :"nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);"
+}

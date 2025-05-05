@@ -1,0 +1,28 @@
+OC.L10N.register(
+    "integration_watsonx",
+    {
+    "Default" : "Alapértelmezett",
+    "Text generation" : "Szöveg generálás",
+    "tokens" : "Tokenek",
+    "Bad HTTP method" : "Hibás HTTP metódus",
+    "Bad credentials" : "Hibás hitelesítő adatok",
+    "Detect language" : "Nyelv észlelése",
+    "Model" : "Modell",
+    "Example: {example}" : "Például: {example}",
+    "Service name (optional)" : "Szolgáltatás neve (nem kötelező)",
+    "Request timeout (seconds)" : "Kérés időtúllépése (másodpercben)",
+    "Authentication" : "Hitelesítés",
+    "Completions" : "Befejezettek",
+    "Default completion model to use" : "Alapértelmezett kiegészítési modell kiválasztása",
+    "Usage limits" : "Felhasználási limitek",
+    "Usage quotas per time period" : "Használati kvóták időszakonként",
+    "Quota type" : "Kvóta típusa",
+    "Select enabled features" : "Válassza ki az engedélyezett funkciókat",
+    "Your administrator defined a custom service address" : "A rendszergazda egyedi szolgáltatási címet adott meg",
+    "Leave the API key empty to use the one defined by administrators" : "Hagyja üresen az API kulcsot, hogy az adminisztrátor által beállítottat használja.",
+    "API key" : "API kulcs",
+    "Usage quota info" : "Használati kvóta információ",
+    "Usage" : "Felhasználás",
+    "Specifying your own API key will allow unlimited usage" : "A saját API-kulcs megadása korlátlan használatot tesz lehetővé"
+},
+"nplurals=2; plural=(n != 1);");

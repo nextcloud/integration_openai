@@ -1,0 +1,28 @@
+{ "translations": {
+    "Default" : "По умолчанию",
+    "Text generation" : "Генерация текста",
+    "Unknown error while retrieving quota usage." : "Неизвестная ошибка при получении данных об использовании квоты.",
+    "Bad HTTP method" : "Неверный метод HTTP",
+    "Bad credentials" : "Неверные учётные данные",
+    "API request error: " : "Ошибка запроса API:",
+    "Detect language" : "Определить язык",
+    "Model" : "Модель",
+    "Input text" : "Введите текст",
+    "Generated response" : "Сгенерированный ответ",
+    "Example: {example}" : "Пример: {example}",
+    "This name will be displayed as provider name in the AI admin settings" : "Это имя будет отображаться как имя провайдера в настройках администратора ИИ.",
+    "Request timeout (seconds)" : "Таймаут запроса (в секундах)",
+    "Authentication" : "Аутентификация",
+    "Usage limits" : "Ограничения на использование",
+    "Usage quotas per time period" : "Квоты использования за определенный период времени",
+    "Current system-wide usage / period" : "Текущее общесистемное использование / период",
+    "A per-user limit for usage of this API type (0 for unlimited)" : "Ограничение на использование данного типа API для каждого пользователя (0 для неограниченного количества)",
+    "Max new tokens per request" : "Максимальное количество новых токенов на запрос",
+    "Maximum number of new tokens generated for a single text generation prompt" : "Максимальное количество новых токенов, сгенерированных для одного текстового запроса на генерацию",
+    "Leave the API key empty to use the one defined by administrators" : "Оставьте ключ API пустым, чтобы использовать установленный администратором.",
+    "API key" : "Ключ API",
+    "Usage quota info" : "Информация о квоте использования",
+    "Usage" : "Использование",
+    "Specifying your own API key will allow unlimited usage" : "Указание вашего собственного ключа API позволит использовать его неограниченно"
+},"pluralForm" :"nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);"
+}

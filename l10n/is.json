@@ -1,0 +1,11 @@
+{ "translations": {
+    "Default" : "Sjálfgefið",
+    "Bad credentials" : "Gölluð auðkenni",
+    "Detect language" : "Greina tungumál",
+    "Input text" : "Inntakstexti",
+    "Example: {example}" : "Dæmi: {example}",
+    "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
+    "Authentication" : "Auðkenning",
+    "API key" : "API-lykill"
+},"pluralForm" :"nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);"
+}
