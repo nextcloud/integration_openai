@@ -23,6 +23,7 @@ class OpenAiSettingsService {
 		'api_key' => 'string',
 		'default_completion_model_id' => 'string',
 		'default_stt_model_id' => 'string',
+		'default_tts_model_id' => 'string',
 		'default_image_model_id' => 'string',
 		'default_image_size' => 'string',
 		'image_request_auth' => 'boolean',
@@ -36,8 +37,8 @@ class OpenAiSettingsService {
 		'llm_provider_enabled' => 'boolean',
 		't2i_provider_enabled' => 'boolean',
 		'stt_provider_enabled' => 'boolean',
-        'tts_provider_exists' => 'boolean',
-        'tts_provider_enabled' => 'boolean',
+		'tts_provider_exists' => 'boolean',
+		'tts_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
@@ -118,6 +119,10 @@ class OpenAiSettingsService {
 	 */
 	public function getAdminDefaultImageSize(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+	}
+
+	public function getAdminDefaultTtsModelId(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id') ?: Application::DEFAULT_MODEL_ID;
 	}
 
 	/**
@@ -268,6 +273,7 @@ class OpenAiSettingsService {
 			'api_key' => $this->getAdminApiKey(),
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
 			'default_stt_model_id' => $this->getAdminDefaultSttModelId(),
+			'default_tts_model_id' => $this->getAdminDefaultTtsModelId(),
 			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
 			'default_image_size' => $this->getAdminDefaultImageSize(),
 			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
@@ -284,8 +290,8 @@ class OpenAiSettingsService {
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
 			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
-            'tts_provider_exists' => $this->getTtsProviderExists(),
-            'tts_provider_enabled' => $this->getTtsProviderEnabled(),
+			'tts_provider_exists' => $this->getTtsProviderExists(),
+			'tts_provider_enabled' => $this->getTtsProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
 			'basic_password' => $this->getAdminBasicPassword(),
@@ -358,19 +364,19 @@ class OpenAiSettingsService {
 		return $this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
 	}
 
-    /**
-     * @return bool
-     */
-    public function getTtsProviderEnabled(): bool {
-        return $this->getTtsProviderExists() && $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
-    }
+	/**
+	 * @return bool
+	 */
+	public function getTtsProviderEnabled(): bool {
+		return $this->getTtsProviderExists() && $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
+	}
 
-    /**
-     * @return bool
-     */
-    public function getTtsProviderExists(): bool {
-        return class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech');
-    }
+	/**
+	 * @return bool
+	 */
+	public function getTtsProviderExists(): bool {
+		return class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech');
+	}
 
 	////////////////////////////////////////////
 	//////////// Setters for settings //////////
@@ -441,6 +447,15 @@ class OpenAiSettingsService {
 	public function setAdminDefaultSttModelId(string $defaultSttModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
 		$this->appConfig->setValueString(Application::APP_ID, 'default_stt_model_id', $defaultSttModelId);
+	}
+
+	/**
+	 * @param string $defaultTtsModelId
+	 * @return void
+	 */
+	public function setAdminDefaultTtsModelId(string $defaultTtsModelId): void {
+		// No need to validate. As long as it's a string, we're happy campers
+		$this->appConfig->setValueString(Application::APP_ID, 'default_speech_model_id', $defaultTtsModelId);
 	}
 
 	/**
@@ -632,6 +647,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['default_stt_model_id'])) {
 			$this->setAdminDefaultSttModelId($adminConfig['default_stt_model_id']);
 		}
+		if (isset($adminConfig['default_tts_model_id'])) {
+			$this->setAdminDefaultTtsModelId($adminConfig['default_tts_model_id']);
+		}
 		if (isset($adminConfig['default_image_model_id'])) {
 			$this->setAdminDefaultImageModelId($adminConfig['default_image_model_id']);
 		}
@@ -671,9 +689,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['stt_provider_enabled'])) {
 			$this->setSttProviderEnabled($adminConfig['stt_provider_enabled']);
 		}
-        if (isset($adminConfig['tts_provider_enabled'])) {
-            $this->setTtsProviderEnabled($adminConfig['tts_provider_enabled']);
-        }
+		if (isset($adminConfig['tts_provider_enabled'])) {
+			$this->setTtsProviderEnabled($adminConfig['tts_provider_enabled']);
+		}
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
 		}
@@ -762,13 +780,13 @@ class OpenAiSettingsService {
 		$this->appConfig->setValueString(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
 	}
 
-    /**
-     * @param bool $enabled
-     * @return void
-     */
-    public function setTtsProviderEnabled(bool $enabled): void {
-        $this->appConfig->setValueString(Application::APP_ID, 'tts_provider_enabled', $enabled ? '1' : '0');
-    }
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setTtsProviderEnabled(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_provider_enabled', $enabled ? '1' : '0');
+	}
 
 	/**
 	 * @param bool $enabled
