@@ -577,7 +577,7 @@ class OpenAiSettingsService {
 
 	/**
 	 * Set the admin config for the settings page
-	 * @param mixed[] $config
+	 * @param mixed[] $adminConfig
 	 * @return void
 	 * @throws Exception
 	 */
@@ -671,6 +671,7 @@ class OpenAiSettingsService {
 	 * Set the user config for the settings page
 	 * @param string $userId
 	 * @param string[] $userConfig
+	 * @throws Exception
 	 */
 	public function setUserConfig(string $userId, array $userConfig): void {
 		// That the variable types are correct
