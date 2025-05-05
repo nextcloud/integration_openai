@@ -24,6 +24,8 @@ class OpenAiSettingsService {
 		'default_completion_model_id' => 'string',
 		'default_stt_model_id' => 'string',
 		'default_tts_model_id' => 'string',
+		'tts_voices' => 'array',
+		'default_tts_voice' => 'string',
 		'default_image_model_id' => 'string',
 		'default_image_size' => 'string',
 		'image_request_auth' => 'boolean',
@@ -121,8 +123,35 @@ class OpenAiSettingsService {
 		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getAdminDefaultTtsModelId(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id') ?: Application::DEFAULT_MODEL_ID;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminDefaultTtsVoice(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice') ?: Application::DEFAULT_SPEECH_VOICE;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getAdminTtsVoices(): array {
+		$voices = json_decode(
+			$this->appConfig->getValueString(
+				Application::APP_ID, 'tts_voices',
+				json_encode(Application::DEFAULT_SPEECH_VOICES)
+			) ?: json_encode(Application::DEFAULT_SPEECH_VOICES),
+			true,
+		);
+		if (!is_array($voices)) {
+			$voices = Application::DEFAULT_SPEECH_VOICES;
+		}
+		return $voices;
 	}
 
 	/**
@@ -274,6 +303,8 @@ class OpenAiSettingsService {
 			'default_completion_model_id' => $this->getAdminDefaultCompletionModelId(),
 			'default_stt_model_id' => $this->getAdminDefaultSttModelId(),
 			'default_tts_model_id' => $this->getAdminDefaultTtsModelId(),
+			'default_tts_voice' => $this->getAdminDefaultTtsVoice(),
+			'tts_voices' => $this->getAdminTtsVoices(),
 			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
 			'default_image_size' => $this->getAdminDefaultImageSize(),
 			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
@@ -468,6 +499,14 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @param string $voice
+	 * @return void
+	 */
+	public function setAdminDefaultTtsVoice(string $voice): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'default_speech_voice', $voice);
+	}
+
+	/**
 	 * @param string $defaultImageSize
 	 * @return void
 	 * @throws Exception
@@ -609,6 +648,15 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @param array $voices
+	 * @return void
+	 */
+	public function setAdminTtsVoices(array $voices): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_voices', json_encode($voices));
+		$this->invalidateModelsCache();
+	}
+
+	/**
 	 * Set the admin config for the settings page
 	 * @param mixed[] $adminConfig
 	 * @return void
@@ -692,6 +740,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['tts_provider_enabled'])) {
 			$this->setTtsProviderEnabled($adminConfig['tts_provider_enabled']);
 		}
+		if (isset($adminConfig['default_tts_voice'])) {
+			$this->setAdminDefaultTtsVoice($adminConfig['default_tts_voice']);
+		}
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
 		}
@@ -703,6 +754,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['use_basic_auth'])) {
 			$this->setUseBasicAuth($adminConfig['use_basic_auth']);
+		}
+		if (isset($adminConfig['tts_voices'])) {
+			$this->setAdminTtsVoices($adminConfig['tts_voices']);
 		}
 	}
 

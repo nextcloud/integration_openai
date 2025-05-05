@@ -397,7 +397,7 @@
 					<NcSelect
 						v-model="selectedModel.tts"
 						class="model-select"
-						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
+						:clearable="state.default_tts_model_id !== DEFAULT_MODEL_ITEM.id"
 						:options="formattedModels"
 						:input-label="t('integration_openai', 'Default transcription model to use')"
 						:no-wrap="true"
@@ -427,6 +427,27 @@
 				<NcNoteCard v-else type="info">
 					{{ t('integration_openai', 'No models to list') }}
 				</NcNoteCard>
+				<NcSelect v-model="state.tts_voices"
+					:input-label="t('integration_openai', 'TTS Voices')"
+					multiple
+					taggable
+					@input="onInput()" />
+				<NcButton
+					:title="t('integration_openai', 'A list of voices supported by the endpoint you are using. Defaults to openai\'s list.')"
+					type="tertiary"
+					aria-label="voices-info">
+					<template #icon>
+						<HelpCircleIcon />
+					</template>
+				</NcButton>
+				<NcSelect
+					v-model="state.default_tts_voice"
+					class="model-select"
+					:options="state.tts_voices"
+					:input-label="t('integration_openai', 'Default voice to use')"
+					:no-wrap="true"
+					input-id="openai-tts-voices-select"
+					@input="onInput()" />
 			</div>
 			<div>
 				<h2>
@@ -808,6 +829,8 @@ export default {
 				default_image_size: this.state.default_image_size,
 				quota_period: parseInt(this.state.quota_period),
 				quotas: this.state.quotas,
+				tts_voices: this.state.tts_voices,
+				default_tts_voice: this.state.default_tts_voice,
 			}
 			await this.saveOptions(values, false)
 		}, 2000),

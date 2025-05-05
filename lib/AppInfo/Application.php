@@ -42,6 +42,10 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_TRANSCRIPTION_MODEL_ID = 'whisper-1';
 	public const DEFAULT_SPEECH_MODEL_ID = 'tts-1-hd';
 	public const DEFAULT_SPEECH_VOICE = 'alloy';
+	public const DEFAULT_SPEECH_VOICES = [
+		'alloy', 'ash', 'ballad', 'coral', 'echo', 'fable',
+		'onyx', 'nova', 'sage', 'shimmer', 'verse'
+	];
 	public const DEFAULT_DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
 	public const DEFAULT_CHUNK_SIZE = 10000;
