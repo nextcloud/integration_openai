@@ -82,16 +82,18 @@ class TextToSpeechProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
+		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices')) ?: Application::DEFAULT_SPEECH_VOICES;
 		return [
-			'voice' => [new ShapeEnumValue('alloy', 'alloy')],
+			'voice' => array_map(function ($v) { return new ShapeEnumValue($v, $v); }, $voices),
 			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id');
+		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice') ?: Application::DEFAULT_SPEECH_VOICE;
+		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id') ?: Application::DEFAULT_SPEECH_MODEL_ID;
 		return [
-			'voice' => 'alloy',
+			'voice' => $adminVoice,
 			'model' => $adminModel,
 			'speed' => 1,
 		];
