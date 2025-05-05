@@ -691,7 +691,7 @@ export default {
 						|| this.models[1]
 						|| this.models[0]
 
-					const defaultTtsModelId = this.state.default_stt_model_id || response.data?.default_stt_model_id
+					const defaultTtsModelId = this.state.default_tts_model_id || response.data?.default_tts_model_id
 					const ttsModelToSelect = this.models.find(m => m.id === defaultTtsModelId)
 							|| this.models.find(m => m.id.match(/tts/i))
 							|| this.models[1]

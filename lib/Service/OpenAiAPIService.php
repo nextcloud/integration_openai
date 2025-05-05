@@ -248,9 +248,9 @@ class OpenAiAPIService {
 				return $this->l10n->t('Image generation');
 			case Application::QUOTA_TYPE_TRANSCRIPTION:
 				return $this->l10n->t('Audio transcription');
-            case Application::QUOTA_TYPE_SPEECH:
-                return $this->l10n->t('Text to speech');
-            default:
+			case Application::QUOTA_TYPE_SPEECH:
+				return $this->l10n->t('Text to speech');
+			default:
 				return $this->l10n->t('Unknown');
 		}
 	}
@@ -268,8 +268,8 @@ class OpenAiAPIService {
 				return $this->l10n->t('images');
 			case Application::QUOTA_TYPE_TRANSCRIPTION:
 				return $this->l10n->t('seconds');
-            case Application::QUOTA_TYPE_SPEECH:
-                return $this->l10n->t('characters');
+			case Application::QUOTA_TYPE_SPEECH:
+				return $this->l10n->t('characters');
 			default:
 				return $this->l10n->t('Unknown');
 		}
@@ -746,38 +746,38 @@ class OpenAiAPIService {
 		return $requestOptions;
 	}
 
-    /**
-     * @param string|null $userId
-     * @param string $prompt
-     * @param string $model
-     * @param string $voice
-     * @return array
-     * @throws Exception
-     */
-    public function requestSpeechCreation(
-        ?string $userId, string $prompt, string $model, string $voice
-    ): array {
-        if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH)) {
-            throw new Exception($this->l10n->t('Speech generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
-        }
+	/**
+	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param string $model
+	 * @param string $voice
+	 * @return array
+	 * @throws Exception
+	 */
+	public function requestSpeechCreation(
+		?string $userId, string $prompt, string $model, string $voice,
+	): array {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH)) {
+			throw new Exception($this->l10n->t('Speech generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
 
-        $params = [
-            'input' => $prompt,
-            'voice' => $voice,
-            'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
-            'response_format' => 'wav'
-        ];
+		$params = [
+			'input' => $prompt,
+			'voice' => $voice,
+			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
+			'response_format' => 'wav'
+		];
 
-        $apiResponse = $this->request($userId, 'audio/speech', $params, 'POST');
+		$apiResponse = $this->request($userId, 'audio/speech', $params, 'POST');
 
-        try {
-            $charCount = mb_strlen($prompt);
-            $this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount);
-        } catch (DBException $e) {
-            $this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-        }
-        return $apiResponse;
-    }
+		try {
+			$charCount = mb_strlen($prompt);
+			$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+		}
+		return $apiResponse;
+	}
 
 	/**
 	 * @return int
