@@ -13,6 +13,7 @@ use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneTaskType;
 use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
+use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\ReformulateProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
@@ -97,6 +98,7 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(TopicsProvider::class);
 			$context->registerTaskProcessingProvider(ContextWriteProvider::class);
 			$context->registerTaskProcessingProvider(ReformulateProvider::class);
+			$context->registerTaskProcessingProvider(EmojiProvider::class);
 			if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChangeTone')) {
 				$context->registerTaskProcessingTaskType(ChangeToneTaskType::class);
 			}
