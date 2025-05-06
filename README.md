@@ -63,6 +63,14 @@ Positive:
 Negative:
 * The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
 
+### Rating for Text-To-Speech via the OpenAI API: 🔴
+
+Negative:
+* The software for training and inferencing of this model is proprietary, limiting running it locally or training by yourself
+* The trained model is not freely available, so the model can not be ran on-premises
+* The training data is not freely available, limiting the ability of external parties to check and correct for bias or optimise the model’s performance and CO2 usage.
+
+
 ### Rating for Text generation via LocalAI: 🟢
 
 Positive:
