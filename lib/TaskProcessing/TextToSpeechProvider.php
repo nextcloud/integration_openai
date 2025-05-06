@@ -28,7 +28,6 @@ class TextToSpeechProvider implements ISynchronousProvider {
 		private OpenAiAPIService $openAiAPIService,
 		private IL10N $l,
 		private LoggerInterface $logger,
-		private IClientService $clientService,
 		private IAppConfig $appConfig,
 		private ?string $userId,
 	) {
