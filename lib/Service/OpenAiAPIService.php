@@ -763,8 +763,8 @@ class OpenAiAPIService {
 
 		$params = [
 			'input' => $prompt,
-			'voice' => $voice,
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
+			'voice' => $voice === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_VOICE : $voice,
+			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_MODEL_ID : $model,
 			'response_format' => 'wav'
 		];
 
