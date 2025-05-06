@@ -13,6 +13,7 @@ OC.L10N.register(
     "Authentication method" : "Autentimise meetod",
     "API key" : "API võti",
     "Username" : "Kasutajanimi",
-    "Password" : "Salasõna"
+    "Password" : "Salasõna",
+    "Usage quota info" : "Kasutuskvoodi teave"
 },
 "nplurals=2; plural=(n != 1);");
