@@ -487,7 +487,7 @@
 				<NcCheckboxRadioSwitch
 					:checked="state.llm_provider_enabled"
 					@update:checked="onCheckboxChanged($event, 'llm_provider_enabled', false)">
-					{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write etc...)') }}
+					{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write, etc.)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
 					:checked="state.t2i_provider_enabled"
