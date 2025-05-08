@@ -2,6 +2,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: monthly
+      timezone: Europe/Paris
+    groups:
+      github-actions:
+        patterns:
+          - "*"
   - package-ecosystem: composer
     directory: "/"
     schedule:
