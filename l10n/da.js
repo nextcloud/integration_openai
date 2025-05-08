@@ -101,7 +101,6 @@ OC.L10N.register(
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Anvend parameteren \"{newParam}\" i stedet for den forældede \"{deprecatedParam}\"",
     "Select enabled features" : "Vælg aktiverede funktioner",
     "Translation provider (to translate Talk messages for example)" : "Oversættelsesudbyder (til f.eks at oversætte Snak beskeder)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "Tekstbehandlingsudbydere (til at generere tekst, sammenfatte, kontekstskrive osv.)",
     "Image generation provider" : "Billedgenereringsleverandør",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Tale til tekst leverandør (til f.eks. at transskribere Snak optagelser)",
     "OpenAI options saved" : "OpenAI indstillinger gemt",

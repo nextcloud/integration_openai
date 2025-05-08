@@ -101,7 +101,6 @@ OC.L10N.register(
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Χρησιμοποιήστε την παράμετρο \"{newParam}\" αντί για την καταργημένη \"{deprecatedParam}\"",
     "Select enabled features" : "Επιλέξτε ενεργοποιημένες λειτουργίες",
     "Translation provider (to translate Talk messages for example)" : "Πάροχος μετάφρασης (για παράδειγμα για μετάφραση μηνυμάτων του Talk)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "Πάροχοι επεξεργασίας κειμένου (για δημιουργία κειμένου, σύνοψη, συγγραφή περιεχομένου κλπ...)",
     "Image generation provider" : "Πάροχος δημιουργίας εικόνας",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Πάροχος μετατροπής ομιλίας σε κείμενο (για παράδειγμα για μεταγραφή ηχογραφήσεων του Talk)",
     "OpenAI options saved" : "Οι επιλογές OpenAI αποθηκεύτηκαν",

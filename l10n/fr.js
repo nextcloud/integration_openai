@@ -86,7 +86,6 @@ OC.L10N.register(
     "Maximum number of new tokens generated for a single text generation prompt" : "Nombre maximum de nouveaux jetons générés pour un unique prompt de génération de texte.",
     "Select enabled features" : "Sélectionner les fonctionnalités activées",
     "Translation provider (to translate Talk messages for example)" : "Fournisseur de traduction (pour traduire les messages instantanés, par exemple)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "Fournisseurs de traitement de texte (pour générer du texte, résumer, écrire du contexte etc...)",
     "Image generation provider" : "Fournisseur de génération d'images",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Fournisseur de synthèse vocale (pour transcrire des enregistrements de Discussion, par exemple)",
     "OpenAI options saved" : "Options OpenAI sauvegardées",

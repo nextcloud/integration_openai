@@ -100,7 +100,6 @@
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "使用「{newParam}」參數而非棄用的「{deprecatedParam}」",
     "Select enabled features" : "選取已啟用的功能",
     "Translation provider (to translate Talk messages for example)" : "翻譯提供者（舉例來說，用來翻譯 Talk 中的訊息）",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "文字處理提供者（用來產生文字、摘要、情境寫作等）",
     "Image generation provider" : "圖像產生提供者",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "音頻轉文字提供者（舉例來說，用來轉錄 Talk 的錄音）",
     "OpenAI options saved" : "OpenAI 選項已儲存",

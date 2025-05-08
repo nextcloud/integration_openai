@@ -79,7 +79,6 @@ OC.L10N.register(
     "Maximum number of new tokens generated for a single text generation prompt" : "يەككە تېكىست ھاسىل قىلىش ئۈچۈن ھاسىل قىلىنغان ئەڭ يېڭى يېڭى بەلگە",
     "Select enabled features" : "قوزغىتىلغان ئىقتىدارلارنى تاللاڭ",
     "Translation provider (to translate Talk messages for example)" : "تەرجىمان تەمىنلىگۈچى (سۆزلىشىش ئۇچۇرلىرىنى تەرجىمە قىلىش ئۈچۈن)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "تېكىست بىر تەرەپ قىلىش تەمىنلىگۈچىلىرى (تېكىست ھاسىل قىلىش ، خۇلاسىلەش ، مەزمۇن يېزىش قاتارلىقلار ...)",
     "Image generation provider" : "رەسىم ھاسىل قىلغۇچى",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "سۆزلەشتىن تېكىست تەمىنلىگۈچى (سۆز خاتىرىسىنى خاتىرىلەش ئۈچۈن)",
     "OpenAI options saved" : "OpenAI تاللانمىلىرى ساقلاندى",

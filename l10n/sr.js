@@ -102,7 +102,7 @@ OC.L10N.register(
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Уместо застарелог „{deprecatedParam}”, употребите параметар „{newParam}”",
     "Select enabled features" : "Изаберите укључене могућности",
     "Translation provider (to translate Talk messages for example)" : "Пружалац услуге превођења (на пример, за превођење Talk порука)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "Пружаоци услуге обраде текста (за генерисање текста, резимирање, писање у контексту, итд.)",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Пружаоци услуге обраде текста (за генерисање текста, резимирање, писање контекста, итд.)",
     "Image generation provider" : "Пружалац услуге генерисања слике",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Пружалац услуге претварања говора у текст (на пример, за транскрибовање Talk снимака)",
     "OpenAI options saved" : "Сачуване су OpenAI опције",

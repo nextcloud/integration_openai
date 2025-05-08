@@ -100,7 +100,7 @@
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Úsáid paraiméadar \"{newParam}\" in ionad an pharaiméadar \"{deprecatedParam}\"",
     "Select enabled features" : "Roghnaigh gnéithe cumasaithe",
     "Translation provider (to translate Talk messages for example)" : "Soláthraí aistriúcháin (chun teachtaireachtaí Talk a aistriú mar shampla)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "Soláthraithe próiseála téacs (chun téacs a ghiniúint, achoimre a dhéanamh, comhthéacs a scríobh srl...)",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Soláthraithe próiseála téacs (chun téacs a ghiniúint, achoimriú, comhthéacs a scríobh, srl.)",
     "Image generation provider" : "Soláthraí giniúna íomhá",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Soláthraí cainte go téacs (chun taifeadtaí Talk a thrascríobh mar shampla)",
     "OpenAI options saved" : "Roghanna OpenAI sábháilte",

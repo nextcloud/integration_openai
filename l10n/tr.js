@@ -102,7 +102,6 @@ OC.L10N.register(
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Kullanımdan kaldırılan \"{deprecatedParam}\" yerine \"{newParam}\" parametresini kullanın",
     "Select enabled features" : "Kullanıma alınacak özellikleri seçin",
     "Translation provider (to translate Talk messages for example)" : "Çeviri hizmeti (örneğin Konuş iletilerini çevirmek için)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "Metin işleme hizmeti sağlayıcıları (metin oluşturma, özetleme, bağlam yazma...)",
     "Image generation provider" : "Görsel oluşturma hizmeti sağlayıcısı",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Yazıdan metni dönüştürme hizmeti (örneğin Konuş kayıtlarını yazıya dönüştürmek için)",
     "OpenAI options saved" : "OpenAI ayarları kaydedildi",

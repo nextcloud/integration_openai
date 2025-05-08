@@ -100,7 +100,6 @@
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"",
     "Select enabled features" : "Select enabled features",
     "Translation provider (to translate Talk messages for example)" : "Translation provider (to translate Talk messages for example)",
-    "Text processing providers (to generate text, summarize, context write etc...)" : "Text processing providers (to generate text, summarize, context write etc...)",
     "Image generation provider" : "Image generation provider",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Speech-to-text provider (to transcribe Talk recordings for example)",
     "OpenAI options saved" : "OpenAI options saved",
