@@ -28,6 +28,8 @@ use OCP\Lock\LockedException;
 use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use FFMpeg\FFMpeg;
+use FFMpeg\Format\Audio\Opus;
 
 /**
  * Service to make requests to OpenAI/LocalAI REST API
@@ -605,32 +607,39 @@ class OpenAiAPIService {
 
 		$inputFilePath = '/mnt/ncdata' . $file->getPath();
 		$tempFilePath = preg_replace('/\.webm$/', '.ogg', $inputFilePath);
-
-		if (str_ends_with($file->getName(), '.webm')) {
-			$command = "ffmpeg -i '$inputFilePath' -vn -map_metadata -1 -ac 1 -c:a libopus -b:a 12k -application voip '$tempFilePath'";
-			exec($command, $output, $returnVar);
 	
-			if ($returnVar !== 0) {
-				$this->logger->error('FFmpeg encoding failed for file: ' . $inputFilePath . '. Command output: ' . implode("\n", $output));
+		if (str_ends_with($file->getName(), '.webm')) {
+			try {
+				$ffmpeg = FFMpeg::create();
+				$audio = $ffmpeg->open($inputFilePath);
+	
+				$format = new Opus();
+				$format->setAudioChannels(1)
+					   ->setAudioKiloBitrate(12)
+					   ->setApplication('voip');
+	
+				$audio->save($format, $tempFilePath);
+	
+				$fileContent = file_get_contents($tempFilePath);
+			} catch (\Exception $e) {
+				$this->logger->error('FFmpeg encoding failed for file: ' . $inputFilePath . '. Error: ' . $e->getMessage());
 				throw new Exception($this->l10n->t('Could not encode audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 			}
-	
-			$fileContent = file_get_contents($tempFilePath);
 		} else {
 			$fileContent = $file->getContent();
 		}
-
+	
 		try {
 			$transcriptionResponse = $this->transcribe($userId, $fileContent, $translate, $model);
 		} catch (NotPermittedException|LockedException|GenericFileException $e) {
 			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
-
+	
 		if (file_exists($tempFilePath)) {
 			unlink($tempFilePath);
 		}
-
+	
 		return $transcriptionResponse;
 	}
 
