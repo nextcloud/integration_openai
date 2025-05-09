@@ -59,6 +59,7 @@ OC.L10N.register(
     "Max new tokens per request" : "Numero massimo di nuovi token per richiesta",
     "Maximum number of new tokens generated for a single text generation prompt" : "Numero massimo di nuovi token generati per una singola richiesta di generazione di testo",
     "Select enabled features" : "Seleziona le funzionalità abilitate",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Fornitori di elaborazione di testo (per generare testo, riassumere, scrivere il contesto, ecc.)",
     "Your administrator defined a custom service address" : "L'amministratore ha definito un indirizzo di servizio personalizzato",
     "Leave the API key empty to use the one defined by administrators" : "Lasciare vuota la chiave API per utilizzare quella definita dagli amministratori",
     "API key" : "Chiave API",
