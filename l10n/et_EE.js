@@ -2,8 +2,11 @@ OC.L10N.register(
     "integration_openai",
     {
     "Default" : "Vaikimisi",
+    "Image generation" : "Pildiloome",
+    "Audio transcription" : "Heliriba üleskirjutus",
     "Unknown" : "Teadmata",
     "seconds" : "sekundit",
+    "Unknown image generation error" : "Tundmatu viga pildiloomel",
     "Bad HTTP method" : "Vigane HTTP-meetod",
     "Bad credentials" : "Vale kasutajanimi, salasõna või tunnusluba",
     "Detect language" : "Tuvasta keel",

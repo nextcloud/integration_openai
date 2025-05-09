@@ -100,6 +100,7 @@
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Use o parâmetro \"{newParam}\" em vez do obsoleto \"{deprecatedParam}\"",
     "Select enabled features" : "Selecione recursos habilitados",
     "Translation provider (to translate Talk messages for example)" : "Provedor de tradução (para traduzir mensagens do Talk, por exemplo)",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Provedores de processamento de texto (para gerar texto, resumir, escrever no contexto, etc.)",
     "Image generation provider" : "Provedor de geração de imagens",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provedor de fala para texto (para transcrever gravações do Talk, por exemplo)",
     "OpenAI options saved" : "Opções do OpenAI salvas",

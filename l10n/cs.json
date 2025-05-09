@@ -99,6 +99,7 @@
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Použít parametr „{newParam}“ namísto zastaralého „{deprecatedParam}“",
     "Select enabled features" : "Vyberte zapnuté funkce",
     "Translation provider (to translate Talk messages for example)" : "Poskytovatel překladů (například pro překládání zpráv v Talk)",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Poskytovatelé zpracovávání textu (pro jeho vytváření, shrnování, kontextové psaní, atd.)",
     "Image generation provider" : "Poskytovatel vytváření obrázků",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Poskytovatel převodu řeči na text (například pro přepis nahrávek z Talk)",
     "OpenAI options saved" : "Předvolby pro OpenAI uloženy",

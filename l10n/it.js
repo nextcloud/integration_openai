@@ -102,6 +102,7 @@ OC.L10N.register(
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilizza \"{newParam}\" parametro invece del deprecato \"{deprecatedParam}\"",
     "Select enabled features" : "Seleziona le funzionalità abilitate",
     "Translation provider (to translate Talk messages for example)" : "Fornitore di traduzioni (per tradurre messaggi di Talk, ad esempio)",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Fornitori di elaborazione di testo (per generare testo, riassumere, scrivere il contesto, ecc.)",
     "Image generation provider" : "Provider di generazione di immagini",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provider di sintesi vocale (ad esempio per trascrivere registrazioni di conversazioni)",
     "OpenAI options saved" : "Opzioni OpenAI salvate",
