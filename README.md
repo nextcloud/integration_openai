@@ -4,7 +4,7 @@
 -->
 # IBM watsonx AI integration in Nextcloud
 
-<!-- [![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/integration_watsonx)](https://api.reuse.software/info/github.com/nextcloud/integration_watsonx) -->
+[![REUSE status](https://api.reuse.software/badge/github.com/nextcloud/integration_watsonx)](https://api.reuse.software/info/github.com/nextcloud/integration_watsonx)
 
 This app implements the following text generation providers
 using any freely-available large language model:
