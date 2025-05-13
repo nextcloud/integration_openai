@@ -16,6 +16,7 @@ OC.L10N.register(
     "Assistant app" : "Abilise rakendus",
     "Service URL" : "Teenuse võrguaadress",
     "Leave empty to use {openaiApiUrl}" : "Jäta tühjaks, kui soovid kasutada {openaiApiUrl} aadressi",
+    "Request timeout (seconds)" : "Päringu aegumine (sekundites)",
     "Authentication" : "Autentimine",
     "Authentication method" : "Autentimise meetod",
     "API key" : "API võti",
