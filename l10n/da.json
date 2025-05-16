@@ -18,7 +18,7 @@
     "The maximum number of words/tokens that can be generated in the completion." : "Det maksimale antal ord / tokens, der kan genereres i færdiggørelsen.",
     "Model" : "Model",
     "The model used to generate the completion" : "Den model, der anvendes til at generere færdiggørelsen",
-    "Change Tone" : "Ændr tone",
+    "Change Tone" : "Skift tone",
     "Ask a question about your data." : "Stil et spørgsmål om dine data.",
     "Input text" : "Inputtekst",
     "Write a text that you want the assistant to rewrite in another tone." : "Skriv en tekst, som assistenten skal skrive i en anden tone.",
