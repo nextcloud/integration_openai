@@ -399,7 +399,7 @@
 						class="model-select"
 						:clearable="state.default_tts_model_id !== DEFAULT_MODEL_ITEM.id"
 						:options="formattedModels"
-						:input-label="t('integration_openai', 'Default transcription model to use')"
+						:input-label="t('integration_openai', 'Default speech generation model to use')"
 						:no-wrap="true"
 						input-id="openai-tts-model-select"
 						@input="onModelSelected('tts', $event)" />
@@ -427,19 +427,24 @@
 				<NcNoteCard v-else type="info">
 					{{ t('integration_openai', 'No models to list') }}
 				</NcNoteCard>
-				<NcSelect v-model="state.tts_voices"
-					:input-label="t('integration_openai', 'TTS Voices')"
-					multiple
-					taggable
-					@input="onInput()" />
-				<NcButton
-					:title="t('integration_openai', 'A list of voices supported by the endpoint you are using. Defaults to openai\'s list.')"
-					type="tertiary"
-					aria-label="voices-info">
-					<template #icon>
-						<HelpCircleIcon />
-					</template>
-				</NcButton>
+				<div class="line column">
+					<label>{{ t('integration_openai', 'TTS Voices') }}
+						<NcButton
+							:title="t('integration_openai', 'A list of voices supported by the endpoint you are using. Defaults to openai\'s list.')"
+							type="tertiary"
+							aria-label="voices-info">
+							<template #icon>
+								<HelpCircleIcon />
+							</template>
+						</NcButton>
+					</label>
+					<NcSelect v-model="state.tts_voices"
+						:label-outside="true"
+						multiple
+						taggable
+						style="width: 350px;"
+						@input="onInput()" />
+				</div>
 				<NcSelect
 					v-model="state.default_tts_voice"
 					class="model-select"
