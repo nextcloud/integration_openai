@@ -126,7 +126,8 @@ class SummaryProvider implements ISynchronousProvider {
 			try {
 				$completions = [];
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$summarySystemPrompt = 'Summarize the following text in the same language as the text.';
+					$summarySystemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. ' .
+						'You should only return the summary without any additional information.';
 
 					foreach ($prompts as $p) {
 						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
@@ -134,7 +135,9 @@ class SummaryProvider implements ISynchronousProvider {
 					}
 				} else {
 					$wrapSummaryPrompt = function (string $p): string {
-						return 'Summarize the following text delimited by XML tags in the same language as the text.\n\n<text>\n' . $p . '\n</text>';
+						return 'You are a helpful assistant that summarizes text in the same language as the text. ' .
+							'You should only return the summary without any additional information. ' .
+							'Here is the text to summarize:\n\n' . $p . '\n';
 					};
 
 					foreach (array_map($wrapSummaryPrompt, $prompts) as $p) {
