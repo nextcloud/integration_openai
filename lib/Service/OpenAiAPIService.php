@@ -931,7 +931,16 @@ class OpenAiAPIService {
 			if ($respCode >= 400) {
 				return ['error' => $this->l10n->t('Bad credentials')];
 			} else {
-				return json_decode($body, true) ?: [$body];
+				if ($response->getHeader('Content-Type') === 'application/json') {
+					$parsedBody = json_decode($body, true);
+					if ($parsedBody === null) {
+						$this->logger->warning('Could not JSON parse the response', ['body' => $body]);
+						return ['error' => 'Could not JSON parse the response'];
+					}
+					return $parsedBody;
+				} else {
+					return ['body' => $body];
+				}
 			}
 		} catch (ClientException|ServerException $e) {
 			$responseBody = $e->getResponse()->getBody();

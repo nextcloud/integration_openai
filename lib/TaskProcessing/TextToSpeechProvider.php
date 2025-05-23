@@ -72,11 +72,6 @@ class TextToSpeechProvider implements ISynchronousProvider {
 				$this->l->t('The model used to generate the speech'),
 				EShapeType::Enum
 			),
-			'speed' => new ShapeDescriptor(
-				$this->l->t('Speed'),
-				$this->l->t('Speech speed modifier'),
-				EShapeType::Number
-			)
 		];
 	}
 
@@ -94,7 +89,6 @@ class TextToSpeechProvider implements ISynchronousProvider {
 		return [
 			'voice' => $adminVoice,
 			'model' => $adminModel,
-			'speed' => 1,
 		];
 	}
 
@@ -133,11 +127,11 @@ class TextToSpeechProvider implements ISynchronousProvider {
 		try {
 			$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $prompt, $model, $voice);
 
-			if (count($apiResponse) === 0) {
+			if (!isset($apiResponse['body'])) {
 				$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
 				throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
 			}
-			return ['speech' => array_pop($apiResponse)];
+			return ['speech' => $apiResponse['body']];
 		} catch (\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
