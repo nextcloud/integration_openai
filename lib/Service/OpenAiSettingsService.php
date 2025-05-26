@@ -39,7 +39,6 @@ class OpenAiSettingsService {
 		'llm_provider_enabled' => 'boolean',
 		't2i_provider_enabled' => 'boolean',
 		'stt_provider_enabled' => 'boolean',
-		'tts_provider_exists' => 'boolean',
 		'tts_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
@@ -321,7 +320,6 @@ class OpenAiSettingsService {
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
 			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
-			'tts_provider_exists' => $this->getTtsProviderExists(),
 			'tts_provider_enabled' => $this->getTtsProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
@@ -399,14 +397,7 @@ class OpenAiSettingsService {
 	 * @return bool
 	 */
 	public function getTtsProviderEnabled(): bool {
-		return $this->getTtsProviderExists() && $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getTtsProviderExists(): bool {
-		return class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech');
+		return $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
 	}
 
 	////////////////////////////////////////////

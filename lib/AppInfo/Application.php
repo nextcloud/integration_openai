@@ -18,6 +18,7 @@ use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\ReformulateProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
+use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TopicsProvider;
@@ -118,9 +119,10 @@ class Application extends App implements IBootstrap {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
 			}
 		}
-		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech') && $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1') {
-			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToSpeechProvider::class);
+		if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech')) {
+			$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\TextToSpeechTaskType::class);
 		}
+		$context->registerTaskProcessingProvider(TextToSpeechProvider::class);
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);
 		}

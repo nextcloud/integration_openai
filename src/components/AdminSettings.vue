@@ -388,72 +388,70 @@
 					{{ t('integration_openai', 'No models to list') }}
 				</NcNoteCard>
 			</div>
-			<div v-if="state.tts_provider_exists">
-				<h2>
-					{{ t('integration_openai', 'Text to speech') }}
-				</h2>
-				<div v-if="models"
-					class="line line-select">
-					<NcSelect
-						v-model="selectedModel.tts"
-						class="model-select"
-						:clearable="state.default_tts_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels"
-						:input-label="t('integration_openai', 'Default speech generation model to use')"
-						:no-wrap="true"
-						input-id="openai-tts-model-select"
-						@input="onModelSelected('tts', $event)" />
-					<a v-if="state.url === ''"
-						:title="t('integration_openai', 'More information about OpenAI models')"
-						href="https://beta.openai.com/docs/models"
-						target="_blank">
-						<NcButton type="tertiary" aria-label="openai-info">
-							<template #icon>
-								<HelpCircleIcon />
-							</template>
-						</NcButton>
-					</a>
-					<a v-else
-						:title="t('integration_openai', 'More information about LocalAI models')"
-						href="https://localai.io/model-compatibility/index.html"
-						target="_blank">
-						<NcButton type="tertiary" aria-label="localai-info">
-							<template #icon>
-								<HelpCircleIcon />
-							</template>
-						</NcButton>
-					</a>
-				</div>
-				<NcNoteCard v-else type="info">
-					{{ t('integration_openai', 'No models to list') }}
-				</NcNoteCard>
-				<div class="line column">
-					<label>{{ t('integration_openai', 'TTS Voices') }}
-						<NcButton
-							:title="t('integration_openai', 'A list of voices supported by the endpoint you are using. Defaults to openai\'s list.')"
-							type="tertiary"
-							aria-label="voices-info">
-							<template #icon>
-								<HelpCircleIcon />
-							</template>
-						</NcButton>
-					</label>
-					<NcSelect v-model="state.tts_voices"
-						:label-outside="true"
-						multiple
-						taggable
-						style="width: 350px;"
-						@input="onInput()" />
-				</div>
+			<h2>
+				{{ t('integration_openai', 'Text to speech') }}
+			</h2>
+			<div v-if="models"
+				class="line line-select">
 				<NcSelect
-					v-model="state.default_tts_voice"
+					v-model="selectedModel.tts"
 					class="model-select"
-					:options="state.tts_voices"
-					:input-label="t('integration_openai', 'Default voice to use')"
+					:clearable="state.default_tts_model_id !== DEFAULT_MODEL_ITEM.id"
+					:options="formattedModels"
+					:input-label="t('integration_openai', 'Default speech generation model to use')"
 					:no-wrap="true"
-					input-id="openai-tts-voices-select"
+					input-id="openai-tts-model-select"
+					@input="onModelSelected('tts', $event)" />
+				<a v-if="state.url === ''"
+					:title="t('integration_openai', 'More information about OpenAI models')"
+					href="https://beta.openai.com/docs/models"
+					target="_blank">
+					<NcButton type="tertiary" aria-label="openai-info">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</a>
+				<a v-else
+					:title="t('integration_openai', 'More information about LocalAI models')"
+					href="https://localai.io/model-compatibility/index.html"
+					target="_blank">
+					<NcButton type="tertiary" aria-label="localai-info">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</a>
+			</div>
+			<NcNoteCard v-else type="info">
+				{{ t('integration_openai', 'No models to list') }}
+			</NcNoteCard>
+			<div class="line column">
+				<label>{{ t('integration_openai', 'TTS Voices') }}
+					<NcButton
+						:title="t('integration_openai', 'A list of voices supported by the endpoint you are using. Defaults to openai\'s list.')"
+						type="tertiary"
+						aria-label="voices-info">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</label>
+				<NcSelect v-model="state.tts_voices"
+					:label-outside="true"
+					multiple
+					taggable
+					style="width: 350px;"
 					@input="onInput()" />
 			</div>
+			<NcSelect
+				v-model="state.default_tts_voice"
+				class="model-select"
+				:options="state.tts_voices"
+				:input-label="t('integration_openai', 'Default voice to use')"
+				:no-wrap="true"
+				input-id="openai-tts-voices-select"
+				@input="onInput()" />
 			<div>
 				<h2>
 					{{ t('integration_openai', 'Usage limits') }}
@@ -565,13 +563,11 @@
 					@update:model-value="onCheckboxChanged($event, 'stt_provider_enabled', false)">
 					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
 				</NcCheckboxRadioSwitch>
-				<div v-if="state.tts_provider_exists">
-					<NcCheckboxRadioSwitch
-						:checked="state.tts_provider_enabled"
-						@update:checked="onCheckboxChanged($event, 'tts_provider_enabled', false)">
-						{{ t('integration_openai', 'Text-to-speech provider') }}
-					</NcCheckboxRadioSwitch>
-				</div>
+				<NcCheckboxRadioSwitch
+					:checked="state.tts_provider_enabled"
+					@update:checked="onCheckboxChanged($event, 'tts_provider_enabled', false)">
+					{{ t('integration_openai', 'Text-to-speech provider') }}
+				</NcCheckboxRadioSwitch>
 			</div>
 		</div>
 	</div>
