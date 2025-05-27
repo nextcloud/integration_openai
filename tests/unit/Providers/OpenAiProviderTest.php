@@ -213,6 +213,7 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
