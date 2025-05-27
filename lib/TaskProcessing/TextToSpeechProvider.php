@@ -11,14 +11,12 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
-use OCP\TaskProcessing\TaskTypes\TextToSpeech;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -44,7 +42,10 @@ class TextToSpeechProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		return TextToSpeech::ID;
+		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChangeTone')) {
+			return \OCP\TaskProcessing\TaskTypes\TextToSpeech::ID;
+		}
+		return TextToSpeechTaskType::ID;
 	}
 
 	public function getExpectedRuntime(): int {
