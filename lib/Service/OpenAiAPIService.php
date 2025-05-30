@@ -904,11 +904,18 @@ class OpenAiAPIService {
 			} else {
 				$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 			}
-			if (isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])) {
-				throw new Exception($this->l10n->t('API request error: ') . $parsedResponseBody['error']['message'], intval($e->getCode()));
-			} else {
-				throw new Exception($this->l10n->t('API request error: ') . $e->getMessage(), intval($e->getCode()));
-			}
+			throw new Exception(
+				$this->l10n->t('API request error: ') . (
+					$e->getResponse()->getStatusCode() === 401
+						? $this->l10n->t('Invalid API Key/Basic Auth: ')
+						: ''
+				) . (
+					isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])
+						? $parsedResponseBody['error']['message']
+						: $e->getMessage()
+				),
+				intval($e->getCode()),
+			);
 		}
 	}
 }
