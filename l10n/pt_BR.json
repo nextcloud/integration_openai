@@ -73,7 +73,7 @@
     "Max new tokens per request" : "Máximo de novos tokens por solicitação",
     "Maximum number of new tokens generated for a single text generation prompt" : "Número máximo de novos tokens gerados para um único prompt de geração de texto",
     "Select enabled features" : "Selecione recursos habilitados",
-    "Text processing providers (to generate text, summarize, context write, etc.)" : "Provedores de processamento de texto (para gerar texto, resumir, escrever no contexto, etc.)",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Provedores de processamento de texto (para gerar texto, resumir, escrita contextual, etc.)",
     "Watsonx.ai options saved" : "Opções do watsonx.ai salvas",
     "Failed to save watsonx.ai options" : "Falha ao salvar as opções do watsonx.ai",
     "Your administrator defined a custom service address" : "Seu administrador definiu um endereço de serviço personalizado",
