@@ -58,7 +58,7 @@ OC.L10N.register(
     "A per-user limit for usage of this API type (0 for unlimited)" : "Bu API türünün kullanımı ile ilgili kullanıcı başına sınır (sınırsız için 0)",
     "Max new tokens per request" : "İstek başına en fazla yeni kod sayısı",
     "Maximum number of new tokens generated for a single text generation prompt" : "Tek bir metin oluşturma istemi için oluşturulacak en fazla yeni kod sayısı",
-    "Select enabled features" : "Kullanıma alınacak özellikleri seçin",
+    "Select enabled features" : "Etkin özellikleri seçin",
     "Your administrator defined a custom service address" : "Yöneticiniz bir özel hizmet adresi tanımlamış",
     "Leave the API key empty to use the one defined by administrators" : "Yöneticiler tarafından tanımlanmış bir anahtarın kullanılması için API anahtarını boş bırakın",
     "API key" : "API anahtarı",
