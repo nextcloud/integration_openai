@@ -42,7 +42,7 @@ class TextToSpeechProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChangeTone')) {
+		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech')) {
 			return \OCP\TaskProcessing\TaskTypes\TextToSpeech::ID;
 		}
 		return TextToSpeechTaskType::ID;
