@@ -16,3 +16,4 @@
 - Micke Nordin <hej@mic.ke>
 - rakekniven <2069590+rakekniven@users.noreply.github.com>
 - Richard Steinmetz <richard@steinmetz.cloud>
+- Lukas Schaefer <lukas@lschaefer.xyz>
