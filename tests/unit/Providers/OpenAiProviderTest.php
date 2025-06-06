@@ -576,7 +576,8 @@ class OpenAiProviderTest extends TestCase {
 			'input' => $inputText,
 			'voice' => Application::DEFAULT_SPEECH_VOICE,
 			'model' => Application::DEFAULT_SPEECH_MODEL_ID,
-			'response_format' => 'wav',
+			'response_format' => 'mp3',
+			'speed' => 1,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
