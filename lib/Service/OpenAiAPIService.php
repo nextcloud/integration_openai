@@ -751,12 +751,14 @@ class OpenAiAPIService {
 	 * @param string $prompt
 	 * @param string $model
 	 * @param string $voice
+	 * @param int $speed
 	 * @return array
 	 * @throws Exception
 	 */
 	public function requestSpeechCreation(
-		?string $userId, string $prompt, string $model, string $voice,
+		?string $userId, string $prompt, string $model, string $voice, int $speed = 1,
 	): array {
+		$this->logger->error('speed is ' . $speed);
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH)) {
 			throw new Exception($this->l10n->t('Speech generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
@@ -765,7 +767,8 @@ class OpenAiAPIService {
 			'input' => $prompt,
 			'voice' => $voice === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_VOICE : $voice,
 			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_MODEL_ID : $model,
-			'response_format' => 'wav'
+			'response_format' => 'wav',
+			'speed' => $speed,
 		];
 
 		$apiResponse = $this->request($userId, 'audio/speech', $params, 'POST');
