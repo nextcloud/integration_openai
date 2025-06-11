@@ -20,13 +20,13 @@
 				<div class="line">
 					<NcTextField
 						id="openai-api-key"
+						v-model="state.api_key"
 						class="input"
-						:value.sync="state.api_key"
 						:readonly="readonly"
 						type="password"
 						:label="t('integration_openai', 'API key')"
 						:show-trailing-button="!!state.api_key"
-						@update:value="onSensitiveInput"
+						@update:model-value="onSensitiveInput"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput()"
 						@focus="readonly = false">
 						<KeyIcon />
@@ -116,8 +116,8 @@ import KeyIcon from 'vue-material-design-icons/Key.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
-import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
-import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 
 import { loadState } from '@nextcloud/initial-state'
 import { generateUrl } from '@nextcloud/router'
