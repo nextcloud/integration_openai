@@ -31,16 +31,16 @@
 				<div class="line">
 					<NcTextField
 						id="openai-url"
+						v-model="state.url"
 						class="input"
-						:value.sync="state.url"
 						:label="t('integration_openai', 'Service URL')"
 						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080/v1' })"
 						:show-trailing-button="!!state.url"
-						@update:value="onSensitiveInput(true)"
+						@update:model-value="onSensitiveInput(true)"
 						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
 						<EarthIcon />
 					</NcTextField>
-					<NcButton type="tertiary"
+					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'Leave empty to use {openaiApiUrl}', { openaiApiUrl: 'https://api.openai.com/v1' })">
 						<template #icon>
 							<HelpCircleIcon />
@@ -60,14 +60,14 @@
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
 						id="openai-service-name"
+						v-model="state.service_name"
 						class="input"
-						:value.sync="state.service_name"
 						:label="t('integration_openai', 'Service name (optional)')"
 						:placeholder="t('integration_openai', 'Example: LocalAI of university ABC')"
 						:show-trailing-button="!!state.service_name"
-						@update:value="onInput()"
+						@update:model-value="onInput()"
 						@trailing-button-click="state.service_name = '' ; onInput()" />
-					<NcButton type="tertiary"
+					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'This name will be displayed as provider name in the AI admin settings')">
 						<template #icon>
 							<HelpCircleIcon />
@@ -77,20 +77,20 @@
 				<div class="line">
 					<NcInputField
 						id="openai-api-timeout"
+						v-model="state.request_timeout"
 						class="input"
-						:value.sync="state.request_timeout"
 						type="number"
 						:label="t('integration_openai', 'Request timeout (seconds)')"
 						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
 						:show-trailing-button="!!state.request_timeout"
-						@update:value="onInput()"
+						@update:model-value="onInput()"
 						@trailing-button-click="state.request_timeout = '' ; onInput()">
 						<TimerAlertOutlineIcon />
 						<template #trailing-button-icon>
 							<CloseIcon :size="20" />
 						</template>
 					</NcInputField>
-					<NcButton type="tertiary"
+					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'Timeout for the request to the external API')">
 						<template #icon>
 							<HelpCircleIcon />
@@ -109,20 +109,20 @@
 					<div class="radios">
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:checked="!state.use_basic_auth"
+							:model-value="!state.use_basic_auth"
 							type="radio"
 							button-variant-grouped="horizontal"
 							name="auth_method"
-							@update:checked="onCheckboxChanged(false, 'use_basic_auth')">
+							@update:model-value="onCheckboxChanged(false, 'use_basic_auth')">
 							{{ t('assistant', 'API key') }}
 						</NcCheckboxRadioSwitch>
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:checked="state.use_basic_auth"
+							:model-value="state.use_basic_auth"
 							type="radio"
 							button-variant-grouped="horizontal"
 							name="auth_method"
-							@update:checked="onCheckboxChanged(true, 'use_basic_auth')">
+							@update:model-value="onCheckboxChanged(true, 'use_basic_auth')">
 							{{ t('assistant', 'Basic Authentication') }}
 						</NcCheckboxRadioSwitch>
 					</div>
@@ -130,13 +130,13 @@
 				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
 					<NcTextField
 						id="openai-api-key"
+						v-model="state.api_key"
 						class="input"
-						:value.sync="state.api_key"
 						type="password"
 						:readonly="readonly"
 						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
 						:show-trailing-button="!!state.api_key"
-						@update:value="onSensitiveInput(true)"
+						@update:model-value="onSensitiveInput(true)"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
 						<KeyIcon />
@@ -153,12 +153,12 @@
 					<div class="line">
 						<NcTextField
 							id="openai-basic-user"
+							v-model="state.basic_user"
 							class="input"
-							:value.sync="state.basic_user"
 							:readonly="readonly"
 							:label="t('integration_openai', 'Basic Auth user')"
 							:show-trailing-button="!!state.basic_user"
-							@update:value="onSensitiveInput(true)"
+							@update:model-value="onSensitiveInput(true)"
 							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)"
 							@focus="readonly = false">
 							<AccountIcon />
@@ -167,13 +167,13 @@
 					<div class="line">
 						<NcTextField
 							id="openai-basic-password"
+							v-model="state.basic_password"
 							class="input"
-							:value.sync="state.basic_password"
 							type="password"
 							:readonly="readonly"
 							:label="t('integration_openai', 'Basic Auth password')"
 							:show-trailing-button="!!state.basic_password"
-							@update:value="onSensitiveInput(true)"
+							@update:model-value="onSensitiveInput(true)"
 							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)"
 							@focus="readonly = false">
 							<KeyIcon />
@@ -193,20 +193,20 @@
 					<div class="radios">
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:checked="state.chat_endpoint_enabled"
+							:model-value="state.chat_endpoint_enabled"
 							type="radio"
 							button-variant-grouped="horizontal"
 							name="chat_endpoint"
-							@update:checked="onCheckboxChanged(true, 'chat_endpoint_enabled', false)">
+							@update:model-value="onCheckboxChanged(true, 'chat_endpoint_enabled', false)">
 							{{ t('assistant', 'Chat completions') }}
 						</NcCheckboxRadioSwitch>
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:checked="!state.chat_endpoint_enabled"
+							:model-value="!state.chat_endpoint_enabled"
 							type="radio"
 							button-variant-grouped="horizontal"
 							name="chat_endpoint"
-							@update:checked="onCheckboxChanged(false, 'chat_endpoint_enabled', false)">
+							@update:model-value="onCheckboxChanged(false, 'chat_endpoint_enabled', false)">
 							{{ t('assistant', 'Completions') }}
 						</NcCheckboxRadioSwitch>
 					</div>
@@ -226,12 +226,12 @@
 						:input-label="t('integration_openai', 'Default completion model to use')"
 						:no-wrap="true"
 						input-id="openai-model-select"
-						@input="onModelSelected('text', $event)" />
+						@update:model-value="onModelSelected('text', $event)" />
 					<a v-if="state.url === ''"
 						:title="t('integration_openai', 'More information about OpenAI models')"
 						href="https://beta.openai.com/docs/models"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="openai-info">
+						<NcButton variant="tertiary" aria-label="openai-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -241,7 +241,7 @@
 						:title="t('integration_openai', 'More information about LocalAI models')"
 						href="https://localai.io/model-compatibility/index.html"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="localai-info">
+						<NcButton variant="tertiary" aria-label="localai-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -251,13 +251,13 @@
 				<div class="line">
 					<NcTextField
 						id="llm-extra-params"
+						v-model="state.llm_extra_params"
 						class="input"
-						:value.sync="state.llm_extra_params"
 						:label="t('integration_openai', 'Extra completion model parameters')"
 						:show-trailing-button="!!state.llm_extra_params"
-						@update:value="onInput()"
+						@update:model-value="onInput()"
 						@trailing-button-click="state.llm_extra_params = '' ; onInput()" />
-					<NcButton type="tertiary"
+					<NcButton variant="tertiary"
 						:title="llmExtraParamHint">
 						<template #icon>
 							<HelpCircleIcon />
@@ -268,18 +268,18 @@
 					<!--Input for max chunk size (prompt length) for a single request-->
 					<NcInputField
 						id="openai-chunk-size"
+						v-model="state.chunk_size"
 						class="input"
 						type="number"
-						:value.sync="state.chunk_size"
 						:label="t('integration_openai', 'Max input tokens per request')"
 						:show-trailing-button="!!state.chunk_size"
-						@update:value="onInput()"
+						@update:model-value="onInput()"
 						@trailing-button-click="state.chunk_size = '' ; onInput()">
 						<template #trailing-button-icon>
 							<CloseIcon :size="20" />
 						</template>
 					</NcInputField>
-					<NcButton type="tertiary"
+					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)')">
 						<template #icon>
 							<HelpCircleIcon />
@@ -301,12 +301,12 @@
 						:input-label="t('integration_openai', 'Default image generation model to use')"
 						:no-wrap="true"
 						input-id="openai-model-select"
-						@input="onModelSelected('image', $event)" />
+						@update:model-value="onModelSelected('image', $event)" />
 					<a v-if="state.url === ''"
 						:title="t('integration_openai', 'More information about OpenAI models')"
 						href="https://beta.openai.com/docs/models"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="openai-info">
+						<NcButton variant="tertiary" aria-label="openai-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -316,7 +316,7 @@
 						:title="t('integration_openai', 'More information about LocalAI models')"
 						href="https://localai.io/model-compatibility/index.html"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="localai-info">
+						<NcButton variant="tertiary" aria-label="localai-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -329,13 +329,13 @@
 				<div class="line">
 					<NcTextField
 						id="default-image-size"
+						v-model="state.default_image_size"
 						class="input"
-						:value.sync="state.default_image_size"
 						:label="t('integration_openai', 'Default image size')"
 						:show-trailing-button="!!state.default_image_size"
-						@update:value="onInput()"
+						@update:model-value="onInput()"
 						@trailing-button-click="state.default_image_size = '' ; onInput()" />
-					<NcButton type="tertiary"
+					<NcButton variant="tertiary"
 						:title="defaultImageSizeParamHint">
 						<template #icon>
 							<HelpCircleIcon />
@@ -343,8 +343,8 @@
 					</NcButton>
 				</div>
 				<NcCheckboxRadioSwitch
-					:checked="state.image_request_auth"
-					@update:checked="onCheckboxChanged($event, 'image_request_auth', false)">
+					:model-value="state.image_request_auth"
+					@update:model-value="onCheckboxChanged($event, 'image_request_auth', false)">
 					{{ t('integration_openai', 'Use authentication for image retrieval request') }}
 				</NcCheckboxRadioSwitch>
 			</div>
@@ -362,12 +362,12 @@
 						:input-label="t('integration_openai', 'Default transcription model to use')"
 						:no-wrap="true"
 						input-id="openai-stt-model-select"
-						@input="onModelSelected('stt', $event)" />
+						@update:model-value="onModelSelected('stt', $event)" />
 					<a v-if="state.url === ''"
 						:title="t('integration_openai', 'More information about OpenAI models')"
 						href="https://beta.openai.com/docs/models"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="openai-info">
+						<NcButton variant="tertiary" aria-label="openai-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -377,7 +377,7 @@
 						:title="t('integration_openai', 'More information about LocalAI models')"
 						href="https://localai.io/model-compatibility/index.html"
 						target="_blank">
-						<NcButton type="tertiary" aria-label="localai-info">
+						<NcButton variant="tertiary" aria-label="localai-info">
 							<template #icon>
 								<HelpCircleIcon />
 							</template>
@@ -396,12 +396,12 @@
 					<!--Time period in days for the token usage-->
 					<NcInputField
 						id="openai-api-quota-period"
+						v-model="state.quota_period"
 						class="input"
 						type="number"
-						:value.sync="state.quota_period"
 						:label="t('integration_openai', 'Quota enforcement time period (days)')"
 						:show-trailing-button="!!state.quota_period"
-						@update:value="onInput()"
+						@update:model-value="onInput()"
 						@trailing-button-click="state.quota_period = '' ; onInput()">
 						<template #trailing-button-icon>
 							<CloseIcon :size="20" />
@@ -451,18 +451,18 @@
 					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
 					<NcInputField
 						id="openai-api-max-tokens"
+						v-model="state.max_tokens"
 						class="input"
 						type="number"
-						:value.sync="state.max_tokens"
 						:label="t('integration_openai', 'Max new tokens per request')"
 						:show-trailing-button="!!state.max_tokens"
-						@update:value="onInput()"
+						@update:model-value="onInput()"
 						@trailing-button-click="state.max_tokens = '' ; onInput()">
 						<template #trailing-button-icon>
 							<CloseIcon :size="20" />
 						</template>
 					</NcInputField>
-					<NcButton type="tertiary"
+					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')">
 						<template #icon>
 							<HelpCircleIcon />
@@ -470,8 +470,8 @@
 					</NcButton>
 				</div>
 				<NcCheckboxRadioSwitch
-					:checked="state.use_max_completion_tokens_param"
-					@update:checked="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
+					:model-value="state.use_max_completion_tokens_param"
+					@update:model-value="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
 					{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
 				</NcCheckboxRadioSwitch>
 			</div>
@@ -480,23 +480,23 @@
 					{{ t('integration_openai', 'Select enabled features') }}
 				</h2>
 				<NcCheckboxRadioSwitch
-					:checked="state.translation_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 'translation_provider_enabled', false)">
+					:model-value="state.translation_provider_enabled"
+					@update:model-value="onCheckboxChanged($event, 'translation_provider_enabled', false)">
 					{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
-					:checked="state.llm_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 'llm_provider_enabled', false)">
+					:model-value="state.llm_provider_enabled"
+					@update:model-value="onCheckboxChanged($event, 'llm_provider_enabled', false)">
 					{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write, etc.)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
-					:checked="state.t2i_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 't2i_provider_enabled', false)">
+					:model-value="state.t2i_provider_enabled"
+					@update:model-value="onCheckboxChanged($event, 't2i_provider_enabled', false)">
 					{{ t('integration_openai', 'Image generation provider') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
-					:checked="state.stt_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 'stt_provider_enabled', false)">
+					:model-value="state.stt_provider_enabled"
+					@update:model-value="onCheckboxChanged($event, 'stt_provider_enabled', false)">
 					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
 				</NcCheckboxRadioSwitch>
 			</div>
@@ -514,12 +514,12 @@ import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.v
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
-import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/dist/Components/NcCheckboxRadioSwitch.js'
-import NcInputField from '@nextcloud/vue/dist/Components/NcInputField.js'
-import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
-import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
-import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcInputField from '@nextcloud/vue/components/NcInputField'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
