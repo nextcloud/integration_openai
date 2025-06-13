@@ -58,6 +58,16 @@ OC.L10N.register(
     "A watsonx.ai project ID or space ID is required to generate text" : "텍스트 생성을 위하여 watsonx.ai 프로젝트 ID나 스페이스 ID가 필요합니다.",
     "Usage limits" : "사용 제한",
     "Quota type" : "쿼터 종류",
-    "API key" : "API 키"
+    "Select enabled features" : "활성화된 기능 선택",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "텍스트 처리 제공자 (텍스트 생성, 요약, 컨텍스트 쓰기 등)",
+    "Watsonx.ai options saved" : "watsonx.ai 옵션 저장됨",
+    "Failed to save watsonx.ai options" : "watsonx.ai 옵션을 저장하는데 실패했습니다.",
+    "Your administrator defined a custom service address" : "관리자가 사용자 지정 서비스 주소를 정의했습니다.",
+    "Leave the API key empty to use the one defined by administrators" : "관리자가 지정한 항목을 사용하려면 API 키를 비워두십시오.",
+    "API key" : "API 키",
+    "A watsonx.ai project ID or space ID is required if an API key is specified" : "API 키가 지정된다면 watsonx.ai 프로젝트 ID 혹은 스페이스 ID가 필요합니다.",
+    "Usage quota info" : "사용량 쿼터 정보",
+    "Usage" : "사용량",
+    "Specifying your own API key will allow unlimited usage" : "자신의 API 키를 지정하면 무제한 사용을 허용합니다."
 },
 "nplurals=1; plural=0;");

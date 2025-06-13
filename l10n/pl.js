@@ -45,6 +45,8 @@ OC.L10N.register(
     "Chat completions" : "Chat completions",
     "Completions" : "Completions",
     "Max input tokens per request" : "Maksymalna liczba tokenów dla jednego żądania. ",
+    "Maximum number of new tokens generated for a single text generation prompt" : "Maksymalna liczba nowych tokenów generowanych dla pojedynczej wiadomości tekstowej",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Dostawcy przetwarzania tekstu (do generowania tekstu, podsumowywania, pisania kontekstowego itp.)",
     "Your administrator defined a custom service address" : "Twój administrator zdefiniował niestandardowy adres usługi",
     "Leave the API key empty to use the one defined by administrators" : "Pozostaw klucz API pusty, aby użyć klucza zdefiniowanego przez administratorów",
     "API key" : "Klucz API",
