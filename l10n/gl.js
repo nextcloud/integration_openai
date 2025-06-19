@@ -50,7 +50,7 @@ OC.L10N.register(
     "Max input tokens per request" : "Número máximo de testemuños de entrada por solicitude",
     "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "Dividir a idicación en anacos, sendo cada anaco non superior ao número especificado de testemuños (0 desactiva a fragmentación)",
     "Usage limits" : "Límites de uso",
-    "Quota enforcement time period (days)" : "Período de execución da cota (días)",
+    "Quota enforcement time period (days)" : "Período de aplicación da cota (días)",
     "Usage quotas per time period" : "Cotas de uso por período de tempo",
     "Quota type" : "Tipo de cota",
     "Per-user quota / period" : "Cota/período por usuario",
