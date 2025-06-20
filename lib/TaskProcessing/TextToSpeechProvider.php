@@ -75,7 +75,9 @@ class TextToSpeechProvider implements ISynchronousProvider {
 			),
 			'speed' => new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->l->t('Speech speed modifier'),
+				$this->openAiAPIService->isUsingOpenAi() ?
+					$this->l->t('Speech speed modifier (Valid values: 0.25-4)')
+					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
 			)
 		];
@@ -134,6 +136,13 @@ class TextToSpeechProvider implements ISynchronousProvider {
 		$speed = 1;
 		if (isset($input['speed']) && is_numeric($input['speed'])) {
 			$speed = $input['speed'];
+			if ($this->openAiAPIService->isUsingOpenAi()) {
+				if ($speed > 4) {
+					$speed = 4;
+				} elseif ($speed < 0.25) {
+					$speed = 0.25;
+				}
+			}
 		}
 
 		try {
