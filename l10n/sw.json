@@ -1,0 +1,9 @@
+{ "translations": {
+    "Unknown" : "Haijulikani",
+    "seconds" : "sekunde",
+    "Bad HTTP method" : "Njia mbaya ya HTTP ",
+    "Bad credentials" : "Sifa mbaya",
+    "Size" : "Ukubwa",
+    "Password" : "Nenosiri"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}

@@ -19,6 +19,7 @@
     "Bad HTTP method" : "Лоша HTTP метода",
     "Bad credentials" : "Лоши креденцијали",
     "API request error: " : "Грешка API захтева: ",
+    "Invalid API Key/Basic Auth: " : "Неисправан API кључ/Basic Auth: ",
     "Detect language" : "Откриј језик",
     "Friendlier" : "Више пријатељски",
     "More formal" : "Формалније",

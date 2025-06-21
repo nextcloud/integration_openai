@@ -21,6 +21,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Droch-mhodh HTTP",
     "Bad credentials" : "Dintiúir dona",
     "API request error: " : "Earráid iarratais API:",
+    "Invalid API Key/Basic Auth: " : "Eochair API/Údarú Bunúsach neamhbhailí:",
     "Detect language" : "Braith teanga",
     "Friendlier" : "Níos cairdiúla",
     "More formal" : "Níos foirmiúla",

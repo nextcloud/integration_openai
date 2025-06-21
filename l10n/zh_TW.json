@@ -19,6 +19,7 @@
     "Bad HTTP method" : "錯誤的 HTTP 方法",
     "Bad credentials" : "錯誤的憑證",
     "API request error: " : "API 請求錯誤：",
+    "Invalid API Key/Basic Auth: " : "無效的 API 金鑰/基本認證：",
     "Detect language" : "偵測語言",
     "Friendlier" : "更友善",
     "More formal" : "更正式",
