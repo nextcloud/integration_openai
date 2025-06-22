@@ -21,6 +21,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Metodo HTTP non corretto",
     "Bad credentials" : "Credenziali non valide",
     "API request error: " : "Errore richiesta API:",
+    "Invalid API Key/Basic Auth: " : "Chiave API/Autenticazione di base non valida:",
     "Detect language" : "Rileva lingua",
     "Friendlier" : "Più amichevole",
     "More formal" : "Più formale",

@@ -4,6 +4,7 @@
     "Bad HTTP method" : "Njia mbaya ya HTTP ",
     "Bad credentials" : "Sifa mbaya",
     "Size" : "Ukubwa",
+    "Authentication" : "Uthibitisho",
     "Password" : "Nenosiri"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -6,6 +6,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Njia mbaya ya HTTP ",
     "Bad credentials" : "Sifa mbaya",
     "Size" : "Ukubwa",
+    "Authentication" : "Uthibitisho",
     "Password" : "Nenosiri"
 },
 "nplurals=2; plural=(n != 1);");
