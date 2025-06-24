@@ -758,9 +758,8 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function requestSpeechCreation(
-		?string $userId, string $prompt, string $model, string $voice, int $speed = 1,
+		?string $userId, string $prompt, string $model, string $voice, float $speed = 1,
 	): array {
-		$this->logger->error('speed is ' . $speed);
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH)) {
 			throw new Exception($this->l10n->t('Speech generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
@@ -779,7 +778,7 @@ class OpenAiAPIService {
 			$charCount = mb_strlen($prompt);
 			$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount);
 		} catch (DBException $e) {
-			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_SPEECH . '. Error: ' . $e->getMessage());
 		}
 		return $apiResponse;
 	}

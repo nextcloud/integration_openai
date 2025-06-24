@@ -557,7 +557,7 @@ class OpenAiProviderTest extends TestCase {
 	}
 
 	public function testTextToSpeechProvider(): void {
-		$translationProvider = new TextToSpeechProvider(
+		$TTSProvider = new TextToSpeechProvider(
 			$this->openAiApiService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),

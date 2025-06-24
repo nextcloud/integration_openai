@@ -406,7 +406,7 @@
 					:title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
 					target="_blank">
-					<NcButton type="tertiary" aria-label="openai-info">
+					<NcButton variant="tertiary" aria-label="openai-info">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -416,7 +416,7 @@
 					:title="t('integration_openai', 'More information about LocalAI models')"
 					href="https://localai.io/model-compatibility/index.html"
 					target="_blank">
-					<NcButton type="tertiary" aria-label="localai-info">
+					<NcButton variant="tertiary" aria-label="localai-info">
 						<template #icon>
 							<HelpCircleIcon />
 						</template>
@@ -430,7 +430,7 @@
 				<label>{{ t('integration_openai', 'TTS Voices') }}
 					<NcButton
 						:title="t('integration_openai', 'A list of voices supported by the endpoint you are using. Defaults to openai\'s list.')"
-						type="tertiary"
+						variant="tertiary"
 						aria-label="voices-info">
 						<template #icon>
 							<HelpCircleIcon />
@@ -445,13 +445,13 @@
 					@input="onInput()" />
 			</div>
 			<NcSelect
-				v-model="state.default_tts_voice"
+				:model-value="state.default_tts_voice"
 				class="model-select"
 				:options="state.tts_voices"
 				:input-label="t('integration_openai', 'Default voice to use')"
 				:no-wrap="true"
 				input-id="openai-tts-voices-select"
-				@input="onInput()" />
+				@click="onInput()" />
 			<div>
 				<h2>
 					{{ t('integration_openai', 'Usage limits') }}
@@ -564,8 +564,8 @@
 					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
 				</NcCheckboxRadioSwitch>
 				<NcCheckboxRadioSwitch
-					:checked="state.tts_provider_enabled"
-					@update:checked="onCheckboxChanged($event, 'tts_provider_enabled', false)">
+					:model-value="state.tts_provider_enabled"
+					@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
 					{{ t('integration_openai', 'Text-to-speech provider') }}
 				</NcCheckboxRadioSwitch>
 			</div>
@@ -715,9 +715,9 @@ export default {
 
 					const defaultTtsModelId = this.state.default_tts_model_id || response.data?.default_tts_model_id
 					const ttsModelToSelect = this.models.find(m => m.id === defaultTtsModelId)
-							|| this.models.find(m => m.id.match(/tts/i))
-							|| this.models[1]
-							|| this.models[0]
+						|| this.models.find(m => m.id.match(/tts/i))
+						|| this.models[1]
+						|| this.models[0]
 
 					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
 					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
