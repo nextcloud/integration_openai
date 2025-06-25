@@ -586,7 +586,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
+		$result = $TTSProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
 		$this->assertEquals(['speech' => 'BINARYDATA'], $result);
 
 		// Check that token usage is logged properly (should be 21 characters)
