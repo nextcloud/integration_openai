@@ -118,6 +118,7 @@ class TextToSpeechProvider implements ISynchronousProvider {
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new RuntimeException('Invalid prompt');
 		}
+		// For OpenAI the text input limit is 4096 characters (https://platform.openai.com/docs/api-reference/audio/createSpeech#audio-createspeech-input)
 		$prompt = $input['input'];
 
 		if (isset($input['model']) && is_string($input['model'])) {
