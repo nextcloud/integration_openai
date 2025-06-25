@@ -445,7 +445,7 @@
 					@input="onInput()" />
 			</div>
 			<NcSelect
-				:model-value="state.default_tts_voice"
+				v-model="state.default_tts_voice"
 				class="model-select"
 				:options="state.tts_voices"
 				:input-label="t('integration_openai', 'Default voice to use')"
