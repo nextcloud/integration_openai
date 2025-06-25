@@ -753,7 +753,7 @@ class OpenAiAPIService {
 	 * @param string $prompt
 	 * @param string $model
 	 * @param string $voice
-	 * @param int $speed
+	 * @param float $speed
 	 * @return array
 	 * @throws Exception
 	 */
