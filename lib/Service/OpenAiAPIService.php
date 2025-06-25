@@ -28,6 +28,8 @@ use OCP\Lock\LockedException;
 use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Throwable;
+use function json_encode;
 
 /**
  * Service to make requests to OpenAI/LocalAI REST API
@@ -132,7 +134,7 @@ class OpenAiAPIService {
 			throw $e;
 		}
 		if (isset($modelsResponse['error'])) {
-			$this->logger->warning('Error retrieving models: ' . \json_encode($modelsResponse));
+			$this->logger->warning('Error retrieving models: ' . json_encode($modelsResponse));
 			$this->areCredsValid = false;
 			throw new Exception($modelsResponse['error'], Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -142,7 +144,7 @@ class OpenAiAPIService {
 		}
 
 		if (!$this->isModelListValid($modelsResponse['data'])) {
-			$this->logger->warning('Invalid models response: ' . \json_encode($modelsResponse));
+			$this->logger->warning('Invalid models response: ' . json_encode($modelsResponse));
 			$this->areCredsValid = false;
 			throw new Exception($this->l10n->t('Invalid models response received'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
@@ -185,7 +187,7 @@ class OpenAiAPIService {
 				array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
 			}
 			return $modelEnumValues;
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			// avoid flooding the logs with errors from calls of task processing
 			$this->logger->info('Error getting model enum values', ['exception' => $e]);
 			return [];
@@ -248,6 +250,8 @@ class OpenAiAPIService {
 				return $this->l10n->t('Image generation');
 			case Application::QUOTA_TYPE_TRANSCRIPTION:
 				return $this->l10n->t('Audio transcription');
+			case Application::QUOTA_TYPE_SPEECH:
+				return $this->l10n->t('Text to speech');
 			default:
 				return $this->l10n->t('Unknown');
 		}
@@ -266,6 +270,8 @@ class OpenAiAPIService {
 				return $this->l10n->t('images');
 			case Application::QUOTA_TYPE_TRANSCRIPTION:
 				return $this->l10n->t('seconds');
+			case Application::QUOTA_TYPE_SPEECH:
+				return $this->l10n->t('characters');
 			default:
 				return $this->l10n->t('Unknown');
 		}
@@ -743,6 +749,41 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param string $model
+	 * @param string $voice
+	 * @param float $speed
+	 * @return array
+	 * @throws Exception
+	 */
+	public function requestSpeechCreation(
+		?string $userId, string $prompt, string $model, string $voice, float $speed = 1,
+	): array {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH)) {
+			throw new Exception($this->l10n->t('Speech generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
+
+		$params = [
+			'input' => $prompt,
+			'voice' => $voice === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_VOICE : $voice,
+			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_MODEL_ID : $model,
+			'response_format' => 'mp3',
+			'speed' => $speed,
+		];
+
+		$apiResponse = $this->request($userId, 'audio/speech', $params, 'POST');
+
+		try {
+			$charCount = mb_strlen($prompt);
+			$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_SPEECH . '. Error: ' . $e->getMessage());
+		}
+		return $apiResponse;
+	}
+
+	/**
 	 * @return int
 	 */
 	public function getExpTextProcessingTime(): int {
@@ -893,9 +934,16 @@ class OpenAiAPIService {
 
 			if ($respCode >= 400) {
 				return ['error' => $this->l10n->t('Bad credentials')];
-			} else {
-				return json_decode($body, true) ?: [];
 			}
+			if ($response->getHeader('Content-Type') === 'application/json') {
+				$parsedBody = json_decode($body, true);
+				if ($parsedBody === null) {
+					$this->logger->warning('Could not JSON parse the response', ['body' => $body]);
+					return ['error' => 'Could not JSON parse the response'];
+				}
+				return $parsedBody;
+			}
+			return ['body' => $body];
 		} catch (ClientException|ServerException $e) {
 			$responseBody = $e->getResponse()->getBody();
 			$parsedResponseBody = json_decode($responseBody, true);

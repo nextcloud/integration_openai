@@ -21,6 +21,7 @@ use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\ProofreadProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
+use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\Http\Client\IClient;
@@ -148,6 +149,7 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
@@ -211,6 +213,7 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
@@ -275,6 +278,7 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
@@ -339,6 +343,7 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
@@ -391,8 +396,8 @@ class OpenAiProviderTest extends TestCase {
 		$url = self::OPENAI_API_BASE . 'chat/completions';
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
-		$systemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. ' .
-			'You should only return the summary without any additional information.';
+		$systemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
+			. 'You should only return the summary without any additional information.';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'system', 'content' => $systemPrompt],
@@ -405,6 +410,7 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
@@ -468,6 +474,7 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
@@ -535,6 +542,7 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
@@ -543,6 +551,46 @@ class OpenAiProviderTest extends TestCase {
 
 		// Check that token usage is logged properly
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testTextToSpeechProvider(): void {
+		$TTSProvider = new TextToSpeechProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OC::$server->get(IAppConfig::class),
+			self::TEST_USER1,
+		);
+
+		$inputText = 'This is a test prompt';
+
+		$response = 'BINARYDATA';
+
+		$url = self::OPENAI_API_BASE . 'audio/speech';
+
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'input' => $inputText,
+			'voice' => Application::DEFAULT_SPEECH_VOICE,
+			'model' => Application::DEFAULT_SPEECH_MODEL_ID,
+			'response_format' => 'mp3',
+			'speed' => 1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $TTSProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
+		$this->assertEquals(['speech' => 'BINARYDATA'], $result);
+
+		// Check that token usage is logged properly (should be 21 characters)
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_SPEECH);
 		$this->assertEquals(21, $usage);
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);

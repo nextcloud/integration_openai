@@ -388,6 +388,70 @@
 					{{ t('integration_openai', 'No models to list') }}
 				</NcNoteCard>
 			</div>
+			<h2>
+				{{ t('integration_openai', 'Text to speech') }}
+			</h2>
+			<div v-if="models"
+				class="line line-select">
+				<NcSelect
+					v-model="selectedModel.tts"
+					class="model-select"
+					:clearable="state.default_tts_model_id !== DEFAULT_MODEL_ITEM.id"
+					:options="formattedModels"
+					:input-label="t('integration_openai', 'Default speech generation model to use')"
+					:no-wrap="true"
+					input-id="openai-tts-model-select"
+					@input="onModelSelected('tts', $event)" />
+				<a v-if="state.url === ''"
+					:title="t('integration_openai', 'More information about OpenAI models')"
+					href="https://beta.openai.com/docs/models"
+					target="_blank">
+					<NcButton variant="tertiary" aria-label="openai-info">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</a>
+				<a v-else
+					:title="t('integration_openai', 'More information about LocalAI models')"
+					href="https://localai.io/model-compatibility/index.html"
+					target="_blank">
+					<NcButton variant="tertiary" aria-label="localai-info">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</a>
+			</div>
+			<NcNoteCard v-else type="info">
+				{{ t('integration_openai', 'No models to list') }}
+			</NcNoteCard>
+			<div class="line column">
+				<label>{{ t('integration_openai', 'TTS Voices') }}
+					<NcButton
+						:title="t('integration_openai', 'A list of voices supported by the endpoint you are using. Defaults to openai\'s list.')"
+						variant="tertiary"
+						aria-label="voices-info">
+						<template #icon>
+							<HelpCircleIcon />
+						</template>
+					</NcButton>
+				</label>
+				<NcSelect v-model="state.tts_voices"
+					:label-outside="true"
+					multiple
+					taggable
+					style="width: 350px;"
+					@input="onInput()" />
+			</div>
+			<NcSelect
+				v-model="state.default_tts_voice"
+				class="model-select"
+				:options="state.tts_voices"
+				:input-label="t('integration_openai', 'Default voice to use')"
+				:no-wrap="true"
+				input-id="openai-tts-voices-select"
+				@click="onInput()" />
 			<div>
 				<h2>
 					{{ t('integration_openai', 'Usage limits') }}
@@ -499,6 +563,11 @@
 					@update:model-value="onCheckboxChanged($event, 'stt_provider_enabled', false)">
 					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
 				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch
+					:model-value="state.tts_provider_enabled"
+					@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
+					{{ t('integration_openai', 'Text-to-speech provider') }}
+				</NcCheckboxRadioSwitch>
 			</div>
 		</div>
 	</div>
@@ -559,6 +628,7 @@ export default {
 				text: null,
 				image: null,
 				stt: null,
+				tts: null,
 			},
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
@@ -643,9 +713,16 @@ export default {
 						|| this.models[1]
 						|| this.models[0]
 
+					const defaultTtsModelId = this.state.default_tts_model_id || response.data?.default_tts_model_id
+					const ttsModelToSelect = this.models.find(m => m.id === defaultTtsModelId)
+						|| this.models.find(m => m.id.match(/tts/i))
+						|| this.models[1]
+						|| this.models[0]
+
 					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
 					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
 					this.selectedModel.stt = this.modelToNcSelectObject(sttModelToSelect)
+					this.selectedModel.tts = this.modelToNcSelectObject(ttsModelToSelect)
 
 					// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
 					if (shouldSave
@@ -681,6 +758,9 @@ export default {
 				} else if (type === 'stt') {
 					this.selectedModel.stt = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
 					this.state.default_stt_model_id = DEFAULT_MODEL_ITEM.id
+				} else if (type === 'tts') {
+					this.selectedModel.tts = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
+					this.state.default_tts_model_id = DEFAULT_MODEL_ITEM.id
 				}
 			} else {
 				if (type === 'image') {
@@ -689,12 +769,15 @@ export default {
 					this.state.default_completion_model_id = selected.id
 				} else if (type === 'stt') {
 					this.state.default_stt_model_id = selected.id
+				} else if (type === 'tts') {
+					this.state.default_tts_model_id = selected.id
 				}
 			}
 			this.saveOptions({
 				default_completion_model_id: this.state.default_completion_model_id,
 				default_image_model_id: this.state.default_image_model_id,
 				default_stt_model_id: this.state.default_stt_model_id,
+				default_tts_model_id: this.state.default_tts_model_id,
 			})
 		},
 		loadQuotaInfo() {
@@ -747,6 +830,8 @@ export default {
 				default_image_size: this.state.default_image_size,
 				quota_period: parseInt(this.state.quota_period),
 				quotas: this.state.quotas,
+				tts_voices: this.state.tts_voices,
+				default_tts_voice: this.state.default_tts_voice,
 			}
 			await this.saveOptions(values, false)
 		}, 2000),
