@@ -75,8 +75,8 @@ class TextToSpeechProvider implements ISynchronousProvider {
 			),
 			'speed' => new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->openAiAPIService->isUsingOpenAi() ?
-					$this->l->t('Speech speed modifier (Valid values: 0.25-4)')
+				$this->openAiAPIService->isUsingOpenAi()
+					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
 			)
