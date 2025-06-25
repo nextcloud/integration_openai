@@ -11,9 +11,9 @@
 - John Molakvoæ <skjnldsv@protonmail.com>
 - Juergen Kellerer <juergen@k123.eu>
 - Julien Veyssier <julien-nc@posteo.net>
+- Lukas Schaefer <lukas@lschaefer.xyz>
 - Marcel Klehr <mklehr@gmx.net>
-- Sami Finnilä <sami.finnila@gmail.com>
 - Micke Nordin <hej@mic.ke>
 - rakekniven <2069590+rakekniven@users.noreply.github.com>
 - Richard Steinmetz <richard@steinmetz.cloud>
-- Lukas Schaefer <lukas@lschaefer.xyz>
+- Sami Finnilä <sami.finnila@gmail.com>
