@@ -16,6 +16,8 @@ OC.L10N.register(
     "In which tone should your text be rewritten?" : "V akom tóne by mal byť váš text prepísaný?",
     "Generated response" : "Vygenerovaná odpoveď",
     "The rewritten text in the desired tone, written by the assistant:" : "Prepísaný text v požadovanom tóne, napísaný asistentom:",
+    "Speed" : "Rýchlosť",
+    "Prompt" : "Zadanie",
     "Request timeout (seconds)" : "Timeout požiadavky (s)",
     "Authentication" : "Autentifikácia",
     "Authentication method" : "Autentifikačná metóda",

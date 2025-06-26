@@ -9,6 +9,8 @@ OC.L10N.register(
     "Detect language" : "Greina tungumál",
     "Input text" : "Inntakstexti",
     "Size" : "Stærð",
+    "Speed" : "Hraði",
+    "Prompt" : "Kvaðning",
     "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Authentication" : "Auðkenning",
     "Authentication method" : "Auðkenningarmáti",

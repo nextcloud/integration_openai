@@ -23,6 +23,8 @@ OC.L10N.register(
     "Generated response" : "Sortutako erantzuna",
     "The rewritten text in the desired tone, written by the assistant:" : "Berridatzitako testua nahi den tonuan, laguntzaileak idatzita:",
     "Size" : "Tamaina",
+    "Speed" : "Abiadura",
+    "Prompt" : "Galdera",
     "Service URL" : "Zerbitzuaren URLa",
     "Example: {example}" : "Adibidea: {example}",
     "Request timeout (seconds)" : "Eskaeraren denbora-muga (segundoak)",

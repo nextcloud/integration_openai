@@ -10,6 +10,8 @@ OC.L10N.register(
     "Detect language" : "Визначити мову",
     "Input text" : "Текст для введення",
     "Size" : "Розмір",
+    "Speed" : "Швидкість",
+    "Prompt" : "Запрошення",
     "Request timeout (seconds)" : "Час очікування запиту (секунди)",
     "Authentication" : "Авторизація",
     "Authentication method" : "Спосіб авторизації",

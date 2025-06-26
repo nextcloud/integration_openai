@@ -7,6 +7,7 @@ OC.L10N.register(
     "Bad HTTP method" : "שגיאה במתודת HTTP",
     "Bad credentials" : "פרטי גישה שגויים",
     "Size" : "גודל",
+    "Speed" : "מהירות",
     "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Authentication" : "אימות",
     "Authentication method" : "שיטת אימות",

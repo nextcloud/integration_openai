@@ -14,6 +14,8 @@ OC.L10N.register(
     "Detect language" : "Nyelv észlelése",
     "Model" : "Modell",
     "Size" : "?éret",
+    "Speed" : "Sebesség",
+    "Prompt" : "Prompt",
     "OpenAI and LocalAI integration" : "OpenAI és LocalAI integráció",
     "Integration of OpenAI and LocalAI services" : "OpenAI és LocalAI szolgáltatások integrációja",
     "OpenAI admin options saved" : "Az OpenAI rendszergazdai beállításai mentve",

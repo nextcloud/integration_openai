@@ -43,6 +43,7 @@ OC.L10N.register(
     "Size" : "Wzrost",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Opcjonalne. Rozmiar generowanych obrazów. Musi być w formacie 256x256. Domyślnie jest to%s",
     "The model used to generate the images" : "Model użyty do wygenerowania obrazów",
+    "Speed" : "Prędkość",
     "OpenAI and LocalAI integration" : "Integracja OpenAI i LocalAI",
     "Integration of OpenAI and LocalAI services" : "Integracja usług OpenAI i LocalAI",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Obiekt JSON. Sprawdź dokumentację API, aby uzyskać listę wszystkich dostępnych parametrów. Na przykład: {example}",

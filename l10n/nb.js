@@ -27,6 +27,8 @@ OC.L10N.register(
     "The model used to generate the completion" : "Modellen som brukes til å generere fullføringen",
     "Input text" : "Inndatatekst",
     "Size" : "Størrelse",
+    "Speed" : "Hastighet",
+    "Prompt" : "Spør",
     "OpenAI and LocalAI integration" : "OpenAI og LocalAI integrasjon",
     "Integration of OpenAI and LocalAI services" : "Integrasjon av OpenAI og LocalAI tjenester",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON-objekt. Se API-dokumentasjonen for å få listen over alle tilgjengelige parametere. For eksempel: {example}",

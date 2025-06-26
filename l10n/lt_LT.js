@@ -13,6 +13,7 @@ OC.L10N.register(
     "Detect language" : "Aptikti kalbą",
     "Model" : "Modelis",
     "Size" : "Dydis",
+    "Speed" : "Greitis",
     "OpenAI and LocalAI integration" : "„OpenAI“ ir „LocalAI“ integracija",
     "Failed to load models" : "Nepavyko įkelti modelių",
     "Example: {example}" : "Pavyzdys: {example}",

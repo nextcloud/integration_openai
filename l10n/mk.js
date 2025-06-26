@@ -5,6 +5,7 @@ OC.L10N.register(
     "Unknown" : "Непознат",
     "seconds" : "секунди",
     "Bad credentials" : "Неточни акредитиви",
+    "Speed" : "Брзина",
     "Authentication" : "Автентикација",
     "Authentication method" : "Начин на автентификација",
     "API key" : "API key",

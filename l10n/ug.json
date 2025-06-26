@@ -28,6 +28,7 @@
     "Size" : "چوڭلۇقى",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "ئىختىيارىي. ھاسىل قىلىنغان رەسىملەرنىڭ چوڭلۇقى. چوقۇم 256x256 فورماتىدا بولۇشى كېرەك. سۈكۈتتىكىسى% s",
     "The model used to generate the images" : "رەسىم ھاسىل قىلىشتا ئىشلىتىلگەن مودېل",
+    "Prompt" : "تېز",
     "OpenAI and LocalAI integration" : "OpenAI بىلەن LocalAI بىرلەشتۈرۈش",
     "Integration of OpenAI and LocalAI services" : "OpenAI ۋە LocalAI مۇلازىمىتىنى بىرلەشتۈرۈش",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON ئوبيېكتى. بارلىق ھۆججەتلەرنىڭ تىزىملىكىنى ئېلىش ئۈچۈن API ھۆججىتىنى تەكشۈرۈڭ. مەسىلەن: {example}",

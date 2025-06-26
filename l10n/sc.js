@@ -8,6 +8,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Mètodu HTTP no bàlidu",
     "Bad credentials" : "Credentziales non bàlidas",
     "Size" : "Mannària",
+    "Speed" : "Lestresa",
     "Request timeout (seconds)" : "Tempus màssimu de sa rechesta (segundos)",
     "Authentication" : "Autenticatzione",
     "Authentication method" : "Mètodu de autenticatzione",

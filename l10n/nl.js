@@ -8,6 +8,7 @@ OC.L10N.register(
     "Bad credentials" : "Foute inloggegevens",
     "Detect language" : "Detecteer taal",
     "Size" : "Grootte",
+    "Speed" : "Snelheid",
     "Request timeout (seconds)" : "Aanvraag time-out (seconds)",
     "Authentication" : "Authenticatie",
     "Authentication method" : "Authenticatiemethode",

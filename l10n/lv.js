@@ -6,6 +6,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Nederīgs HTTP pieprasījuma veids",
     "Bad credentials" : "Nederīgi pieteikšanās dati",
     "Size" : "Izmērs",
+    "Speed" : "Ātrums",
     "Authentication" : "Autentifikācija",
     "Authentication method" : "Autentificēšanās veids",
     "API key" : "API atslēga",
