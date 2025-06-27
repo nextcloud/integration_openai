@@ -40,6 +40,8 @@
     "Size" : "Størrelse",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Valgfrit. Størrelsen af de genererede billeder. Skal være i 256x256 format. Standard er %s",
     "The model used to generate the images" : "Modellen der bruges til at generere billederne",
+    "Speed" : "Hastighed",
+    "Prompt" : "Prompt",
     "OpenAI and LocalAI integration" : "Integration af OpenAI og LocalAI",
     "Integration of OpenAI and LocalAI services" : "Integration af OpenAI og LocalAI",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON objekt. Tjek API dokumentationen for at få listen over alle tilgængelige parametre. For eksempel: {example}",

@@ -4,6 +4,7 @@ OC.L10N.register(
     "Unknown" : "Nekonata",
     "seconds" : "sekundoj",
     "Size" : "Grando",
+    "Speed" : "Rapideco",
     "Request timeout (seconds)" : "Eltempiĝo (sekundoj)",
     "Authentication" : "Aŭtentigo",
     "Authentication method" : "Aŭtentiga metodo",

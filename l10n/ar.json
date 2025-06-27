@@ -41,6 +41,8 @@
     "Size" : "حجم",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "إختيارياً؛ حجم الصور المُولّدة يجب أن يكون على نسق 256*256. القيمة التلقائية هي %s",
     "The model used to generate the images" : "النموذج المستعمل لتوليد الصِّوَر",
+    "Speed" : "السرعة",
+    "Prompt" : "المُطالبة prompt",
     "OpenAI and LocalAI integration" : "مُكاملة OpenAI و LocalAI",
     "Integration of OpenAI and LocalAI services" : "مُكامَلة خِدْمَات OpenAI و LocalAI",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "كائن JSON. طالِع توثيق واجهة التطبيقات API للحصول على قائمة بكل البارامترات المتاحة. على سبيل المثال: {example}",

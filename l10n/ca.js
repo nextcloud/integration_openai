@@ -18,6 +18,8 @@ OC.L10N.register(
     "Generated response" : "Resposta generada",
     "The rewritten text in the desired tone, written by the assistant:" : "El text reescrit en el to desitjat, escrit per l'assistent:",
     "Size" : "Tamany",
+    "Speed" : "Velocitat",
+    "Prompt" : "Indicador",
     "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
     "Authentication" : "Autenticació",
     "Authentication method" : "Mètode d'autenticació",

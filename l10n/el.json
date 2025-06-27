@@ -40,6 +40,7 @@
     "Size" : "Μέγεθος",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Προαιρετικό. Το μέγεθος των δημιουργημένων εικόνων. Πρέπει να είναι σε μορφή 256x256. Προεπιλογή είναι %s",
     "The model used to generate the images" : "Το μοντέλο που χρησιμοποιείται για τη δημιουργία των εικόνων",
+    "Speed" : "Ταχύτητα",
     "OpenAI and LocalAI integration" : "Ενσωμάτωση OpenAI και LocalAI",
     "Integration of OpenAI and LocalAI services" : "Ενσωμάτωση υπηρεσιών OpenAI και LocalAI",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Αντικείμενο JSON. Ελέγξτε την τεκμηρίωση του API για να λάβετε τη λίστα όλων των διαθέσιμων παραμέτρων. Για παράδειγμα: {example}",

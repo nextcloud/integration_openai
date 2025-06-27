@@ -7,6 +7,8 @@ OC.L10N.register(
     "Bad HTTP method" : "Лош HTTP метод",
     "Bad credentials" : "Лоши идентификационни данни",
     "Detect language" : "Разпознаване на език",
+    "Speed" : "Скорост",
+    "Prompt" : "Подкана",
     "OpenAI admin options saved" : "Опциите за администратор на OpenAI са записани",
     "Failed to save OpenAI admin options" : "Неуспешно записване на опциите за администратор на OpenAI",
     "Request timeout (seconds)" : "Време за изчакване на заявката (секунди)",

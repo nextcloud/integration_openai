@@ -8,6 +8,7 @@ OC.L10N.register(
     "Detect language" : "Detectar idioma",
     "Input text" : "Ingresar texto",
     "Size" : "Tamaño",
+    "Prompt" : "Prompt",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",

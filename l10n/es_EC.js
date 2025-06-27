@@ -9,6 +9,7 @@ OC.L10N.register(
     "Detect language" : "Detectar idioma",
     "Model" : "Modelo",
     "Size" : "Tamaño",
+    "Prompt" : "Promoción",
     "OpenAI and LocalAI integration" : "Integración de OpenAI y LocalAI",
     "Integration of OpenAI and LocalAI services" : "Integración de los servicios de OpenAI y LocalAI",
     "OpenAI admin options saved" : "Opciones de administrador de OpenAI guardadas",
