@@ -100,7 +100,6 @@ OC.L10N.register(
     "A per-user limit for usage of this API type (0 for unlimited)" : "Bu API türünün kullanımı ile ilgili kullanıcı başına sınır (sınırsız için 0)",
     "Max new tokens per request" : "İstek başına en fazla yeni kod sayısı",
     "Maximum number of new tokens generated for a single text generation prompt" : "Tek bir metin oluşturma istemi için oluşturulacak en fazla yeni kod sayısı",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Kullanımdan kaldırılan \"{deprecatedParam}\" yerine \"{newParam}\" parametresini kullanın",
     "Select enabled features" : "Etkin özellikleri seçin",
     "Translation provider (to translate Talk messages for example)" : "Çeviri hizmeti (örneğin Talk iletilerini çevirmek için)",
     "Image generation provider" : "Görsel oluşturma hizmeti sağlayıcısı",
@@ -117,6 +116,7 @@ OC.L10N.register(
     "your Basic Auth password" : "temel kimlik doğrulaması parolanız",
     "Usage quota info" : "Kullanım kotası bilgileri",
     "Usage" : "Kullanım",
-    "Specifying your own API key will allow unlimited usage" : "Kendi API anahtarınızı yazarak sınırsız kullanıma geçebilirsiniz"
+    "Specifying your own API key will allow unlimited usage" : "Kendi API anahtarınızı yazarak sınırsız kullanıma geçebilirsiniz",
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Kullanımdan kaldırılan \"{deprecatedParam}\" yerine \"{newParam}\" parametresini kullanın"
 },
 "nplurals=2; plural=(n > 1);");

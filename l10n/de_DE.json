@@ -46,7 +46,7 @@
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Optional. Die Größe der generierten Bilder muss im Format 256x256 sein. Standard ist %s",
     "The model used to generate the images" : "Das zur Generierung der Bilder verwendete Modell",
     "OpenAI's Text to Speech" : "Text zu Sprache von OpenAI",
-    "Voice" : "Sprachnachrichten",
+    "Voice" : "Sprache",
     "The voice to use" : "Die zu verwendende Stimme",
     "The model used to generate the speech" : "Das Modell, das zur Erzeugung der Sprache verwendet wird",
     "Speed" : "Geschwindigkeit",
@@ -118,7 +118,6 @@
     "A per-user limit for usage of this API type (0 for unlimited)" : "Ein Limit pro Benutzer für die Nutzung dieses API-Typs (0 für unbegrenzt)",
     "Max new tokens per request" : "Maximale Anzahl neuer Token pro Anfrage",
     "Maximum number of new tokens generated for a single text generation prompt" : "Maximale Anzahl neuer Token, die für eine einzelne Eingabeaufforderung zur Texterstellung erzeugt werden",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden",
     "Select enabled features" : "Aktivierte Funktionen auswählen",
     "Translation provider (to translate Talk messages for example)" : "Übersetzungsanbieter (zum Beispiel zum Übersetzen von Talk-Nachrichten)",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Textverarbeitungsanbieter (zum Erstellen von Text, Zusammenfassen, Schreiben im Kontext usw.)",
@@ -137,6 +136,7 @@
     "your Basic Auth password" : "Ihr Basic Auth-Passwort",
     "Usage quota info" : "Informationen zum Nutzungskontingent",
     "Usage" : "Verwendung",
-    "Specifying your own API key will allow unlimited usage" : "Die Angabe Ihres eigenen API-Schlüssels ermöglicht eine unbegrenzte Nutzung"
+    "Specifying your own API key will allow unlimited usage" : "Die Angabe Ihres eigenen API-Schlüssels ermöglicht eine unbegrenzte Nutzung",
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

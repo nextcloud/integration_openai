@@ -98,7 +98,6 @@ OC.L10N.register(
     "A per-user limit for usage of this API type (0 for unlimited)" : "Όριο ανά χρήστη για χρήση αυτού του τύπου API (0 για απεριόριστο)",
     "Max new tokens per request" : "Μέγιστος αριθμός νέων tokens ανά αίτημα",
     "Maximum number of new tokens generated for a single text generation prompt" : "Μέγιστος αριθμός νέων tokens που δημιουργούνται για μια μεμονωμένη ερώτηση δημιουργίας κειμένου",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Χρησιμοποιήστε την παράμετρο \"{newParam}\" αντί για την καταργημένη \"{deprecatedParam}\"",
     "Select enabled features" : "Επιλέξτε ενεργοποιημένες λειτουργίες",
     "Translation provider (to translate Talk messages for example)" : "Πάροχος μετάφρασης (για παράδειγμα για μετάφραση μηνυμάτων του Talk)",
     "Image generation provider" : "Πάροχος δημιουργίας εικόνας",
@@ -115,6 +114,7 @@ OC.L10N.register(
     "your Basic Auth password" : "το συνθηματικό της Βασικής Πιστοποίησης σας",
     "Usage quota info" : "Πληροφορίες ποσόστωσης χρήσης",
     "Usage" : "Χρήση",
-    "Specifying your own API key will allow unlimited usage" : "Ο καθορισμός του δικού σας κλειδιού API θα επιτρέψει απεριόριστη χρήση"
+    "Specifying your own API key will allow unlimited usage" : "Ο καθορισμός του δικού σας κλειδιού API θα επιτρέψει απεριόριστη χρήση",
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Χρησιμοποιήστε την παράμετρο \"{newParam}\" αντί για την καταργημένη \"{deprecatedParam}\""
 },
 "nplurals=2; plural=(n != 1);");

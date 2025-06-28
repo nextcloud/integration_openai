@@ -100,7 +100,6 @@ OC.L10N.register(
     "A per-user limit for usage of this API type (0 for unlimited)" : "Un limite per utente per l'utilizzo di questo tipo di API (0 per illimitato)",
     "Max new tokens per request" : "Numero massimo di nuovi token per richiesta",
     "Maximum number of new tokens generated for a single text generation prompt" : "Numero massimo di nuovi token generati per una singola richiesta di generazione di testo",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilizza \"{newParam}\" parametro invece del deprecato \"{deprecatedParam}\"",
     "Select enabled features" : "Seleziona le funzionalità abilitate",
     "Translation provider (to translate Talk messages for example)" : "Fornitore di traduzioni (per tradurre messaggi di Talk, ad esempio)",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Fornitori di elaborazione di testo (per generare testo, riassumere, scrivere il contesto, ecc.)",
@@ -118,6 +117,7 @@ OC.L10N.register(
     "your Basic Auth password" : "la tua password di autenticazione di base",
     "Usage quota info" : "Informazioni sulla quota di utilizzo",
     "Usage" : "Utilizzo",
-    "Specifying your own API key will allow unlimited usage" : "Specificando la tua chiave API potrai usufruire di un utilizzo illimitato"
+    "Specifying your own API key will allow unlimited usage" : "Specificando la tua chiave API potrai usufruire di un utilizzo illimitato",
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilizza \"{newParam}\" parametro invece del deprecato \"{deprecatedParam}\""
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

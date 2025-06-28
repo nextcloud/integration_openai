@@ -99,7 +99,6 @@ OC.L10N.register(
     "A per-user limit for usage of this API type (0 for unlimited)" : "En per bruger grænse for anvendelse af denne API type (0 for ubegrænset)",
     "Max new tokens per request" : "Maks nye tokens per forespørgsel",
     "Maximum number of new tokens generated for a single text generation prompt" : "Maksimalt antal nye tokens genereret for en enkelt tekstgenereringsprompt",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Anvend parameteren \"{newParam}\" i stedet for den forældede \"{deprecatedParam}\"",
     "Select enabled features" : "Vælg aktiverede funktioner",
     "Translation provider (to translate Talk messages for example)" : "Oversættelsesudbyder (til f.eks at oversætte Snak beskeder)",
     "Image generation provider" : "Billedgenereringsleverandør",
@@ -116,6 +115,7 @@ OC.L10N.register(
     "your Basic Auth password" : "din Basic Auth adgangskode",
     "Usage quota info" : "Anvendelses kvoteinfo",
     "Usage" : "Anvendelse",
-    "Specifying your own API key will allow unlimited usage" : "Angivelse af din egen API nøgle vil tillade ubegrænset anvendelse"
+    "Specifying your own API key will allow unlimited usage" : "Angivelse af din egen API nøgle vil tillade ubegrænset anvendelse",
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Anvend parameteren \"{newParam}\" i stedet for den forældede \"{deprecatedParam}\""
 },
 "nplurals=2; plural=(n != 1);");

@@ -98,7 +98,6 @@
     "A per-user limit for usage of this API type (0 for unlimited)" : "تقييد لحصة كل مستخدِم عند استعمال هذا الـ API ـ ( 0 تعني .حصة غير محددة) ",
     "Max new tokens per request" : "أقصى عدد من الأَمَارَات tokens الجديدة لكل طلب",
     "Maximum number of new tokens generated for a single text generation prompt" : "أقصى عدد من الأَمَارَات tokens الجديدة المولدة لكل طلب مفرد لتوليد نص",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "إستعمِل \"{newParam}\" بارامتراً عِوَضاً عن المُلغَى \"{deprecatedParam}\"",
     "Select enabled features" : "إختَر الخصائص المُمَكّنة",
     "Translation provider (to translate Talk messages for example)" : "مزود الترجمة (لترجمة رسائل تطبيق Talk على سبيل المثال)",
     "Image generation provider" : "مزود توليد الصور",
@@ -115,6 +114,7 @@
     "your Basic Auth password" : "التحقُّق المبدئي من كلمة مرورك",
     "Usage quota info" : "معلومات حصص الاستعمال",
     "Usage" : "الاستعمال",
-    "Specifying your own API key will allow unlimited usage" : "سيسمح تحديد مفتاح API الخاص بك باستعمال غير محدد الحصة"
+    "Specifying your own API key will allow unlimited usage" : "سيسمح تحديد مفتاح API الخاص بك باستعمال غير محدد الحصة",
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "إستعمِل \"{newParam}\" بارامتراً عِوَضاً عن المُلغَى \"{deprecatedParam}\""
 },"pluralForm" :"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
 }
