@@ -48,7 +48,7 @@
     "Max input tokens per request" : "İstek başına giriş kodu sayısı",
     "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "İstemi, her biri belirtilen kod sayısından fazla olmayacak şekilde parçalara ayırır (0 olduğunda parçalara ayrılmaz)",
     "Usage limits" : "Kullanım sınırları",
-    "Quota enforcement time period (days)" : "Kota dayatması zaman aralığı (gün)",
+    "Quota enforcement time period (days)" : "Kota zorunlu kılma zaman aralığı (gün)",
     "Usage quotas per time period" : "Dönem başına kullanım kotaları",
     "Quota type" : "Kota türü",
     "Per-user quota / period" : "Kullanıcı başına kota / dönem",

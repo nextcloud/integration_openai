@@ -1,7 +1,7 @@
 OC.L10N.register(
     "integration_watsonx",
     {
-    "Invalid models response received" : "Resposta de modelos inválida recebida",
+    "Invalid models response received" : "Inválida a resposta de modelos recebida",
     "Default" : "Padrão",
     "Text generation" : "Geração de texto",
     "tokens" : "tokens",
