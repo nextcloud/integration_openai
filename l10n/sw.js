@@ -5,7 +5,9 @@ OC.L10N.register(
     "seconds" : "sekunde",
     "Bad HTTP method" : "Njia mbaya ya HTTP ",
     "Bad credentials" : "Sifa mbaya",
+    "Detect language" : "Lugha iliyotambuliwa",
     "Size" : "Ukubwa",
+    "Voice" : "Sauti",
     "Authentication" : "Uthibitisho",
     "Password" : "Nenosiri"
 },
