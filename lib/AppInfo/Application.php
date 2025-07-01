@@ -127,6 +127,10 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);
 		}
 
+
+		$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\ImageQuestionTaskType::class);
+		$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ImageQuestionProvider::class);
+
 		$context->registerCapability(Capabilities::class);
 	}
 
