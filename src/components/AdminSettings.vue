@@ -31,7 +31,7 @@
 					<NcButton type="tertiary"
 						:title="t('integration_watsonx', 'Leave empty to use {watsonxApiUrl}', { watsonxApiUrl: 'https://us-south.ml.cloud.ibm.com' })">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -56,7 +56,7 @@
 					<NcButton type="tertiary"
 						:title="t('integration_watsonx', 'This name will be displayed as provider name in the AI admin settings')">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -79,7 +79,7 @@
 					<NcButton type="tertiary"
 						:title="t('integration_watsonx', 'Timeout for the request to the external API')">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -100,7 +100,7 @@
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
-						<KeyIcon />
+						<KeyOutlineIcon />
 					</NcTextField>
 				</div>
 				<NcNoteCard v-show="state.url === '' || state.url.includes('cloud.ibm.com')" type="info">
@@ -127,7 +127,7 @@
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.project_id = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
-						<KeyIcon />
+						<KeyOutlineIcon />
 					</NcTextField>
 				</div>
 				<div class="line">
@@ -142,7 +142,7 @@
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.space_id = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
-						<KeyIcon />
+						<KeyOutlineIcon />
 					</NcTextField>
 				</div>
 				<NcNoteCard type="info">
@@ -200,7 +200,7 @@
 						target="_blank">
 						<NcButton type="tertiary" aria-label="watsonx-info">
 							<template #icon>
-								<HelpCircleIcon />
+								<HelpCircleOutlineIcon />
 							</template>
 						</NcButton>
 					</a>
@@ -210,7 +210,7 @@
 						target="_blank">
 						<NcButton type="tertiary" aria-label="watsonx-info">
 							<template #icon>
-								<HelpCircleIcon />
+								<HelpCircleOutlineIcon />
 							</template>
 						</NcButton>
 					</a>
@@ -227,7 +227,7 @@
 					<NcButton type="tertiary"
 						:title="llmExtraParamHint">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -249,7 +249,7 @@
 					<NcButton type="tertiary"
 						:title="t('integration_watsonx', 'Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)')">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -331,7 +331,7 @@
 					<NcButton type="tertiary"
 						:title="t('integration_watsonx', 'Maximum number of new tokens generated for a single text generation prompt')">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -353,8 +353,8 @@
 <script>
 import CloseIcon from 'vue-material-design-icons/Close.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
-import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
-import KeyIcon from 'vue-material-design-icons/Key.vue'
+import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
+import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
 import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
@@ -377,11 +377,11 @@ export default {
 	name: 'AdminSettings',
 
 	components: {
-		KeyIcon,
+		KeyOutlineIcon,
 		CloseIcon,
 		EarthIcon,
 		TimerAlertOutlineIcon,
-		HelpCircleIcon,
+		HelpCircleOutlineIcon,
 		NcButton,
 		NcSelect,
 		NcCheckboxRadioSwitch,
