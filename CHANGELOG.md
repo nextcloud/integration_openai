@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Switch to outlined icons. #12
 - Update npm packages. #5 #9 #10 #14
 - Update composer packages. #8
 
