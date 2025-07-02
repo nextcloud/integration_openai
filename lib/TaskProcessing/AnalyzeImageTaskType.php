@@ -15,8 +15,8 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ITaskType;
 use OCP\TaskProcessing\ShapeDescriptor;
 
-class ImageQuestionTaskType implements ITaskType {
-	public const ID = Application::APP_ID . ':image_question';
+class AnalyzeImageTaskType implements ITaskType {
+	public const ID = Application::APP_ID . ':analyze-image';
 
 	public function __construct(
 		private IL10N $l,
@@ -27,7 +27,7 @@ class ImageQuestionTaskType implements ITaskType {
 	 * @inheritDoc
 	 */
 	public function getName(): string {
-		return $this->l->t('Image question');
+		return $this->l->t('Analyze image');
 	}
 
 	/**
@@ -51,7 +51,7 @@ class ImageQuestionTaskType implements ITaskType {
 		return [
 			'image' => new ShapeDescriptor(
 				$this->l->t('Image'),
-				$this->l->t('Image to ask question about'),
+				$this->l->t('Image to ask a question about'),
 				EShapeType::Image,
 			),
 			'input' => new ShapeDescriptor(
@@ -69,7 +69,7 @@ class ImageQuestionTaskType implements ITaskType {
 		return [
 			'output' => new ShapeDescriptor(
 				$this->l->t('Generated response'),
-				$this->l->t('The answer to the question:'),
+				$this->l->t('The answer to the question'),
 				EShapeType::Text
 			),
 		];

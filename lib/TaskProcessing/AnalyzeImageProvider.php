@@ -21,7 +21,7 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class ImageQuestionProvider implements ISynchronousProvider {
+class AnalyzeImageProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -34,7 +34,7 @@ class ImageQuestionProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-image_question';
+		return Application::APP_ID . '-analyze-image';
 	}
 
 	public function getName(): string {
@@ -42,7 +42,7 @@ class ImageQuestionProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		return ImageQuestionTaskType::ID;
+		return AnalyzeImageTaskType::ID;
 	}
 
 	public function getExpectedRuntime(): int {
@@ -62,12 +62,12 @@ class ImageQuestionProvider implements ISynchronousProvider {
 		return [
 			'max_tokens' => new ShapeDescriptor(
 				$this->l->t('Maximum output words'),
-				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
+				$this->l->t('The maximum number of words/tokens that can be generated in the output.'),
 				EShapeType::Number
 			),
 			'model' => new ShapeDescriptor(
 				$this->l->t('Model'),
-				$this->l->t('The model used to generate the completion'),
+				$this->l->t('The model used to generate the output'),
 				EShapeType::Enum
 			),
 		];
@@ -116,6 +116,18 @@ class ImageQuestionProvider implements ISynchronousProvider {
 		if (!str_starts_with($fileType, 'image/')) {
 			throw new RuntimeException('Invalid input file type ' . $fileType);
 		}
+		if ($this->openAiAPIService->isUsingOpenAi()) {
+			$validFileTypes = [
+				'image/jpeg',
+				'image/jpg',
+				'image/png',
+				'image/gif',
+				'image/webp',
+			];
+			if (!in_array($fileType, $validFileTypes)) {
+				throw new RuntimeException('Invalid input file type for OpenAI ' . $fileType);
+			}
+		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new RuntimeException('Invalid prompt');
@@ -134,16 +146,20 @@ class ImageQuestionProvider implements ISynchronousProvider {
 		}
 
 		try {
-			$systemPrompt = 'Take the users question and answer it based on the provided image. Ensure that the answer matches the language of the user\'s text input.';
-			$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, $systemPrompt, [json_encode([
-				'role' => 'user',
-				'content' => [[
-					'type' => 'image_url',
-					'image_url' => [
-						'url' => 'data:' . $fileType . ';base64,' . $inputFile
-					]]
-				]
-			])], 1, $maxTokens);
+			$systemPrompt = 'Take the user\'s question and answer it based on the provided image. Ensure that the answer matches the language of the user\'s question.';
+			$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, $systemPrompt, [
+				json_encode([
+					'role' => 'user',
+					'content' => [
+						[
+							'type' => 'image_url',
+							'image_url' => [
+								'url' => 'data:' . $fileType . ';base64,' . $inputFile
+							]
+						]
+					]
+				])
+			], 1, $maxTokens);
 			$completion = $completion['messages'];
 
 			if (count($completion) > 0) {
