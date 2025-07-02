@@ -119,7 +119,6 @@ class AnalyzeImageProvider implements ISynchronousProvider {
 		if ($this->openAiAPIService->isUsingOpenAi()) {
 			$validFileTypes = [
 				'image/jpeg',
-				'image/jpg',
 				'image/png',
 				'image/gif',
 				'image/webp',
@@ -154,10 +153,10 @@ class AnalyzeImageProvider implements ISynchronousProvider {
 						[
 							'type' => 'image_url',
 							'image_url' => [
-								'url' => 'data:' . $fileType . ';base64,' . $inputFile
-							]
-						]
-					]
+								'url' => 'data:' . $fileType . ';base64,' . $inputFile,
+							],
+						],
+					],
 				])
 			], 1, $maxTokens);
 			$completion = $completion['messages'];

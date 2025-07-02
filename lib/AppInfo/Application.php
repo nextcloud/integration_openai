@@ -118,6 +118,10 @@ class Application extends App implements IBootstrap {
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextProofread')) {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
 			}
+			if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImage')) {
+				$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\AnalyzeImageTaskType::class);
+			}
+			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImageProvider::class);
 		}
 		if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech')) {
 			$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\TextToSpeechTaskType::class);
@@ -126,10 +130,6 @@ class Application extends App implements IBootstrap {
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);
 		}
-
-
-		$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\AnalyzeImageTaskType::class);
-		$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImageProvider::class);
 
 		$context->registerCapability(Capabilities::class);
 	}
