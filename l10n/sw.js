@@ -9,6 +9,7 @@ OC.L10N.register(
     "Size" : "Ukubwa",
     "Voice" : "Sauti",
     "Authentication" : "Uthibitisho",
+    "API key" : "Ufunguo wa API",
     "Password" : "Nenosiri"
 },
 "nplurals=2; plural=(n != 1);");
