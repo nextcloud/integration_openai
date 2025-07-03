@@ -69,8 +69,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				EShapeType::Enum
 			),
 			'voice' => new ShapeDescriptor(
-				$this->l->t('Voice'),
-				$this->l->t('The voice to use'),
+				$this->l->t('Output voice'),
+				$this->l->t('The voice used to generate speech'),
 				EShapeType::Enum
 			),
 			'tts_model' => new ShapeDescriptor(
@@ -120,7 +120,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		return [
 			'input_transcript' => new ShapeDescriptor(
 				$this->l->t('Input transcript'),
-				$this->l->t('Input transcription'),
+				$this->l->t('Transcription of the input audio'),
 				EShapeType::Text,
 			),
 		];
@@ -132,7 +132,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 	public function process(?string $userId, array $input, callable $reportProgress): array {
 		if (!isset($input['input']) || !$input['input'] instanceof File || !$input['input']->isReadable()) {
-			throw new RuntimeException('Invalid input file');
+			throw new RuntimeException('Invalid input audio file in the "input" field. A readable file is expected.');
 		}
 		$inputFile = $input['input'];
 
@@ -142,7 +142,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$systemPrompt = $input['system_prompt'];
 
 		if (!isset($input['history']) || !is_array($input['history'])) {
-			throw new RuntimeException('Invalid history');
+			throw new RuntimeException('Invalid chat history, array expected');
 		}
 		$history = $input['history'];
 
@@ -160,9 +160,9 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 
 		if (isset($input['voice']) && is_string($input['voice'])) {
-			$voice = $input['voice'];
+			$outputVoice = $input['voice'];
 		} else {
-			$voice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE) ?: Application::DEFAULT_SPEECH_VOICE;
+			$outputVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE) ?: Application::DEFAULT_SPEECH_VOICE;
 		}
 
 		$speed = 1;
@@ -184,7 +184,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			$b64Audio = base64_encode($inputFile->getContent());
 			$extraParams = [
 				'modalities' => ['text', 'audio'],
-				'audio' => ['voice' => $voice, 'format' => 'mp3'],
+				'audio' => ['voice' => $outputVoice, 'format' => 'mp3'],
 			];
 			$completion = $this->openAiAPIService->createChatCompletion(
 				$userId, 'gpt-4o-audio-preview', null, $systemPrompt, $history, 1, 1000,
@@ -230,7 +230,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 		// text to speech
 		try {
-			$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $llmResult, $ttsModel, $voice, $speed);
+			$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $llmResult, $ttsModel, $outputVoice, $speed);
 
 			if (!isset($apiResponse['body'])) {
 				$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
@@ -243,7 +243,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			];
 		} catch (\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
+			throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage());
 		}
 	}
 }
