@@ -132,8 +132,21 @@ class Application extends App implements IBootstrap {
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);
 		}
-		$context->registerTaskProcessingTaskType(AudioToAudioChatTaskType::class);
-		$context->registerTaskProcessingProvider(AudioToAudioChatProvider::class);
+
+		// only register audio chat stuff if we're using OpenAI or stt+llm+tts are enabled
+		$serviceUrl = $this->appConfig->getValueString(Application::APP_ID, 'url');
+		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+		if (
+			$isUsingOpenAI
+			|| (
+				$this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1'
+				&& $this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1'
+				&& $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1'
+			)
+		) {
+			$context->registerTaskProcessingTaskType(AudioToAudioChatTaskType::class);
+			$context->registerTaskProcessingProvider(AudioToAudioChatProvider::class);
+		}
 
 		$context->registerCapability(Capabilities::class);
 	}
