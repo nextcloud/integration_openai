@@ -1,0 +1,8 @@
+{ "translations": {
+    "Bad HTTP method" : "Njia mbaya ya HTTP ",
+    "Bad credentials" : "Sifa mbaya",
+    "Detect language" : "Lugha iliyotambuliwa",
+    "Authentication" : "Uthibitisho",
+    "API key" : "Ufunguo wa API"
+},"pluralForm" :"nplurals=2; plural=(n != 1);"
+}
