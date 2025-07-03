@@ -110,26 +110,44 @@ class AnalyzeImageProvider implements ISynchronousProvider {
 			throw new RuntimeException('Must support chat completion endpoint');
 		}
 
-		if (!isset($input['image']) || !$input['image'] instanceof File || !$input['image']->isReadable()) {
-			throw new RuntimeException('Invalid input file');
+		$history = [];
+
+		if (!isset($input['image']) || !is_array($input['image'])) {
+			throw new RuntimeException('Invalid file list');
+		}
+		foreach ($input['image'] as $image) {
+			if (!$image instanceof File || !$image->isReadable()) {
+				throw new RuntimeException('Invalid input file');
+			}
+			$inputFile = base64_encode(stream_get_contents($image->fopen('rb')));
+			$fileType = $image->getMimeType();
+			if (!str_starts_with($fileType, 'image/')) {
+				throw new RuntimeException('Invalid input file type ' . $fileType);
+			}
+			if ($this->openAiAPIService->isUsingOpenAi()) {
+				$validFileTypes = [
+					'image/jpeg',
+					'image/png',
+					'image/gif',
+					'image/webp',
+				];
+				if (!in_array($fileType, $validFileTypes)) {
+					throw new RuntimeException('Invalid input file type for OpenAI ' . $fileType);
+				}
+			}
+			$history[] = json_encode([
+				'role' => 'user',
+				'content' => [
+					[
+						'type' => 'image_url',
+						'image_url' => [
+							'url' => 'data:' . $fileType . ';base64,' . $inputFile,
+						],
+					],
+				],
+			]);
 		}
 
-		$inputFile = base64_encode(stream_get_contents($input['image']->fopen('rb')));
-		$fileType = $input['image']->getMimeType();
-		if (!str_starts_with($fileType, 'image/')) {
-			throw new RuntimeException('Invalid input file type ' . $fileType);
-		}
-		if ($this->openAiAPIService->isUsingOpenAi()) {
-			$validFileTypes = [
-				'image/jpeg',
-				'image/png',
-				'image/gif',
-				'image/webp',
-			];
-			if (!in_array($fileType, $validFileTypes)) {
-				throw new RuntimeException('Invalid input file type for OpenAI ' . $fileType);
-			}
-		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new RuntimeException('Invalid prompt');
@@ -148,20 +166,8 @@ class AnalyzeImageProvider implements ISynchronousProvider {
 		}
 
 		try {
-			$systemPrompt = 'Take the user\'s question and answer it based on the provided image. Ensure that the answer matches the language of the user\'s question.';
-			$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, $systemPrompt, [
-				json_encode([
-					'role' => 'user',
-					'content' => [
-						[
-							'type' => 'image_url',
-							'image_url' => [
-								'url' => 'data:' . $fileType . ';base64,' . $inputFile,
-							],
-						],
-					],
-				])
-			], 1, $maxTokens);
+			$systemPrompt = 'Take the user\'s question and answer it based on the provided images. Ensure that the answer matches the language of the user\'s question.';
+			$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens);
 			$completion = $completion['messages'];
 
 			if (count($completion) > 0) {

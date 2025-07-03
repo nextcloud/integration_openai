@@ -50,9 +50,9 @@ class AnalyzeImageTaskType implements ITaskType {
 	public function getInputShape(): array {
 		return [
 			'image' => new ShapeDescriptor(
-				$this->l->t('Image'),
-				$this->l->t('Image to ask a question about'),
-				EShapeType::Image,
+				$this->l->t('Images'),
+				$this->l->t('Images to ask a question about'),
+				EShapeType::ListOfImages,
 			),
 			'input' => new ShapeDescriptor(
 				$this->l->t('Question'),
