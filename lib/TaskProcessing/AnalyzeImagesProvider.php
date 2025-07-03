@@ -115,9 +115,19 @@ class AnalyzeImagesProvider implements ISynchronousProvider {
 		if (!isset($input['images']) || !is_array($input['images'])) {
 			throw new RuntimeException('Invalid file list');
 		}
+		// Maximum file count for openai is 500. Seems reasonable enough to enforce for all apis though (https://platform.openai.com/docs/guides/images-vision?api-mode=responses&format=url#image-input-requirements)
+		if (count($input['images']) > 500) {
+			throw new RuntimeException('Too many files given. Max is 100');
+		}
+		$fileSize = 0;
 		foreach ($input['images'] as $image) {
 			if (!$image instanceof File || !$image->isReadable()) {
 				throw new RuntimeException('Invalid input file');
+			}
+			$fileSize += intval($image->getSize());
+			// Maximum file size for openai is 50MB. Seems reasonable enough to enforce for all apis though. (https://platform.openai.com/docs/guides/images-vision?api-mode=responses&format=url#image-input-requirements)
+			if ($fileSize > 50 * 1000 * 1000) {
+				throw new RuntimeException('Filesize of input files too large. Max is 50MB');
 			}
 			$inputFile = base64_encode(stream_get_contents($image->fopen('rb')));
 			$fileType = $image->getMimeType();
