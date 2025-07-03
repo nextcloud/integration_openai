@@ -77,6 +77,11 @@ class AudioToAudioChatTaskType implements ITaskType {
 				$this->l->t('The generated response as part of the conversation'),
 				EShapeType::Audio
 			),
+			'output_transcript' => new ShapeDescriptor(
+				$this->l->t('Output transcript'),
+				$this->l->t('Response transcription'),
+				EShapeType::Text,
+			),
 		];
 	}
 }

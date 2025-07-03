@@ -12,7 +12,6 @@ namespace OCA\OpenAi\TaskProcessing;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
 use OCP\IAppConfig;
 use OCP\IL10N;
@@ -27,7 +26,6 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private IAppConfig $appConfig,
@@ -123,11 +121,6 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			'input_transcript' => new ShapeDescriptor(
 				$this->l->t('Input transcript'),
 				$this->l->t('Input transcription'),
-				EShapeType::Text,
-			),
-			'output_transcript' => new ShapeDescriptor(
-				$this->l->t('Output transcript'),
-				$this->l->t('Response transcription'),
 				EShapeType::Text,
 			),
 		];
@@ -249,7 +242,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				'input_transcript' => $inputTranscription,
 			];
 		} catch (\Exception $e) {
-			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
 		}
 	}
