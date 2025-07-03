@@ -118,10 +118,10 @@ class Application extends App implements IBootstrap {
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextProofread')) {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
 			}
-			if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImage')) {
-				$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\AnalyzeImageTaskType::class);
+			if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImages')) {
+				$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\AnalyzeImagesTaskType::class);
 			}
-			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImageProvider::class);
+			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImagesProvider::class);
 		}
 		if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech')) {
 			$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\TextToSpeechTaskType::class);

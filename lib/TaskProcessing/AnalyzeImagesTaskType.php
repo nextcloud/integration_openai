@@ -15,8 +15,8 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ITaskType;
 use OCP\TaskProcessing\ShapeDescriptor;
 
-class AnalyzeImageTaskType implements ITaskType {
-	public const ID = Application::APP_ID . ':analyze-image';
+class AnalyzeImagesTaskType implements ITaskType {
+	public const ID = Application::APP_ID . ':analyze-images';
 
 	public function __construct(
 		private IL10N $l,
@@ -27,14 +27,14 @@ class AnalyzeImageTaskType implements ITaskType {
 	 * @inheritDoc
 	 */
 	public function getName(): string {
-		return $this->l->t('Analyze image');
+		return $this->l->t('Analyze images');
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	public function getDescription(): string {
-		return $this->l->t('Ask a question about an image.');
+		return $this->l->t('Ask a question about the given images.');
 	}
 
 	/**
@@ -49,7 +49,7 @@ class AnalyzeImageTaskType implements ITaskType {
 	 */
 	public function getInputShape(): array {
 		return [
-			'image' => new ShapeDescriptor(
+			'images' => new ShapeDescriptor(
 				$this->l->t('Images'),
 				$this->l->t('Images to ask a question about'),
 				EShapeType::ListOfImages,

@@ -21,7 +21,7 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class AnalyzeImageProvider implements ISynchronousProvider {
+class AnalyzeImagesProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -34,7 +34,7 @@ class AnalyzeImageProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-analyze-image';
+		return Application::APP_ID . '-analyze-images';
 	}
 
 	public function getName(): string {
@@ -42,10 +42,10 @@ class AnalyzeImageProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImage')) {
-			return \OCP\TaskProcessing\TaskTypes\AnalyzeImage::ID;
+		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImages')) {
+			return \OCP\TaskProcessing\TaskTypes\AnalyzeImages::ID;
 		}
-		return AnalyzeImageTaskType::ID;
+		return AnalyzeImagesTaskType::ID;
 	}
 
 	public function getExpectedRuntime(): int {
@@ -112,10 +112,10 @@ class AnalyzeImageProvider implements ISynchronousProvider {
 
 		$history = [];
 
-		if (!isset($input['image']) || !is_array($input['image'])) {
+		if (!isset($input['images']) || !is_array($input['images'])) {
 			throw new RuntimeException('Invalid file list');
 		}
-		foreach ($input['image'] as $image) {
+		foreach ($input['images'] as $image) {
 			if (!$image instanceof File || !$image->isReadable()) {
 				throw new RuntimeException('Invalid input file');
 			}
