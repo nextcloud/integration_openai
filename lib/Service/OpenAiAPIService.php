@@ -418,7 +418,8 @@ class OpenAiAPIService {
 	 * @param array|null $extraParams
 	 * @param string|null $toolMessage JSON string with role, content, tool_call_id
 	 * @param array|null $tools
-	 * @return array{messages: array<string>, tool_calls: array<string>}
+	 * @param string|null $userAudioPromptBase64
+	 * @return array{messages: array<string>, tool_calls: array<string>, audio_messages: list<array<string, mixed>>}
 	 * @throws Exception
 	 */
 	public function createChatCompletion(
@@ -432,6 +433,7 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
+		?string $userAudioPromptBase64 = null,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -475,8 +477,24 @@ class OpenAiAPIService {
 				$messages[] = $message;
 			}
 		}
-		if ($userPrompt !== null) {
-			$messages[] = ['role' => 'user', 'content' => $userPrompt];
+		if ($userPrompt !== null || $userAudioPromptBase64 !== null) {
+			$message = ['role' => 'user', 'content' => []];
+			if ($userPrompt !== null) {
+				$message['content'][] = [
+					'type' => 'text',
+					'text' => $userPrompt,
+				];
+			}
+			if ($userAudioPromptBase64 !== null) {
+				$message['content'][] = [
+					'type' => 'input_audio',
+					'input_audio' => [
+						'data' => $userAudioPromptBase64,
+						'format' => 'mp3',
+					],
+				];
+			}
+			$messages[] = $message;
 		}
 		if ($toolMessage !== null) {
 			$msgs = json_decode($toolMessage, true);
@@ -536,6 +554,7 @@ class OpenAiAPIService {
 		$completions = [
 			'messages' => [],
 			'tool_calls' => [],
+			'audio_messages' => [],
 		];
 
 		foreach ($response['choices'] as $choice) {
@@ -563,6 +582,9 @@ class OpenAiAPIService {
 			// always try to get a message
 			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
 				$completions['messages'][] = $choice['message']['content'];
+			}
+			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
+				$completions['audio_messages'][] = $choice['message'];
 			}
 		}
 
