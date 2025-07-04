@@ -38,12 +38,14 @@
 						:show-trailing-button="!!state.url"
 						@update:model-value="onSensitiveInput(true)"
 						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
-						<EarthIcon />
+						<template #icon>
+							<EarthIcon :size="20" />
+						</template>
 					</NcTextField>
 					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'Leave empty to use {openaiApiUrl}', { openaiApiUrl: 'https://api.openai.com/v1' })">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -70,7 +72,7 @@
 					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'This name will be displayed as provider name in the AI admin settings')">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -85,7 +87,9 @@
 						:show-trailing-button="!!state.request_timeout"
 						@update:model-value="onInput()"
 						@trailing-button-click="state.request_timeout = '' ; onInput()">
-						<TimerAlertOutlineIcon />
+						<template #icon>
+							<TimerAlertOutlineIcon :size="20" />
+						</template>
 						<template #trailing-button-icon>
 							<CloseIcon :size="20" />
 						</template>
@@ -93,7 +97,7 @@
 					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'Timeout for the request to the external API')">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -139,7 +143,9 @@
 						@update:model-value="onSensitiveInput(true)"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
-						<KeyIcon />
+						<template #icon>
+							<KeyOutlineIcon :size="20" />
+						</template>
 					</NcTextField>
 				</div>
 				<NcNoteCard v-show="state.url === ''" type="info">
@@ -161,7 +167,9 @@
 							@update:model-value="onSensitiveInput(true)"
 							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)"
 							@focus="readonly = false">
-							<AccountIcon />
+							<template #icon>
+								<AccountOutlineIcon :size="20" />
+							</template>
 						</NcTextField>
 					</div>
 					<div class="line">
@@ -176,7 +184,9 @@
 							@update:model-value="onSensitiveInput(true)"
 							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)"
 							@focus="readonly = false">
-							<KeyIcon />
+							<template #icon>
+								<KeyOutlineIcon :size="20" />
+							</template>
 						</NcTextField>
 					</div>
 				</div>
@@ -233,7 +243,7 @@
 						target="_blank">
 						<NcButton variant="tertiary" aria-label="openai-info">
 							<template #icon>
-								<HelpCircleIcon />
+								<HelpCircleOutlineIcon />
 							</template>
 						</NcButton>
 					</a>
@@ -243,7 +253,7 @@
 						target="_blank">
 						<NcButton variant="tertiary" aria-label="localai-info">
 							<template #icon>
-								<HelpCircleIcon />
+								<HelpCircleOutlineIcon />
 							</template>
 						</NcButton>
 					</a>
@@ -260,7 +270,7 @@
 					<NcButton variant="tertiary"
 						:title="llmExtraParamHint">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -282,7 +292,7 @@
 					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)')">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -308,7 +318,7 @@
 						target="_blank">
 						<NcButton variant="tertiary" aria-label="openai-info">
 							<template #icon>
-								<HelpCircleIcon />
+								<HelpCircleOutlineIcon />
 							</template>
 						</NcButton>
 					</a>
@@ -318,7 +328,7 @@
 						target="_blank">
 						<NcButton variant="tertiary" aria-label="localai-info">
 							<template #icon>
-								<HelpCircleIcon />
+								<HelpCircleOutlineIcon />
 							</template>
 						</NcButton>
 					</a>
@@ -338,7 +348,7 @@
 					<NcButton variant="tertiary"
 						:title="defaultImageSizeParamHint">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -369,7 +379,7 @@
 						target="_blank">
 						<NcButton variant="tertiary" aria-label="openai-info">
 							<template #icon>
-								<HelpCircleIcon />
+								<HelpCircleOutlineIcon />
 							</template>
 						</NcButton>
 					</a>
@@ -379,7 +389,7 @@
 						target="_blank">
 						<NcButton variant="tertiary" aria-label="localai-info">
 							<template #icon>
-								<HelpCircleIcon />
+								<HelpCircleOutlineIcon />
 							</template>
 						</NcButton>
 					</a>
@@ -408,7 +418,7 @@
 					target="_blank">
 					<NcButton variant="tertiary" aria-label="openai-info">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</a>
@@ -418,7 +428,7 @@
 					target="_blank">
 					<NcButton variant="tertiary" aria-label="localai-info">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</a>
@@ -433,7 +443,7 @@
 						variant="tertiary"
 						aria-label="voices-info">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</label>
@@ -529,7 +539,7 @@
 					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')">
 						<template #icon>
-							<HelpCircleIcon />
+							<HelpCircleOutlineIcon />
 						</template>
 					</NcButton>
 				</div>
@@ -574,11 +584,11 @@
 </template>
 
 <script>
-import AccountIcon from 'vue-material-design-icons/Account.vue'
+import AccountOutlineIcon from 'vue-material-design-icons/AccountOutline.vue'
 import CloseIcon from 'vue-material-design-icons/Close.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
-import HelpCircleIcon from 'vue-material-design-icons/HelpCircle.vue'
-import KeyIcon from 'vue-material-design-icons/Key.vue'
+import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
+import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
 import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
@@ -604,12 +614,12 @@ export default {
 
 	components: {
 		OpenAiIcon,
-		KeyIcon,
+		KeyOutlineIcon,
 		CloseIcon,
-		AccountIcon,
+		AccountOutlineIcon,
 		EarthIcon,
 		TimerAlertOutlineIcon,
-		HelpCircleIcon,
+		HelpCircleOutlineIcon,
 		NcButton,
 		NcSelect,
 		NcCheckboxRadioSwitch,
