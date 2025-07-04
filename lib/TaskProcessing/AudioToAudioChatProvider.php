@@ -62,7 +62,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 
 	public function getOptionalInputShape(): array {
-		return [
+		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
+		$ois = [
 			'llm_model' => new ShapeDescriptor(
 				$this->l->t('Completion model'),
 				$this->l->t('The model used to generate the completion'),
@@ -73,43 +74,54 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$this->l->t('The voice used to generate speech'),
 				EShapeType::Enum
 			),
-			'tts_model' => new ShapeDescriptor(
+		];
+		if (!$isUsingOpenAi) {
+			$ois['tts_model'] = new ShapeDescriptor(
 				$this->l->t('Text-to-speech model'),
 				$this->l->t('The model used to generate the speech'),
 				EShapeType::Enum
-			),
-			'speed' => new ShapeDescriptor(
+			);
+			$ois['speed'] = new ShapeDescriptor(
 				$this->l->t('Speed'),
 				$this->openAiAPIService->isUsingOpenAi()
 					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
-			)
-		];
+			);
+		}
+		return $ois;
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
+		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
 		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices')) ?: Application::DEFAULT_SPEECH_VOICES;
 		$models = $this->openAiAPIService->getModelEnumValues($this->userId);
-		return [
+		$enumValues = [
 			'voice' => array_map(function ($v) { return new ShapeEnumValue($v, $v); }, $voices),
 			'llm_model' => $models,
-			'tts_model' => $models,
 		];
+		if (!$isUsingOpenAi) {
+			$enumValues['tts_model'] = $models;
+		}
+		return $enumValues;
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
+		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
 		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice') ?: Application::DEFAULT_SPEECH_VOICE;
-		$adminTtsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id') ?: Application::DEFAULT_SPEECH_MODEL_ID;
-		$adminLlmModel = $this->openAiAPIService->isUsingOpenAi()
-			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
+		$adminLlmModel = $isUsingOpenAi
+			? 'gpt-4o-audio-preview'
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id');
-		return [
+		$defaults = [
 			'voice' => $adminVoice,
-			'tts_model' => $adminTtsModel,
-			'speed' => 1,
 			'llm_model' => $adminLlmModel,
 		];
+		if (!$isUsingOpenAi) {
+			$adminTtsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id') ?: Application::DEFAULT_SPEECH_MODEL_ID;
+			$defaults['tts_model'] = $adminTtsModel;
+			$defaults['speed'] = 1;
+		}
+		return $defaults;
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -155,7 +167,10 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		if (isset($input['llm_model']) && is_string($input['llm_model'])) {
 			$llmModel = $input['llm_model'];
 		} else {
-			$llmModel = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
+			$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
+			$llmModel = $isUsingOpenAi
+				? 'gpt-4o-audio-preview'
+				: ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID);
 		}
 
 
@@ -187,7 +202,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				'audio' => ['voice' => $outputVoice, 'format' => 'mp3'],
 			];
 			$completion = $this->openAiAPIService->createChatCompletion(
-				$userId, 'gpt-4o-audio-preview', null, $systemPrompt, $history, 1, 1000,
+				$userId, $llmModel, null, $systemPrompt, $history, 1, 1000,
 				$extraParams, null, null, $b64Audio,
 			);
 			$message = array_pop($completion['audio_messages']);
