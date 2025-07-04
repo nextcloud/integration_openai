@@ -29,7 +29,9 @@
 						@update:model-value="onSensitiveInput"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput()"
 						@focus="readonly = false">
-						<KeyIcon />
+						<template #icon>
+							<KeyOutlineIcon :size="20" />
+						</template>
 					</NcTextField>
 				</div>
 				<div v-if="!state.is_custom_service">
@@ -48,7 +50,7 @@
 				</NcNoteCard>
 				<div class="line">
 					<label for="basic-user">
-						<KeyIcon :size="20" class="icon" />
+						<KeyOutlineIcon :size="20" class="icon" />
 						{{ t('integration_openai', 'Username') }}
 					</label>
 					<input id="openai-basic-user"
@@ -61,7 +63,7 @@
 				</div>
 				<div class="line">
 					<label for="basic-password">
-						<KeyIcon :size="20" class="icon" />
+						<KeyOutlineIcon :size="20" class="icon" />
 						{{ t('integration_openai', 'Password') }}
 					</label>
 					<input id="openai-basic-password"
@@ -112,18 +114,18 @@
 
 <script>
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
-import KeyIcon from 'vue-material-design-icons/Key.vue'
+import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
-import NcTextField from '@nextcloud/vue/components/NcTextField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 
-import { loadState } from '@nextcloud/initial-state'
-import { generateUrl } from '@nextcloud/router'
 import axios from '@nextcloud/axios'
-import { showSuccess, showError } from '@nextcloud/dialogs'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { loadState } from '@nextcloud/initial-state'
 import { confirmPassword } from '@nextcloud/password-confirmation'
+import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 
 export default {
@@ -131,7 +133,7 @@ export default {
 
 	components: {
 		OpenAiIcon,
-		KeyIcon,
+		KeyOutlineIcon,
 		InformationOutlineIcon,
 		NcNoteCard,
 		NcTextField,
@@ -226,10 +228,12 @@ export default {
 	#openai-content {
 		margin-left: 40px;
 	}
+
 	h2,
 	.line,
 	.settings-hint {
 		display: flex;
+		justify-content: start;
 		align-items: center;
 		margin-top: 12px;
 		.icon {
