@@ -49,30 +49,37 @@
 					{{ t('integration_openai', 'Leave the username and password empty to use the ones defined by your administrator') }}
 				</NcNoteCard>
 				<div class="line">
-					<label for="basic-user">
-						<KeyOutlineIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Username') }}
-					</label>
-					<input id="openai-basic-user"
+					<NcTextField
+						id="openai-basic-user"
 						v-model="state.basic_user"
-						type="text"
+						class="input"
 						:readonly="readonly"
-						:placeholder="t('integration_openai', 'your Basic Auth user')"
-						@input="onSensitiveInput"
+						:label="t('integration_openai', 'Basic Auth user')"
+						:show-trailing-button="!!state.basic_user"
+						@update:model-value="onSensitiveInput()"
+						@trailing-button-click="state.basic_user = '' ; onSensitiveInput()"
 						@focus="readonly = false">
+						<template #icon>
+							<AccountOutlineIcon :size="20" />
+						</template>
+					</NcTextField>
 				</div>
 				<div class="line">
-					<label for="basic-password">
-						<KeyOutlineIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Password') }}
-					</label>
-					<input id="openai-basic-password"
+					<NcTextField
+						id="openai-basic-password"
 						v-model="state.basic_password"
+						class="input"
 						type="password"
 						:readonly="readonly"
-						:placeholder="t('integration_openai', 'your Basic Auth password')"
-						@input="onSensitiveInput"
+						:label="t('integration_openai', 'Basic Auth password')"
+						:show-trailing-button="!!state.basic_password"
+						@update:model-value="onSensitiveInput()"
+						@trailing-button-click="state.basic_password = '' ; onSensitiveInput()"
 						@focus="readonly = false">
+						<template #icon>
+							<KeyOutlineIcon :size="20" />
+						</template>
+					</NcTextField>
 				</div>
 			</div>
 			<div v-if="quotaInfo !== null">
@@ -113,6 +120,7 @@
 </template>
 
 <script>
+import AccountOutlineIcon from 'vue-material-design-icons/AccountOutline.vue'
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
 
@@ -132,6 +140,7 @@ export default {
 	name: 'PersonalSettings',
 
 	components: {
+		AccountOutlineIcon,
 		OpenAiIcon,
 		KeyOutlineIcon,
 		InformationOutlineIcon,
@@ -167,17 +176,17 @@ export default {
 			this.saveOptions({
 			})
 		}, 2000),
-		onSensitiveInput: debounce(function() {
+		onSensitiveInput: debounce(async function() {
 			const values = {
-				basic_user: this.state.basic_user,
+				basic_user: (this.state.basic_user ?? '').trim(),
 			}
 			if (this.state.api_key !== 'dummyApiKey') {
-				values.api_key = this.state.api_key
+				values.api_key = (this.state.api_key ?? '').trim()
 			}
 			if (this.state.basic_password !== 'dummyPassword') {
-				values.basic_password = this.state.basic_password
+				values.basic_password = (this.state.basic_password ?? '').trim()
 			}
-			this.saveOptions(values, true)
+			await this.saveOptions(values, true)
 		}, 2000),
 		async loadQuotaInfo() {
 			const url = generateUrl('/apps/integration_openai/quota-info')
