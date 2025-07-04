@@ -194,6 +194,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 		$sttModel = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 
+		$serviceName = $this->appConfig->getValueString(Application::APP_ID, 'service_name') ?: Application::APP_ID;
+
 		/////////////// Using the chat API if connected to OpenAI
 		if ($this->openAiAPIService->isUsingOpenAi()) {
 			$b64Audio = base64_encode($inputFile->getContent());
@@ -216,7 +218,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
 				$result['input_transcript'] = $inputTranscription;
 			} catch (Exception $e) {
-				$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
+				$this->logger->warning($serviceName . ' transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
 			}
 
 			return $result;
@@ -227,8 +229,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		try {
 			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
 		} catch (Exception $e) {
-			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
+			$this->logger->warning($serviceName . ' transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
+			throw new RuntimeException($serviceName . ' transcription failed with: ' . $e->getMessage());
 		}
 
 		// free prompt
@@ -236,10 +238,10 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			$completion = $this->openAiAPIService->createChatCompletion($userId, $llmModel, $inputTranscription, $systemPrompt, $history, 1, 1000);
 			$completion = $completion['messages'];
 		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			throw new RuntimeException($serviceName . ' chat completion request failed: ' . $e->getMessage());
 		}
 		if (count($completion) === 0) {
-			throw new RuntimeException('No completion in OpenAI/LocalAI response.');
+			throw new RuntimeException('No completion in ' . $serviceName . ' response.');
 		}
 		$llmResult = array_pop($completion);
 
@@ -248,8 +250,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $llmResult, $ttsModel, $outputVoice, $speed);
 
 			if (!isset($apiResponse['body'])) {
-				$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
-				throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
+				$this->logger->warning($serviceName . ' text to speech generation failed: no speech returned');
+				throw new RuntimeException($serviceName . ' text to speech generation failed: no speech returned');
 			}
 			return [
 				'output' => $apiResponse['body'],
@@ -257,8 +259,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				'input_transcript' => $inputTranscription,
 			];
 		} catch (\Exception $e) {
-			$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage());
+			$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
+			throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
 		}
 	}
 }
