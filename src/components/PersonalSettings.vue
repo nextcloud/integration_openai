@@ -28,7 +28,7 @@
 						@update:value="onSensitiveInput"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput()"
 						@focus="readonly = false">
-						<KeyOutlineIcon />
+						<KeyIcon />
 					</NcTextField>
 				</div>
 				<NcNoteCard type="info">
@@ -46,7 +46,7 @@
 						@update:value="onSensitiveInput"
 						@trailing-button-click="state.project_id = '' ; onSensitiveInput()"
 						@focus="readonly = false">
-						<KeyOutlineIcon />
+						<KeyIcon />
 					</NcTextField>
 				</div>
 				<div class="line">
@@ -61,7 +61,7 @@
 						@update:value="onSensitiveInput"
 						@trailing-button-click="state.space_id = '' ; onSensitiveInput()"
 						@focus="readonly = false">
-						<KeyOutlineIcon />
+						<KeyIcon />
 					</NcTextField>
 				</div>
 				<div v-if="!state.is_custom_service">
@@ -113,7 +113,7 @@
 
 <script>
 import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
-import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
+import KeyIcon from 'vue-material-design-icons/Key.vue'
 
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField.js'
 import NcNoteCard from '@nextcloud/vue/dist/Components/NcNoteCard.js'
@@ -129,7 +129,7 @@ export default {
 	name: 'PersonalSettings',
 
 	components: {
-		KeyOutlineIcon,
+		KeyIcon,
 		InformationOutlineIcon,
 		NcNoteCard,
 		NcTextField,

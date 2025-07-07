@@ -100,7 +100,7 @@
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
-						<KeyOutlineIcon />
+						<KeyIcon />
 					</NcTextField>
 				</div>
 				<NcNoteCard v-show="state.url === '' || state.url.includes('cloud.ibm.com')" type="info">
@@ -127,7 +127,7 @@
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.project_id = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
-						<KeyOutlineIcon />
+						<KeyIcon />
 					</NcTextField>
 				</div>
 				<div class="line">
@@ -142,7 +142,7 @@
 						@update:value="onSensitiveInput(true)"
 						@trailing-button-click="state.space_id = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
-						<KeyOutlineIcon />
+						<KeyIcon />
 					</NcTextField>
 				</div>
 				<NcNoteCard type="info">
@@ -354,7 +354,7 @@
 import CloseIcon from 'vue-material-design-icons/Close.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
-import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
+import KeyIcon from 'vue-material-design-icons/Key.vue'
 import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
@@ -377,7 +377,7 @@ export default {
 	name: 'AdminSettings',
 
 	components: {
-		KeyOutlineIcon,
+		KeyIcon,
 		CloseIcon,
 		EarthIcon,
 		TimerAlertOutlineIcon,
