@@ -10,7 +10,6 @@ namespace OCA\OpenAi\AppInfo;
 use OCA\OpenAi\Capabilities;
 use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
 use OCA\OpenAi\TaskProcessing\AudioToAudioChatProvider;
-use OCA\OpenAi\TaskProcessing\AudioToAudioChatTaskType;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneTaskType;
@@ -144,8 +143,9 @@ class Application extends App implements IBootstrap {
 				&& $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1'
 			)
 		) {
-			$context->registerTaskProcessingTaskType(AudioToAudioChatTaskType::class);
-			$context->registerTaskProcessingProvider(AudioToAudioChatProvider::class);
+			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AudioToAudioChat')) {
+				$context->registerTaskProcessingProvider(AudioToAudioChatProvider::class);
+			}
 		}
 
 		$context->registerCapability(Capabilities::class);

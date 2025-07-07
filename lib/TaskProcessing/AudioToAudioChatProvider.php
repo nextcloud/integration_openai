@@ -19,6 +19,7 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
+use OCP\TaskProcessing\TaskTypes\AudioToAudioChat;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -42,10 +43,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AudioToAudioChat')) {
-			return \OCP\TaskProcessing\TaskTypes\AudioToAudioChat::ID;
-		}
-		return AudioToAudioChatTaskType::ID;
+		return AudioToAudioChat::ID;
 	}
 
 	public function getExpectedRuntime(): int {
@@ -129,13 +127,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalOutputShape(): array {
-		return [
-			'input_transcript' => new ShapeDescriptor(
-				$this->l->t('Input transcript'),
-				$this->l->t('Transcription of the input audio'),
-				EShapeType::Text,
-			),
-		];
+		return [];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
@@ -203,14 +195,35 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				'modalities' => ['text', 'audio'],
 				'audio' => ['voice' => $outputVoice, 'format' => 'mp3'],
 			];
+			$systemPrompt .= ' Producing text responses will break the user interface. Important: You have multimodal voice capability, and you use voice exclusively to respond.';
 			$completion = $this->openAiAPIService->createChatCompletion(
 				$userId, $llmModel, null, $systemPrompt, $history, 1, 1000,
 				$extraParams, null, null, $b64Audio,
 			);
 			$message = array_pop($completion['audio_messages']);
+			// TODO find a way to force the model to answer with audio when there is only text in the history
+			// https://community.openai.com/t/gpt-4o-audio-preview-responds-in-text-not-audio/1006486/5
+			if ($message === null) {
+				// no audio, TTS the text message
+				try {
+					$textResponse = array_pop($completion['messages']);
+					$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $textResponse, $ttsModel, $outputVoice, $speed);
+					if (!isset($apiResponse['body'])) {
+						$this->logger->warning($serviceName . ' text to speech generation failed: no speech returned');
+						throw new RuntimeException($serviceName . ' text to speech generation failed: no speech returned');
+					}
+					$output = $apiResponse['body'];
+				} catch (\Exception $e) {
+					$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
+					throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
+				}
+			} else {
+				$output = base64_decode($message['audio']['data']);
+				$textResponse = $message['audio']['transcript'];
+			}
 			$result = [
-				'output' => base64_decode($message['audio']['data']),
-				'output_transcript' => $message['audio']['transcript'],
+				'output' => $output,
+				'output_transcript' => $textResponse,
 			];
 
 			// we still want the input transcription
@@ -218,7 +231,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
 				$result['input_transcript'] = $inputTranscription;
 			} catch (Exception $e) {
-				$this->logger->warning($serviceName . ' transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
+				$this->logger->warning($serviceName . ' audio input transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
+				throw new RuntimeException($serviceName . ' audio input transcription failed with: ' . $e->getMessage());
 			}
 
 			return $result;
