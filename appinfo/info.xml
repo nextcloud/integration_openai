@@ -35,9 +35,9 @@ Negative:
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
 ]]>	</description>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<licence>agpl</licence>
-	<author>Edward Ly</author>
+	<author mail="contact@edward.ly" homepage="https://edward.ly/">Edward Ly</author>
 	<namespace>Watsonx</namespace>
 	<documentation>
 		<developer>https://github.com/nextcloud/integration_watsonx</developer>
