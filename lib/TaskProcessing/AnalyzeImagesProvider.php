@@ -117,7 +117,7 @@ class AnalyzeImagesProvider implements ISynchronousProvider {
 		}
 		// Maximum file count for openai is 500. Seems reasonable enough to enforce for all apis though (https://platform.openai.com/docs/guides/images-vision?api-mode=responses&format=url#image-input-requirements)
 		if (count($input['images']) > 500) {
-			throw new RuntimeException('Too many files given. Max is 100');
+			throw new RuntimeException('Too many files given. Max is 500');
 		}
 		$fileSize = 0;
 		foreach ($input['images'] as $image) {
