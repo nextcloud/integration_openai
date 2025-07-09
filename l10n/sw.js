@@ -4,6 +4,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Njia mbaya ya HTTP ",
     "Bad credentials" : "Sifa mbaya",
     "Detect language" : "Lugha iliyotambuliwa",
+    "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Uthibitisho",
     "API key" : "Ufunguo wa API"
 },
