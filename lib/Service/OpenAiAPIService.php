@@ -95,11 +95,11 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * @param string $userId
+	 * @param ?string $userId
 	 * @return array|string[]
 	 * @throws Exception
 	 */
-	public function getModels(string $userId): array {
+	public function getModels(?string $userId): array {
 		// caching against 'getModelEnumValues' calls from all the providers
 		if ($this->areCredsValid === false) {
 			$this->logger->info('Cannot get OpenAI models without an API key');
@@ -118,11 +118,33 @@ class OpenAiAPIService {
 			return $this->modelsMemoryCache;
 		}
 
-		$cacheKey = Application::MODELS_CACHE_KEY;
+		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . ($userId ?? '');
+		$adminCacheKey = Application::MODELS_CACHE_KEY . '-main';
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
-		if ($cachedModels = $cache->get($cacheKey)) {
-			$this->logger->debug('Getting OpenAI models from distributed cache');
-			return $cachedModels;
+
+		// try to get models from the user cache first
+		if ($userId !== null) {
+			$userCachedModels = $cache->get($userCacheKey);
+			if ($userCachedModels) {
+				$this->logger->debug('Getting OpenAI models from user cache for user ' . $userId);
+				return $userCachedModels;
+			}
+		}
+
+		// if the user has an API key or uses basic auth, skip the admin cache
+		if (!(
+			$this->openAiSettingsService->getUserApiKey($userId, false) !== ''
+			|| (
+				$this->openAiSettingsService->getUseBasicAuth()
+				&& $this->openAiSettingsService->getUserBasicUser($userId) !== ''
+				&& $this->openAiSettingsService->getUserBasicPassword($userId) !== ''
+			)
+		)) {
+			// if no user cache or userId is null, try to get from the admin cache
+			if ($adminCachedModels = $cache->get($adminCacheKey)) {
+				$this->logger->debug('Getting OpenAI models from the main distributed cache');
+				return $adminCachedModels;
+			}
 		}
 
 		try {
@@ -149,7 +171,7 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Invalid models response received'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		$cache->set($cacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
+		$cache->set($userId !== null ? $userCacheKey : $adminCacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
 		$this->modelsMemoryCache = $modelsResponse;
 		$this->areCredsValid = true;
 		return $modelsResponse;
@@ -175,9 +197,6 @@ class OpenAiAPIService {
 	 * @return array
 	 */
 	public function getModelEnumValues(?string $userId): array {
-		if ($userId === null) {
-			return [];
-		}
 		try {
 			$modelResponse = $this->getModels($userId);
 			$modelEnumValues = array_map(function (array $model) {
