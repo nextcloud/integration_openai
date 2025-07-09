@@ -127,7 +127,13 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalOutputShape(): array {
-		return [];
+		return [
+			'audio_id' => new ShapeDescriptor(
+				$this->l->t('Remote audio ID'),
+				$this->l->t('The ID of the audio response returned by the remote service'),
+				EShapeType::Text
+			),
+		];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
@@ -187,15 +193,74 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$sttModel = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		$serviceName = $this->appConfig->getValueString(Application::APP_ID, 'service_name') ?: Application::APP_ID;
 
-		/////////////// Using the chat API if connected to OpenAI
+		// Using the chat API if connected to OpenAI
 		// there is an issue if the history mostly contains text, the model will answer text even if we add the audio modality
-		/*
 		if ($this->openAiAPIService->isUsingOpenAi()) {
 			return $this->oneStep($userId, $systemPrompt, $inputFile, $history, $outputVoice, $sttModel, $llmModel, $ttsModel, $speed, $serviceName);
 		}
-		*/
 
-		//////////////// 3 steps: STT -> LLM -> TTS
+		// 3 steps: STT -> LLM -> TTS
+		return $this->threeSteps($userId, $systemPrompt, $inputFile, $history, $outputVoice, $sttModel, $llmModel, $ttsModel, $speed, $serviceName);
+	}
+
+	private function oneStep(
+		?string $userId, string $systemPrompt, File $inputFile, array $history, string $outputVoice,
+		string $sttModel, string $llmModel, string $ttsModel, float $speed, string $serviceName,
+	): array {
+		$result = [];
+		$b64Audio = base64_encode($inputFile->getContent());
+		$extraParams = [
+			'modalities' => ['text', 'audio'],
+			'audio' => ['voice' => $outputVoice, 'format' => 'mp3'],
+		];
+		$systemPrompt .= ' Producing text responses will break the user interface. Important: You have multimodal voice capability, and you use voice exclusively to respond.';
+		$completion = $this->openAiAPIService->createChatCompletion(
+			$userId, $llmModel, null, $systemPrompt, $history, 1, 1000,
+			$extraParams, null, null, $b64Audio,
+		);
+		$message = array_pop($completion['audio_messages']);
+		// TODO find a way to force the model to answer with audio when there is only text in the history
+		// https://community.openai.com/t/gpt-4o-audio-preview-responds-in-text-not-audio/1006486/5
+		if ($message === null) {
+			// no audio, TTS the text message
+			try {
+				$textResponse = array_pop($completion['messages']);
+				$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $textResponse, $ttsModel, $outputVoice, $speed);
+				if (!isset($apiResponse['body'])) {
+					$this->logger->warning($serviceName . ' text to speech generation failed: no speech returned');
+					throw new RuntimeException($serviceName . ' text to speech generation failed: no speech returned');
+				}
+				$output = $apiResponse['body'];
+			} catch (\Exception $e) {
+				$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
+				throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
+			}
+		} else {
+			$output = base64_decode($message['audio']['data']);
+			$textResponse = $message['audio']['transcript'];
+			if (isset($message['audio']['id'])) {
+				$result['audio_id'] = $message['audio']['id'];
+			}
+		}
+		$result['output'] = $output;
+		$result['output_transcript'] = $textResponse;
+
+		// we still want the input transcription
+		try {
+			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
+			$result['input_transcript'] = $inputTranscription;
+		} catch (Exception $e) {
+			$this->logger->warning($serviceName . ' audio input transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
+			throw new RuntimeException($serviceName . ' audio input transcription failed with: ' . $e->getMessage());
+		}
+
+		return $result;
+	}
+
+	private function threeSteps(
+		?string $userId, string $systemPrompt, File $inputFile, array $history, string $outputVoice,
+		string $sttModel, string $llmModel, string $ttsModel, float $speed, string $serviceName,
+	): array {
 		// speech to text
 		try {
 			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
@@ -233,57 +298,5 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
 		}
-	}
-
-	private function oneStep(
-		?string $userId, string $systemPrompt, File $inputFile, array $history, string $outputVoice,
-		string $sttModel, string $llmModel, string $ttsModel, float $speed, string $serviceName
-	): array {
-		$b64Audio = base64_encode($inputFile->getContent());
-		$extraParams = [
-			'modalities' => ['text', 'audio'],
-			'audio' => ['voice' => $outputVoice, 'format' => 'mp3'],
-		];
-		$systemPrompt .= ' Producing text responses will break the user interface. Important: You have multimodal voice capability, and you use voice exclusively to respond.';
-		$completion = $this->openAiAPIService->createChatCompletion(
-			$userId, $llmModel, null, $systemPrompt, $history, 1, 1000,
-			$extraParams, null, null, $b64Audio,
-		);
-		$message = array_pop($completion['audio_messages']);
-		// TODO find a way to force the model to answer with audio when there is only text in the history
-		// https://community.openai.com/t/gpt-4o-audio-preview-responds-in-text-not-audio/1006486/5
-		if ($message === null) {
-			// no audio, TTS the text message
-			try {
-				$textResponse = array_pop($completion['messages']);
-				$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $textResponse, $ttsModel, $outputVoice, $speed);
-				if (!isset($apiResponse['body'])) {
-					$this->logger->warning($serviceName . ' text to speech generation failed: no speech returned');
-					throw new RuntimeException($serviceName . ' text to speech generation failed: no speech returned');
-				}
-				$output = $apiResponse['body'];
-			} catch (\Exception $e) {
-				$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-				throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
-			}
-		} else {
-			$output = base64_decode($message['audio']['data']);
-			$textResponse = $message['audio']['transcript'];
-		}
-		$result = [
-			'output' => $output,
-			'output_transcript' => $textResponse,
-		];
-
-		// we still want the input transcription
-		try {
-			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
-			$result['input_transcript'] = $inputTranscription;
-		} catch (Exception $e) {
-			$this->logger->warning($serviceName . ' audio input transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException($serviceName . ' audio input transcription failed with: ' . $e->getMessage());
-		}
-
-		return $result;
 	}
 }
