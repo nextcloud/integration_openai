@@ -6,6 +6,7 @@ OC.L10N.register(
     "Unknown" : "Óþekkt",
     "seconds" : "sekúndum",
     "Bad credentials" : "Gölluð auðkenni",
+    "Images" : "Myndir",
     "Detect language" : "Greina tungumál",
     "Input text" : "Inntakstexti",
     "Size" : "Stærð",

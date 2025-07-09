@@ -5,6 +5,8 @@ OC.L10N.register(
     "Unknown" : "Непознат",
     "seconds" : "секунди",
     "Bad credentials" : "Неточни акредитиви",
+    "Images" : "Слики",
+    "Question" : "Прашање",
     "Speed" : "Брзина",
     "Authentication" : "Автентикација",
     "Authentication method" : "Начин на автентификација",

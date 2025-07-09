@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "שניות",
     "Bad HTTP method" : "שגיאה במתודת HTTP",
     "Bad credentials" : "פרטי גישה שגויים",
+    "Images" : "תמונות",
     "Size" : "גודל",
     "Speed" : "מהירות",
     "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",

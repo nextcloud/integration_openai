@@ -7,6 +7,7 @@ OC.L10N.register(
     "seconds" : "segundos",
     "Bad HTTP method" : "Mètodu HTTP no bàlidu",
     "Bad credentials" : "Credentziales non bàlidas",
+    "Images" : "Immàgines",
     "Size" : "Mannària",
     "Speed" : "Lestresa",
     "Request timeout (seconds)" : "Tempus màssimu de sa rechesta (segundos)",

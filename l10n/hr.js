@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "sekunda",
     "Bad HTTP method" : "Pogrešna metoda HTTP-a",
     "Bad credentials" : "Pogrešne vjerodajnice",
+    "Images" : "Slike",
     "Speed" : "Brzina",
     "Request timeout (seconds)" : "Istek zahtjeva (u sekundama)",
     "Authentication" : "Autentifikacija",

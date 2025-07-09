@@ -4,6 +4,7 @@ OC.L10N.register(
     "Default" : "Paraprake",
     "Unknown" : "I panjohur",
     "seconds" : "sekonda",
+    "Images" : "Imazhe ",
     "Size" : "Madhësi",
     "Request timeout (seconds)" : "Kohë skadimi kërkese (sekonda)",
     "Authentication" : "Mirëfilltësim",

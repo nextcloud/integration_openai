@@ -5,6 +5,7 @@ OC.L10N.register(
     "seconds" : "sekundes",
     "Bad HTTP method" : "Nederīgs HTTP pieprasījuma veids",
     "Bad credentials" : "Nederīgi pieteikšanās dati",
+    "Images" : "Attēli",
     "Size" : "Izmērs",
     "Speed" : "Ātrums",
     "Authentication" : "Autentifikācija",

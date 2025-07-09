@@ -6,6 +6,8 @@ OC.L10N.register(
     "seconds" : "seconden",
     "Bad HTTP method" : "Foute HTTP methode",
     "Bad credentials" : "Foute inloggegevens",
+    "Images" : "Afbeeldingen",
+    "Question" : "Vraag",
     "Detect language" : "Detecteer taal",
     "Size" : "Grootte",
     "Speed" : "Snelheid",

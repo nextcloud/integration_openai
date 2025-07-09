@@ -7,6 +7,8 @@ OC.L10N.register(
     "seconds" : "sekuntia",
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
     "Bad credentials" : "Virheelliset kirjautumistiedot",
+    "Images" : "Kuvat",
+    "Question" : "Kysymys",
     "Detect language" : "Havaitse kieli",
     "Speed" : "Nopeus",
     "Prompt" : "Kehote",

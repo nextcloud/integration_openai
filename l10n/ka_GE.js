@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Default" : "საწყისი პარამეტრები",
     "Unknown" : "უცნობია",
+    "Images" : "სურათები",
     "Size" : "ზომა",
     "Request timeout (seconds)" : "მოთხოვნის დროის ამოწურვა (წამები)",
     "Authentication" : "აუტენტიფიკაცია",

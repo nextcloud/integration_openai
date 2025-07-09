@@ -5,6 +5,7 @@ OC.L10N.register(
     "Image generation" : "Generación de imágenes",
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
+    "Images" : "Imágenes",
     "Detect language" : "Detectar idioma",
     "Input text" : "Ingresar texto",
     "Size" : "Tamaño",

@@ -7,6 +7,8 @@ OC.L10N.register(
     "seconds" : "секунд",
     "Bad HTTP method" : "Поганий метод HTTP",
     "Bad credentials" : "Погані облікові дані",
+    "Images" : "Зображення",
+    "Question" : "Питання",
     "Detect language" : "Визначити мову",
     "Input text" : "Текст для введення",
     "Size" : "Розмір",
