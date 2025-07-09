@@ -8,6 +8,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.6.0 – 2025-07-09
+
+### Added
+
+- Add support for text to speech @lukasdotcom [#210](https://github.com/nextcloud/integration_openai/pull/210)
+- Add Analyze Image Task Type @lukasdotcom [#226](https://github.com/nextcloud/integration_openai/pull/226)
+
+### Changed
+
+- update README.md @edward-ly @jospoortvliet [#46](https://github.com/nextcloud/integration_openai/pull/46)
+- update summary prompt @edward-ly [#214](https://github.com/nextcloud/integration_openai/pull/214)
+- migrate to vue3 and @nextcloud/vue 9 @julien-nc [#220](https://github.com/nextcloud/integration_openai/pull/220)
+- use outline icons instead of solid ones @kyteinsky [#228](https://github.com/nextcloud/integration_openai/pull/228)
+- update personal settings basic auth @kyteinsky [#228](https://github.com/nextcloud/integration_openai/pull/228)
+
+### Fixed
+
+- do not add /v1 twice to the service url @kyteinsky [#207](https://github.com/nextcloud/integration_openai/pull/207)
+- Fix some mistakes in phpdoc @lukasdotcom [#211](https://github.com/nextcloud/integration_openai/pull/211)
+- fix English source string @edward-ly [#212](https://github.com/nextcloud/integration_openai/pull/212)
+- improve 401 error message @kyteinsky [#218](https://github.com/nextcloud/integration_openai/pull/218)
+- Update all workflows and fix bootstrap.php @lukasdotcom [#221](https://github.com/nextcloud/integration_openai/pull/221)
+- fix content type identification @lukasdotcom [#225](https://github.com/nextcloud/integration_openai/pull/225)
+- separate user and admin cache, and allow taskproc without userId @kyteinsky [#230](https://github.com/nextcloud/integration_openai/pull/230)
+
+
 ## 3.5.0 – 2025-03-11
 
 ### Added
