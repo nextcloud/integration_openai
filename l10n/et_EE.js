@@ -50,6 +50,7 @@ OC.L10N.register(
     "Per-user quota / period" : "Kasutajakohane kvoot / ajavahemik",
     "Current system-wide usage / period" : "Praegune serveriülene kvoot / ajavahemik",
     "Max new tokens per request" : "Sõnede suurim arv päringus",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Tekstitöötluse teenusepakkujad (tekstiloome, kokkuvõtete tegemine, kontekstuaalne kirjutamine, jne.)",
     "Watsonx.ai options saved" : "Watsonx.ai eelistused on salvestatud",
     "Failed to save watsonx.ai options" : "Ei õnnestunud salvestada watsonx.ai eelistusi",
     "Your administrator defined a custom service address" : "Sinu serveri peakasutaja on teenuse aadressi eelseadistanud",
