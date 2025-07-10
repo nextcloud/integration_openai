@@ -133,6 +133,11 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$this->l->t('The ID of the audio response returned by the remote service'),
 				EShapeType::Text
 			),
+			'audio_expires_at' => new ShapeDescriptor(
+				$this->l->t('Remote audio expiration date'),
+				$this->l->t('The remote audio response stays available in the service until this date'),
+				EShapeType::Number
+			),
 		];
 	}
 
@@ -240,6 +245,9 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			$textResponse = $message['audio']['transcript'];
 			if (isset($message['audio']['id'])) {
 				$result['audio_id'] = $message['audio']['id'];
+			}
+			if (isset($message['audio']['expires_at'])) {
+				$result['audio_expires_at'] = $message['audio']['expires_at'];
 			}
 		}
 		$result['output'] = $output;
