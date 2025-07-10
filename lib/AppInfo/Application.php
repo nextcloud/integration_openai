@@ -9,6 +9,7 @@ namespace OCA\OpenAi\AppInfo;
 
 use OCA\OpenAi\Capabilities;
 use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
+use OCA\OpenAi\TaskProcessing\AudioToAudioChatProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneTaskType;
@@ -129,6 +130,22 @@ class Application extends App implements IBootstrap {
 		$context->registerTaskProcessingProvider(TextToSpeechProvider::class);
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);
+		}
+
+		// only register audio chat stuff if we're using OpenAI or stt+llm+tts are enabled
+		$serviceUrl = $this->appConfig->getValueString(Application::APP_ID, 'url');
+		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+		if (
+			$isUsingOpenAI
+			|| (
+				$this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1'
+				&& $this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1'
+				&& $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1'
+			)
+		) {
+			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AudioToAudioChat')) {
+				$context->registerTaskProcessingProvider(AudioToAudioChatProvider::class);
+			}
 		}
 
 		$context->registerCapability(Capabilities::class);

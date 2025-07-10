@@ -39,6 +39,7 @@
 				<referencedClass name="OCP\TaskProcessing\EShapeType" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\TextToTextProofread" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools" />
+				<referencedClass name="OCP\TaskProcessing\TaskTypes\AudioToAudioChat" />
 			</errorLevel>
 		</UndefinedClass>
 		<UndefinedDocblockClass>
