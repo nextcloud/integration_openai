@@ -7,8 +7,6 @@ OC.L10N.register(
     "Bad credentials" : "Akkaunt ma'lumotlari xato",
     "Images" : "Tasvirlar",
     "Size" : "Size",
-    "Authentication" : "Autentifikatsiya",
-    "Username" : "Username",
-    "Password" : "Password"
+    "Authentication" : "Autentifikatsiya"
 },
 "nplurals=1; plural=0;");

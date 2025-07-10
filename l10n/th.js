@@ -8,7 +8,6 @@ OC.L10N.register(
     "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
     "Authentication" : "การตรวจสอบสิทธิ์",
     "Authentication method" : "วิธีการตรวจสอบความถูกต้อง",
-    "API key" : "รหัส API",
-    "Username" : "ชื่อผู้ใช้"
+    "API key" : "รหัส API"
 },
 "nplurals=1; plural=0;");

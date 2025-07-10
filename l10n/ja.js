@@ -38,10 +38,6 @@ OC.L10N.register(
     "Authentication method" : "認証方法",
     "API key" : "APIキー",
     "Usage limits" : "使用制限",
-    "Quota type" : "クォータのタイプ",
-    "Username" : "ユーザー名",
-    "your Basic Auth user" : "基本認証ユーザー名",
-    "Password" : "パスワード",
-    "your Basic Auth password" : "基本認証パスワード"
+    "Quota type" : "クォータのタイプ"
 },
 "nplurals=1; plural=0;");

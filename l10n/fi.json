@@ -13,8 +13,6 @@
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "Authentication" : "Tunnistautuminen",
     "Authentication method" : "Tunnistautumistapa",
-    "API key" : "API-avain",
-    "Username" : "Käyttäjätunnus",
-    "Password" : "Salasana"
+    "API key" : "API-avain"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

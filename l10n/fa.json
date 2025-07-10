@@ -40,8 +40,6 @@
     "OpenAI options saved" : "OpenAI options saved",
     "Failed to save OpenAI options" : "Failed to save OpenAI options",
     "Your administrator defined a custom service address" : "Your administrator defined a custom service address",
-    "Leave the API key empty to use the one defined by administrators" : "Leave the API key empty to use the one defined by administrators",
-    "Username" : "نام کاربری",
-    "Password" : "گذرواژه"
+    "Leave the API key empty to use the one defined by administrators" : "Leave the API key empty to use the one defined by administrators"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

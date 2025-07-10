@@ -79,10 +79,6 @@ OC.L10N.register(
     "Leave the API key empty to use the one defined by administrators" : "La API-nøkkelen være tom for å bruke den som er definert av administratorer",
     "You can create a free API key in your OpenAI account settings" : "Du kan opprette en gratis API-nøkkel i OpenAI-kontoinnstillingene:",
     "Leave the username and password empty to use the ones defined by your administrator" : "La brukernavnet og passordet stå tomt for å bruke de som er definert av administratoren",
-    "Username" : "Brukernavn",
-    "your Basic Auth user" : "din grunnleggende auth-bruker",
-    "Password" : "PassordP",
-    "your Basic Auth password" : "ditt grunnleggende auth-passord",
     "Usage quota info" : "Informasjon om brukskvote",
     "Usage" : "Bruk",
     "Specifying your own API key will allow unlimited usage" : "Å spesifisere din egen API-nøkkel vil tillate ubegrenset bruk"

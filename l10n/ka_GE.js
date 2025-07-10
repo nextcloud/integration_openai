@@ -8,8 +8,6 @@ OC.L10N.register(
     "Request timeout (seconds)" : "მოთხოვნის დროის ამოწურვა (წამები)",
     "Authentication" : "აუტენტიფიკაცია",
     "Authentication method" : "აუტენტიფიკაციის მეთოდი",
-    "API key" : "API გასაღები",
-    "Username" : "მომხმარებლის სახელი",
-    "Password" : "პაროლ"
+    "API key" : "API გასაღები"
 },
 "nplurals=2; plural=(n!=1);");

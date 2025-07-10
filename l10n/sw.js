@@ -12,7 +12,6 @@ OC.L10N.register(
     "Voice" : "Sauti",
     "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Uthibitisho",
-    "API key" : "Ufunguo wa API",
-    "Password" : "Nenosiri"
+    "API key" : "Ufunguo wa API"
 },
 "nplurals=2; plural=(n != 1);");

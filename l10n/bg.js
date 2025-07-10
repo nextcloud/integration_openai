@@ -6,6 +6,8 @@ OC.L10N.register(
     "seconds" : "секунди",
     "Bad HTTP method" : "Лош HTTP метод",
     "Bad credentials" : "Лоши идентификационни данни",
+    "Images" : "Изображения",
+    "Question" : "Въпрос",
     "Detect language" : "Разпознаване на език",
     "Speed" : "Скорост",
     "Prompt" : "Подкана",
@@ -19,8 +21,6 @@ OC.L10N.register(
     "More information about OpenAI models" : "Повече информация за моделите на OpenAI",
     "OpenAI options saved" : "Опциите на OpenAI са записани",
     "Failed to save OpenAI options" : "Неуспешно записване на опциите на OpenAI",
-    "Leave the API key empty to use the one defined by administrators" : "Оставяне на празен API ключ, за да се използва този, определен от администраторите",
-    "Username" : "Потребител",
-    "Password" : "Парола"
+    "Leave the API key empty to use the one defined by administrators" : "Оставяне на празен API ключ, за да се използва този, определен от администраторите"
 },
 "nplurals=2; plural=(n != 1);");

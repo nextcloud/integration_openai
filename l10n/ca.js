@@ -9,6 +9,8 @@ OC.L10N.register(
     "Unknown image generation error" : "Error de generació d'imatge desconegut",
     "Bad HTTP method" : "Mètode HTTP incorrecte",
     "Bad credentials" : "Credencials dolentes",
+    "Images" : "Imatges",
+    "Question" : "Pregunta",
     "Generated response" : "Resposta generada",
     "Detect language" : "Detecta la llengua",
     "Change Tone" : "Canvia el to",
@@ -23,8 +25,6 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
     "Authentication" : "Autenticació",
     "Authentication method" : "Mètode d'autenticació",
-    "API key" : "Clau de l'API",
-    "Username" : "Nom d'usuari",
-    "Password" : "Contrasenya"
+    "API key" : "Clau de l'API"
 },
 "nplurals=2; plural=(n != 1);");

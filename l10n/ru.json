@@ -79,8 +79,6 @@
     "Your administrator defined a custom service address" : "Ваш администратор определил адрес пользовательского сервиса",
     "Leave the API key empty to use the one defined by administrators" : "Оставьте ключ API пустым, чтобы использовать установленный администратором.",
     "You can create a free API key in your OpenAI account settings" : "Вы можете создать бесплатный ключ API в настройках вашего аккаунта OpenAI.",
-    "Username" : "Имя пользователя",
-    "Password" : "Пароль",
     "Usage quota info" : "Информация о квоте использования",
     "Usage" : "Использование",
     "Specifying your own API key will allow unlimited usage" : "Указание вашего собственного ключа API позволит использовать его неограниченно"

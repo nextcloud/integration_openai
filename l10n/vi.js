@@ -9,8 +9,6 @@ OC.L10N.register(
     "Images" : "Hình ảnh",
     "Size" : "Kích cỡ",
     "Authentication" : "Xác thực",
-    "Authentication method" : "Phương thức xác thực",
-    "Username" : "Tên đăng nhập",
-    "Password" : "Mật khẩu"
+    "Authentication method" : "Phương thức xác thực"
 },
 "nplurals=1; plural=0;");

@@ -40,8 +40,6 @@ OC.L10N.register(
     "OpenAI options saved" : "OpenAI-alternativ sparade",
     "Failed to save OpenAI options" : "Det gick inte att spara OpenAI-alternativ",
     "Your administrator defined a custom service address" : "Din administratör har definierat en anpassad service-adress",
-    "Leave the API key empty to use the one defined by administrators" : "Lämna API-nyckeln tom för att använda den som definierats av administratörer",
-    "Username" : "Användarnamn",
-    "Password" : "Lösenord"
+    "Leave the API key empty to use the one defined by administrators" : "Lämna API-nyckeln tom för att använda den som definierats av administratörer"
 },
 "nplurals=2; plural=(n != 1);");

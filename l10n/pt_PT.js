@@ -12,8 +12,6 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Pedido expira (segundos)",
     "Authentication" : "Autenticação",
     "Authentication method" : "Método de Autenticação",
-    "API key" : "Chave API",
-    "Username" : "Nome de utilizador",
-    "Password" : "Password"
+    "API key" : "Chave API"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

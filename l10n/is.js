@@ -15,8 +15,6 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Authentication" : "Auðkenning",
     "Authentication method" : "Auðkenningarmáti",
-    "API key" : "API-lykill",
-    "Username" : "Notandanafn",
-    "Password" : "Lykilorð"
+    "API key" : "API-lykill"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

@@ -38,8 +38,6 @@ OC.L10N.register(
     "Completions" : "Osaketak",
     "Usage limits" : "Erabilpen mugak",
     "Quota type" : "Kuota mota",
-    "Username" : "Erabiltzaile-izena",
-    "Password" : "Pasahitza",
     "Usage" : "Erabilpena"
 },
 "nplurals=2; plural=(n != 1);");

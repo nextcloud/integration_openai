@@ -30,8 +30,6 @@ OC.L10N.register(
     "Authentication method" : "Način overitve",
     "API key" : "Ključ API",
     "Usage limits" : "Omejitve uporabe",
-    "Username" : "Uporabniško ime",
-    "Password" : "Geslo",
     "Usage" : "Uporaba"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

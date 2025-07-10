@@ -88,10 +88,6 @@
     "Leave the API key empty to use the one defined by administrators" : "باشقۇرغۇچى بەلگىلىگەن ئاچقۇچنى ئىشلىتىش ئۈچۈن API كۇنۇپكىسىنى بوش قويۇڭ",
     "You can create a free API key in your OpenAI account settings" : "OpenAI ھېسابات تەڭشىكىڭىزدە ھەقسىز API ئاچالايسىز",
     "Leave the username and password empty to use the ones defined by your administrator" : "باشقۇرغۇچىڭىز بەلگىلىگەننى ئىشلىتىش ئۈچۈن ئىشلەتكۈچى ئىسمى ۋە پارولىنى بوش قويۇڭ",
-    "Username" : "ئىشلەتكۈچى ئاتى",
-    "your Basic Auth user" : "Basic Auth user",
-    "Password" : "پارول",
-    "your Basic Auth password" : "Basic Auth پارولىڭىز",
     "Usage quota info" : "ئىشلىتىش نورمىسى ئۇچۇرى",
     "Usage" : "ئىشلىتىش",
     "Specifying your own API key will allow unlimited usage" : "ئۆزىڭىزنىڭ API ئاچقۇچىنى بەلگىلىسىڭىز چەكسىز ئىشلىتىشكە يول قويىدۇ"

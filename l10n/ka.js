@@ -10,8 +10,6 @@ OC.L10N.register(
     "Size" : "Size",
     "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Authentication",
-    "API key" : "API key",
-    "Username" : "Username",
-    "Password" : "Password"
+    "API key" : "API key"
 },
 "nplurals=2; plural=(n!=1);");
