@@ -63,7 +63,7 @@ class OpenAiSettingsService {
 
 	public function invalidateModelsCache(): void {
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
-		$cache->remove(Application::MODELS_CACHE_KEY);
+		$cache->clear(Application::MODELS_CACHE_KEY);
 	}
 
 	////////////////////////////////////////////
