@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.7.0 – 2025-07-11
+
+### Added
+
+- Implement audio chat provider @julien-nc [#227](https://github.com/nextcloud/integration_openai/pull/227)
+
+### Fixed
+
+- update composer with php8.1 @kyteinsky [#233](https://github.com/nextcloud/integration_openai/pull/233)
+- Invalidate all cache with a prefix instead of deleting one key that we don't use anymore @julien-nc [#234](https://github.com/nextcloud/integration_openai/pull/234)
+
+
 ## 3.6.0 – 2025-07-09
 
 ### Added
