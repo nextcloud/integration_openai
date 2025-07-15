@@ -496,24 +496,33 @@ class OpenAiAPIService {
 				$messages[] = $message;
 			}
 		}
-		if ($userPrompt !== null || $userAudioPromptBase64 !== null) {
-			$message = ['role' => 'user', 'content' => []];
+		if ($userAudioPromptBase64 !== null) {
+			// if there is audio, use the new message format (content is a list of objects)
+			$message = [
+				'role' => 'user',
+				'content' => [
+					[
+						'type' => 'input_audio',
+						'input_audio' => [
+							'data' => $userAudioPromptBase64,
+							'format' => 'mp3',
+						],
+					],
+				],
+			];
 			if ($userPrompt !== null) {
 				$message['content'][] = [
 					'type' => 'text',
 					'text' => $userPrompt,
 				];
 			}
-			if ($userAudioPromptBase64 !== null) {
-				$message['content'][] = [
-					'type' => 'input_audio',
-					'input_audio' => [
-						'data' => $userAudioPromptBase64,
-						'format' => 'mp3',
-					],
-				];
-			}
 			$messages[] = $message;
+		} elseif ($userPrompt !== null) {
+			// if there is only text, use the old message format (content is a string)
+			$messages[] = [
+				'role' => 'user',
+				'content' => $userPrompt,
+			];
 		}
 		if ($toolMessage !== null) {
 			$msgs = json_decode($toolMessage, true);

@@ -140,7 +140,7 @@ class OpenAiProviderTest extends TestCase {
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'user', 'content' => [['type' => 'text', 'text' => $prompt]]]],
+			'messages' => [['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
@@ -204,7 +204,7 @@ class OpenAiProviderTest extends TestCase {
 		$message = 'Give me an emoji for the following text. Output only the emoji without any other characters.' . "\n\n" . $prompt;
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'user', 'content' => [['type' => 'text', 'text' => $message]]]],
+			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
@@ -269,7 +269,7 @@ class OpenAiProviderTest extends TestCase {
 		$message = 'Give me the headline of the following text in its original language. Do not output the language. Output only the headline without any quotes or additional punctuation.' . "\n\n" . $prompt;
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'user', 'content' => [['type' => 'text', 'text' => $message]]]],
+			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
@@ -334,7 +334,7 @@ class OpenAiProviderTest extends TestCase {
 		$message = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
-			'messages' => [['role' => 'user', 'content' => [['type' => 'text', 'text' => $message]]]],
+			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
@@ -402,7 +402,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
 				['role' => 'system', 'content' => $systemPrompt],
-				['role' => 'user', 'content' => [['type' => 'text', 'text' => $prompt]]],
+				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
@@ -469,7 +469,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
 				['role' => 'system', 'content' => $systemPrompt],
-				['role' => 'user', 'content' => [['type' => 'text', 'text' => $prompt]]],
+				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
@@ -539,7 +539,7 @@ class OpenAiProviderTest extends TestCase {
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
-				['role' => 'user', 'content' => [['type' => 'text', 'text' => 'Translate from ' . $fromLang . ' to English (US): ' . $inputText]]],
+				['role' => 'user', 'content' => 'Translate from ' . $fromLang . ' to English (US): ' . $inputText],
 			],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
