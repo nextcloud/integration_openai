@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.7.1 – 2025-07-16
+
+### Fixed
+
+- Prefer using the old message format in the chat history: content is a string. Use the new format when there is audio @julien-nc [#237](https://github.com/nextcloud/integration_openai/pull/237)
+
+
 ## 3.7.0 – 2025-07-11
 
 ### Added
