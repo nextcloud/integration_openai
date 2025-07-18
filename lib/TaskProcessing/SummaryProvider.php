@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IAppConfig;
@@ -28,6 +29,7 @@ class SummaryProvider implements ISynchronousProvider {
 		private IAppConfig $appConfig,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
+		private ChunkService $chunkService,
 		private ?string $userId,
 	) {
 	}
@@ -117,11 +119,14 @@ class SummaryProvider implements ISynchronousProvider {
 			$model = $input['model'];
 		}
 
-		$prompts = self::chunkSplitPrompt($prompt);
+		$prompts = $this->chunkService->chunkSplitPrompt($prompt);
 		$newNumChunks = count($prompts);
-
+		$progress = 0.0;
 		do {
+			// Ensure that progress never finishes no matter how many times this loop runs
+			$increase = (1.0 - $progress) / 2.0 / (float)$newNumChunks;
 			$oldNumChunks = $newNumChunks;
+			$reportProgress($progress);
 
 			try {
 				$completions = [];
@@ -132,6 +137,8 @@ class SummaryProvider implements ISynchronousProvider {
 					foreach ($prompts as $p) {
 						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
 						$completions[] = $completion['messages'];
+						$progress += $increase;
+						$reportProgress($progress);
 					}
 				} else {
 					$wrapSummaryPrompt = function (string $p): string {
@@ -142,6 +149,8 @@ class SummaryProvider implements ISynchronousProvider {
 
 					foreach (array_map($wrapSummaryPrompt, $prompts) as $p) {
 						$completions[] = $this->openAiAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
+						$progress += $increase;
+						$reportProgress($progress);
 					}
 				}
 			} catch (Exception $e) {
@@ -161,7 +170,7 @@ class SummaryProvider implements ISynchronousProvider {
 			));
 			$summary = implode(' ', $completionStrings);
 
-			$prompts = self::chunkSplitPrompt($summary);
+			$prompts = $this->chunkService->chunkSplitPrompt($summary);
 			$newNumChunks = count($prompts);
 		} while ($oldNumChunks > $newNumChunks);
 
@@ -170,35 +179,4 @@ class SummaryProvider implements ISynchronousProvider {
 		return ['output' => $summary];
 	}
 
-	private function chunkSplitPrompt(string $prompt): array {
-		$chunkSize = $this->openAiSettingsService->getChunkSize();
-
-		// https://platform.openai.com/tokenizer
-		// Rough approximation, 1 token is approximately 4 bytes for OpenAI models
-		// It's safer to have a lower estimate on the max number of tokens, so consider 3 bytes per token instead of 4 (to account for some multibyte characters)
-		$maxChars = $chunkSize * 3;
-
-		if (!$chunkSize || (mb_strlen($prompt) <= $maxChars)) {
-			// Chunking is disabled or prompt is short enough to be a single chunk
-			return [$prompt];
-		}
-
-		// Try splitting by paragraph, match as many paragraphs as possible per chunk up to the maximum chunk size
-		if (preg_match_all("/.{1,{$maxChars}}\n/su", $prompt, $prompts)) {
-			return $prompts[0];
-		}
-
-		// Try splitting by sentence
-		if (preg_match_all("/.{1,{$maxChars}}[!\.\?\n]/su", $prompt, $prompts)) {
-			return $prompts[0];
-		}
-
-		// Try splitting by word
-		if (preg_match_all("/.{1,{$maxChars}}\W/su", $prompt, $prompts)) {
-			return $prompts[0];
-		}
-
-		// Split by number of characters in maximum chunk size
-		return mb_str_split($prompt, $maxChars);
-	}
 }
