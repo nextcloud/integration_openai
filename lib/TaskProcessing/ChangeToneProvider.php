@@ -96,7 +96,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID)
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id');
 		return [
-			'max_tokens' => 1000,
+			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
 		];
 	}
