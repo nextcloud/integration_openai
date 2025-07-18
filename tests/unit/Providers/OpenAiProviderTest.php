@@ -14,6 +14,7 @@ namespace OCA\OpenAi\Tests\Unit\Provider;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
@@ -44,6 +45,7 @@ class OpenAiProviderTest extends TestCase {
 
 	private OpenAiAPIService $openAiApiService;
 	private OpenAiSettingsService $openAiSettingsService;
+	private ChunkService $chunkService;
 	/**
 	 * @var MockObject|IClient
 	 */
@@ -63,6 +65,8 @@ class OpenAiProviderTest extends TestCase {
 		$this->loginAsUser(self::TEST_USER1);
 
 		$this->openAiSettingsService = \OC::$server->get(OpenAiSettingsService::class);
+
+		$this->chunkService = \OC::$server->get(ChunkService::class);
 
 		$this->quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
 
@@ -298,6 +302,7 @@ class OpenAiProviderTest extends TestCase {
 			\OC::$server->get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
+			$this->chunkService,
 			self::TEST_USER1,
 		);
 
@@ -364,6 +369,7 @@ class OpenAiProviderTest extends TestCase {
 			\OC::$server->get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
+			$this->chunkService,
 			self::TEST_USER1,
 		);
 
@@ -432,6 +438,7 @@ class OpenAiProviderTest extends TestCase {
 			\OC::$server->get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
+			$this->chunkService,
 			self::TEST_USER1,
 		);
 
@@ -502,6 +509,7 @@ class OpenAiProviderTest extends TestCase {
 			\OC::$server->get(\OCP\L10N\IFactory::class),
 			$this->createMock(\OCP\ICacheFactory::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
+			$this->chunkService,
 			self::TEST_USER1,
 		);
 
