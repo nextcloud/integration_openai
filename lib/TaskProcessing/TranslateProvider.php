@@ -153,12 +153,6 @@ class TranslateProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$cacheKey = ($input['origin_language'] ?? '') . '/' . $input['target_language'] . '/' . md5($inputText);
-
-		$cache = $this->cacheFactory->createDistributed('integration_openai');
-		if ($cached = $cache->get($cacheKey)) {
-			return ['output' => $cached];
-		}
 		$chunks = $this->chunkService->chunkSplitPrompt($inputText, true, $maxTokens);
 		$result = '';
 		$increase = 1.0 / (float)count($chunks);
@@ -176,6 +170,16 @@ class TranslateProvider implements ISynchronousProvider {
 			}
 
 			foreach ($chunks as $chunk) {
+				$progress += $increase;
+				$cacheKey = ($input['origin_language'] ?? '') . '/' . $input['target_language'] . '/' . md5($chunk);
+
+				$cache = $this->cacheFactory->createDistributed('integration_openai');
+				if ($cached = $cache->get($cacheKey)) {
+					$this->logger->debug('Using cached translation', ['cached' => $cached, 'cacheKey' => $cacheKey]);
+					$result .= $cached;
+					$reportProgress($progress);
+					continue;
+				}
 				$prompt = $promptStart . $chunk;
 
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
@@ -185,11 +189,12 @@ class TranslateProvider implements ISynchronousProvider {
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 				}
 
-				$progress += $increase;
 				$reportProgress($progress);
 
 				if (count($completion) > 0) {
-					$result .= array_pop($completion);
+					$completion = array_pop($completion);
+					$result .= $completion;
+					$cache->set($cacheKey, $completion);
 					continue;
 				}
 
