@@ -296,6 +296,36 @@
 						</template>
 					</NcButton>
 				</div>
+				<div class="line">
+					<!--Input for max number of tokens to generate for a single request-->
+					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
+					<NcInputField
+						id="openai-api-max-tokens"
+						v-model="state.max_tokens"
+						class="input"
+						type="number"
+						:label="t('integration_openai', 'Max output tokens per request')"
+						:show-trailing-button="!!state.max_tokens"
+						@update:model-value="onInput()"
+						@trailing-button-click="state.max_tokens = '' ; onInput()">
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
+					<NcButton variant="tertiary"
+						:title="t('integration_openai', 'Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks.')">
+						<template #icon>
+							<HelpCircleOutlineIcon />
+						</template>
+					</NcButton>
+				</div>
+				<div class="line">
+					<NcCheckboxRadioSwitch
+						:model-value="state.use_max_completion_tokens_param"
+						@update:model-value="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
+						{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
+					</NcCheckboxRadioSwitch>
+				</div>
 			</div>
 			<div>
 				<h2>
@@ -352,11 +382,13 @@
 						</template>
 					</NcButton>
 				</div>
-				<NcCheckboxRadioSwitch
-					:model-value="state.image_request_auth"
-					@update:model-value="onCheckboxChanged($event, 'image_request_auth', false)">
-					{{ t('integration_openai', 'Use authentication for image retrieval request') }}
-				</NcCheckboxRadioSwitch>
+				<div class="line">
+					<NcCheckboxRadioSwitch
+						:model-value="state.image_request_auth"
+						@update:model-value="onCheckboxChanged($event, 'image_request_auth', false)">
+						{{ t('integration_openai', 'Use authentication for image retrieval request') }}
+					</NcCheckboxRadioSwitch>
+				</div>
 			</div>
 			<div>
 				<h2>
@@ -482,9 +514,13 @@
 						</template>
 					</NcInputField>
 				</div>
-				<h4>
+				<h2>
 					{{ t('integration_openai', 'Usage quotas per time period') }}
-				</h4>
+				</h2>
+				<NcNoteCard type="info">
+					{{ t('integration_openai', 'A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced.') }}
+					{{ t('integration_openai', '"0" means unlimited usage for a particular quota type.') }}
+				</NcNoteCard>
 				<!--Loop through all quota types and list an input for them on this line-->
 				<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
 				<table class="quota-table">
@@ -520,34 +556,6 @@
 						</tr>
 					</tbody>
 				</table>
-				<div class="line">
-					<!--Input for max number of tokens to generate for a single request-->
-					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
-					<NcInputField
-						id="openai-api-max-tokens"
-						v-model="state.max_tokens"
-						class="input"
-						type="number"
-						:label="t('integration_openai', 'Max new tokens per request')"
-						:show-trailing-button="!!state.max_tokens"
-						@update:model-value="onInput()"
-						@trailing-button-click="state.max_tokens = '' ; onInput()">
-						<template #trailing-button-icon>
-							<CloseIcon :size="20" />
-						</template>
-					</NcInputField>
-					<NcButton variant="tertiary"
-						:title="t('integration_openai', 'Maximum number of new tokens generated for a single text generation prompt')">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</div>
-				<NcCheckboxRadioSwitch
-					:model-value="state.use_max_completion_tokens_param"
-					@update:model-value="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
-					{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
-				</NcCheckboxRadioSwitch>
 			</div>
 			<div>
 				<h2>
@@ -831,6 +839,8 @@ export default {
 			}
 		}, 2000),
 		onInput: debounce(async function() {
+			// sanitize quotas
+			this.state.quotas = this.state.quotas.map(e => parseInt(e)).map(e => isNaN(e) || e < 0 ? 0 : e)
 			const values = {
 				service_name: this.state.service_name,
 				request_timeout: parseInt(this.state.request_timeout),
