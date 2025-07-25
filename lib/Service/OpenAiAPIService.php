@@ -486,7 +486,7 @@ class OpenAiAPIService {
 							'type' => 'function',
 							'function' => $toolCall,
 						];
-						$formattedToolCall['function']['arguments'] = json_encode($toolCall['args']);
+						$formattedToolCall['function']['arguments'] = json_encode($toolCall['args'], JSON_FORCE_OBJECT);
 						unset($formattedToolCall['function']['id']);
 						unset($formattedToolCall['function']['args']);
 						unset($formattedToolCall['function']['type']);
