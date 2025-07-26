@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Chaguo msingi",
     "Unknown" : "Haijulikani",
     "seconds" : "sekunde",
     "Bad HTTP method" : "Njia mbaya ya HTTP ",
