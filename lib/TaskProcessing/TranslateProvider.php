@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IAppConfig;
@@ -35,6 +36,7 @@ class TranslateProvider implements ISynchronousProvider {
 		private IFactory $l10nFactory,
 		private ICacheFactory $cacheFactory,
 		private LoggerInterface $logger,
+		private ChunkService $chunkService,
 		private ?string $userId,
 	) {
 	}
@@ -151,42 +153,60 @@ class TranslateProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$cacheKey = ($input['origin_language'] ?? '') . '/' . $input['target_language'] . '/' . md5($inputText);
-
-		$cache = $this->cacheFactory->createDistributed('integration_openai');
-		if ($cached = $cache->get($cacheKey)) {
-			return ['output' => $cached];
-		}
-
+		$chunks = $this->chunkService->chunkSplitPrompt($inputText, true, $maxTokens);
+		$result = '';
+		$increase = 1.0 / (float)count($chunks);
+		$progress = 0.0;
 		try {
 			$coreLanguages = $this->getCoreLanguagesByCode();
 
 			$toLanguage = $coreLanguages[$input['target_language']] ?? $input['target_language'];
+
 			if ($input['origin_language'] !== 'detect_language') {
 				$fromLanguage = $coreLanguages[$input['origin_language']] ?? $input['origin_language'];
-				$this->logger->debug('OpenAI translation FROM[' . $fromLanguage . '] TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
-				$prompt = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ' . $inputText;
+				$promptStart = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ';
 			} else {
-				$this->logger->debug('OpenAI translation TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
-				$prompt = 'Translate to ' . $toLanguage . ': ' . $inputText;
+				$promptStart = 'Translate to ' . $toLanguage . ': ';
 			}
 
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-				$completion = $completion['messages'];
-			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+			foreach ($chunks as $chunk) {
+				$progress += $increase;
+				$cacheKey = ($input['origin_language'] ?? '') . '/' . $input['target_language'] . '/' . md5($chunk);
+
+				$cache = $this->cacheFactory->createDistributed('integration_openai');
+				if ($cached = $cache->get($cacheKey)) {
+					$this->logger->debug('Using cached translation', ['cached' => $cached, 'cacheKey' => $cacheKey]);
+					$result .= $cached;
+					$reportProgress($progress);
+					continue;
+				}
+				$prompt = $promptStart . $chunk;
+
+				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+					$completion = $completion['messages'];
+				} else {
+					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+				}
+
+				$reportProgress($progress);
+
+				if (count($completion) > 0) {
+					$completion = array_pop($completion);
+					$result .= $completion;
+					$cache->set($cacheKey, $completion);
+					continue;
+				}
+
+				throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage} for chunk");
 			}
 
-			if (count($completion) > 0) {
-				$endTime = time();
-				$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-				return ['output' => array_pop($completion)];
-			}
+			$endTime = time();
+			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			return ['output' => $result];
 
 		} catch (Exception $e) {
 			throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage}", 0, $e);
 		}
-		throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage}");
 	}
 }

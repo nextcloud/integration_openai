@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IAppConfig;
@@ -19,6 +20,7 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextTopics;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class TopicsProvider implements ISynchronousProvider {
@@ -28,6 +30,8 @@ class TopicsProvider implements ISynchronousProvider {
 		private IAppConfig $appConfig,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
+		private ChunkService $chunkService,
+		private LoggerInterface $logger,
 		private ?string $userId,
 	) {
 	}
@@ -106,7 +110,6 @@ class TopicsProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Extract topics from the following text. Detect the language of the text. Use the same language as the text. Output only the topics, comma separated. Here is the text:' . "\n\n" . $prompt;
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -118,23 +121,64 @@ class TopicsProvider implements ISynchronousProvider {
 		} else {
 			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
+		$prompts = $this->chunkService->chunkSplitPrompt($prompt);
+		$newNumChunks = count($prompts);
+		$progress = 0.0;
+		$firstRun = true;
+		do {
+			// Make sure to run again if there is more than one chunk after the first run to remove duplicates
+			$runAgain = $firstRun && $newNumChunks > 1;
+			$firstRun = false;
 
-		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-				$completion = $completion['messages'];
-			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+			// Ensure that progress never finishes no matter how many times this loop runs
+			$increase = (1.0 - $progress) / (float)$newNumChunks * 0.9;
+			$oldNumChunks = $newNumChunks;
+			$reportProgress($progress);
+
+			try {
+				$completions = [];
+				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+					$topicsSystemPrompt = 'Extract topics from the following text. Detect the language of the text. Use the same language as the text. Output only the topics, comma separated.';
+
+					foreach ($prompts as $p) {
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $topicsSystemPrompt, null, 1, $maxTokens);
+						$completions[] = $completion['messages'];
+						$progress += $increase;
+						$reportProgress($progress);
+					}
+				} else {
+					$wrapTopicsPrompt = function (string $p): string {
+						return 'Extract topics from the following text. Detect the language of the text. Use the same language as the text.'
+							. 'Output only the topics, comma separated. Here is the text:\n\n' . $p . "\n";
+					};
+
+					foreach (array_map($wrapTopicsPrompt, $prompts) as $p) {
+						$completions[] = $this->openAiAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
+						$progress += $increase;
+						$reportProgress($progress);
+					}
+				}
+			} catch (Exception $e) {
+				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
-		}
-		if (count($completion) > 0) {
-			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-			return ['output' => array_pop($completion)];
-		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+			// Each prompt chunk should return a non-empty array of completions, this will return false if at least one array is empty
+			$allPromptsHaveCompletions = array_reduce($completions, fn (bool $prev, array $next): bool => $prev && count($next), true);
+			if (!$allPromptsHaveCompletions) {
+				throw new RuntimeException('No result in OpenAI/LocalAI response.');
+			}
+
+			// Take only one completion for each chunk and combine them into a completion
+			$completionStrings = array_map(fn (array $completions): string => trim(array_pop($completions)), $completions);
+			$topics = implode(', ', $completionStrings);
+
+			$prompts = $this->chunkService->chunkSplitPrompt($topics);
+			$this->logger->error('TopicsProvider(dsadsaads): ' . $topics);
+			$newNumChunks = count($prompts);
+		} while ($oldNumChunks > $newNumChunks || $runAgain);
+
+		$endTime = time();
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		return ['output' => $topics];
 	}
 }

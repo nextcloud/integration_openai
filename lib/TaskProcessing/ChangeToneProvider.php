@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IAppConfig;
@@ -19,6 +20,7 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
+use OCP\TaskProcessing\TaskTypes\TextToTextChangeTone;
 use RuntimeException;
 
 class ChangeToneProvider implements ISynchronousProvider {
@@ -28,6 +30,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 		private IAppConfig $appConfig,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
+		private ChunkService $chunkService,
 		private ?string $userId,
 	) {
 	}
@@ -42,7 +45,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 
 	public function getTaskTypeId(): string {
 		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChangeTone')) {
-			return \OCP\TaskProcessing\TaskTypes\TextToTextChangeTone::ID;
+			return TextToTextChangeTone::ID;
 		}
 		return ChangeToneTaskType::ID;
 	}
@@ -121,7 +124,6 @@ class ChangeToneProvider implements ISynchronousProvider {
 		}
 		$textInput = $input['input'];
 		$toneInput = $input['tone'];
-		$prompt = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -134,22 +136,33 @@ class ChangeToneProvider implements ISynchronousProvider {
 			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
 
-		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-				$completion = $completion['messages'];
-			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+		$chunks = $this->chunkService->chunkSplitPrompt($textInput, true, $maxTokens);
+		$result = '';
+		$increase = 1.0 / (float)count($chunks);
+		$progress = 0.0;
+		foreach ($chunks as $textInput) {
+			$prompt = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
+			try {
+				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+					$completion = $completion['messages'];
+				} else {
+					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+				}
+			} catch (Exception $e) {
+				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
-		}
-		if (count($completion) > 0) {
-			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-			return ['output' => array_pop($completion)];
-		}
+			$progress += $increase;
+			$reportProgress($progress);
+			if (count($completion) > 0) {
+				$result .= array_pop($completion);
+				continue;
+			}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+			throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		}
+		$endTime = time();
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		return ['output' => $result];
 	}
 }
