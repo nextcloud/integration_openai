@@ -1,5 +1,7 @@
 { "translations": {
     "Default" : "Chaguo msingi",
+    "Text generation" : "Text generation",
+    "Image generation" : "Image generation",
     "Unknown" : "Haijulikani",
     "seconds" : "sekunde",
     "Bad HTTP method" : "Njia mbaya ya HTTP ",
