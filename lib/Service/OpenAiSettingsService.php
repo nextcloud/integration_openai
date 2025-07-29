@@ -219,7 +219,7 @@ class OpenAiSettingsService {
 		// Make sure all quota types are set in the json encoded app value (in case new quota types are added in the future)
 		if (count($quotas) !== count(Application::DEFAULT_QUOTAS)) {
 			foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
-				if (!isset($quotas[$quotaType])) {
+				if (!isset($quotas[$quotaType]) || !is_int($quotas[$quotaType]) || $quotas[$quotaType] < 0) {
 					$quotas[$quotaType] = Application::DEFAULT_QUOTAS[$quotaType];
 				}
 			}
