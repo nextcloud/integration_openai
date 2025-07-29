@@ -123,7 +123,7 @@ class ProofreadProvider implements ISynchronousProvider {
 
 		$chunks = $this->chunkService->chunkSplitPrompt($textInput, true, $maxTokens);
 		$result = '';
-		$increase = 1.0 / (float)count($chunks);
+		$increase = 1.0 / ((float)count($chunks) + 1.0);
 		$progress = 0.0;
 
 		foreach ($chunks as $textInput) {
@@ -147,6 +147,25 @@ class ProofreadProvider implements ISynchronousProvider {
 
 			throw new RuntimeException('No result in OpenAI/LocalAI response.');
 		}
+		if (count($chunks) > 1) {
+			$systemPrompt = 'Repeat the proofread feedback list. Ensure that no information is lost, but also not duplicated. ';
+			try {
+				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $result, $systemPrompt, null, 1, $maxTokens);
+					$completion = $completion['messages'];
+				} else {
+					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $result;
+					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+				}
+			} catch (Exception $e) {
+				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			}
+			if (count($completion) > 0) {
+				$result = array_pop($completion);
+			}
+		}
+		$progress += $increase;
+		$reportProgress($progress);
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 		return ['output' => $result];
