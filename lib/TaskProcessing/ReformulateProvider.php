@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IAppConfig;
@@ -28,6 +29,7 @@ class ReformulateProvider implements ISynchronousProvider {
 		private IAppConfig $appConfig,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
+		private ChunkService $chunkService,
 		private ?string $userId,
 	) {
 	}
@@ -106,7 +108,6 @@ class ReformulateProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid prompt');
 		}
 		$prompt = $input['input'];
-		$prompt = 'Reformulate the following text. Use the same language as the original text.  Output only the reformulation. Here is the text:' . "\n\n" . $prompt . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -118,23 +119,35 @@ class ReformulateProvider implements ISynchronousProvider {
 		} else {
 			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
+		$chunks = $this->chunkService->chunkSplitPrompt($prompt, true, $maxTokens);
+		$result = '';
+		$increase = 1.0 / (float)count($chunks);
+		$progress = 0.0;
 
-		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-				$completion = $completion['messages'];
-			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+		foreach ($chunks as $chunk) {
+			$prompt = 'Reformulate the following text. Use the same language as the original text.  Output only the reformulation. Here is the text:' . "\n\n" . $chunk . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
+			try {
+				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+					$completion = $completion['messages'];
+				} else {
+					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+				}
+			} catch (Exception $e) {
+				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
-		}
-		if (count($completion) > 0) {
-			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-			return ['output' => array_pop($completion)];
+			if (count($completion) > 0) {
+				$result .= array_pop($completion);
+				$progress += $increase;
+				$reportProgress($progress);
+				continue;
+			}
+
+			throw new RuntimeException('No result in OpenAI/LocalAI response.');
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		$endTime = time();
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		return ['output' => $result];
 	}
 }

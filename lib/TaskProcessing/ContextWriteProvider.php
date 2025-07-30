@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IAppConfig;
@@ -27,6 +28,7 @@ class ContextWriteProvider implements ISynchronousProvider {
 		private OpenAiAPIService $openAiAPIService,
 		private IAppConfig $appConfig,
 		private OpenAiSettingsService $openAiSettingsService,
+		private ChunkService $chunkService,
 		private IL10N $l,
 		private ?string $userId,
 	) {
@@ -108,17 +110,9 @@ class ContextWriteProvider implements ISynchronousProvider {
 		) {
 			throw new RuntimeException('Invalid inputs');
 		}
+
 		$writingStyle = $input['style_input'];
 		$sourceMaterial = $input['source_input'];
-
-		$prompt = 'You\'re a professional copywriter tasked with copying an instructed or demonstrated *WRITING STYLE*'
-			. ' and writing a text on the provided *SOURCE MATERIAL*.'
-			. " \n*WRITING STYLE*:\n$writingStyle\n\n*SOURCE MATERIAL*:\n\n$sourceMaterial\n\n"
-			. 'Now write a text in the same style detailed or demonstrated under *WRITING STYLE* using the *SOURCE MATERIAL*'
-			. ' as source of facts and instruction on what to write about.'
-			. ' Do not invent any facts or events yourself.'
-			. ' Also, use the *WRITING STYLE* as a guide for how to write the text ONLY and not as a source of facts or events.'
-			. ' Detect the language used in the *SOURCE_MATERIAL*. Make sure to use the same language in your response. Do not mention the language explicitly.';
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -131,22 +125,42 @@ class ContextWriteProvider implements ISynchronousProvider {
 			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
 		}
 
-		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-				$completion = $completion['messages'];
-			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
-			}
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
-		}
-		if (count($completion) > 0) {
-			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-			return ['output' => array_pop($completion)];
-		}
+		$chunks = $this->chunkService->chunkSplitPrompt($sourceMaterial, true, $maxTokens);
+		$result = '';
+		$increase = 1.0 / (float)count($chunks);
+		$progress = 0.0;
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		foreach ($chunks as $sourceMaterial) {
+			$prompt = 'You\'re a professional copywriter tasked with copying an instructed or demonstrated *WRITING STYLE*'
+				. ' and writing a text on the provided *SOURCE MATERIAL*.'
+				. " \n*WRITING STYLE*:\n$writingStyle\n\n*SOURCE MATERIAL*:\n\n$sourceMaterial\n\n"
+				. 'Now write a text in the same style detailed or demonstrated under *WRITING STYLE* using the *SOURCE MATERIAL*'
+				. ' as source of facts and instruction on what to write about.'
+				. ' Do not invent any facts or events yourself.'
+				. ' Also, use the *WRITING STYLE* as a guide for how to write the text ONLY and not as a source of facts or events.'
+				. ' Detect the language used in the *SOURCE_MATERIAL*. Make sure to use the same language in your response. Do not mention the language explicitly.';
+			try {
+				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+					$completion = $completion['messages'];
+				} else {
+					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+				}
+			} catch (Exception $e) {
+				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			}
+			if (count($completion) > 0) {
+				$result .= array_pop($completion);
+				$progress += $increase;
+				$reportProgress($progress);
+				continue;
+			}
+
+			throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		}
+		$endTime = time();
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		return ['output' => $result];
+
 	}
 }
