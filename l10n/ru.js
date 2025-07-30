@@ -77,8 +77,6 @@ OC.L10N.register(
     "Per-user quota / period" : "Квота / период для каждого пользователя",
     "Current system-wide usage / period" : "Текущее общесистемное использование / период",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Ограничение на использование данного типа API для каждого пользователя (0 для неограниченного количества)",
-    "Max new tokens per request" : "Максимальное количество новых токенов на запрос",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Максимальное количество новых токенов, сгенерированных для одного текстового запроса на генерацию",
     "Select enabled features" : "Выберите включенные функции",
     "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Поставщики услуг обработки текста (для генерации текста, обобщения, записи контекста и т.д.)",

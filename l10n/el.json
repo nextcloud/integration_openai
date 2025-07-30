@@ -95,8 +95,6 @@
     "Per-user quota / period" : "Ποσόστωση ανά χρήστη / περίοδος",
     "Current system-wide usage / period" : "Τρέχουσα χρήση σε όλο το σύστημα / περίοδος",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Όριο ανά χρήστη για χρήση αυτού του τύπου API (0 για απεριόριστο)",
-    "Max new tokens per request" : "Μέγιστος αριθμός νέων tokens ανά αίτημα",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Μέγιστος αριθμός νέων tokens που δημιουργούνται για μια μεμονωμένη ερώτηση δημιουργίας κειμένου",
     "Select enabled features" : "Επιλέξτε ενεργοποιημένες λειτουργίες",
     "Translation provider (to translate Talk messages for example)" : "Πάροχος μετάφρασης (για παράδειγμα για μετάφραση μηνυμάτων του Talk)",
     "Image generation provider" : "Πάροχος δημιουργίας εικόνας",

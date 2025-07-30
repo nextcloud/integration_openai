@@ -135,8 +135,6 @@ OC.L10N.register(
     "Per-user quota / period" : "每個用戶的配額/週期",
     "Current system-wide usage / period" : "在目前系統範圍內的使用量/週期",
     "A per-user limit for usage of this API type (0 for unlimited)" : "每個使用者使用此 API 類型的用量限制（0 為無限制）",
-    "Max new tokens per request" : "每個請求的最大新權杖數",
-    "Maximum number of new tokens generated for a single text generation prompt" : "單一文字產生提示產生的新權杖最大數量",
     "Select enabled features" : "選取已啟用的功能",
     "Translation provider (to translate Talk messages for example)" : "翻譯提供者（舉例來說，用來翻譯 Talk 中的訊息）",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "文本處理提供者（生成文本、摘要、上下文寫作等）",

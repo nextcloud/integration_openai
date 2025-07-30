@@ -76,8 +76,6 @@
     "Per-user quota / period" : "ھەر بىر ئىشلەتكۈچىنىڭ نورمىسى / مۇددىتى",
     "Current system-wide usage / period" : "نۆۋەتتىكى سىستېمىنى ئىشلىتىش / ئىشلىتىش ۋاقتى",
     "A per-user limit for usage of this API type (0 for unlimited)" : "بۇ API تىپىنى ئىشلىتىشنىڭ ھەر بىر ئىشلەتكۈچى چەكلىمىسى (چەكلىمىسىز 0)",
-    "Max new tokens per request" : "ھەر بىر تەلەپكە يېڭى بەلگە",
-    "Maximum number of new tokens generated for a single text generation prompt" : "يەككە تېكىست ھاسىل قىلىش ئۈچۈن ھاسىل قىلىنغان ئەڭ يېڭى يېڭى بەلگە",
     "Select enabled features" : "قوزغىتىلغان ئىقتىدارلارنى تاللاڭ",
     "Translation provider (to translate Talk messages for example)" : "تەرجىمان تەمىنلىگۈچى (سۆزلىشىش ئۇچۇرلىرىنى تەرجىمە قىلىش ئۈچۈن)",
     "Image generation provider" : "رەسىم ھاسىل قىلغۇچى",

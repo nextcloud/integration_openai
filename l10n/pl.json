@@ -87,7 +87,6 @@
     "Chat completions" : "Chat completions",
     "Completions" : "Completions",
     "Max input tokens per request" : "Maksymalna liczba tokenów dla jednego żądania. ",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Maksymalna liczba nowych tokenów generowanych dla pojedynczej wiadomości tekstowej",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Dostawcy przetwarzania tekstu (do generowania tekstu, podsumowywania, pisania kontekstowego itp.)",
     "Image generation provider" : "Dostawca generowania obrazu",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Dostawca mowy na tekst (np. do transkrypcji nagrań rozmów)",

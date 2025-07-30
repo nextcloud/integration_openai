@@ -132,8 +132,6 @@
     "Per-user quota / period" : "Kvóta/období pro jednotlivého uživatele",
     "Current system-wide usage / period" : "Stávající celosystémové využití/období",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Limity využívání jednotlivými uživateli tohoto typu API (0 pro neomezeno)",
-    "Max new tokens per request" : "Nových tokenů v jednotlivém požadavku nejvýše",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Maximální počet nových tokenů vytvořených pro jedno vyzvání k vytvoření textu",
     "Select enabled features" : "Vyberte zapnuté funkce",
     "Translation provider (to translate Talk messages for example)" : "Poskytovatel překladů (například pro překládání zpráv v Talk)",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Poskytovatelé zpracovávání textu (pro jeho vytváření, shrnování, kontextové psaní, atd.)",

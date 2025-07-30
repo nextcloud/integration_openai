@@ -99,8 +99,6 @@ OC.L10N.register(
     "Per-user quota / period" : "Per bruger kvote/periode",
     "Current system-wide usage / period" : "Nuværende system anvendelse / periode",
     "A per-user limit for usage of this API type (0 for unlimited)" : "En per bruger grænse for anvendelse af denne API type (0 for ubegrænset)",
-    "Max new tokens per request" : "Maks nye tokens per forespørgsel",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Maksimalt antal nye tokens genereret for en enkelt tekstgenereringsprompt",
     "Select enabled features" : "Vælg aktiverede funktioner",
     "Translation provider (to translate Talk messages for example)" : "Oversættelsesudbyder (til f.eks at oversætte Snak beskeder)",
     "Image generation provider" : "Billedgenereringsleverandør",

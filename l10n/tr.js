@@ -124,8 +124,6 @@ OC.L10N.register(
     "Per-user quota / period" : "Kullanıcı başına kota / dönem",
     "Current system-wide usage / period" : "Geçerli sistem geneli kullanım / dönem",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Bu API türünün kullanımı ile ilgili kullanıcı başına sınır (sınırsız için 0)",
-    "Max new tokens per request" : "İstek başına en fazla yeni kod sayısı",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Tek bir metin oluşturma istemi için oluşturulacak en fazla yeni kod sayısı",
     "Select enabled features" : "Açık özellikleri seçin",
     "Translation provider (to translate Talk messages for example)" : "Çeviri hizmeti (örneğin Konuş iletilerini çevirmek için)",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Metin işleme hizmeti sağlayıcıları (metin oluşturma, özetleme, bağlam yazma gibi)",

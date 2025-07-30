@@ -114,7 +114,6 @@ OC.L10N.register(
     "Quota type" : "Kvoodi tüüp",
     "Per-user quota / period" : "Kasutajakohane kvoot / ajavahemik",
     "Current system-wide usage / period" : "Praegune serveriülene kvoot / ajavahemik",
-    "Max new tokens per request" : "Sõnede suurim arv päringus",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Tekstitöötluse teenusepakkujad (tekstiloome, kokkuvõtete tegemine, kontekstuaalne kirjutamine, jne.)",
     "Image generation provider" : "Pildiloome teenusepakkuja",
     "Text-to-speech provider" : "Kõnesünteesi teenusepakkuja",

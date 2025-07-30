@@ -133,8 +133,6 @@
     "Per-user quota / period" : "Cota por usuário / período",
     "Current system-wide usage / period" : "Uso atual em todo o sistema / período",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Um limite por usuário para uso deste tipo de API (0 para ilimitado)",
-    "Max new tokens per request" : "Máximo de novos tokens por solicitação",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Número máximo de novos tokens gerados para um único prompt de geração de texto",
     "Select enabled features" : "Selecione recursos habilitados",
     "Translation provider (to translate Talk messages for example)" : "Provedor de tradução (para traduzir mensagens do Talk, por exemplo)",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Provedores de processamento de texto (para gerar texto, resumir, escrita contextual, etc.)",

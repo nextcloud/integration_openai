@@ -100,8 +100,6 @@ OC.L10N.register(
     "Per-user quota / period" : "Cota/período por usuario",
     "Current system-wide usage / period" : "Uso/período actual en todo o sistema",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Un límite por usuario para o uso deste tipo de API (0 para ilimitado)",
-    "Max new tokens per request" : "Máximo de testemuños novos por solicitude",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Número máximo de testemuños novos xerados para unha única indicación de xeración de texto",
     "Select enabled features" : "Seleccione as funcionalidades activadas",
     "Translation provider (to translate Talk messages for example)" : "Provedor de tradución (para traducir mensaxes de Parladoiro, por exemplo)",
     "Image generation provider" : "Provedor de xeración de imaxes",

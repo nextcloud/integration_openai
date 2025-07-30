@@ -65,8 +65,6 @@
     "Per-user quota / period" : "Kvote per bruker / periode",
     "Current system-wide usage / period" : "Gjeldende systemomfattende bruk / periode",
     "A per-user limit for usage of this API type (0 for unlimited)" : "En grense per bruker for bruk av denne API-typen (0 for ubegrenset)",
-    "Max new tokens per request" : "Maks nye tokener per forespørsel",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Maksimalt antall nye tokener generert for en enkelt tekstgenereringsledetekst",
     "Select enabled features" : "Velg aktiverte funksjoner",
     "Translation provider (to translate Talk messages for example)" : "Oversettelsesleverandør (for å oversette for eksempel Talk-meldinger)",
     "Image generation provider" : "Leverandør av bildegenerering",

@@ -133,8 +133,6 @@
     "Per-user quota / period" : "Квота по кориснику / период",
     "Current system-wide usage / period" : "Тренутна употреба на нивоу система / период",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Ограничење по кориснику за овај API тип (0 за без ограничења)",
-    "Max new tokens per request" : "Максимални број нових жетона по захтеву",
-    "Maximum number of new tokens generated for a single text generation prompt" : "Максимални број нових жетона који се генерише за један захтев за генерисање текста",
     "Select enabled features" : "Изаберите укључене могућности",
     "Translation provider (to translate Talk messages for example)" : "Пружалац услуге превођења (на пример, за превођење Talk порука)",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Пружаоци услуге обраде текста (за генерисање текста, резимирање, писање контекста, итд.)",

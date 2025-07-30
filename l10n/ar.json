@@ -98,8 +98,6 @@
     "Per-user quota / period" : "الحصة / الفترة لكل مستخدم",
     "Current system-wide usage / period" : "الحصة/ الفترة على مستوى النظام حاليّاً",
     "A per-user limit for usage of this API type (0 for unlimited)" : "تقييد لحصة كل مستخدِم عند استعمال هذا الـ API ـ ( 0 تعني .حصة غير محددة) ",
-    "Max new tokens per request" : "أقصى عدد من الأَمَارَات tokens الجديدة لكل طلب",
-    "Maximum number of new tokens generated for a single text generation prompt" : "أقصى عدد من الأَمَارَات tokens الجديدة المولدة لكل طلب مفرد لتوليد نص",
     "Select enabled features" : "إختَر الخصائص المُمَكّنة",
     "Translation provider (to translate Talk messages for example)" : "مزود الترجمة (لترجمة رسائل تطبيق Talk على سبيل المثال)",
     "Image generation provider" : "مزود توليد الصور",
