@@ -647,7 +647,7 @@ class OpenAiAPIService {
 	 * @return array|null
 	 */
 	private function getAdminExtraParams(string $configKey): ?array {
-		$stringValue = $this->appConfig->getValueString(Application::APP_ID, $configKey);
+		$stringValue = $this->appConfig->getValueString(Application::APP_ID, $configKey, lazy: true);
 		if ($stringValue === '') {
 			return null;
 		}
@@ -861,8 +861,8 @@ class OpenAiAPIService {
 	 */
 	public function getExpTextProcessingTime(): int {
 		return $this->isUsingOpenAi()
-			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME)))
-			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME)));
+			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME), lazy: true))
+			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME), lazy: true));
 	}
 
 	/**
@@ -874,9 +874,9 @@ class OpenAiAPIService {
 		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
 		if ($this->isUsingOpenAi()) {
-			$this->appConfig->setValueString(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)), lazy: true);
 		} else {
-			$this->appConfig->setValueString(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)), lazy: true);
 		}
 	}
 
@@ -885,8 +885,8 @@ class OpenAiAPIService {
 	 */
 	public function getExpImgProcessingTime(): int {
 		return $this->isUsingOpenAi()
-			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME)))
-			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME)));
+			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME), lazy: true))
+			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME), lazy: true));
 	}
 
 	/**
@@ -898,9 +898,9 @@ class OpenAiAPIService {
 		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
 		if ($this->isUsingOpenAi()) {
-			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)), lazy: true);
 		} else {
-			$this->appConfig->setValueString(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)));
+			$this->appConfig->setValueString(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)), lazy: true);
 		}
 	}
 
