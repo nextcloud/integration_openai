@@ -131,6 +131,7 @@ OC.L10N.register(
     "Usage limits" : "Limites de uso",
     "Quota enforcement time period (days)" : "Período de aplicação da cota (dias)",
     "Usage quotas per time period" : "Cotas de uso por período",
+    "\"0\" means unlimited usage for a particular quota type." : "\"0\" significa uso ilimitado para um tipo específico de cota.",
     "Quota type" : "Tipo de cota",
     "Per-user quota / period" : "Cota por usuário / período",
     "Current system-wide usage / period" : "Uso atual em todo o sistema / período",
