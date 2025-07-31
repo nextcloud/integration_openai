@@ -85,7 +85,7 @@ class TextToTextChatProvider implements ISynchronousProvider {
 
 	public function process(?string $userId, array $input, callable $reportProgress): array {
 		$startTime = time();
-		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID, lazy: true) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new RuntimeException('Invalid input');
