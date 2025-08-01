@@ -118,7 +118,7 @@
     "Max input tokens per request" : "Maximale Eingabetoken pro Anfrage",
     "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "Die Eingabeaufforderung in Blöcke aufteilen, wobei jeder Block nicht mehr als die angegebene Anzahl von Tokens umfassen darf (0 deaktiviert das Aufteilen)",
     "Max output tokens per request" : "Maximale Ausgabetoken pro Anfrage",
-    "Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks." : "Maximale Anzahl generierter Ausgabetoken für eine einzelne Texterstellunganforderung. Dies gilt auch für die Speech-to-Text-Aufgaben.",
+    "Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks." : "Maximale Anzahl generierter Ausgabetoken für eine einzelne Texterstellunganforderung. Dies gilt auch für die Sprache-zu-Text-Aufgaben.",
     "Default image generation model to use" : "Zu verwendendes Standard-Bilderzeugungsmodell",
     "No models to list" : "Keine Modelle zum Auflisten",
     "Default image size" : "Standardbildgröße",
