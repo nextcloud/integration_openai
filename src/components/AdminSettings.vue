@@ -443,7 +443,7 @@
 					:input-label="t('integration_openai', 'Default speech generation model to use')"
 					:no-wrap="true"
 					input-id="openai-tts-model-select"
-					@input="onModelSelected('tts', $event)" />
+					@update:model-value="onModelSelected('tts', $event)" />
 				<a v-if="state.url === ''"
 					:title="t('integration_openai', 'More information about OpenAI models')"
 					href="https://beta.openai.com/docs/models"
