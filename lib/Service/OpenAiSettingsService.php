@@ -74,7 +74,7 @@ class OpenAiSettingsService {
 	 * @throws Exception
 	 */
 	public function getAdminApiKey(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'api_key');
+		return $this->appConfig->getValueString(Application::APP_ID, 'api_key', lazy: true);
 	}
 
 	/**
@@ -98,42 +98,42 @@ class OpenAiSettingsService {
 	 * @return string
 	 */
 	public function getAdminDefaultCompletionModelId(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID, lazy: true) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getAdminDefaultSttModelId(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id') ?: Application::DEFAULT_MODEL_ID;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', lazy: true) ?: Application::DEFAULT_MODEL_ID;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getAdminDefaultImageModelId(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id') ?: Application::DEFAULT_MODEL_ID;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', lazy: true) ?: Application::DEFAULT_MODEL_ID;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getAdminDefaultImageSize(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_size') ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_image_size', lazy: true) ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getAdminDefaultTtsModelId(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id') ?: Application::DEFAULT_MODEL_ID;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', lazy: true) ?: Application::DEFAULT_MODEL_ID;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getAdminDefaultTtsVoice(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice') ?: Application::DEFAULT_SPEECH_VOICE;
+		return $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
 	}
 
 	/**
@@ -143,7 +143,8 @@ class OpenAiSettingsService {
 		$voices = json_decode(
 			$this->appConfig->getValueString(
 				Application::APP_ID, 'tts_voices',
-				json_encode(Application::DEFAULT_SPEECH_VOICES)
+				json_encode(Application::DEFAULT_SPEECH_VOICES),
+				lazy: true,
 			) ?: json_encode(Application::DEFAULT_SPEECH_VOICES),
 			true,
 		);
@@ -164,42 +165,42 @@ class OpenAiSettingsService {
 	 * @return string
 	 */
 	public function getServiceName(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'service_name');
+		return $this->appConfig->getValueString(Application::APP_ID, 'service_name', lazy: true);
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getRequestTimeout(): int {
-		return intval($this->appConfig->getValueString(Application::APP_ID, 'request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT))) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT), lazy: true)) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getChunkSize(): int {
-		return $this->appConfig->getValueInt(Application::APP_ID, 'chunk_size', Application::DEFAULT_CHUNK_SIZE) ?: Application::DEFAULT_CHUNK_SIZE;
+		return $this->appConfig->getValueInt(Application::APP_ID, 'chunk_size', Application::DEFAULT_CHUNK_SIZE, lazy: true) ?: Application::DEFAULT_CHUNK_SIZE;
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getMaxTokens(): int {
-		return intval($this->appConfig->getValueString(Application::APP_ID, 'max_tokens', strval(Application::DEFAULT_MAX_NUM_OF_TOKENS))) ?: Application::DEFAULT_MAX_NUM_OF_TOKENS;
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'max_tokens', strval(Application::DEFAULT_MAX_NUM_OF_TOKENS), lazy: true)) ?: Application::DEFAULT_MAX_NUM_OF_TOKENS;
 	}
 
 	/**
 	 * @return string
 	 */
 	public function getLlmExtraParams(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'llm_extra_params');
+		return $this->appConfig->getValueString(Application::APP_ID, 'llm_extra_params', lazy: true);
 	}
 
 	/**
 	 * @return int
 	 */
 	public function getQuotaPeriod(): int {
-		return intval($this->appConfig->getValueString(Application::APP_ID, 'quota_period', strval(Application::DEFAULT_QUOTA_PERIOD))) ?: Application::DEFAULT_QUOTA_PERIOD;
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'quota_period', strval(Application::DEFAULT_QUOTA_PERIOD), lazy: true)) ?: Application::DEFAULT_QUOTA_PERIOD;
 	}
 
 	/**
@@ -209,7 +210,8 @@ class OpenAiSettingsService {
 		$quotas = json_decode(
 			$this->appConfig->getValueString(
 				Application::APP_ID, 'quotas',
-				json_encode(Application::DEFAULT_QUOTAS)
+				json_encode(Application::DEFAULT_QUOTAS),
+				lazy: true,
 			) ?: json_encode(Application::DEFAULT_QUOTAS),
 			true,
 		);
@@ -223,7 +225,7 @@ class OpenAiSettingsService {
 					$quotas[$quotaType] = Application::DEFAULT_QUOTAS[$quotaType];
 				}
 			}
-			$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas));
+			$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas), lazy: true);
 		}
 
 		return $quotas;
@@ -233,7 +235,7 @@ class OpenAiSettingsService {
 	 * @return boolean
 	 */
 	public function getChatEndpointEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'chat_endpoint_enabled', '1') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'chat_endpoint_enabled', '1', lazy: true) === '1';
 	}
 
 	/**
@@ -270,7 +272,7 @@ class OpenAiSettingsService {
 	 * @return string
 	 */
 	public function getAdminBasicUser(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'basic_user');
+		return $this->appConfig->getValueString(Application::APP_ID, 'basic_user', lazy: true);
 	}
 
 	/**
@@ -279,14 +281,14 @@ class OpenAiSettingsService {
 	 * @throws Exception
 	 */
 	public function getAdminBasicPassword(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'basic_password');
+		return $this->appConfig->getValueString(Application::APP_ID, 'basic_password', lazy: true);
 	}
 
 	/**
 	 * @return boolean
 	 */
 	public function getUseBasicAuth(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_basic_auth', '0') === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'use_basic_auth', '0', lazy: true) === '1';
 	}
 
 	/**
@@ -352,7 +354,7 @@ class OpenAiSettingsService {
 		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 		// we know OpenAI expects "use_max_completion_tokens_param", let's assume the other services don't
 		$default = $isUsingOpenAI ? '1' : '0';
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', $default) === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', $default, lazy: true) === '1';
 	}
 
 	/**
@@ -369,7 +371,7 @@ class OpenAiSettingsService {
 		$serviceUrl = $this->getServiceUrl();
 		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 		$default = $isUsingOpenAI ? '0' : '1';
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default) === '1';
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default, lazy: true) === '1';
 	}
 
 	/**
@@ -424,7 +426,7 @@ class OpenAiSettingsService {
 			}
 		}
 
-		$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas, JSON_THROW_ON_ERROR));
+		$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas, JSON_THROW_ON_ERROR), lazy: true);
 	}
 
 	/**
@@ -433,7 +435,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminApiKey(string $apiKey): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'api_key', $apiKey, false, true);
+		$this->appConfig->setValueString(Application::APP_ID, 'api_key', $apiKey, true, true);
 		$this->invalidateModelsCache();
 	}
 
@@ -459,7 +461,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminDefaultCompletionModelId(string $defaultCompletionModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_completion_model_id', $defaultCompletionModelId, lazy: true);
 	}
 
 	/**
@@ -468,7 +470,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminDefaultSttModelId(string $defaultSttModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'default_stt_model_id', $defaultSttModelId);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_stt_model_id', $defaultSttModelId, lazy: true);
 	}
 
 	/**
@@ -477,7 +479,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminDefaultTtsModelId(string $defaultTtsModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'default_speech_model_id', $defaultTtsModelId);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_speech_model_id', $defaultTtsModelId, lazy: true);
 	}
 
 	/**
@@ -486,7 +488,7 @@ class OpenAiSettingsService {
 	 */
 	public function setAdminDefaultImageModelId(string $defaultImageModelId): void {
 		// No need to validate. As long as it's a string, we're happy campers
-		$this->appConfig->setValueString(Application::APP_ID, 'default_image_model_id', $defaultImageModelId);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_image_model_id', $defaultImageModelId, lazy: true);
 	}
 
 	/**
@@ -494,7 +496,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setAdminDefaultTtsVoice(string $voice): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'default_speech_voice', $voice);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_speech_voice', $voice, lazy: true);
 	}
 
 	/**
@@ -506,7 +508,7 @@ class OpenAiSettingsService {
 		if ($defaultImageSize !== '' && preg_match('/^\d+x\d+$/', $defaultImageSize) !== 1) {
 			throw new Exception('Invalid image size value');
 		}
-		$this->appConfig->setValueString(Application::APP_ID, 'default_image_size', $defaultImageSize);
+		$this->appConfig->setValueString(Application::APP_ID, 'default_image_size', $defaultImageSize, lazy: true);
 	}
 
 	/**
@@ -529,7 +531,7 @@ class OpenAiSettingsService {
 	 * @throws Exception
 	 */
 	public function setServiceName(string $serviceName): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'service_name', $serviceName);
+		$this->appConfig->setValueString(Application::APP_ID, 'service_name', $serviceName, lazy: true);
 	}
 
 	/**
@@ -539,7 +541,7 @@ class OpenAiSettingsService {
 	public function setRequestTimeout(int $requestTimeout): void {
 		// Validate input:
 		$requestTimeout = max(1, $requestTimeout);
-		$this->appConfig->setValueString(Application::APP_ID, 'request_timeout', strval($requestTimeout));
+		$this->appConfig->setValueString(Application::APP_ID, 'request_timeout', strval($requestTimeout), lazy: true);
 	}
 
 	/**
@@ -553,7 +555,7 @@ class OpenAiSettingsService {
 		if ($chunkSize) {
 			$chunkSize = max(Application::MIN_CHUNK_SIZE, $chunkSize);
 		}
-		$this->appConfig->setValueInt(Application::APP_ID, 'chunk_size', $chunkSize);
+		$this->appConfig->setValueInt(Application::APP_ID, 'chunk_size', $chunkSize, lazy: true);
 	}
 
 	/**
@@ -564,7 +566,7 @@ class OpenAiSettingsService {
 	public function setMaxTokens(int $maxTokens): void {
 		// Validate input:
 		$maxTokens = max(100, $maxTokens);
-		$this->appConfig->setValueString(Application::APP_ID, 'max_tokens', strval($maxTokens));
+		$this->appConfig->setValueString(Application::APP_ID, 'max_tokens', strval($maxTokens), lazy: true);
 	}
 
 	public function setLlmExtraParams(string $llmExtraParams): void {
@@ -574,7 +576,7 @@ class OpenAiSettingsService {
 				throw new Exception('Invalid model extra parameters, must be a valid JSON object string or an empty string');
 			}
 		}
-		$this->appConfig->setValueString(Application::APP_ID, 'llm_extra_params', $llmExtraParams);
+		$this->appConfig->setValueString(Application::APP_ID, 'llm_extra_params', $llmExtraParams, lazy: true);
 	}
 
 	/**
@@ -585,7 +587,7 @@ class OpenAiSettingsService {
 	public function setQuotaPeriod(int $quotaPeriod): void {
 		// Validate input:
 		$quotaPeriod = max(1, $quotaPeriod);
-		$this->appConfig->setValueString(Application::APP_ID, 'quota_period', strval($quotaPeriod));
+		$this->appConfig->setValueString(Application::APP_ID, 'quota_period', strval($quotaPeriod), lazy: true);
 	}
 
 	/**
@@ -593,7 +595,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setAdminBasicUser(string $basicUser): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'basic_user', $basicUser);
+		$this->appConfig->setValueString(Application::APP_ID, 'basic_user', $basicUser, lazy: true);
 		$this->invalidateModelsCache();
 	}
 
@@ -602,7 +604,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setAdminBasicPassword(string $basicPassword): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'basic_password', $basicPassword, false, true);
+		$this->appConfig->setValueString(Application::APP_ID, 'basic_password', $basicPassword, true, true);
 		$this->invalidateModelsCache();
 	}
 
@@ -634,7 +636,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setUseBasicAuth(bool $useBasicAuth): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'use_basic_auth', $useBasicAuth ? '1' : '0', lazy: true);
 		$this->invalidateModelsCache();
 	}
 
@@ -643,7 +645,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setAdminTtsVoices(array $voices): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'tts_voices', json_encode($voices));
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_voices', json_encode($voices), lazy: true);
 		$this->invalidateModelsCache();
 	}
 
@@ -782,7 +784,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setUseMaxCompletionParam(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'use_max_completion_tokens_param', $enabled ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'use_max_completion_tokens_param', $enabled ? '1' : '0', lazy: true);
 	}
 
 	/**
@@ -798,7 +800,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 */
 	public function setIsImageRetrievalAuthenticated(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'image_request_auth', $enabled ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'image_request_auth', $enabled ? '1' : '0', lazy: true);
 	}
 
 	/**
@@ -837,6 +839,6 @@ class OpenAiSettingsService {
 	 * @param bool $enabled
 	 */
 	public function setChatEndpointEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'chat_endpoint_enabled', $enabled ? '1' : '0');
+		$this->appConfig->setValueString(Application::APP_ID, 'chat_endpoint_enabled', $enabled ? '1' : '0', lazy: true);
 	}
 }
