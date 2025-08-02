@@ -133,7 +133,7 @@ OC.L10N.register(
     "Usage limits" : "Limites de uso",
     "Quota enforcement time period (days)" : "Período de aplicação da cota (dias)",
     "Usage quotas per time period" : "Cotas de uso por período",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "É possível definir uma cota por usuário para cada tipo de cota. Se o usuário não tiver fornecido sua própria chave de API, essa cota será aplicada.",
+    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "É possível definir uma cota por usuário para cada tipo de cota. Se o usuário não tiver fornecido sua própria chave API, esta cota será aplicada.",
     "\"0\" means unlimited usage for a particular quota type." : "\"0\" significa uso ilimitado para um tipo específico de cota.",
     "Quota type" : "Tipo de cota",
     "Per-user quota / period" : "Cota por usuário / período",
