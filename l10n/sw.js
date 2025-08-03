@@ -4,6 +4,7 @@ OC.L10N.register(
     "Default" : "Chaguo msingi",
     "Text generation" : "Text generation",
     "Image generation" : "Image generation",
+    "Text to speech" : "Text to speech",
     "Unknown" : "Haijulikani",
     "seconds" : "sekunde",
     "Bad HTTP method" : "Njia mbaya ya HTTP ",
@@ -13,6 +14,7 @@ OC.L10N.register(
     "Detect language" : "Lugha iliyotambuliwa",
     "Size" : "Ukubwa",
     "Voice" : "Sauti",
+    "Prompt" : "Prompt",
     "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Uthibitisho",
     "API key" : "Ufunguo wa API"

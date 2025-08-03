@@ -77,6 +77,7 @@ OC.L10N.register(
     "Usage limits" : "Ограничения на использование",
     "Quota enforcement time period (days)" : "Период времени соблюдения квоты (дни)",
     "Usage quotas per time period" : "Квоты использования за определенный период времени",
+    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Для каждого типа квоты может быть установлена квота под конкретного пользователя. Если пользователь не предоставил свой API ключ, эта квота будет применена.",
     "\"0\" means unlimited usage for a particular quota type." : "\"0\" означает безлимитное использование для определенного типа квоты.",
     "Quota type" : "Тип квоты",
     "Per-user quota / period" : "Квота / период для каждого пользователя",
