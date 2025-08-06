@@ -586,6 +586,11 @@
 					@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
 					{{ t('integration_openai', 'Text-to-speech provider') }}
 				</NcCheckboxRadioSwitch>
+				<NcCheckboxRadioSwitch
+					:model-value="state.analyze_image_provider_enabled"
+					@update:model-value="onCheckboxChanged($event, 'analyze_image_provider_enabled', false)">
+					{{ t('integration_openai', 'Analyze image provider') }}
+				</NcCheckboxRadioSwitch>
 			</div>
 		</div>
 	</div>
@@ -699,6 +704,23 @@ export default {
 				value: model.id,
 				label: model.id + (model.owned_by ? ' (' + model.owned_by + ')' : ''),
 			}
+		},
+		autoUpdateConfig() {
+			return axios.post(generateUrl('/apps/integration_openai/admin-config/auto-update')).then((response) => {
+				const data = response.data ?? {}
+				console.debug(data)
+				this.state = {
+					...this.state,
+					...data,
+				}
+			}).catch((error) => {
+				showError(
+					t('integration_openai', 'Failed to auto update config')
+						+ ': ' + this.reduceStars(error.response?.data?.error),
+					{ timeout: 10000 },
+				)
+				console.error(error)
+			})
 		},
 
 		getModels(shouldSave = true) {
@@ -837,6 +859,7 @@ export default {
 			if (getModels) {
 				this.getModels()
 			}
+			this.autoUpdateConfig()
 		}, 2000),
 		onInput: debounce(async function() {
 			// sanitize quotas

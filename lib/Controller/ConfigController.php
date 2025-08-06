@@ -8,6 +8,7 @@
 namespace OCA\OpenAi\Controller;
 
 use Exception;
+use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
@@ -22,6 +23,7 @@ class ConfigController extends Controller {
 		string $appName,
 		IRequest $request,
 		private OpenAiSettingsService $openAiSettingsService,
+		private OpenAiAPIService $openAiAPIService,
 		private ?string $userId,
 	) {
 		parent::__construct($appName, $request);
@@ -97,5 +99,18 @@ class ConfigController extends Controller {
 		}
 
 		return new DataResponse('');
+	}
+
+	/**
+	 * Set admin config values
+	 * @return DataResponse
+	 */
+	public function autoUpdateConfig(): DataResponse {
+		try {
+			$config = $this->openAiAPIService->autoUpdateConfig();
+			return new DataResponse($config);
+		} catch (Exception $e) {
+			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
 	}
 }
