@@ -105,9 +105,9 @@ class ConfigController extends Controller {
 	 * Set admin config values
 	 * @return DataResponse
 	 */
-	public function autoUpdateConfig(): DataResponse {
+	public function autoDetectFeatures(): DataResponse {
 		try {
-			$config = $this->openAiAPIService->autoUpdateConfig();
+			$config = $this->openAiAPIService->autoDetectFeatures();
 			return new DataResponse($config);
 		} catch (Exception $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);

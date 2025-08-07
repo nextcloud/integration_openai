@@ -705,8 +705,8 @@ export default {
 				label: model.id + (model.owned_by ? ' (' + model.owned_by + ')' : ''),
 			}
 		},
-		autoUpdateConfig() {
-			return axios.post(generateUrl('/apps/integration_openai/admin-config/auto-update')).then((response) => {
+		autoDetectFeatures() {
+			return axios.post(generateUrl('/apps/integration_openai/admin-config/auto-detect-features')).then((response) => {
 				const data = response.data ?? {}
 				console.debug(data)
 				this.state = {
@@ -859,7 +859,7 @@ export default {
 			if (getModels) {
 				this.getModels()
 			}
-			this.autoUpdateConfig()
+			this.autoDetectFeatures()
 		}, 2000),
 		onInput: debounce(async function() {
 			// sanitize quotas

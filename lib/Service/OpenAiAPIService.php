@@ -1095,7 +1095,7 @@ class OpenAiAPIService {
 	 * @return array the updated config
 	 * @throws Exception
 	 */
-	public function autoUpdateConfig(): array {
+	public function autoDetectFeatures(): array {
 		$config = [];
 		$config['t2i_provider_enabled'] = $this->isT2IAvailable();
 		$config['stt_provider_enabled'] = $this->isSTTAvailable();
