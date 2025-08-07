@@ -37,7 +37,7 @@ class Version030102Date20241003155512 extends SimpleMigrationStep {
 			$value = $this->appConfig->getValueString(Application::APP_ID, $key);
 			if ($value !== '') {
 				$encryptedValue = $this->crypto->encrypt($value);
-				$this->appConfig->setValueString(Application::APP_ID, $key, $encryptedValue);
+				$this->appConfig->setValueString(Application::APP_ID, $key, $encryptedValue, lazy: true);
 			}
 		}
 
