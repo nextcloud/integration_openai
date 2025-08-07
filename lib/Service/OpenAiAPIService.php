@@ -891,10 +891,11 @@ class OpenAiAPIService {
 	 * @param array $params Query parameters (key/val pairs)
 	 * @param string $method HTTP query method
 	 * @param string|null $contentType
+	 * @param bool $logErrors if set to false error logs will be suppressed
 	 * @return array decoded request result or error
 	 * @throws Exception
 	 */
-	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null): array {
+	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, bool $logErrors = true): array {
 		try {
 			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
 			if ($serviceUrl === '') {
@@ -1000,10 +1001,12 @@ class OpenAiAPIService {
 		} catch (ClientException|ServerException $e) {
 			$responseBody = $e->getResponse()->getBody();
 			$parsedResponseBody = json_decode($responseBody, true);
-			if ($e->getResponse()->getStatusCode() === 404) {
-				$this->logger->debug('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
-			} else {
-				$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
+			if ($logErrors) {
+				if ($e->getResponse()->getStatusCode() === 404) {
+					$this->logger->debug('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
+				} else {
+					$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
+				}
 			}
 			throw new Exception(
 				$this->l10n->t('API request error: ') . (
@@ -1018,5 +1021,87 @@ class OpenAiAPIService {
 				intval($e->getCode()),
 			);
 		}
+	}
+
+	/**
+	 * Check if the T2I provider is available
+	 *
+	 * @return bool whether the T2I provider is available
+	 */
+	public function isT2IAvailable(): bool {
+		if ($this->isUsingOpenAi()) {
+			return true;
+		}
+		try {
+			$params = [
+				'prompt' => 'a',
+				'model' => 'invalid-model',
+			];
+			$this->request(null, 'images/generations', $params, 'POST', logErrors: false);
+		} catch (Exception $e) {
+			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
+		}
+		return true;
+	}
+
+	/**
+	 * Check if the STT provider is available
+	 *
+	 * @return bool whether the STT provider is available
+	 */
+	public function isSTTAvailable(): bool {
+		if ($this->isUsingOpenAi()) {
+			return true;
+		}
+		try {
+			$params = [
+				'model' => 'invalid-model',
+				'file' => 'a',
+			];
+			$this->request(null, 'audio/translations', $params, 'POST', 'multipart/form-data', logErrors: false);
+		} catch (Exception $e) {
+			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
+		}
+		return true;
+	}
+
+	/**
+	 * Check if the TTS provider is available
+	 *
+	 * @return bool whether the TTS provider is available
+	 */
+	public function isTTSAvailable(): bool {
+		if ($this->isUsingOpenAi()) {
+			return true;
+		}
+		try {
+			$params = [
+				'input' => 'a',
+				'voice' => 'invalid-voice',
+				'model' => 'invalid-model',
+				'response_format' => 'mp3',
+			];
+
+			$this->request(null, 'audio/speech', $params, 'POST', logErrors: false);
+		} catch (Exception $e) {
+			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
+		}
+		return true;
+	}
+
+	/**
+	 * Updates the admin config with the availability of the providers
+	 *
+	 * @return array the updated config
+	 * @throws Exception
+	 */
+	public function autoDetectFeatures(): array {
+		$config = [];
+		$config['t2i_provider_enabled'] = $this->isT2IAvailable();
+		$config['stt_provider_enabled'] = $this->isSTTAvailable();
+		$config['tts_provider_enabled'] = $this->isTTSAvailable();
+		$this->openAiSettingsService->setAdminConfig($config);
+		$config['analyze_image_provider_enabled'] = $this->openAiSettingsService->getAnalyzeImageProviderEnabled();
+		return $config;
 	}
 }

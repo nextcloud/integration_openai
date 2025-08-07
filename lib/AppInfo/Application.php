@@ -100,6 +100,9 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(AudioToTextProvider::class);
 		}
 
+		$serviceUrl = $this->appConfig->getValueString(Application::APP_ID, 'url');
+		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+
 		if ($this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToTextProvider::class);
 			$context->registerTaskProcessingProvider(TextToTextChatProvider::class);
@@ -119,10 +122,12 @@ class Application extends App implements IBootstrap {
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextProofread')) {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
 			}
-			if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImages')) {
-				$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\AnalyzeImagesTaskType::class);
+			if ($isUsingOpenAI || $this->appConfig->getValueString(Application::APP_ID, 'analyze_image_provider_enabled') === '1') {
+				if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImages')) {
+					$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\AnalyzeImagesTaskType::class);
+				}
+				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImagesProvider::class);
 			}
-			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImagesProvider::class);
 		}
 		if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech')) {
 			$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\TextToSpeechTaskType::class);
@@ -133,8 +138,6 @@ class Application extends App implements IBootstrap {
 		}
 
 		// only register audio chat stuff if we're using OpenAI or stt+llm+tts are enabled
-		$serviceUrl = $this->appConfig->getValueString(Application::APP_ID, 'url');
-		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 		if (
 			$isUsingOpenAI
 			|| (

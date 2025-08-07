@@ -40,6 +40,7 @@ class OpenAiSettingsService {
 		't2i_provider_enabled' => 'boolean',
 		'stt_provider_enabled' => 'boolean',
 		'tts_provider_enabled' => 'boolean',
+		'analyze_image_provider_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
@@ -321,6 +322,7 @@ class OpenAiSettingsService {
 			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
 			'tts_provider_enabled' => $this->getTtsProviderEnabled(),
+			'analyze_image_provider_enabled' => $this->getAnalyzeImageProviderEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
 			'basic_password' => $this->getAdminBasicPassword(),
@@ -398,6 +400,19 @@ class OpenAiSettingsService {
 	 */
 	public function getTtsProviderEnabled(): bool {
 		return $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getAnalyzeImageProviderEnabled(): bool {
+		$config = $this->appConfig->getValueString(Application::APP_ID, 'analyze_image_provider_enabled');
+		if ($config === '') {
+			$serviceUrl = $this->getServiceUrl();
+			$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+			return $isUsingOpenAI;
+		}
+		return $config === '1';
 	}
 
 	////////////////////////////////////////////
@@ -731,6 +746,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['tts_provider_enabled'])) {
 			$this->setTtsProviderEnabled($adminConfig['tts_provider_enabled']);
 		}
+		if (isset($adminConfig['analyze_image_provider_enabled'])) {
+			$this->setAnalyzeImageProviderEnabled($adminConfig['analyze_image_provider_enabled']);
+		}
 		if (isset($adminConfig['default_tts_voice'])) {
 			$this->setAdminDefaultTtsVoice($adminConfig['default_tts_voice']);
 		}
@@ -831,6 +849,14 @@ class OpenAiSettingsService {
 	 */
 	public function setTtsProviderEnabled(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'tts_provider_enabled', $enabled ? '1' : '0');
+	}
+
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setAnalyzeImageProviderEnabled(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'analyze_image_provider_enabled', $enabled ? '1' : '0');
 	}
 
 	/**
