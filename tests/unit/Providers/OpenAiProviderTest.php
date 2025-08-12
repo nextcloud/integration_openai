@@ -82,6 +82,7 @@ class OpenAiProviderTest extends TestCase {
 			\OC::$server->get(ICacheFactory::class),
 			\OC::$server->get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
+			$this->createMock(\OCP\Notification\IManager::class),
 			$clientService,
 		);
 

@@ -8,6 +8,7 @@
 namespace OCA\OpenAi\AppInfo;
 
 use OCA\OpenAi\Capabilities;
+use OCA\OpenAi\Notification\Notifier;
 use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
 use OCA\OpenAi\TaskProcessing\AudioToAudioChatProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
@@ -152,6 +153,7 @@ class Application extends App implements IBootstrap {
 		}
 
 		$context->registerCapability(Capabilities::class);
+		$context->registerNotifierService(Notifier::class);
 	}
 
 	public function boot(IBootContext $context): void {

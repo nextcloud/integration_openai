@@ -7,6 +7,7 @@
 
 namespace OCA\OpenAi\Service;
 
+use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
@@ -25,6 +26,7 @@ use OCP\IAppConfig;
 use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
+use OCP\Notification\IManager as INotificationManager;
 use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -46,6 +48,7 @@ class OpenAiAPIService {
 		private ICacheFactory $cacheFactory,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
+		private INotificationManager $notificationManager,
 		IClientService $clientService,
 	) {
 		$this->client = $clientService->newClient();
@@ -252,8 +255,17 @@ class OpenAiAPIService {
 			$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
 			throw new Exception('Could not retrieve quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
-
-		return $quotaUsage >= $quota;
+		if ($quotaUsage >= $quota) {
+			$notification = $this->notificationManager->createNotification();
+			$notification->setApp(Application::APP_ID)
+				->setUser($userId)
+				->setDateTime(new DateTime())
+				->setObject('quota_exceeded', (string)$type)
+				->setSubject('quota_exceeded', ['type' => $type]);
+			$this->notificationManager->notify($notification);
+			return true;
+		}
+		return false;
 	}
 
 	/**
