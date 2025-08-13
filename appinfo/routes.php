@@ -16,5 +16,9 @@ return [
 		['name' => 'openAiAPI#getModels', 'url' => '/models', 'verb' => 'GET'],
 		['name' => 'openAiAPI#getUserQuotaInfo', 'url' => '/quota-info', 'verb' => 'GET'],
 		['name' => 'openAiAPI#getAdminQuotaInfo', 'url' => '/admin-quota-info', 'verb' => 'GET'],
+
+		['name' => 'quotaRule#addRule', 'url' => '/quota/rule', 'verb' => 'POST'],
+		['name' => 'quotaRule#updateRule', 'url' => '/quota/rule', 'verb' => 'PUT'],
+		['name' => 'quotaRule#deleteRule', 'url' => '/quota/rule', 'verb' => 'DELETE'],
 	],
 ];

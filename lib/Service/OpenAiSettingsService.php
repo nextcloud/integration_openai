@@ -440,6 +440,8 @@ class OpenAiSettingsService {
 		}
 
 		$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas, JSON_THROW_ON_ERROR));
+		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
+		$cache->clear(Application::QUOTA_RULES_CACHE_PREFIX);
 	}
 
 	/**
