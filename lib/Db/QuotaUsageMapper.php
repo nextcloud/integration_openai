@@ -17,6 +17,7 @@ use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use RuntimeException;
 
 /**
  * @extends QBMapper<QuotaUsage>
@@ -101,13 +102,14 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param string $userId
 	 * @param int $type Type of the quota
 	 * @param int $periodStart Start time of quota
+	 * @param int|null $pool
 	 * @return int
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
-	 * @throws \RuntimeException
+	 * @throws RuntimeException
 	 */
-	public function getQuotaUnitsOfUserInTimePeriod(string $userId, int $type, int $periodStart): int {
+	public function getQuotaUnitsOfUserInTimePeriod(string $userId, int $type, int $periodStart, ?int $pool = null): int {
 		$qb = $this->db->getQueryBuilder();
 
 		// Get the sum of the units used in the time period
@@ -117,11 +119,17 @@ class QuotaUsageMapper extends QBMapper {
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
 			)
 			->andWhere(
-				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
-			)
-			->andWhere(
 				$qb->expr()->gt('timestamp', $qb->createNamedParameter($periodStart, IQueryBuilder::PARAM_INT))
 			);
+		if ($pool === null) {
+			$qb->andWhere(
+				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
+			);
+		} else {
+			$qb->andWhere(
+				$qb->expr()->eq('pool', $qb->createNamedParameter($pool, IQueryBuilder::PARAM_INT))
+			);
+		}
 
 		// Execute the query and return the result
 		$result = (int)$qb->executeQuery()->fetchOne();
@@ -181,15 +189,17 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param string $userId
 	 * @param int $type
 	 * @param int $units
+	 * @param int $pool
 	 * @return QuotaUsage
 	 * @throws Exception
 	 */
-	public function createQuotaUsage(string $userId, int $type, int $units): QuotaUsage {
+	public function createQuotaUsage(string $userId, int $type, int $units, int $pool = -1): QuotaUsage {
 
 		$quotaUsage = new QuotaUsage();
 		$quotaUsage->setUserId($userId);
 		$quotaUsage->setType($type);
 		$quotaUsage->setUnits($units);
+		$quotaUsage->setPool($pool);
 		$quotaUsage->setTimestamp((new DateTime())->getTimestamp());
 		$insertedQuotaUsage = $this->insert($quotaUsage);
 

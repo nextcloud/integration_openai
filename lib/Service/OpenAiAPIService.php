@@ -49,9 +49,21 @@ class OpenAiAPIService {
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
 		private INotificationManager $notificationManager,
+		private QuotaRuleService $quotaRuleService,
 		IClientService $clientService,
 	) {
 		$this->client = $clientService->newClient();
+	}
+
+	/**
+	 * @param string $userId
+	 * @param int $type
+	 * @param int $usage
+	 * @throws Exception If there is an error creating the quota usage.
+	 */
+	public function createQuotaUsage(string $userId, int $type, int $usage) {
+		$rule = $this->quotaRuleService->getRule($type, $userId);
+		$this->quotaUsageMapper->createQuotaUsage($userId, $type, $usage, $rule['pool'] ? $rule['id'] : -1);
 	}
 
 	/**
@@ -238,9 +250,9 @@ class OpenAiAPIService {
 			// User has specified own OpenAI API key, no quota limit:
 			return false;
 		}
-
-		// Get quota limits
-		$quota = $this->openAiSettingsService->getQuotas()[$type];
+		$rule = $this->quotaRuleService->getRule($type, $userId);
+		$quota = $rule['amount'];
+		$pool = $rule['pool'] ? $rule['id'] : null;
 
 		if ($quota === 0) {
 			//  Unlimited quota:
@@ -250,7 +262,7 @@ class OpenAiAPIService {
 		$quotaStart = $this->openAiSettingsService->getQuotaStart();
 
 		try {
-			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaStart);
+			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaStart, $pool);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
 			$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
 			throw new Exception('Could not retrieve quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -319,7 +331,7 @@ class OpenAiAPIService {
 	 */
 	public function getUserQuotaInfo(string $userId): array {
 		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit, just supply default values as fillers)
-		$quotas = $this->hasOwnOpenAiApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->openAiSettingsService->getQuotas();
+		$ownApikey = $this->hasOwnOpenAiApiKey($userId);
 		// Get quota period
 		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
 		$quotaStart = $this->openAiSettingsService->getQuotaStart();
@@ -334,7 +346,15 @@ class OpenAiAPIService {
 				$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 			}
-			$quotaInfo[$quotaType]['limit'] = intval($quotas[$quotaType]);
+			if ($ownApikey) {
+				$quotaInfo[$quotaType]['limit'] = Application::DEFAULT_QUOTAS[$quotaType];
+			} else {
+				$rule = $this->quotaRuleService->getRule($quotaType, $userId);
+				$quotaInfo[$quotaType]['limit'] = $rule['amount'];
+				if ($rule['pool']) {
+					$quotaInfo[$quotaType]['used_pool'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaStart, $rule['id']);
+				}
+			}
 			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
 		}
 
@@ -426,7 +446,7 @@ class OpenAiAPIService {
 		if (isset($response['usage'], $response['usage']['total_tokens'])) {
 			$usage = $response['usage']['total_tokens'];
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -597,7 +617,7 @@ class OpenAiAPIService {
 		if (isset($response['usage'], $response['usage']['total_tokens'])) {
 			$usage = $response['usage']['total_tokens'];
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -745,7 +765,7 @@ class OpenAiAPIService {
 			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
 
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -784,7 +804,7 @@ class OpenAiAPIService {
 
 		} else {
 			try {
-				$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -849,7 +869,7 @@ class OpenAiAPIService {
 
 		try {
 			$charCount = mb_strlen($prompt);
-			$this->quotaUsageMapper->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount);
+			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount);
 		} catch (DBException $e) {
 			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_SPEECH . '. Error: ' . $e->getMessage());
 		}
