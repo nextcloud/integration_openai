@@ -255,21 +255,21 @@ class OpenAiAPIService {
 			$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
 			throw new Exception('Could not retrieve quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
-		if ($quotaUsage >= $quota) {
-			$cache = $this->cacheFactory->createLocal(Application::APP_ID);
-			if ($cache->get('quota_exceeded_' . $userId . '_' . $type) === null) {
-				$notification = $this->notificationManager->createNotification();
-				$notification->setApp(Application::APP_ID)
-					->setUser($userId)
-					->setDateTime(new DateTime())
-					->setObject('quota_exceeded', (string)$type)
-					->setSubject('quota_exceeded', ['type' => $type]);
-				$this->notificationManager->notify($notification);
-				$cache->set('quota_exceeded_' . $userId . '_' . $type, true, 3600);
-			}
-			return true;
+		if ($quotaUsage < $quota) {
+			return false;
 		}
-		return false;
+		$cache = $this->cacheFactory->createLocal(Application::APP_ID);
+		if ($cache->get('quota_exceeded_' . $userId . '_' . $type) === null) {
+			$notification = $this->notificationManager->createNotification();
+			$notification->setApp(Application::APP_ID)
+				->setUser($userId)
+				->setDateTime(new DateTime())
+				->setObject('quota_exceeded', (string)$type)
+				->setSubject('quota_exceeded', ['type' => $type]);
+			$this->notificationManager->notify($notification);
+			$cache->set('quota_exceeded_' . $userId . '_' . $type, true, 3600);
+		}
+		return true;
 	}
 
 	/**
