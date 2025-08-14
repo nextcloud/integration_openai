@@ -13,7 +13,6 @@
 namespace OCA\OpenAi\Tests\Unit\Quota;
 
 use Exception;
-use OC;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\OpenAiAPIService;
@@ -55,7 +54,7 @@ class QuotaTest extends TestCase {
 		parent::setUpBeforeClass();
 		$backend = new Dummy();
 		$backend->createUser(self::TEST_USER1, self::TEST_USER1);
-		OC::$server->get(IUserManager::class)->registerBackend($backend);
+		\OCP\Server::get(IUserManager::class)->registerBackend($backend);
 	}
 
 	protected function setUp(): void {
@@ -63,9 +62,9 @@ class QuotaTest extends TestCase {
 
 		$this->loginAsUser(self::TEST_USER1);
 
-		$this->openAiSettingsService = OC::$server->get(OpenAiSettingsService::class);
+		$this->openAiSettingsService = \OCP\Server::get(OpenAiSettingsService::class);
 
-		$this->quotaUsageMapper = OC::$server->get(QuotaUsageMapper::class);
+		$this->quotaUsageMapper = \OCP\Server::get(QuotaUsageMapper::class);
 
 		$this->notificationManager = $this->createMock(IManager::class);
 
@@ -73,20 +72,20 @@ class QuotaTest extends TestCase {
 
 
 		$this->openAiApiService = new OpenAiAPIService(
-			OC::$server->get(LoggerInterface::class),
+			\OCP\Server::get(LoggerInterface::class),
 			$this->createMock(IL10N::class),
-			OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			$this->cacheFactory,
-			OC::$server->get(QuotaUsageMapper::class),
+			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$this->notificationManager,
-			OC::$server->get(IClientService::class),
+			\OCP\Server::get(IClientService::class),
 		);
 	}
 
 	public static function tearDownAfterClass(): void {
 		// Delete quota usage for test user
-		$quotaUsageMapper = OC::$server->get(QuotaUsageMapper::class);
+		$quotaUsageMapper = \OCP\Server::get(QuotaUsageMapper::class);
 		try {
 			$quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 		} catch (\OCP\Db\Exception|RuntimeException|Exception|Throwable $e) {
@@ -95,7 +94,7 @@ class QuotaTest extends TestCase {
 
 		$backend = new Dummy();
 		$backend->deleteUser(self::TEST_USER1);
-		OC::$server->get(IUserManager::class)->removeBackend($backend);
+		\OCP\Server::get(IUserManager::class)->removeBackend($backend);
 
 		parent::tearDownAfterClass();
 	}
