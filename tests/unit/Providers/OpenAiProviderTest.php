@@ -56,7 +56,7 @@ class OpenAiProviderTest extends TestCase {
 		parent::setUpBeforeClass();
 		$backend = new Dummy();
 		$backend->createUser(self::TEST_USER1, self::TEST_USER1);
-		\OC::$server->get(\OCP\IUserManager::class)->registerBackend($backend);
+		\OCP\Server::get(\OCP\IUserManager::class)->registerBackend($backend);
 	}
 
 	protected function setUp(): void {
@@ -64,11 +64,11 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->loginAsUser(self::TEST_USER1);
 
-		$this->openAiSettingsService = \OC::$server->get(OpenAiSettingsService::class);
+		$this->openAiSettingsService = \OCP\Server::get(OpenAiSettingsService::class);
 
-		$this->chunkService = \OC::$server->get(ChunkService::class);
+		$this->chunkService = \OCP\Server::get(ChunkService::class);
 
-		$this->quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
+		$this->quotaUsageMapper = \OCP\Server::get(QuotaUsageMapper::class);
 
 		// We'll hijack the client service and subsequently iClient to return a mock response from the OpenAI API
 		$clientService = $this->createMock(IClientService::class);
@@ -76,12 +76,13 @@ class OpenAiProviderTest extends TestCase {
 		$clientService->method('newClient')->willReturn($this->iClient);
 
 		$this->openAiApiService = new OpenAiAPIService(
-			\OC::$server->get(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(\Psr\Log\LoggerInterface::class),
 			$this->createMock(\OCP\IL10N::class),
-			\OC::$server->get(IAppConfig::class),
-			\OC::$server->get(ICacheFactory::class),
-			\OC::$server->get(QuotaUsageMapper::class),
+			\OCP\Server::get(IAppConfig::class),
+			\OCP\Server::get(ICacheFactory::class),
+			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
+			$this->createMock(\OCP\Notification\IManager::class),
 			$clientService,
 		);
 
@@ -90,7 +91,7 @@ class OpenAiProviderTest extends TestCase {
 
 	public static function tearDownAfterClass(): void {
 		// Delete quota usage for test user
-		$quotaUsageMapper = \OC::$server->get(QuotaUsageMapper::class);
+		$quotaUsageMapper = \OCP\Server::get(QuotaUsageMapper::class);
 		try {
 			$quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 		} catch (\OCP\Db\Exception|\RuntimeException|\Exception|\Throwable $e) {
@@ -99,7 +100,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$backend = new \Test\Util\User\Dummy();
 		$backend->deleteUser(self::TEST_USER1);
-		\OC::$server->get(\OCP\IUserManager::class)->removeBackend($backend);
+		\OCP\Server::get(\OCP\IUserManager::class)->removeBackend($backend);
 
 		parent::tearDownAfterClass();
 	}
@@ -107,7 +108,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testFreePromptProvider(): void {
 		$freePromptProvider = new TextToTextProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
@@ -170,7 +171,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testEmojiProvider(): void {
 		$emojiProvider = new EmojiProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
@@ -235,7 +236,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testHeadlineProvider(): void {
 		$headlineProvider = new HeadlineProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
@@ -299,7 +300,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testChangeToneProvider(): void {
 		$changeToneProvider = new ChangeToneProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
@@ -366,7 +367,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testSummaryProvider(): void {
 		$summaryProvider = new SummaryProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
@@ -435,7 +436,7 @@ class OpenAiProviderTest extends TestCase {
 	public function testProofreadProvider(): void {
 		$proofreadProvider = new ProofreadProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
@@ -503,10 +504,10 @@ class OpenAiProviderTest extends TestCase {
 	public function testTranslationProvider(): void {
 		$translationProvider = new TranslateProvider(
 			$this->openAiApiService,
-			\OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
-			\OC::$server->get(\OCP\L10N\IFactory::class),
+			\OCP\Server::get(\OCP\L10N\IFactory::class),
 			$this->createMock(\OCP\ICacheFactory::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			$this->chunkService,
@@ -576,7 +577,7 @@ class OpenAiProviderTest extends TestCase {
 			$this->openAiApiService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
-			\OC::$server->get(IAppConfig::class),
+			\OCP\Server::get(IAppConfig::class),
 			self::TEST_USER1,
 		);
 
