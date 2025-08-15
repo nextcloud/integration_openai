@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation quota exceeded" : "تېكىست ھاسىل قىلىش نورمىسى ئېشىپ كەتتى",
+    "Image generation quota exceeded" : "رەسىم ھاسىل قىلىش نورمىسى ئېشىپ كەتتى",
+    "Audio transcription quota exceeded" : "ئاۋاز خاتىرىلەش نورمىسى ئېشىپ كەتتى",
     "Default" : "سۈكۈتتىكى",
     "Text generation" : "تېكىست ئەۋلاد",
     "Image generation" : "رەسىم ھاسىل قىلىش",
@@ -10,12 +13,9 @@ OC.L10N.register(
     "images" : "سۈرەتلەر",
     "seconds" : "سېكۇنت",
     "Unknown error while retrieving quota usage." : "نورما ئىشلىتىشنى ئەسلىگە كەلتۈرۈشتە نامەلۇم خاتالىق.",
-    "Text generation quota exceeded" : "تېكىست ھاسىل قىلىش نورمىسى ئېشىپ كەتتى",
     "Unknown text generation error" : "نامەلۇم تېكىست ھاسىل قىلىش خاتالىقى",
     "Could not read audio file." : "ئاۋاز ھۆججىتىنى ئوقۇيالمىدى.",
-    "Audio transcription quota exceeded" : "ئاۋاز خاتىرىلەش نورمىسى ئېشىپ كەتتى",
     "Unknown audio trancription error" : "نامەلۇم ئاۋاز خاتىرىلەش خاتالىقى",
-    "Image generation quota exceeded" : "رەسىم ھاسىل قىلىش نورمىسى ئېشىپ كەتتى",
     "Unknown image generation error" : "نامەلۇم رەسىم ھاسىل قىلىش خاتالىقى",
     "Bad HTTP method" : "ناچار HTTP ئۇسۇلى",
     "Bad credentials" : "ناچار كىنىشكا",

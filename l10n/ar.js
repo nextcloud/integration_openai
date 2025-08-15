@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation quota exceeded" : " حصة توليد النصوص تمّ تجاوزها",
+    "Image generation quota exceeded" : "حصة توليد الصور تمّ تجاوزها",
+    "Audio transcription quota exceeded" : "حصة الترقين الصوتي تمّ تجاوزها",
     "Invalid models response received" : "تم استلام استجابة نماذج غير صالحة",
     "Default" : "التلقائي",
     "Text generation" : "توليد النص",
@@ -11,12 +14,9 @@ OC.L10N.register(
     "images" : "صِوَر",
     "seconds" : "ثوانٍ",
     "Unknown error while retrieving quota usage." : "حدث خطأ غير محدد أثناء استرجاع باقي الحصة ",
-    "Text generation quota exceeded" : " حصة توليد النصوص تمّ تجاوزها",
     "Unknown text generation error" : "حدث خطأ غير محدد عند توليد النصوص",
     "Could not read audio file." : "تعذّرت قراءة الملف الصوتي.",
-    "Audio transcription quota exceeded" : "حصة الترقين الصوتي تمّ تجاوزها",
     "Unknown audio trancription error" : "حدث خطأ غير محدد عند الترقين الصوتي",
-    "Image generation quota exceeded" : "حصة توليد الصور تمّ تجاوزها",
     "Unknown image generation error" : "خطأ غير محدد عند توليد الصور",
     "Bad HTTP method" : "دالة HTTP  غير صحيحة",
     "Bad credentials" : "معلومات تسجيل الدخول غير صحيحة",
