@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation quota exceeded" : "已经超出文本生成的配额",
     "Invalid models response received" : "收到无效的模型响应",
     "Default" : "默认",
     "Text generation" : "文本生成",
@@ -11,7 +12,6 @@ OC.L10N.register(
     "images" : "图像",
     "seconds" : "秒",
     "Unknown error while retrieving quota usage." : "提取额度使用量时发生未知错误",
-    "Text generation quota exceeded" : "已经超出文本生成的配额",
     "Unknown text generation error" : "未知的文本生成错误",
     "Unknown image generation error" : "未知的图像生成错误",
     "Bad HTTP method" : "错误的HTTP方法",

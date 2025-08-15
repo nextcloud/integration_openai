@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation quota exceeded" : "Superouse a cota de xeración de texto",
+    "Image generation quota exceeded" : "Superouse a cota de xeración de imaxes",
+    "Audio transcription quota exceeded" : "Superouse a cota de transcrición de son",
     "Invalid models response received" : "Recibiuse unha resposta non válida dos modelos",
     "Default" : "Predeterminado",
     "Text generation" : "Xeración de texto",
@@ -11,12 +14,9 @@ OC.L10N.register(
     "images" : "Imaxes",
     "seconds" : "segundos",
     "Unknown error while retrieving quota usage." : "Produciuse un erro descoñecido ao recuperar o uso da cota.",
-    "Text generation quota exceeded" : "Superouse a cota de xeración de texto",
     "Unknown text generation error" : "Produciuse un erro descoñecido de xeración de texto",
     "Could not read audio file." : "Non foi posíbel ler o ficheiro de son",
-    "Audio transcription quota exceeded" : "Superouse a cota de transcrición de son",
     "Unknown audio trancription error" : "Produciuse un erro descoñecido de xeración de transcrición de son",
-    "Image generation quota exceeded" : "Superouse a cota de xeración de imaxes",
     "Unknown image generation error" : "Produciuse un erro descoñecido de xeración de imaxe",
     "Bad HTTP method" : "Método HTTP incorrecto",
     "Bad credentials" : "Credenciais incorrectas",

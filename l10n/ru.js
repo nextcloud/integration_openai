@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation quota exceeded" : "Превышена квота на генерацию текста",
     "Invalid models response received" : "Получен ответ о недопустимых моделях",
     "Default" : "По умолчанию",
     "Text generation" : "Генерация текста",
@@ -11,7 +12,6 @@ OC.L10N.register(
     "images" : "изображения",
     "seconds" : "секунд",
     "Unknown error while retrieving quota usage." : "Неизвестная ошибка при получении данных об использовании квоты.",
-    "Text generation quota exceeded" : "Превышена квота на генерацию текста",
     "Unknown text generation error" : "Неизвестная ошибка генерации текста",
     "Bad HTTP method" : "Неверный метод HTTP",
     "Bad credentials" : "Неверные учетные данные",

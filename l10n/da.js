@@ -1,6 +1,9 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation quota exceeded" : "Kvote for tekstgenerering overskredet",
+    "Image generation quota exceeded" : "Kvote for billedgenerering overskredet",
+    "Audio transcription quota exceeded" : "Lydtransskriptionskvote overskredet",
     "Default" : "Standard",
     "Text generation" : "Tekstgenerering",
     "Image generation" : "Billedgenerering",
@@ -10,12 +13,9 @@ OC.L10N.register(
     "images" : "fotos",
     "seconds" : "sekunder ",
     "Unknown error while retrieving quota usage." : "Ukendt fejl under hentning af kvoteforbrug.",
-    "Text generation quota exceeded" : "Kvote for tekstgenerering overskredet",
     "Unknown text generation error" : "Ukendt tekstgenereringsfejl",
     "Could not read audio file." : "Kunne ikke læse lydfil.",
-    "Audio transcription quota exceeded" : "Lydtransskriptionskvote overskredet",
     "Unknown audio trancription error" : "Ukendt lyd transkriptionsfejl",
-    "Image generation quota exceeded" : "Kvote for billedgenerering overskredet",
     "Unknown image generation error" : "Ukendt billedgenereringsfejl",
     "Bad HTTP method" : "Dårlig HTTP metode",
     "Bad credentials" : "Forkerte legitimationsoplysninger",

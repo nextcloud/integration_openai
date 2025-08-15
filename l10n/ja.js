@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Text generation quota exceeded" : "テキスト生成の制限に達しました",
     "Default" : "デフォルト",
     "Text generation" : "テキスト生成",
     "Image generation" : "画像の生成",
@@ -9,7 +10,6 @@ OC.L10N.register(
     "tokens" : "トークン",
     "images" : "画像",
     "seconds" : "秒",
-    "Text generation quota exceeded" : "テキスト生成の制限に達しました",
     "Unknown text generation error" : "不明なテキスト生成エラー",
     "Could not read audio file." : "オーディオファイルを読み取ることができませんでした。",
     "Unknown image generation error" : "不明な画像生成エラー",
