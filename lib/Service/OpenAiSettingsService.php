@@ -7,6 +7,8 @@
 
 namespace OCA\OpenAi\Service;
 
+use DateInterval;
+use DateTime;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\IAppConfig;
@@ -33,7 +35,7 @@ class OpenAiSettingsService {
 		'max_tokens' => 'integer',
 		'use_max_completion_tokens_param' => 'boolean',
 		'llm_extra_params' => 'string',
-		'quota_period' => 'integer',
+		'quota_period' => 'array',
 		'quotas' => 'array',
 		'translation_provider_enabled' => 'boolean',
 		'llm_provider_enabled' => 'boolean',
@@ -60,6 +62,62 @@ class OpenAiSettingsService {
 		private ICrypto $crypto,
 		private ICacheFactory $cacheFactory,
 	) {
+	}
+
+	/**
+	 * @return int
+	 * @throws Exception
+	 */
+	public function getQuotaStart(): int {
+		$quotaPeriod = $this->getQuotaPeriod();
+		$now = new DateTime();
+
+		if ($quotaPeriod['unit'] === 'day') {
+			// Get a timestamp of the beginning of the time period
+			$periodStart = $now->sub(new DateInterval('P' . $quotaPeriod['length'] . 'D'));
+		} else {
+			$periodStart = new DateTime(date('Y-m-' . $quotaPeriod['day']));
+			// Ensure that this isn't in the future
+			if ($periodStart > $now) {
+				$periodStart = $periodStart->sub(new DateInterval('P1M'));
+			}
+			if ($quotaPeriod['length'] > 1) {
+				// Calculate number of months since 2000-01 to ensure the start month is consistent
+				$startDate = new DateTime('2000-01-' . $quotaPeriod['day']);
+				$months = $startDate->diff($periodStart)->m + $startDate->diff($periodStart)->y * 12;
+				$remainder = $months % $quotaPeriod['length'];
+				$periodStart = $periodStart->sub(new DateInterval('P' . $remainder . 'M'));
+			}
+		}
+		return $periodStart->getTimestamp();
+	}
+
+	/**
+	 * @return int
+	 * @throws Exception
+	 */
+	public function getQuotaEnd(): int {
+		$quotaPeriod = $this->getQuotaPeriod();
+		$now = new DateTime();
+
+		if ($quotaPeriod['unit'] === 'day') {
+			// Get a timestamp of the beginning of the time period
+			$periodEnd = $now;
+		} else {
+			$periodEnd = new DateTime(date('Y-m-' . $quotaPeriod['day']));
+			// Ensure that this isn't in the past
+			if ($periodEnd < $now) {
+				$periodEnd = $periodEnd->add(new DateInterval('P1M'));
+			}
+			if ($quotaPeriod['length'] > 1) {
+				// Calculate number of months since 2000-01 to ensure the start month is consistent
+				$startDate = new DateTime('2000-01-' . $quotaPeriod['day']);
+				$months = $startDate->diff($periodEnd)->m + $startDate->diff($periodEnd)->y * 12;
+				$remainder = $months % $quotaPeriod['length'];
+				$periodEnd = $periodEnd->add(new DateInterval('P' . $quotaPeriod['length'] - $remainder . 'M'));
+			}
+		}
+		return $periodEnd->getTimestamp();
 	}
 
 	public function invalidateModelsCache(): void {
@@ -197,10 +255,20 @@ class OpenAiSettingsService {
 	}
 
 	/**
-	 * @return int
+	 * @return array
 	 */
-	public function getQuotaPeriod(): int {
-		return intval($this->appConfig->getValueString(Application::APP_ID, 'quota_period', strval(Application::DEFAULT_QUOTA_PERIOD))) ?: Application::DEFAULT_QUOTA_PERIOD;
+	public function getQuotaPeriod(): array {
+		$value = json_decode(
+			$this->appConfig->getValueString(Application::APP_ID, 'quota_period', json_encode(Application::DEFAULT_QUOTA_CONFIG)),
+			true
+		) ?: Application::DEFAULT_QUOTA_CONFIG;
+		if (is_int($value)) {
+			return [
+				'length' => $value,
+				'unit' => 'day',
+			];
+		}
+		return $value;
 	}
 
 	/**
@@ -593,14 +661,31 @@ class OpenAiSettingsService {
 	}
 
 	/**
-	 * Setter for quotaPeriod; minimum is 1 day
-	 * @param int $quotaPeriod
+	 * Setter for quotaPeriod; minimum is 1 day.
+	 * Days are floating, and months are set dates
+	 * @param array $quotaPeriod
 	 * @return void
+	 * @throws Exception
 	 */
-	public function setQuotaPeriod(int $quotaPeriod): void {
-		// Validate input:
-		$quotaPeriod = max(1, $quotaPeriod);
-		$this->appConfig->setValueString(Application::APP_ID, 'quota_period', strval($quotaPeriod));
+	public function setQuotaPeriod(array $quotaPeriod): void {
+		if (!isset($quotaPeriod['length']) || !is_int($quotaPeriod['length'])) {
+			throw new Exception('Invalid quota period length');
+		}
+		$quotaPeriod['length'] = max(1, $quotaPeriod['length']);
+		if (!isset($quotaPeriod['unit']) || !is_string($quotaPeriod['unit'])) {
+			throw new Exception('Invalid quota period unit');
+		}
+		// Checks month period
+		if ($quotaPeriod['unit'] === 'month') {
+			if (!isset($quotaPeriod['day']) || !is_int($quotaPeriod['day'])) {
+				throw new Exception('Invalid quota period day');
+			}
+			$quotaPeriod['day'] = max(1, $quotaPeriod['day']);
+			$quotaPeriod['day'] = min($quotaPeriod['day'], 28);
+		} elseif ($quotaPeriod['unit'] !== 'day') {
+			throw new Exception('Invalid quota period unit');
+		}
+		$this->appConfig->setValueString(Application::APP_ID, 'quota_period', json_encode($quotaPeriod));
 	}
 
 	/**
