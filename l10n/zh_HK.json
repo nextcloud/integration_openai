@@ -1,8 +1,11 @@
 { "translations": {
+    "OpenAI Integration" : "OpenAI 整合",
+    "Quota exceeded" : "超過配額",
     "Text generation quota exceeded" : "已超過影像產生額度",
     "Image generation quota exceeded" : "已超過影像產生額度",
     "Audio transcription quota exceeded" : "已超過音訊轉錄額度",
     "Speech generation quota exceeded" : "已超過語音產生額度",
+    "View quota" : "檢視配額",
     "Invalid models response received" : "收到無效的模型回應",
     "Default" : "默認",
     "Text generation" : "產生文字",

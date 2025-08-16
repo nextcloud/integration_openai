@@ -1,8 +1,11 @@
 { "translations": {
+    "OpenAI Integration" : "OpenAI-Integration",
+    "Quota exceeded" : "Kontingent überschritten",
     "Text generation quota exceeded" : "Das Kontingent für die Texterstellung wurde überschritten",
     "Image generation quota exceeded" : "Das Kontingent für die Bilderstellung wurde überschritten",
     "Audio transcription quota exceeded" : "Das Kontingent für Audiotranskription überschritten",
     "Speech generation quota exceeded" : "Kontingent für Spracherzeugung überschritten",
+    "View quota" : "Kontingent anzeigen",
     "Invalid models response received" : "Ungültige Modellantwort erhalten",
     "Default" : "Standard",
     "Text generation" : "Texterstellung",

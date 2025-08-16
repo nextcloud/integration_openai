@@ -1,10 +1,13 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI Integration" : "OpenAI 整合",
+    "Quota exceeded" : "超過額度",
     "Text generation quota exceeded" : "已超過文字產生額度",
     "Image generation quota exceeded" : "已超過影像產生額度",
     "Audio transcription quota exceeded" : "已超過音訊轉錄額度",
     "Speech generation quota exceeded" : "已超過語音產生額度",
+    "View quota" : "檢視額度",
     "Invalid models response received" : "收到無效的模型回應",
     "Default" : "預設",
     "Text generation" : "產生文字",
