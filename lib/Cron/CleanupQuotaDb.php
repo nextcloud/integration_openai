@@ -11,9 +11,9 @@ namespace OCA\OpenAi\Cron;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
-use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class CleanupQuotaDb extends TimedJob {
@@ -21,7 +21,7 @@ class CleanupQuotaDb extends TimedJob {
 		ITimeFactory $time,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private LoggerInterface $logger,
-		private IAppConfig $appConfig,
+		private OpenAiSettingsService $openAiSettingsService,
 	) {
 		parent::__construct($time);
 		$this->setInterval(60 * 60 * 24); // Daily
@@ -29,17 +29,15 @@ class CleanupQuotaDb extends TimedJob {
 
 	protected function run($argument) {
 		$this->logger->debug('Run cleanup job for OpenAI quota db');
+		$quota = $this->openAiSettingsService->getQuotaPeriod();
+		$days = $quota['length'];
+		if ($quota['unit'] == 'month') {
+			$days *= 30;
+		}
 		$this->quotaUsageMapper->cleanupQuotaUsages(
 			// The mimimum period is limited to DEFAULT_QUOTA_PERIOD to not lose
 			// the stored quota usage data below this limit.
-			max(
-				intval($this->appConfig->getValueString(
-					Application::APP_ID,
-					'quota_period',
-					strval(Application::DEFAULT_QUOTA_PERIOD)
-				)),
-				Application::DEFAULT_QUOTA_PERIOD
-			)
+			max($days, Application::DEFAULT_QUOTA_PERIOD)
 		);
 
 	}

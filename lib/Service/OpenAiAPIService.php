@@ -247,10 +247,10 @@ class OpenAiAPIService {
 			return false;
 		}
 
-		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
+		$quotaStart = $this->openAiSettingsService->getQuotaStart();
 
 		try {
-			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaPeriod);
+			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaStart);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
 			$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
 			throw new Exception('Could not retrieve quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -322,12 +322,14 @@ class OpenAiAPIService {
 		$quotas = $this->hasOwnOpenAiApiKey($userId) ? Application::DEFAULT_QUOTAS : $this->openAiSettingsService->getQuotas();
 		// Get quota period
 		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
+		$quotaStart = $this->openAiSettingsService->getQuotaStart();
+		$quotaEnd = $this->openAiSettingsService->getQuotaEnd();
 		// Get quota usage for each quota type:
 		$quotaInfo = [];
 		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
 			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
 			try {
-				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaPeriod);
+				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaStart);
 			} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
 				$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.'), Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -339,6 +341,8 @@ class OpenAiAPIService {
 		return [
 			'quota_usage' => $quotaInfo,
 			'period' => $quotaPeriod,
+			'start' => $quotaStart,
+			'end' => $quotaEnd,
 		];
 	}
 
@@ -347,14 +351,14 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function getAdminQuotaInfo(): array {
-		// Get quota period
-		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
+		// Get quota start time
+		$startTime = $this->openAiSettingsService->getQuotaStart();
 		// Get quota usage of all users for each quota type:
 		$quotaInfo = [];
 		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
 			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
 			try {
-				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $quotaPeriod);
+				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $startTime);
 			} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
 				$this->logger->warning('Could not retrieve quota usage for quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 				// We can pass detailed error info to the UI here since the user is an admin in any case:

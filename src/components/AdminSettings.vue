@@ -500,19 +500,9 @@
 				</h2>
 				<div class="line">
 					<!--Time period in days for the token usage-->
-					<NcInputField
-						id="openai-api-quota-period"
-						v-model="state.quota_period"
-						class="input"
-						type="number"
-						:label="t('integration_openai', 'Quota enforcement time period (days)')"
-						:show-trailing-button="!!state.quota_period"
-						@update:model-value="onInput()"
-						@trailing-button-click="state.quota_period = '' ; onInput()">
-						<template #trailing-button-icon>
-							<CloseIcon :size="20" />
-						</template>
-					</NcInputField>
+					<QuotaPeriodPicker
+						v-model:value="state.quota_period"
+						@update:value="onInput()" />
 				</div>
 				<h2>
 					{{ t('integration_openai', 'Usage quotas per time period') }}
@@ -619,6 +609,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
+import QuotaPeriodPicker from './QuotaPeriodPicker.vue'
 
 const DEFAULT_MODEL_ITEM = { id: 'Default' }
 
@@ -626,6 +617,7 @@ export default {
 	name: 'AdminSettings',
 
 	components: {
+		QuotaPeriodPicker,
 		OpenAiIcon,
 		KeyOutlineIcon,
 		CloseIcon,
@@ -871,7 +863,7 @@ export default {
 				max_tokens: parseInt(this.state.max_tokens),
 				llm_extra_params: this.state.llm_extra_params,
 				default_image_size: this.state.default_image_size,
-				quota_period: parseInt(this.state.quota_period),
+				quota_period: this.state.quota_period,
 				quotas: this.state.quotas,
 				tts_voices: this.state.tts_voices,
 				default_tts_voice: this.state.default_tts_voice,
