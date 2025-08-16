@@ -1,10 +1,13 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI Integration" : "OpenAI Integration",
+    "Quota exceeded" : "Quota exceeded",
     "Text generation quota exceeded" : "Text generation quota exceeded",
     "Image generation quota exceeded" : "Image generation quota exceeded",
     "Audio transcription quota exceeded" : "Audio transcription quota exceeded",
     "Speech generation quota exceeded" : "Speech generation quota exceeded",
+    "View quota" : "View quota",
     "Invalid models response received" : "Invalid models response received",
     "Default" : "Default",
     "Text generation" : "Text generation",
