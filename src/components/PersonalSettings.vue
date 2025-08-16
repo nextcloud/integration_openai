@@ -95,6 +95,9 @@
 								{{ t('integration_openai', 'Quota type') }}
 							</th>
 							<th>{{ t('integration_openai', 'Usage') }}</th>
+							<th v-if="poolUsed">
+								{{ t('integration_openai', 'Shared Usage') }}
+							</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -105,6 +108,12 @@
 							</td>
 							<td v-else>
 								{{ quota.used + ' ' + quota.unit }}
+							</td>
+							<td v-if="quota.used_pool">
+								{{ quota.limit > 0 ? Math.round(quota.used_pool / quota.limit * 100) + ' %' : quota.used_pool + ' ' + quota.unit }}
+							</td>
+							<td v-else-if="poolUsed">
+								{{ t('integration_openai', 'Not Shared') }}
 							</td>
 						</tr>
 					</tbody>
@@ -162,6 +171,9 @@ export default {
 	},
 
 	computed: {
+		poolUsed() {
+			return this.quotaInfo !== null && this.quotaInfo.quota_usage.some((quota) => quota.used_pool)
+		},
 	},
 
 	watch: {
