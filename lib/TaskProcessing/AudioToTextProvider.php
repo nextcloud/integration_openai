@@ -82,7 +82,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 		}
 		$inputFile = $input['input'];
 
-		$model = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
+		$model = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
 
 		try {
 			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model);
