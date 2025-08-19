@@ -4,7 +4,9 @@
 -->
 <template>
 	<div class="rule-form">
-		<div class="controls-row">
+		<b>{{ t('integration_openai', 'Rule {number}', { number: value.id }) }}</b>
+		<div
+			class="controls-row">
 			<MultiselectWho
 				class="user-selector"
 				:value="value.entities"
