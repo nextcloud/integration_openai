@@ -65,6 +65,8 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * Gets the timestamp of the beginning of the quota period
+	 *
 	 * @return int
 	 * @throws Exception
 	 */
@@ -93,6 +95,9 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * Gets the timestamp of the end of the quota period
+	 * if the period is floating, then this will be the current time
+	 *
 	 * @return int
 	 * @throws Exception
 	 */
@@ -262,11 +267,14 @@ class OpenAiSettingsService {
 			$this->appConfig->getValueString(Application::APP_ID, 'quota_period', json_encode(Application::DEFAULT_QUOTA_CONFIG)),
 			true
 		) ?: Application::DEFAULT_QUOTA_CONFIG;
+		// Migrate from old quota period to new one
 		if (is_int($value)) {
-			return [
-				'length' => $value,
-				'unit' => 'day',
-			];
+			$value = ['length' => $value];
+		}
+		foreach (Application::DEFAULT_QUOTA_CONFIG as $key => $defaultValue) {
+			if (!isset($value[$key])) {
+				$value[$key] = $defaultValue;
+			}
 		}
 		return $value;
 	}

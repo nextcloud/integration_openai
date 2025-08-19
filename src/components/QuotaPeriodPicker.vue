@@ -6,7 +6,7 @@
 	<div class="container">
 		<NcNoteCard type="info">
 			{{
-				t('integration_openai', 'Daily quotas are floating quotas while monthly reset on a certain day of the month.')
+				t('integration_openai', 'Daily quotas are floating quotas while monthly reset on a certain day of the month')
 			}}
 		</NcNoteCard>
 		<div class="line">
@@ -85,8 +85,8 @@ export default {
 		},
 		resetText() {
 			return this.floating
-				? n('integration_openai', 'Quota will be enforced based on last %n day of usage.', 'Quota will be enforced based on last %n days of usage.', this.value.length)
-				: n('integration_openai', 'Quota will reset all users every month on day {day}.', 'Quota will reset for all users every %n months on day {day}.', this.value.length, { day: this.value.day })
+				? n('integration_openai', 'Quota will be enforced based on last %n day of usage', 'Quota will be enforced based on last %n days of usage', this.value.length)
+				: n('integration_openai', 'Quota will reset all users every month on day {day}', 'Quota will reset for all users every %n months on day {day}', this.value.length, { day: this.value.day })
 		},
 	},
 

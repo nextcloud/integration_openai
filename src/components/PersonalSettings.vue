@@ -168,12 +168,12 @@ export default {
 	computed: {
 		quotaRangeText() {
 			return this.quotaInfo?.period?.unit === 'month'
-				? t('integration_openai', 'This quota period is from {startDate} to {endDate}.', {
+				? t('integration_openai', 'This quota period is from {startDate} to {endDate}', {
 					startDate: formatRelativeTime(this.quotaInfo.start * 1000),
 					endDate: formatRelativeTime(this.quotaInfo.end * 1000),
 				})
-				: n('integration_openai', 'The quota is kept over a floating period of the last %n day.',
-					'The quota is kept over a floating period of the last %n days.', this.quotaInfo.period.length)
+				: n('integration_openai', 'The quota is kept over a floating period of the last %n day',
+					'The quota is kept over a floating period of the last %n days', this.quotaInfo.period.length)
 		},
 	},
 
