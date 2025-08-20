@@ -1,10 +1,13 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI Integration" : "Comhtháthú OpenAI",
+    "Quota exceeded" : "Cuóta sáraithe",
     "Text generation quota exceeded" : "Sáraíodh an cuóta giniúna téacs",
     "Image generation quota exceeded" : "Sáraíodh an cuóta giniúna íomhá",
     "Audio transcription quota exceeded" : "Sáraíodh an cuóta trascríobh fuaime",
     "Speech generation quota exceeded" : "Chuóta giniúna cainte sáraithe",
+    "View quota" : "Cuóta amhairc",
     "Invalid models response received" : "Fuarthas freagra samhlacha neamhbhailí",
     "Default" : "Réamhshocrú",
     "Text generation" : "Giniúint téacs",
