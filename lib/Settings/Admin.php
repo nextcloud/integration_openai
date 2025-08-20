@@ -33,6 +33,8 @@ class Admin implements ISettings {
 		$adminConfig['basic_password'] = $adminConfig['basic_password'] === '' ? '' : 'dummyPassword';
 		$isAssistantEnabled = $this->appManager->isEnabledForUser('assistant');
 		$adminConfig['assistant_enabled'] = $isAssistantEnabled;
+		$adminConfig['quota_start_date'] = $this->openAiSettingsService->getQuotaStart();
+		$adminConfig['quota_end_date'] = $this->openAiSettingsService->getQuotaEnd();
 		$this->initialStateService->provideInitialState('admin-config', $adminConfig);
 		$rules = $this->quotaRuleService->getRules();
 		$this->initialStateService->provideInitialState('rules', $rules);
