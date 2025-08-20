@@ -556,6 +556,21 @@
 						</tr>
 					</tbody>
 				</table>
+				<div class="line-gap">
+					<NcDateTimePickerNative
+						v-model="quota_usage.start_date"
+						:label="t('integration_openai', 'Start date')" />
+					<NcDateTimePickerNative
+						v-model="quota_usage.end_date"
+						:label="t('integration_openai', 'End date')" />
+					<NcSelect
+						v-model="quota_usage.quota_type"
+						:options="quotaTypes"
+						:input-label="t('integration_openai', 'Quota type')" />
+					<NcButton :href="downloadQuotaUsageUrl">
+						{{ t('integration_openai', 'Download quota usage') }}
+					</NcButton>
+				</div>
 				<QuotaRules :quota-info="quotaInfo" />
 			</div>
 			<div>
@@ -614,6 +629,7 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
+import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
@@ -641,6 +657,7 @@ export default {
 		NcTextField,
 		NcInputField,
 		NcNoteCard,
+		NcDateTimePickerNative,
 		QuotaRules,
 	},
 
@@ -662,10 +679,29 @@ export default {
 			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '1024x1024' }),
 			DEFAULT_MODEL_ITEM,
 			appSettingsAssistantUrl: generateUrl('/settings/apps/integration/assistant'),
+			quota_usage: {
+				quota_type: '',
+				start_date: new Date('2000-01-01'),
+				end_date: new Date(),
+			},
 		}
 	},
 
 	computed: {
+		quotaTypes() {
+			return (this.quotaInfo ?? []).map((q, idx) => ({ id: idx, label: q.type }))
+		},
+		downloadQuotaUsageUrl() {
+			let type = (this.quotaInfo ?? []).findIndex((q) => q.type === this.quota_usage.quota_type)
+			if (type === -1) {
+				type = 0
+			}
+			return generateUrl('/apps/integration_openai/quota/download-usage?type={type}&startDate={startDate}&endDate={endDate}', {
+				type,
+				startDate: this.quota_usage.start_date / 1000,
+				endDate: this.quota_usage.end_date / 1000,
+			})
+		},
 		modelEndpointUrl() {
 			if (this.state.url === '') {
 				return 'https://api.openai.com/v1/models'
@@ -828,6 +864,7 @@ export default {
 			return axios.get(url)
 				.then((response) => {
 					this.quotaInfo = response.data
+					this.quota_usage.quota_type = this.quotaTypes[0]
 				})
 				.catch((error) => {
 					showError(
@@ -953,7 +990,15 @@ export default {
 		}
 	}
 
-	.line {
+	.line-gap {
+		gap: 8px;
+		align-items: normal;
+		> input {
+			align-self: center;
+		}
+	}
+
+	.line, .line-gap {
 		display: flex;
 		align-items: center;
 		margin-top: 12px;
