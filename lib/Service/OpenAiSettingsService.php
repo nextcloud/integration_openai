@@ -119,7 +119,9 @@ class OpenAiSettingsService {
 				$startDate = new DateTime('2000-01-' . $quotaPeriod['day']);
 				$months = $startDate->diff($periodEnd)->m + $startDate->diff($periodEnd)->y * 12;
 				$remainder = $months % $quotaPeriod['length'];
-				$periodEnd = $periodEnd->add(new DateInterval('P' . $quotaPeriod['length'] - $remainder . 'M'));
+				if ($remainder != 0) {
+					$periodEnd = $periodEnd->add(new DateInterval('P' . $quotaPeriod['length'] - $remainder . 'M'));
+				}
 			}
 		}
 		return $periodEnd->getTimestamp();

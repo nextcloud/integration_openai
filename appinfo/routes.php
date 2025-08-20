@@ -20,5 +20,6 @@ return [
 		['name' => 'quotaRule#addRule', 'url' => '/quota/rule', 'verb' => 'POST'],
 		['name' => 'quotaRule#updateRule', 'url' => '/quota/rule', 'verb' => 'PUT'],
 		['name' => 'quotaRule#deleteRule', 'url' => '/quota/rule', 'verb' => 'DELETE'],
+		['name' => 'quotaRule#getQuotaUsage', 'url' => '/quota/download-usage', 'verb' => 'GET'],
 	],
 ];
