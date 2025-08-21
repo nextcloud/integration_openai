@@ -679,6 +679,7 @@ class OpenAiSettingsService {
 			}
 		}
 
+		$quotaDisabled = $this->config->getSystemValue('integration_openai.disable_webui_quota', false);
 		// Validation of the input values is done in the individual setters
 		if (isset($adminConfig['request_timeout'])) {
 			$this->setRequestTimeout($adminConfig['request_timeout']);
@@ -722,10 +723,10 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['llm_extra_params'])) {
 			$this->setLlmExtraParams($adminConfig['llm_extra_params']);
 		}
-		if (isset($adminConfig['quota_period'])) {
+		if (isset($adminConfig['quota_period']) && !$quotaDisabled) {
 			$this->setQuotaPeriod($adminConfig['quota_period']);
 		}
-		if (isset($adminConfig['quotas'])) {
+		if (isset($adminConfig['quotas']) && !$quotaDisabled) {
 			$this->setQuotas($adminConfig['quotas']);
 		}
 		if (isset($adminConfig['use_max_completion_tokens_param'])) {
