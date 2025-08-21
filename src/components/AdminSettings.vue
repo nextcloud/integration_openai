@@ -498,6 +498,9 @@
 				<h2>
 					{{ t('integration_openai', 'Usage limits') }}
 				</h2>
+				<NcNoteCard v-if="state.disable_webui_quota" type="warning">
+					{{ t('integration_openai', 'The webui for quota enforcement is disabled in the config.') }}
+				</NcNoteCard>
 				<div class="line">
 					<!--Time period in days for the token usage-->
 					<NcInputField
@@ -507,6 +510,7 @@
 						type="number"
 						:label="t('integration_openai', 'Quota enforcement time period (days)')"
 						:show-trailing-button="!!state.quota_period"
+						:disabled="state.disable_webui_quota"
 						@update:model-value="onInput()"
 						@trailing-button-click="state.quota_period = '' ; onInput()">
 						<template #trailing-button-icon>
@@ -545,6 +549,7 @@
 									v-model.number="state.quotas[index]"
 									:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
 									type="number"
+									:disabled="state.disable_webui_quota"
 									@input="onInput()">
 								<span v-if="quotaInfo !== null" class="text-cell">
 									{{ quotaInfo[index].unit }}
