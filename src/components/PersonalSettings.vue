@@ -87,6 +87,9 @@
 				<h4>
 					{{ t('integration_openai', 'Usage quota info') }}
 				</h4>
+				<NcNoteCard v-if="poolUsed" type="info">
+					{{ t('integration_openai', 'If you see a shared quota usage of 50% and a usage of 10% that means that you have used 10% of the total shared quota, and the sum of all other users affected by this quota is 40%.') }}
+				</NcNoteCard>
 				<!-- Loop through all quota types-->
 				<table class="quota-table">
 					<thead>

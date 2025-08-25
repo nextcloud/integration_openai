@@ -44,7 +44,10 @@
 				@update:model-value="update('pool', $event)">
 				{{ t('integration_openai', 'Use shared quota') }}
 			</NcCheckboxRadioSwitch>
-			<NcButton variant="success" @click="save">
+			<NcButton v-if="needSaving"
+				:disabled="saving"
+				variant="success"
+				@click="save">
 				{{ t('integration_openai', 'Save') }}
 			</NcButton>
 			<NcButton @click="$emit('delete')">
@@ -92,6 +95,12 @@ export default {
 	},
 
 	emits: ['update:value', 'delete'],
+	data() {
+		return {
+			needSaving: false,
+			saving: false,
+		}
+	},
 
 	computed: {
 		unit() {
@@ -126,14 +135,18 @@ export default {
 		update(key, value) {
 			console.debug('update', key, value)
 			if (value || value === false || value === 0) {
+				this.needSaving = true
 				this.$emit('update:value', { ...this.value, [key]: value })
 			}
 		},
 		save() {
+			this.saving = true
 			return axios.put(generateUrl('/apps/integration_openai/quota/rule'), {
 				rule: this.value,
 				id: this.value.id,
 			}).then((response) => {
+				this.saving = false
+				this.needSaving = false
 				const data = response.data ?? {}
 				this.$emit('update:value', data)
 				showSuccess(t('integration_openai', 'Quota rule saved'))
@@ -167,5 +180,8 @@ export default {
 	background: var(--color-background-hover);
 	padding: 10px;
 	margin: 10px 0;
+}
+.user-selector {
+	max-width: 600px;
 }
 </style>
