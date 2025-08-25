@@ -546,6 +546,7 @@
 						</tr>
 					</tbody>
 				</table>
+				<QuotaRules :quota-info="quotaInfo" />
 			</div>
 			<div>
 				<h2>
@@ -593,6 +594,7 @@ import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
 import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
+import QuotaRules from './Rules/QuotaRules.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
@@ -631,6 +633,7 @@ export default {
 		NcTextField,
 		NcInputField,
 		NcNoteCard,
+		QuotaRules,
 	},
 
 	data() {
