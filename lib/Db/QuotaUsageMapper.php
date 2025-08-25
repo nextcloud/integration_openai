@@ -70,18 +70,15 @@ class QuotaUsageMapper extends QBMapper {
 
 	/**
 	 * @param int $type Type of the quota
-	 * @param int $timePeriod Time period in days
+	 * @param int $periodStart Start time of quota
 	 * @return int
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 * @throws \RuntimeException
 	 */
-	public function getQuotaUnitsInTimePeriod(int $type, int $timePeriod): int {
+	public function getQuotaUnitsInTimePeriod(int $type, int $periodStart): int {
 		$qb = $this->db->getQueryBuilder();
-
-		// Get a timestamp of the beginning of the time period
-		$periodStart = (new DateTime())->sub(new DateInterval('P' . $timePeriod . 'D'))->getTimestamp();
 
 		// Get the sum of the units used in the time period
 		$qb->select($qb->createFunction('SUM(units)'))
@@ -103,18 +100,15 @@ class QuotaUsageMapper extends QBMapper {
 	/**
 	 * @param string $userId
 	 * @param int $type Type of the quota
-	 * @param int $timePeriod Time period in days
+	 * @param int $periodStart Start time of quota
 	 * @return int
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 * @throws \RuntimeException
 	 */
-	public function getQuotaUnitsOfUserInTimePeriod(string $userId, int $type, int $timePeriod): int {
+	public function getQuotaUnitsOfUserInTimePeriod(string $userId, int $type, int $periodStart): int {
 		$qb = $this->db->getQueryBuilder();
-
-		// Get a timestamp of the beginning of the time period
-		$periodStart = (new DateTime())->sub(new DateInterval('P' . $timePeriod . 'D'))->getTimestamp();
 
 		// Get the sum of the units used in the time period
 		$qb->select($qb->createFunction('SUM(units)'))

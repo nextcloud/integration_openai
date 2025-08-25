@@ -55,6 +55,7 @@ class Application extends App implements IBootstrap {
 	public const MIN_CHUNK_SIZE = 500;
 	public const DEFAULT_MAX_NUM_OF_TOKENS = 1000;
 	public const DEFAULT_QUOTA_PERIOD = 30;
+	public const DEFAULT_QUOTA_CONFIG = ['length' => self::DEFAULT_QUOTA_PERIOD, 'unit' => 'day', 'day' => 1];
 
 	public const DEFAULT_OPENAI_TEXT_GENERATION_TIME = 10; // seconds
 	public const DEFAULT_LOCALAI_TEXT_GENERATION_TIME = 60; // seconds

@@ -109,6 +109,9 @@
 						</tr>
 					</tbody>
 				</table>
+				<NcNoteCard type="success">
+					{{ quotaRangeText }}
+				</NcNoteCard>
 			</div>
 			<div v-if="!state.is_custom_service">
 				<NcNoteCard type="info">
@@ -135,6 +138,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
+import { formatRelativeTime } from '@nextcloud/l10n'
 
 export default {
 	name: 'PersonalSettings',
@@ -162,10 +166,18 @@ export default {
 	},
 
 	computed: {
+		quotaRangeText() {
+			return this.quotaInfo?.period?.unit === 'month'
+				? t('integration_openai', 'This quota period is from {startDate} to {endDate}', {
+					startDate: formatRelativeTime(this.quotaInfo.start * 1000),
+					endDate: formatRelativeTime(this.quotaInfo.end * 1000),
+				})
+				: n('integration_openai', 'The quota is kept over a floating period of the last %n day',
+					'The quota is kept over a floating period of the last %n days', this.quotaInfo.period.length)
+		},
 	},
 
-	watch: {
-	},
+	watch: {},
 
 	mounted() {
 		this.loadQuotaInfo()
