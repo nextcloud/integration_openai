@@ -61,6 +61,7 @@ OC.L10N.register(
     "OpenAI options saved" : "已保存OpenAI选项",
     "Failed to save OpenAI options" : "保存OpenAI选项失败",
     "Your administrator defined a custom service address" : "您的管理员定义了一个自定义服务地址",
-    "Leave the API key empty to use the one defined by administrators" : "将API密钥留空以使用管理员定义的API密钥"
+    "Leave the API key empty to use the one defined by administrators" : "将API密钥留空以使用管理员定义的API密钥",
+    "Months" : "月"
 },
 "nplurals=1; plural=0;");

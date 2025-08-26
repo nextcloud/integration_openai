@@ -132,7 +132,6 @@ OC.L10N.register(
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Uma lista de vozes compatíveis com o endpoint que você está usando. O padrão é a lista do openai.",
     "Default voice to use" : "Voz padrão a ser usada",
     "Usage limits" : "Limites de uso",
-    "Quota enforcement time period (days)" : "Período de aplicação da cota (dias)",
     "Usage quotas per time period" : "Cotas de uso por período",
     "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "É possível definir uma cota por usuário para cada tipo de cota. Se o usuário não tiver fornecido sua própria chave API, esta cota será aplicada.",
     "\"0\" means unlimited usage for a particular quota type." : "\"0\" significa uso ilimitado para um tipo específico de cota.",
@@ -156,6 +155,8 @@ OC.L10N.register(
     "Usage quota info" : "Informações de cota de uso",
     "Usage" : "Uso",
     "Specifying your own API key will allow unlimited usage" : "Especificar sua própria chave API permitirá uso ilimitado",
+    "Days" : "Dias",
+    "Months" : "Meses",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Use o parâmetro \"{newParam}\" em vez do obsoleto \"{deprecatedParam}\""
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

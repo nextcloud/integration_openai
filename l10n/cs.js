@@ -133,7 +133,6 @@ OC.L10N.register(
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Seznam hlasů podporovaný koncovým bodem, který používáte. Jako výchozí je používán seznam od openai.",
     "Default voice to use" : "Výchozí hlas který používat",
     "Usage limits" : "Limity využití",
-    "Quota enforcement time period (days)" : "Časová perioda (days) vynucování kvóty",
     "Usage quotas per time period" : "Kvóty využití na časové období",
     "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Je možné nastavit kvótu pro jednotlivé uživatele pro každý z typů kvóty. Pokud uživatel nezadal svůj vlastní klíč k API, bude vynucována tato kvóta.",
     "\"0\" means unlimited usage for a particular quota type." : "„0“ (nula) znamená neomezené využívání v rámci konkrétního typu kvóty.",

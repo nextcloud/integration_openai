@@ -40,6 +40,7 @@
     "Authentication method" : "認証方法",
     "API key" : "APIキー",
     "Usage limits" : "使用制限",
-    "Quota type" : "クォータのタイプ"
+    "Quota type" : "クォータのタイプ",
+    "Months" : "月"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

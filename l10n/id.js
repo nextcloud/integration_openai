@@ -11,6 +11,8 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Minta waktu habis (detik)",
     "Authentication" : "Otentikasi",
     "Authentication method" : "Metode otentikasi",
-    "API key" : "Kunci API"
+    "API key" : "Kunci API",
+    "Days" : "Hari",
+    "Months" : "Bulan"
 },
 "nplurals=1; plural=0;");

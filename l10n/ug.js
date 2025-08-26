@@ -72,7 +72,6 @@ OC.L10N.register(
     "No models to list" : "تىزىملىككە كىرگۈزىدىغان مودېل يوق",
     "Default image size" : "سۈكۈتتىكى رەسىم چوڭلۇقى",
     "Usage limits" : "ئىشلىتىش چەكلىمىسى",
-    "Quota enforcement time period (days)" : "نورما ئىجرا قىلىش ۋاقتى (كۈن)",
     "Usage quotas per time period" : "ھەر ۋاقىت ئىشلىتىش نورمىسى",
     "Quota type" : "نورما تىپى",
     "Per-user quota / period" : "ھەر بىر ئىشلەتكۈچىنىڭ نورمىسى / مۇددىتى",
@@ -90,6 +89,8 @@ OC.L10N.register(
     "Leave the username and password empty to use the ones defined by your administrator" : "باشقۇرغۇچىڭىز بەلگىلىگەننى ئىشلىتىش ئۈچۈن ئىشلەتكۈچى ئىسمى ۋە پارولىنى بوش قويۇڭ",
     "Usage quota info" : "ئىشلىتىش نورمىسى ئۇچۇرى",
     "Usage" : "ئىشلىتىش",
-    "Specifying your own API key will allow unlimited usage" : "ئۆزىڭىزنىڭ API ئاچقۇچىنى بەلگىلىسىڭىز چەكسىز ئىشلىتىشكە يول قويىدۇ"
+    "Specifying your own API key will allow unlimited usage" : "ئۆزىڭىزنىڭ API ئاچقۇچىنى بەلگىلىسىڭىز چەكسىز ئىشلىتىشكە يول قويىدۇ",
+    "Days" : "كۈنلەر",
+    "Months" : "ئايلار"
 },
 "nplurals=2; plural=(n != 1);");

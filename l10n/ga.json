@@ -133,7 +133,6 @@
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Liosta guthanna a dtacaítear leo ag an gcríochphointe atá in úsáid agat. Réamhshocraítear liosta openai leis.",
     "Default voice to use" : "Guth réamhshocraithe le húsáid",
     "Usage limits" : "Teorainneacha úsáide",
-    "Quota enforcement time period (days)" : "Tréimhse ama forfheidhmithe cuóta (laethanta)",
     "Usage quotas per time period" : "Cuótaí úsáide in aghaidh na tréimhse ama",
     "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Is féidir cuóta in aghaidh an úsáideora a shocrú do gach cineál cuóta. Mura bhfuil a n-eochair API féin curtha ar fáil ag an úsáideoir, cuirfear an cuóta seo i bhfeidhm.",
     "\"0\" means unlimited usage for a particular quota type." : "Ciallaíonn \"0\" úsáid gan teorainn le haghaidh cineál cuóta ar leith.",
@@ -157,6 +156,8 @@
     "Usage quota info" : "Eolas faoin gcuóta úsáide",
     "Usage" : "Úsáid",
     "Specifying your own API key will allow unlimited usage" : "Ceadóidh sonraíocht d'eochair API féin úsáid neamhtheoranta",
+    "Days" : "Laethanta",
+    "Months" : "Míonna",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Úsáid paraiméadar \"{newParam}\" in ionad an pharaiméadar \"{deprecatedParam}\""
 },"pluralForm" :"nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);"
 }

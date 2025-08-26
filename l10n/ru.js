@@ -75,7 +75,6 @@ OC.L10N.register(
     "Max output tokens per request" : "Макс. выходных токенов на запрос",
     "Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks." : "Максимальное количество выходных токенов, сгенерированных для одного текстового запроса на генерацию. Это также применяется для задач преобразования текста в речь.",
     "Usage limits" : "Ограничения на использование",
-    "Quota enforcement time period (days)" : "Период времени соблюдения квоты (дни)",
     "Usage quotas per time period" : "Квоты использования за определенный период времени",
     "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Для каждого типа квоты может быть установлена квота под конкретного пользователя. Если пользователь не предоставил свой API ключ, эта квота будет применена.",
     "\"0\" means unlimited usage for a particular quota type." : "\"0\" означает безлимитное использование для определенного типа квоты.",
@@ -91,6 +90,7 @@ OC.L10N.register(
     "You can create a free API key in your OpenAI account settings" : "Вы можете создать бесплатный ключ API в настройках вашего аккаунта OpenAI.",
     "Usage quota info" : "Информация о квоте использования",
     "Usage" : "Использование",
-    "Specifying your own API key will allow unlimited usage" : "Указание вашего собственного ключа API позволит использовать его неограниченно"
+    "Specifying your own API key will allow unlimited usage" : "Указание вашего собственного ключа API позволит использовать его неограниченно",
+    "Months" : "Месяц(ев)"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");

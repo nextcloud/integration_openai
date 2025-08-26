@@ -61,7 +61,6 @@ OC.L10N.register(
     "More information about LocalAI models" : "Mer informasjon om LocalAI-modeller",
     "Extra completion model parameters" : "Parametere for ekstra fullføringsmodell",
     "Usage limits" : "Begrensninger for bruk",
-    "Quota enforcement time period (days)" : "Tidsperiode for håndhevelse av kvoter (dager)",
     "Usage quotas per time period" : "Brukskvoter per tidsperiode",
     "Quota type" : "Kvotetype",
     "Per-user quota / period" : "Kvote per bruker / periode",
@@ -79,6 +78,8 @@ OC.L10N.register(
     "Leave the username and password empty to use the ones defined by your administrator" : "La brukernavnet og passordet stå tomt for å bruke de som er definert av administratoren",
     "Usage quota info" : "Informasjon om brukskvote",
     "Usage" : "Bruk",
-    "Specifying your own API key will allow unlimited usage" : "Å spesifisere din egen API-nøkkel vil tillate ubegrenset bruk"
+    "Specifying your own API key will allow unlimited usage" : "Å spesifisere din egen API-nøkkel vil tillate ubegrenset bruk",
+    "Days" : "Dager",
+    "Months" : "Måneder"
 },
 "nplurals=2; plural=(n != 1);");

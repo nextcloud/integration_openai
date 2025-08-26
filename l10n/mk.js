@@ -10,6 +10,7 @@ OC.L10N.register(
     "Speed" : "Брзина",
     "Authentication" : "Автентикација",
     "Authentication method" : "Начин на автентификација",
-    "API key" : "API key"
+    "API key" : "API key",
+    "Months" : "Месеци"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

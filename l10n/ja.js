@@ -42,6 +42,7 @@ OC.L10N.register(
     "Authentication method" : "認証方法",
     "API key" : "APIキー",
     "Usage limits" : "使用制限",
-    "Quota type" : "クォータのタイプ"
+    "Quota type" : "クォータのタイプ",
+    "Months" : "月"
 },
 "nplurals=1; plural=0;");

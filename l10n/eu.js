@@ -38,6 +38,8 @@ OC.L10N.register(
     "Completions" : "Osaketak",
     "Usage limits" : "Erabilpen mugak",
     "Quota type" : "Kuota mota",
-    "Usage" : "Erabilpena"
+    "Usage" : "Erabilpena",
+    "Days" : "Egunak",
+    "Months" : "Hilabeteak"
 },
 "nplurals=2; plural=(n != 1);");

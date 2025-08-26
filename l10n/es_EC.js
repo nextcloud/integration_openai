@@ -28,6 +28,8 @@ OC.L10N.register(
     "OpenAI options saved" : "Opciones de OpenAI guardadas",
     "Failed to save OpenAI options" : "Error al guardar las opciones de OpenAI",
     "Your administrator defined a custom service address" : "Tu administrador ha definido una dirección de servicio personalizada",
-    "Leave the API key empty to use the one defined by administrators" : "Deja la clave de API vacía para usar la definida por los administradores"
+    "Leave the API key empty to use the one defined by administrators" : "Deja la clave de API vacía para usar la definida por los administradores",
+    "Days" : "Días",
+    "Months" : "Meses"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

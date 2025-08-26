@@ -9,6 +9,8 @@ OC.L10N.register(
     "Images" : "Hình ảnh",
     "Size" : "Kích cỡ",
     "Authentication" : "Xác thực",
-    "Authentication method" : "Phương thức xác thực"
+    "Authentication method" : "Phương thức xác thực",
+    "Days" : "Ngày",
+    "Months" : "Tháng"
 },
 "nplurals=1; plural=0;");

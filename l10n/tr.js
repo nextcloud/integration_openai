@@ -118,7 +118,6 @@ OC.L10N.register(
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Kullandığınız uç nokta tarafından desteklenen seslerin listesi. Varsayılan olarak OpenAI listesi.",
     "Default voice to use" : "Kullanılacak varsayılan ses",
     "Usage limits" : "Kullanım sınırları",
-    "Quota enforcement time period (days)" : "Kota zorunlu kılma zaman aralığı (gün)",
     "Usage quotas per time period" : "Dönem başına kullanım kotaları",
     "Quota type" : "Kota türü",
     "Per-user quota / period" : "Kullanıcı başına kota / dönem",
@@ -139,6 +138,8 @@ OC.L10N.register(
     "Usage quota info" : "Kullanım kotası bilgileri",
     "Usage" : "Kullanım",
     "Specifying your own API key will allow unlimited usage" : "Kendi API anahtarınızı yazarak sınırsız kullanıma geçebilirsiniz",
+    "Days" : "Gün",
+    "Months" : "Ay",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Kullanımdan kaldırılan \"{deprecatedParam}\" yerine \"{newParam}\" parametresini kullanın"
 },
 "nplurals=2; plural=(n > 1);");

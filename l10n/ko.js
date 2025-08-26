@@ -61,7 +61,6 @@ OC.L10N.register(
     "Max input tokens per request" : "요청당 최대 입력 토큰 수",
     "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "프롬프트를 지정된 수의 토큰을 넘지않은 청크로 분리합니다 (0은 기능을 비활성화합니다)",
     "Usage limits" : "사용 제한",
-    "Quota enforcement time period (days)" : "쿼터 강제 기간 (일)",
     "Usage quotas per time period" : "기간 당 사용 쿼터",
     "Quota type" : "쿼터 종류",
     "Per-user quota / period" : "사용자당 쿼터 / 기간",
@@ -73,6 +72,8 @@ OC.L10N.register(
     "Leave the API key empty to use the one defined by administrators" : "관리자가 지정한 항목을 사용하려면 API 키를 비워두십시오.",
     "Usage quota info" : "사용량 쿼터 정보",
     "Usage" : "사용량",
-    "Specifying your own API key will allow unlimited usage" : "자신의 API 키를 지정하면 무제한 사용을 허용합니다."
+    "Specifying your own API key will allow unlimited usage" : "자신의 API 키를 지정하면 무제한 사용을 허용합니다.",
+    "Days" : "일",
+    "Months" : "개월"
 },
 "nplurals=1; plural=0;");

@@ -45,6 +45,8 @@ OC.L10N.register(
     "Leave the API key empty to use the one defined by administrators" : "Hagyja üresen az API kulcsot, hogy az adminisztrátor által beállítottat használja.",
     "Usage quota info" : "Használati kvóta információ",
     "Usage" : "Felhasználás",
-    "Specifying your own API key will allow unlimited usage" : "A saját API-kulcs megadása korlátlan használatot tesz lehetővé"
+    "Specifying your own API key will allow unlimited usage" : "A saját API-kulcs megadása korlátlan használatot tesz lehetővé",
+    "Days" : "Napok",
+    "Months" : "Hónapok"
 },
 "nplurals=2; plural=(n != 1);");

@@ -135,7 +135,6 @@ OC.L10N.register(
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Список голосів, які підтримуються кінцевою точкою, яку ви використовуєте. За замовчуванням використовується список openai.",
     "Default voice to use" : "Використовувати голос за замовчуванням",
     "Usage limits" : "Обмеження щодо використання",
-    "Quota enforcement time period (days)" : "Період застосування квоти (дні)",
     "Usage quotas per time period" : "Квоти використання за період часу",
     "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Для кожного типу квоти можна встановити квоту на користувача. Якщо користувач не надав власний ключ API, ця квота буде застосовуватися.",
     "\"0\" means unlimited usage for a particular quota type." : "«0» означає необмежене використання для певного типу квоти.",
@@ -159,6 +158,8 @@ OC.L10N.register(
     "Usage quota info" : "Інформація про квоту використання",
     "Usage" : "Використання",
     "Specifying your own API key will allow unlimited usage" : "Вказавши власний ключ API, ви зможете використовувати його необмежену кількість разів",
+    "Days" : "Дні",
+    "Months" : "Місяці",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Використовуйте параметр \"{newParam}\" замість застарілого \"{deprecatedParam}\""
 },
 "nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);");

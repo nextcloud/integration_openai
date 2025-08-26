@@ -15,6 +15,8 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "Authentication" : "Tunnistautuminen",
     "Authentication method" : "Tunnistautumistapa",
-    "API key" : "API-avain"
+    "API key" : "API-avain",
+    "Days" : "Päivää",
+    "Months" : "Kuukautta"
 },
 "nplurals=2; plural=(n != 1);");

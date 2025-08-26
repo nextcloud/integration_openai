@@ -14,6 +14,7 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Aanvraag time-out (seconds)",
     "Authentication" : "Authenticatie",
     "Authentication method" : "Authenticatiemethode",
-    "API key" : "API-sleutel"
+    "API key" : "API-sleutel",
+    "Months" : "Maanden"
 },
 "nplurals=2; plural=(n != 1);");

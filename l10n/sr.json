@@ -127,7 +127,6 @@
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Листа гласова које подржава крајња тачка коју користите. Подразумевана вредности је листа компаније openai",
     "Default voice to use" : "Подразумеани глас који ће се користити",
     "Usage limits" : "Границе употребе",
-    "Quota enforcement time period (days)" : "Временски период наметања квоте (дана)",
     "Usage quotas per time period" : "Квоте употребе по временском периоду",
     "Quota type" : "Тип квоте",
     "Per-user quota / period" : "Квота по кориснику / период",
@@ -148,6 +147,8 @@
     "Usage quota info" : "Информације о квоти употребе",
     "Usage" : "Употреба",
     "Specifying your own API key will allow unlimited usage" : "Ако наведете сопствени API кључ имаћете могућност неограничене употребе",
+    "Days" : "Дана",
+    "Months" : "Месеци",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Уместо застарелог „{deprecatedParam}”, употребите параметар „{newParam}”"
 },"pluralForm" :"nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
 }

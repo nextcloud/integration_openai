@@ -23,6 +23,8 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Timeout požiadavky (s)",
     "Authentication" : "Autentifikácia",
     "Authentication method" : "Autentifikačná metóda",
-    "API key" : "API kľúč"
+    "API key" : "API kľúč",
+    "Days" : "Dni",
+    "Months" : "Mesiacov"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

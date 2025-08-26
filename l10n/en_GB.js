@@ -135,7 +135,6 @@ OC.L10N.register(
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "A list of voices supported by the endpoint you are using. Defaults to openai's list.",
     "Default voice to use" : "Default voice to use",
     "Usage limits" : "Usage limits",
-    "Quota enforcement time period (days)" : "Quota enforcement time period (days)",
     "Usage quotas per time period" : "Usage quotas per time period",
     "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced.",
     "\"0\" means unlimited usage for a particular quota type." : "\"0\" means unlimited usage for a particular quota type.",
@@ -159,6 +158,7 @@ OC.L10N.register(
     "Usage quota info" : "Usage quota info",
     "Usage" : "Usage",
     "Specifying your own API key will allow unlimited usage" : "Specifying your own API key will allow unlimited usage",
+    "Months" : "Months",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\""
 },
 "nplurals=2; plural=(n != 1);");

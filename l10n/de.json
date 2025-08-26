@@ -133,7 +133,6 @@
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Eine Liste der Stimmen, die von dem von dir verwendeten Endpunkt unterstützt wird. Standardmäßig wird die Liste von OpenAI verwendet.",
     "Default voice to use" : "Zu verwendende Standardstimme",
     "Usage limits" : "Nutzungsbeschränkungen",
-    "Quota enforcement time period (days)" : "Zeitraum der Kontingentdurchsetzung (Tage)",
     "Usage quotas per time period" : "Nutzungskontingente pro Zeitraum",
     "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Für jeden Kontingenttyp kann ein Kontingent pro Benutzer festgelegt werden. Wenn der Benutzer keinen eigenen API-Schlüssel angegeben hat, wird dieses Kontingent erzwungen.",
     "\"0\" means unlimited usage for a particular quota type." : "„0“ bedeutet unbegrenzte Nutzung für einen bestimmten Kontingenttyp.",
@@ -157,6 +156,7 @@
     "Usage quota info" : "Informationen zum Nutzungskontingent",
     "Usage" : "Verwendung",
     "Specifying your own API key will allow unlimited usage" : "Die Angabe deines eigenen API-Schlüssels ermöglicht eine unbegrenzte Nutzung",
+    "Months" : "Monate",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

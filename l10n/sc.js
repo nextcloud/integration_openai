@@ -13,6 +13,7 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Tempus màssimu de sa rechesta (segundos)",
     "Authentication" : "Autenticatzione",
     "Authentication method" : "Mètodu de autenticatzione",
-    "API key" : "Crae API"
+    "API key" : "Crae API",
+    "Months" : "Meses"
 },
 "nplurals=2; plural=(n != 1);");

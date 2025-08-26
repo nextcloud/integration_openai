@@ -94,7 +94,6 @@ OC.L10N.register(
     "Use authentication for image retrieval request" : "Empregue a autenticación para a solicitude de recuperación de imaxes",
     "Default transcription model to use" : "Modelo de transcrición predeterminado a empregar",
     "Usage limits" : "Límites de uso",
-    "Quota enforcement time period (days)" : "Período de execución da cota (días)",
     "Usage quotas per time period" : "Cotas de uso por período de tempo",
     "Quota type" : "Tipo de cota",
     "Per-user quota / period" : "Cota/período por usuario",
@@ -113,6 +112,8 @@ OC.L10N.register(
     "Usage quota info" : "Información sobre a cota de uso",
     "Usage" : "Uso",
     "Specifying your own API key will allow unlimited usage" : "Especificar a súa propia chave da API permitiralle un uso ilimitado",
+    "Days" : "Días",
+    "Months" : "Meses",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Empregue o parámetro «{newParam}» en troques do obsoleto «{deprecatedParam}»"
 },
 "nplurals=2; plural=(n != 1);");

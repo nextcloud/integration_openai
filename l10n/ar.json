@@ -92,7 +92,6 @@
     "Use authentication for image retrieval request" : "استعمل المصادقة لطلب استرجاع الصِّوَر",
     "Default transcription model to use" : "نموذج الاستنساخ الافتراضي المُستعمَل",
     "Usage limits" : "حدود الاستعمال",
-    "Quota enforcement time period (days)" : "الفترة الزمنية لإنفاذ الحصص (بالأيام)",
     "Usage quotas per time period" : "حصص الاستخدام لكل فترة زمنية",
     "Quota type" : "نوع الحصة",
     "Per-user quota / period" : "الحصة / الفترة لكل مستخدم",

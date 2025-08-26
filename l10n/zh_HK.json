@@ -133,7 +133,6 @@
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "您使用的端點所支援的語音清單。預設為 OpenAI 的清單。",
     "Default voice to use" : "默認使用的嗓音",
     "Usage limits" : "使用量限制",
-    "Quota enforcement time period (days)" : "配額執行期限（天）",
     "Usage quotas per time period" : "每個時段的使用量配額",
     "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "每種配額類型可設定每個使用者的配額。如果使用者未提供自己的 API 金鑰，則會強制執行此配額。",
     "\"0\" means unlimited usage for a particular quota type." : "「0」表示特定配額類型的使用量不受限制。",
@@ -157,6 +156,8 @@
     "Usage quota info" : "使用量配額資訊",
     "Usage" : "使用量",
     "Specifying your own API key will allow unlimited usage" : "指定您自己的 API 金鑰可允許無限制的使用量",
+    "Days" : "天",
+    "Months" : "月",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "使用「{newParam}」參數而非棄用的「{deprecatedParam}」"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

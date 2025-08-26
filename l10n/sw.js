@@ -17,6 +17,8 @@ OC.L10N.register(
     "Prompt" : "Prompt",
     "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Uthibitisho",
-    "API key" : "Ufunguo wa API"
+    "API key" : "Ufunguo wa API",
+    "Days" : "Siku",
+    "Months" : "Miezi"
 },
 "nplurals=2; plural=(n != 1);");

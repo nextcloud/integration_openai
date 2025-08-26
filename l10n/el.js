@@ -91,7 +91,6 @@ OC.L10N.register(
     "Use authentication for image retrieval request" : "Χρήση πιστοποίησης για αίτημα ανάκτησης εικόνας",
     "Default transcription model to use" : "Προεπιλεγμένο μοντέλο μεταγραφής προς χρήση",
     "Usage limits" : "Όρια χρήσης",
-    "Quota enforcement time period (days)" : "Χρονική περίοδος εφαρμογής ποσόστωσης (ημέρες)",
     "Usage quotas per time period" : "Ποσόστωση χρήσης ανά χρονική περίοδο",
     "Quota type" : "Τύπος ποσόστωσης",
     "Per-user quota / period" : "Ποσόστωση ανά χρήστη / περίοδος",
@@ -110,6 +109,7 @@ OC.L10N.register(
     "Usage quota info" : "Πληροφορίες ποσόστωσης χρήσης",
     "Usage" : "Χρήση",
     "Specifying your own API key will allow unlimited usage" : "Ο καθορισμός του δικού σας κλειδιού API θα επιτρέψει απεριόριστη χρήση",
+    "Months" : "Μήνες",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Χρησιμοποιήστε την παράμετρο \"{newParam}\" αντί για την καταργημένη \"{deprecatedParam}\""
 },
 "nplurals=2; plural=(n != 1);");

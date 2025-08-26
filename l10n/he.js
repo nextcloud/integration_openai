@@ -12,6 +12,8 @@ OC.L10N.register(
     "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Authentication" : "אימות",
     "Authentication method" : "שיטת אימות",
-    "API key" : "מפתח API"
+    "API key" : "מפתח API",
+    "Days" : "ימים",
+    "Months" : "חודשים"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");
