@@ -20,7 +20,6 @@ use OCP\IDBConnection;
 class QuotaRuleMapper extends QBMapper {
 	public function __construct(
 		IDBConnection $db,
-		private QuotaUserMapper $quotaUserMapper,
 	) {
 		parent::__construct($db, 'openai_quota_rule', QuotaRule::class);
 	}
@@ -54,7 +53,7 @@ class QuotaRuleMapper extends QBMapper {
 			->from($this->getTableName(), 'r')
 			->leftJoin('r', 'openai_quota_user', 'u', 'r.id = u.rule_id')
 			->where(
-				$qb->expr()->eq('type', $qb->createNamedParameter($quotaType, IQueryBuilder::PARAM_INT))
+				$qb->expr()->eq('r.type', $qb->createNamedParameter($quotaType, IQueryBuilder::PARAM_INT))
 			)->andWhere(
 				$qb->expr()->orX(
 					$qb->expr()->andX(

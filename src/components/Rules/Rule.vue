@@ -4,12 +4,12 @@
 -->
 <template>
 	<div class="rule-form">
-		<b>{{ t('integration_openai', 'Rule {number}', { number: value.id }) }}</b>
+		<b>{{ t('integration_openai', 'Rule {number}', { number: ruleData.id }) }}</b>
 		<div
 			class="controls-row">
 			<MultiselectWho
 				class="user-selector"
-				:value="value.entities"
+				:value="ruleData.entities"
 				:placeholder="t('integration_openai', 'Who this rule applies to?')"
 				:aria-label-combobox="t('integration_openai', 'Who this rule applies to?')"
 				:input-label="t('integration_openai', 'Select users/groups')"
@@ -23,23 +23,23 @@
 		<div class="controls-row">
 			<NcInputField
 				id="quota"
-				:model-value="value.amount"
+				:model-value="ruleData.amount"
 				class="input"
 				type="number"
-				:label="value.pool ? t('integration_openai', 'Shared quota') : t('integration_openai', 'Quota per user')"
+				:label="ruleData.pool ? t('integration_openai', 'Shared quota') : t('integration_openai', 'Quota per user')"
 				@update:model-value="update('amount', $event)" />
 			<span class="text-cell">
 				{{ unit }}
 			</span>
 			<NcInputField
 				id="priority"
-				:model-value="value.priority"
+				:model-value="ruleData.priority"
 				class="input"
 				type="number"
 				:label="t('integration_openai', 'Rule Priority')"
 				@update:model-value="update('priority', $event)" />
 			<NcCheckboxRadioSwitch
-				:model-value="value.pool"
+				:model-value="ruleData.pool"
 				type="switch"
 				@update:model-value="update('pool', $event)">
 				{{ t('integration_openai', 'Use shared quota') }}
@@ -84,7 +84,7 @@ export default {
 	},
 
 	props: {
-		value: {
+		ruleData: {
 			type: Object,
 			required: true,
 		},
@@ -94,7 +94,7 @@ export default {
 		},
 	},
 
-	emits: ['update:value', 'delete'],
+	emits: ['update:ruleData', 'delete'],
 	data() {
 		return {
 			needSaving: false,
@@ -105,16 +105,16 @@ export default {
 	computed: {
 		unit() {
 			console.debug('quotaInfo', this.quotaInfo)
-			if (this.quotaInfo[this.value.type] === undefined) {
+			if (this.quotaInfo[this.ruleData.type] === undefined) {
 				return ''
 			}
-			return this.quotaInfo[this.value.type].unit
+			return this.quotaInfo[this.ruleData.type].unit
 		},
 		category() {
-			if (this.quotaInfo[this.value.type] === undefined) {
+			if (this.quotaInfo[this.ruleData.type] === undefined) {
 				return ''
 			}
-			return this.quotaInfo[this.value.type].type
+			return this.quotaInfo[this.ruleData.type].type
 		},
 	},
 
@@ -136,19 +136,18 @@ export default {
 			console.debug('update', key, value)
 			if (value || value === false || value === 0) {
 				this.needSaving = true
-				this.$emit('update:value', { ...this.value, [key]: value })
+				this.$emit('update:ruleData', { ...this.ruleData, [key]: value })
 			}
 		},
 		save() {
 			this.saving = true
 			return axios.put(generateUrl('/apps/integration_openai/quota/rule'), {
-				rule: this.value,
-				id: this.value.id,
+				rule: this.ruleData,
+				id: this.ruleData.id,
 			}).then((response) => {
-				this.saving = false
 				this.needSaving = false
 				const data = response.data ?? {}
-				this.$emit('update:value', data)
+				this.$emit('update:ruleData', data)
 				showSuccess(t('integration_openai', 'Quota rule saved'))
 			}).catch((error) => {
 				showError(
@@ -157,7 +156,7 @@ export default {
 					{ timeout: 10000 },
 				)
 				console.error(error)
-			})
+			}).finally(() => { this.saving = false })
 		},
 	},
 }

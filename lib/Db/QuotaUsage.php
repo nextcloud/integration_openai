@@ -11,6 +11,7 @@ namespace OCA\OpenAi\Db;
 
 use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
+use OCP\DB\Types;
 use ReturnTypeWillChange;
 
 /**
@@ -38,22 +39,22 @@ class QuotaUsage extends Entity implements JsonSerializable {
 	protected $pool;
 
 	public function __construct() {
-		$this->addType('user_id', 'string');
-		$this->addType('type', 'integer');
-		$this->addType('units', 'integer');
-		$this->addType('timestamp', 'integer');
-		$this->addType('pool', 'integer');
+		$this->addType('user_id', Types::STRING);
+		$this->addType('type', Types::INTEGER);
+		$this->addType('units', Types::INTEGER);
+		$this->addType('timestamp', Types::INTEGER);
+		$this->addType('pool', Types::INTEGER);
 	}
 
 	#[ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return [
-			'id' => $this->id,
-			'user_id' => $this->userId,
-			'type' => $this->type,
-			'units' => $this->units,
-			'timestamp' => $this->timestamp,
-			'pool' => $this->pool
+			'id' => $this->getId(),
+			'user_id' => $this->getUserId(),
+			'type' => $this->getType(),
+			'units' => $this->getUnits(),
+			'timestamp' => $this->getTimestamp(),
+			'pool' => $this->getPool()
 		];
 	}
 }

@@ -495,7 +495,7 @@
 				input-id="openai-tts-voices-select"
 				@click="onInput()" />
 			<div>
-				<h2>
+				<h2 style="margin: 10px 0 -10px 0">
 					{{ t('integration_openai', 'Usage limits') }}
 				</h2>
 				<div class="line">
@@ -508,7 +508,7 @@
 					{{ t('integration_openai', 'Usage quotas per time period') }}
 				</h2>
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced.') }}
+					{{ t('integration_openai', 'A per-user quota for each quota type can be set. If the user has not provided their own API key, and a rule is not specified for this user or any of their groups, this quota will be enforced.') }}
 					{{ t('integration_openai', '"0" means unlimited usage for a particular quota type.') }}
 				</NcNoteCard>
 				<!--Loop through all quota types and list an input for them on this line-->
@@ -546,6 +546,7 @@
 						</tr>
 					</tbody>
 				</table>
+				<h2>{{ t('integration_openai', 'Quota Rules') }}</h2>
 				<QuotaRules :quota-info="quotaInfo" />
 			</div>
 			<div>
@@ -982,5 +983,8 @@ export default {
 		min-width: 350px;
 		margin: 0 !important;
 	}
+}
+.notecard {
+	max-width: 900px;
 }
 </style>

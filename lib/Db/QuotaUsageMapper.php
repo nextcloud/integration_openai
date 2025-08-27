@@ -193,7 +193,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @return QuotaUsage
 	 * @throws Exception
 	 */
-	public function createQuotaUsage(string $userId, int $type, int $units, ?int $pool = -1): QuotaUsage {
+	public function createQuotaUsage(string $userId, int $type, int $units, int $pool = -1): QuotaUsage {
 
 		$quotaUsage = new QuotaUsage();
 		$quotaUsage->setUserId($userId);

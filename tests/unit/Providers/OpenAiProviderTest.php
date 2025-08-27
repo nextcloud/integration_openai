@@ -84,7 +84,7 @@ class OpenAiProviderTest extends TestCase {
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\Notification\IManager::class),
-			\OC::$server->get(QuotaRuleService::class),
+			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
 		);
 

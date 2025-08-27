@@ -114,6 +114,9 @@ export default {
 	display: flex;
 	align-items: center;
 	gap: 5px;
+	.select {
+		margin-bottom: 0;
+	}
 }
 
 .container {

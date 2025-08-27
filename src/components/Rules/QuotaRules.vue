@@ -4,14 +4,13 @@
 -->
 <template>
 	<div>
-		<h2>{{ t('integration_openai', 'Quota Rules') }}</h2>
 		<NcNoteCard type="info">
 			{{ t('integration_openai', 'Rules can be set for specific groups or users. These rules will override the global quota settings.') }}
 			{{ t('integration_openai', 'Only the rule with the highest priority is active if multiple rules match.') }}
 		</NcNoteCard>
 		<Rule v-for="(rule, index) in state"
 			:key="index"
-			v-model:value="state[index]"
+			v-model:rule-data="state[index]"
 			:quota-info="quotaInfo ?? []"
 			@delete="removeRule(index)" />
 		<NcButton @click="addRule">

@@ -43,28 +43,35 @@ class QuotaUserMapper extends QBMapper {
 		$qb->select('*')
 			->from($this->getTableName())
 			->where($qb->expr()->eq('rule_id', $qb->createNamedParameter($ruleId, IQueryBuilder::PARAM_INT)));
-		$oldUsers = $this->findEntities($qb);
-		$oldUsersById = array_reduce($oldUsers, function (array $carry, QuotaUser $oldUser) {
-			$carry[$oldUser->getEntityType() . '-' . $oldUser->getEntityId()] = $oldUser;
-			return $carry;
-		}, []);
-		$usersById = [];
-		// Add users that are in the new list but not in the old list
-		foreach ($users as $user) {
-			if (!isset($oldUsersById[$user['entity_type'] . '-' . $user['entity_id']])) {
-				$newUser = new QuotaUser();
-				$newUser->setRuleId($ruleId);
-				$newUser->setEntityType($user['entity_type']);
-				$newUser->setEntityId($user['entity_id']);
-				$this->insert($newUser);
+		$this->db->beginTransaction();
+		try {
+			$oldUsers = $this->findEntities($qb);
+			$oldUsersById = array_reduce($oldUsers, function (array $carry, QuotaUser $oldUser) {
+				$carry[$oldUser->getEntityType() . '-' . $oldUser->getEntityId()] = $oldUser;
+				return $carry;
+			}, []);
+			$usersById = [];
+			// Add users that are in the new list but not in the old list
+			foreach ($users as $user) {
+				if (!isset($oldUsersById[$user['entity_type'] . '-' . $user['entity_id']])) {
+					$newUser = new QuotaUser();
+					$newUser->setRuleId($ruleId);
+					$newUser->setEntityType($user['entity_type']);
+					$newUser->setEntityId($user['entity_id']);
+					$this->insert($newUser);
+				}
+				$usersById[$user['entity_type'] . '-' . $user['entity_id']] = $user;
 			}
-			$usersById[$user['entity_type'] . '-' . $user['entity_id']] = $user;
-		}
-		// Delete users that are not in the new list but are in the old list
-		foreach ($oldUsers as $oldUser) {
-			if (!isset($usersById[$oldUser->getEntityType() . '-' . $oldUser->getEntityId()])) {
-				$this->delete($oldUser);
+			// Delete users that are not in the new list but are in the old list
+			foreach ($oldUsers as $oldUser) {
+				if (!isset($usersById[$oldUser->getEntityType() . '-' . $oldUser->getEntityId()])) {
+					$this->delete($oldUser);
+				}
 			}
+			$this->db->commit();
+		} catch (\Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
 		}
 	}
 

@@ -128,7 +128,7 @@ export default {
 				.filter((s) => {
 					return (
 						s.source === 'users'
-								&& !this.value.find((u) => u.type === 'user' && u.entity_id === s.id)
+								&& !this.value.find((u) => u.entity_type === 'user' && u.entity_id === s.id)
 					)
 				})
 				.map((s) => {
@@ -149,24 +149,25 @@ export default {
 				if (
 					lowerCurrent.match(lowerQuery)
 						&& !this.value.find(
-							(u) => u.type === 'user' && u.entity_id === this.currentUser.uid,
+							(u) => u.entity_type === 'user' && u.entity_id === this.currentUser.uid,
 						)
 				) {
 					result.push({
 						entity_id: this.currentUser.uid,
-						type: 'user',
+						entity_type: 'user',
 						display_name: this.currentUser.displayName,
 						id: 'user-' + this.currentUser.uid,
 					})
 				}
 			}
+			console.debug(result)
 
 			// groups suggestions (avoid selected ones)
 			const groups = this.suggestions
 				.filter((s) => {
 					return (
 						s.source === 'groups'
-								&& !this.value.find((u) => u.type === 'group' && u.entity_id === s.id)
+								&& !this.value.find((u) => u.entity_type === 'group' && u.entity_id === s.id)
 					)
 				})
 				.map((s) => {
@@ -213,7 +214,7 @@ export default {
 					showError(t('integration_openai', 'Impossible to get user/group list'))
 					console.error(error)
 				})
-				.then(() => {
+				.finally(() => {
 					this.loadingSuggestions = false
 				})
 		},

@@ -11,6 +11,7 @@ namespace OCA\OpenAi\Db;
 
 use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
+use OCP\DB\Types;
 use ReturnTypeWillChange;
 
 /**
@@ -34,20 +35,20 @@ class QuotaRule extends Entity implements JsonSerializable {
 	protected $pool;
 
 	public function __construct() {
-		$this->addType('type', 'integer');
-		$this->addType('amount', 'integer');
-		$this->addType('priority', 'integer');
-		$this->addType('pool', 'boolean');
+		$this->addType('type', Types::INTEGER);
+		$this->addType('amount', Types::INTEGER);
+		$this->addType('priority', Types::INTEGER);
+		$this->addType('pool', Types::BOOLEAN);
 	}
 
 	#[ReturnTypeWillChange]
 	public function jsonSerialize() {
 		return [
-			'id' => $this->id,
-			'type' => $this->type,
-			'amount' => $this->amount,
-			'priority' => $this->priority,
-			'pool' => $this->pool
+			'id' => $this->getId(),
+			'type' => $this->getType(),
+			'amount' => $this->getAmount(),
+			'priority' => $this->getPriority(),
+			'pool' => $this->getPool()
 		];
 	}
 }

@@ -25,14 +25,6 @@ class Version030800Date20250812122830 extends SimpleMigrationStep {
 	 * @param IOutput $output
 	 * @param Closure(): ISchemaWrapper $schemaClosure
 	 * @param array $options
-	 */
-	public function preSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
-	}
-
-	/**
-	 * @param IOutput $output
-	 * @param Closure(): ISchemaWrapper $schemaClosure
-	 * @param array $options
 	 * @return null|ISchemaWrapper
 	 */
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
@@ -56,9 +48,10 @@ class Version030800Date20250812122830 extends SimpleMigrationStep {
 			]);
 			$table->addColumn('pool', Types::BOOLEAN, [
 				'notnull' => false,
-				'default' => false
+				'default' => false,
 			]);
 			$table->setPrimaryKey(['id']);
+			$table->addIndex(['type'], 'oai_rule_type');
 		}
 		if (!$schema->hasTable('openai_quota_user')) {
 			$table = $schema->createTable('openai_quota_user');
@@ -92,13 +85,5 @@ class Version030800Date20250812122830 extends SimpleMigrationStep {
 		}
 
 		return $schema;
-	}
-
-	/**
-	 * @param IOutput $output
-	 * @param Closure $schemaClosure
-	 * @param array $options
-	 */
-	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
 	}
 }

@@ -12,9 +12,11 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaRuleMapper;
 use OCA\OpenAi\Db\QuotaUserMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\ICacheFactory;
 use OCP\IGroupManager;
 use OCP\IUserManager;
+use Psr\Log\LoggerInterface;
 
 class QuotaRuleService {
 	public function __construct(
@@ -24,6 +26,7 @@ class QuotaRuleService {
 		private IGroupManager $groupManager,
 		private ICacheFactory $cacheFactory,
 		private IUserManager $userManager,
+		private LoggerInterface $logger,
 	) {
 	}
 	/**
@@ -31,7 +34,7 @@ class QuotaRuleService {
 	 *
 	 * @param int $quotaType
 	 * @param string $userId
-	 * @return ?array
+	 * @return array
 	 */
 	public function getRule(int $quotaType, string $userId) {
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
@@ -42,7 +45,7 @@ class QuotaRuleService {
 			$groups = $this->groupManager->getUserGroupIds($user);
 			try {
 				$rule = $this->quotaRuleMapper->getRule($quotaType, $userId, $groups)->jsonSerialize();
-			} catch (DoesNotExistException) {
+			} catch (DoesNotExistException|MultipleObjectsReturnedException) {
 				$rule = [
 					'amount' => $this->openAiSettingsService->getQuotas()[$quotaType],
 					'pool' => false,
@@ -164,6 +167,7 @@ class QuotaRuleService {
 	private function validateEntities(array $entities) {
 		foreach ($entities as $e) {
 			if (!is_array($e)) {
+				$this->logger->warning('Invalid entity', $e);
 				throw new Exception('Invalid entity');
 			}
 			$validTypes = [
@@ -171,6 +175,7 @@ class QuotaRuleService {
 				'group',
 			];
 			if (!isset($e['entity_type'], $e['entity_id']) || !in_array($e['entity_type'], $validTypes) || !is_string($e['entity_id'])) {
+				$this->logger->warning('Invalid entity', $e);
 				throw new Exception('Invalid entity');
 			}
 		}
