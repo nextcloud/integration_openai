@@ -11,9 +11,7 @@
 		</NcNoteCard>
 		<div class="line">
 			<span class="text-cell">
-				{{
-					floating ? t('integration_openai', 'Quota enforcement time ') : t('integration_openai', 'Reset quota every')
-				}}
+				{{ textBeforeInput }}
 			</span>
 			<NcInputField
 				id="quota"
@@ -86,7 +84,12 @@ export default {
 		resetText() {
 			return this.floating
 				? n('integration_openai', 'Quota will be enforced based on last %n day of usage', 'Quota will be enforced based on last %n days of usage', this.value.length)
-				: n('integration_openai', 'Quota will reset all users every month on day {day}', 'Quota will reset for all users every %n months on day {day}', this.value.length, { day: this.value.day })
+				: n('integration_openai', 'Quota will reset for all the users every month on day number {nth_day}', 'Quota will reset for all the users every %n months on day number {nth_day}', this.value.length, { nth_day: this.value.day }) // TRANSLATORS: "nth_day" is a number like 1, 12, etc
+		},
+		textBeforeInput() {
+			return this.floating
+				? t('integration_openai', 'Quota enforcement time') // TRANSLATORS: In front of number input that allows you to select a number of days
+				: t('integration_openai', 'Reset quota every') // TRANSLATORS: In front of number input that allows you to select a number of months
 		},
 	},
 
