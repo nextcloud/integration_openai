@@ -154,6 +154,8 @@
     "Usage quota info" : "Informace o využití kvóty",
     "Usage" : "Využití",
     "Specifying your own API key will allow unlimited usage" : "Zadání vašeho vlastního klíče k API umožní neomezené využívání",
+    "Days" : "Dny",
+    "Months" : "Měsíců",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Použít parametr „{newParam}“ namísto zastaralého „{deprecatedParam}“"
 },"pluralForm" :"nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;"
 }

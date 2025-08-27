@@ -158,6 +158,7 @@ OC.L10N.register(
     "Usage quota info" : "Usage quota info",
     "Usage" : "Usage",
     "Specifying your own API key will allow unlimited usage" : "Specifying your own API key will allow unlimited usage",
+    "Days" : "Days",
     "Months" : "Months",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\""
 },

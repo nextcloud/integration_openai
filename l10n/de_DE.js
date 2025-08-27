@@ -149,6 +149,8 @@ OC.L10N.register(
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Sprache-zu-Text-Anbieter (zum Beispiel zum Transkribieren von Talk-Gesprächsaufzeichnungen)",
     "Text-to-speech provider" : "Text-zu-Sprache-Anbieter",
     "Analyze image provider" : "Bildanbieter analysieren",
+    "This quota period is from {startDate} to {endDate}" : "Dieser Kontingentszeitraum läuft vom {startDate} bis zum {endDate}",
+    "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Das Kontingent wird über einen variablen Zeitraum des letzten %n Tages gehalten","Das Kontingent wird über einen variablen Zeitraum der letzten %n Tage gehalten"],
     "OpenAI options saved" : "OpenAI-Einstellungen gespeichert",
     "Failed to save OpenAI options" : "OpenAI-Einstellungen konnten nicht gespeichert werden",
     "Your administrator defined a custom service address" : "Ihre Administration hat eine benutzerdefinierte Dienstadresse definiert",
@@ -158,7 +160,14 @@ OC.L10N.register(
     "Usage quota info" : "Informationen zum Nutzungskontingent",
     "Usage" : "Verwendung",
     "Specifying your own API key will allow unlimited usage" : "Die Angabe Ihres eigenen API-Schlüssels ermöglicht eine unbegrenzte Nutzung",
+    "Days" : "Tage",
     "Months" : "Monate",
+    "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["Das Kontingent wird basierend auf dem letzten %n Nutzungstag erzwungen","Das Kontingent wird basierend auf den letzten %n Nutzungstagen erzwungen"],
+    "_Quota will reset all users every month on day {day}_::_Quota will reset for all users every %n months on day {day}_" : ["Das Kontingent wird für alle Benutzer alle %n Monate am Tag {day} zurückgesetzt","Das Kontingent wird für alle Benutzer alle %n Monate am Tag {day} zurückgesetzt"],
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Tägliche Kontingente sind variable Kontingente, während monatliche Kontingente an einem bestimmten Tag des Monats zurückgesetzt werden.",
+    "Quota enforcement time " : "Zeit der Kontingentsdurchsetzung",
+    "Reset quota every" : "Kontingent zurücksetzen jede",
+    "On day" : "Am Tag",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden"
 },
 "nplurals=2; plural=(n != 1);");

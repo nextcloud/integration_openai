@@ -25,6 +25,8 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
     "Authentication" : "Autenticació",
     "Authentication method" : "Mètode d'autenticació",
-    "API key" : "Clau de l'API"
+    "API key" : "Clau de l'API",
+    "Days" : "Dies",
+    "Months" : "Mesos"
 },
 "nplurals=2; plural=(n != 1);");

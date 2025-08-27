@@ -111,6 +111,7 @@ OC.L10N.register(
     "Usage quota info" : "Anvendelses kvoteinfo",
     "Usage" : "Anvendelse",
     "Specifying your own API key will allow unlimited usage" : "Angivelse af din egen API nøgle vil tillade ubegrænset anvendelse",
+    "Days" : "Dage",
     "Months" : "Måneder",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Anvend parameteren \"{newParam}\" i stedet for den forældede \"{deprecatedParam}\""
 },

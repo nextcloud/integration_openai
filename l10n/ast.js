@@ -15,6 +15,8 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
     "Authentication" : "Autenticación",
     "API key" : "Clave de l'API",
-    "OpenAI options saved" : "Guardáronse les opciones d'OpenAI"
+    "OpenAI options saved" : "Guardáronse les opciones d'OpenAI",
+    "Days" : "Díes",
+    "Months" : "Meses"
 },
 "nplurals=2; plural=(n != 1);");
