@@ -147,6 +147,8 @@
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "音頻轉文字提供者（舉例來說，用來轉錄 Talk 的錄音）",
     "Text-to-speech provider" : "文字轉語音提供者",
     "Analyze image provider" : "分析影像提供者",
+    "This quota period is from {startDate} to {endDate}" : "此配額期間從 {startDate} 至 {endDate}",
+    "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["配額在過去%n天內的浮動期間內保留"],
     "OpenAI options saved" : "OpenAI 選項已儲存",
     "Failed to save OpenAI options" : "儲存 OpenAI 選項失敗",
     "Your administrator defined a custom service address" : "您的管理員定義了自訂的服務位置",
@@ -158,6 +160,10 @@
     "Specifying your own API key will allow unlimited usage" : "指定您自己的 API 金鑰可允許無限制的使用量",
     "Days" : "天",
     "Months" : "月",
+    "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["配額將根據最近%n天的使用量執行"],
+    "Reset quota every" : "重設配額，每",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "每日配額是浮動配額，而每月配額則在每月的某一天重設。",
+    "On day" : "在特定日期",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "使用「{newParam}」參數而非棄用的「{deprecatedParam}」"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

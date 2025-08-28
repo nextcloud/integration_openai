@@ -136,10 +136,8 @@ OC.L10N.register(
     "Days" : "Päeva",
     "Months" : "Kuud",
     "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["Kvooti kontrollitakse viimase %n päeva kasutusel alusel","Kvooti kontrollitakse viimase %n päeva kasutusel alusel"],
-    "_Quota will reset all users every month on day {day}_::_Quota will reset for all users every %n months on day {day}_" : ["Kõikide kasutajate kvoot nullitakse iga kuu {day}-ndal kuupäeval","Kõikide kasutajate kvoot nullitakse iga %n kuu järel {day}-ndal kuupäeval"],
-    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Igapäevased kvoodid on libisevad kvoodid ja igakuine nullimine toimub kindlal kuupäeval?",
-    "Quota enforcement time " : "Kvoodi jõustamise aeg",
     "Reset quota every" : "Lähtesta kvoot iga",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Igapäevased kvoodid on libisevad kvoodid ja igakuine nullimine toimub kindlal kuupäeval?",
     "On day" : "Päeval",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Aegunud parameetri „{deprecatedParam}“ asemel kasuta pigem „{newParam}“ parameetrit"
 },

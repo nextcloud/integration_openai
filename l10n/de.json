@@ -161,10 +161,8 @@
     "Days" : "Tage",
     "Months" : "Monate",
     "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["Das Kontingent wird basierend auf dem letzten %n Nutzungstag erzwungen","Das Kontingent wird basierend auf den letzten %n Nutzungstagen erzwungen"],
-    "_Quota will reset all users every month on day {day}_::_Quota will reset for all users every %n months on day {day}_" : ["Das Kontingent wird für alle Benutzer alle %n Monate am Tag {day} zurückgesetzt","Das Kontingent wird für alle Benutzer alle %n Monate am Tag {day} zurückgesetzt"],
-    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Tägliche Kontingente sind variable Kontingente, während monatliche Kontingente an einem bestimmten Tag des Monats zurückgesetzt werden.",
-    "Quota enforcement time " : "Zeit der Kontigentsdurchsetzung",
     "Reset quota every" : "Kontingent zurücksetzen jede",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Tägliche Kontingente sind variable Kontingente, während monatliche Kontingente an einem bestimmten Tag des Monats zurückgesetzt werden.",
     "On day" : "Am Tag",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"

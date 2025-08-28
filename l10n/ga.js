@@ -149,6 +149,8 @@ OC.L10N.register(
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Soláthraí cainte go téacs (chun taifeadtaí Talk a thrascríobh mar shampla)",
     "Text-to-speech provider" : "Soláthraí téacs-go-hurlabhra",
     "Analyze image provider" : "Anailísigh soláthraí íomhá",
+    "This quota period is from {startDate} to {endDate}" : "Tá an tréimhse cuóta seo ó {startDate} go {endDate}",
+    "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Coinnítear an cuóta thar thréimhse snámhach den %n lá deireanach","Coinnítear an cuóta thar thréimhse snámhach de na %n lá seo caite","Coinnítear an cuóta thar thréimhse snámhach de na %n lá seo caite","Coinnítear an cuóta thar thréimhse snámhach de na %n lá seo caite","Coinnítear an cuóta thar thréimhse snámhach de na %n lá seo caite"],
     "OpenAI options saved" : "Roghanna OpenAI sábháilte",
     "Failed to save OpenAI options" : "Theip ar shábháil roghanna OpenAI",
     "Your administrator defined a custom service address" : "Sainmhínigh do riarthóir seoladh seirbhíse saincheaptha",
@@ -160,6 +162,10 @@ OC.L10N.register(
     "Specifying your own API key will allow unlimited usage" : "Ceadóidh sonraíocht d'eochair API féin úsáid neamhtheoranta",
     "Days" : "Laethanta",
     "Months" : "Míonna",
+    "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanach","Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanacha","Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanacha","Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanacha","Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanacha"],
+    "Reset quota every" : "Athshocraigh an cuóta gach",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Is cuótaí ar snámh iad cuótaí laethúla agus athshocraítear iad go míosúil ar lá áirithe den mhí.",
+    "On day" : "Ar an lá",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Úsáid paraiméadar \"{newParam}\" in ionad an pharaiméadar \"{deprecatedParam}\""
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

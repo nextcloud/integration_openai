@@ -149,6 +149,8 @@ OC.L10N.register(
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Speech-to-text provider (to transcribe Talk recordings for example)",
     "Text-to-speech provider" : "Text-to-speech provider",
     "Analyze image provider" : "Analyze image provider",
+    "This quota period is from {startDate} to {endDate}" : "This quota period is from {startDate} to {endDate}",
+    "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["The quota is kept over a floating period of the last %n day","The quota is kept over a floating period of the last %n days"],
     "OpenAI options saved" : "OpenAI options saved",
     "Failed to save OpenAI options" : "Failed to save OpenAI options",
     "Your administrator defined a custom service address" : "Your administrator defined a custom service address",
@@ -160,6 +162,10 @@ OC.L10N.register(
     "Specifying your own API key will allow unlimited usage" : "Specifying your own API key will allow unlimited usage",
     "Days" : "Days",
     "Months" : "Months",
+    "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["Quota will be enforced based on last %n day of usage","Quota will be enforced based on last %n days of usage"],
+    "Reset quota every" : "Reset quota every",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Daily quotas are floating quotas while monthly reset on a certain day of the month",
+    "On day" : "On day",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\""
 },
 "nplurals=2; plural=(n != 1);");

@@ -161,10 +161,8 @@
     "Days" : "天",
     "Months" : "月",
     "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["配額將根據最近%n天的使用量執行"],
-    "_Quota will reset all users every month on day {day}_::_Quota will reset for all users every %n months on day {day}_" : ["所有使用者的配額將每隔%n個月在 {day} 重設一次。"],
-    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "每日配額是浮動配額，而每月配額則在每月的某一天重設。",
-    "Quota enforcement time " : "配額執行時間",
     "Reset quota every" : "重設配額，每",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "每日配額是浮動配額，而每月配額則在每月的某一天重設。",
     "On day" : "在特定日期",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "使用「{newParam}」參數而非棄用的「{deprecatedParam}」"
 },"pluralForm" :"nplurals=1; plural=0;"
