@@ -683,6 +683,8 @@ class OpenAiAPIService {
 	 * @param string|null $userId
 	 * @param File $file
 	 * @param bool $translate
+	 * @param string $model
+	 * @param string $language
 	 * @return string
 	 * @throws Exception
 	 */
@@ -691,9 +693,10 @@ class OpenAiAPIService {
 		File $file,
 		bool $translate = false,
 		string $model = Application::DEFAULT_MODEL_ID,
+		string $language = 'detect_language',
 	): string {
 		try {
-			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model);
+			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model, $language);
 		} catch (NotPermittedException|LockedException|GenericFileException $e) {
 			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -707,6 +710,7 @@ class OpenAiAPIService {
 	 * @param string $audioFileContent
 	 * @param bool $translate
 	 * @param string $model
+	 * @param string $language
 	 * @return string
 	 * @throws Exception
 	 */
@@ -715,6 +719,7 @@ class OpenAiAPIService {
 		string $audioFileContent,
 		bool $translate = true,
 		string $model = Application::DEFAULT_MODEL_ID,
+		string $language = 'detect_language',
 	): string {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -730,6 +735,9 @@ class OpenAiAPIService {
 			'response_format' => 'verbose_json',
 			// Verbose needed for extraction of audio duration
 		];
+		if ($language !== 'detect_language') {
+			$params['language'] = $language;
+		}
 		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
 		$contentType = 'multipart/form-data';
 
