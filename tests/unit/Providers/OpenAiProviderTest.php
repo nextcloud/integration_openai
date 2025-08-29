@@ -17,6 +17,7 @@ use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
@@ -83,6 +84,7 @@ class OpenAiProviderTest extends TestCase {
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\Notification\IManager::class),
+			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
 		);
 

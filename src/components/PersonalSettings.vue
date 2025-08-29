@@ -87,6 +87,9 @@
 				<h4>
 					{{ t('integration_openai', 'Usage quota info') }}
 				</h4>
+				<NcNoteCard v-if="poolUsed" type="info">
+					{{ t('integration_openai', 'If you see a shared quota usage of 50% and a usage of 10% that means that you have used 10% of the total shared quota, and the sum of all other users affected by this quota is 40%.') }}
+				</NcNoteCard>
 				<!-- Loop through all quota types-->
 				<table class="quota-table">
 					<thead>
@@ -95,6 +98,9 @@
 								{{ t('integration_openai', 'Quota type') }}
 							</th>
 							<th>{{ t('integration_openai', 'Usage') }}</th>
+							<th v-if="poolUsed">
+								{{ t('integration_openai', 'Shared Usage') }}
+							</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -105,6 +111,12 @@
 							</td>
 							<td v-else>
 								{{ quota.used + ' ' + quota.unit }}
+							</td>
+							<td v-if="quota.used_pool">
+								{{ quota.limit > 0 ? Math.round(quota.used_pool / quota.limit * 100) + ' %' : quota.used_pool + ' ' + quota.unit }}
+							</td>
+							<td v-else-if="poolUsed">
+								{{ t('integration_openai', 'Not Shared') }}
 							</td>
 						</tr>
 					</tbody>
@@ -174,6 +186,9 @@ export default {
 				})
 				: n('integration_openai', 'The quota is kept over a floating period of the last %n day',
 					'The quota is kept over a floating period of the last %n days', this.quotaInfo.period.length)
+		},
+		poolUsed() {
+			return this.quotaInfo !== null && this.quotaInfo.quota_usage.some((quota) => quota.used_pool)
 		},
 	},
 
