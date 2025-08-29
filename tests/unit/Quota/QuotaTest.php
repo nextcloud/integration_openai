@@ -13,6 +13,7 @@ namespace OCA\OpenAi\Tests\Unit\Quota;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Db\EntityType;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -139,11 +140,11 @@ class QuotaTest extends TestCase {
 		$rule['entities'] = [
 			[
 				'entity_id' => self::TEST_USER1,
-				'entity_type' => 'user',
+				'entity_type' => EntityType::USER->value,
 			],
 			[
 				'entity_id' => self::TEST_USER2,
-				'entity_type' => 'user',
+				'entity_type' => EntityType::USER->value,
 			]
 		];
 		$this->quotaRuleService->updateRule($rule['id'], $rule);

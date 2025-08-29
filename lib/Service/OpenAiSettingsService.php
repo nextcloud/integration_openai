@@ -681,7 +681,9 @@ class OpenAiSettingsService {
 		if (!isset($quotaPeriod['length']) || !is_int($quotaPeriod['length'])) {
 			throw new Exception('Invalid quota period length');
 		}
-		$quotaPeriod['length'] = max(1, $quotaPeriod['length']);
+		if ($quotaPeriod['length'] < 1) {
+			throw new Exception('Invalid quota period length');
+		}
 		if (!isset($quotaPeriod['unit']) || !is_string($quotaPeriod['unit'])) {
 			throw new Exception('Invalid quota period unit');
 		}
@@ -690,8 +692,12 @@ class OpenAiSettingsService {
 			if (!isset($quotaPeriod['day']) || !is_int($quotaPeriod['day'])) {
 				throw new Exception('Invalid quota period day');
 			}
-			$quotaPeriod['day'] = max(1, $quotaPeriod['day']);
-			$quotaPeriod['day'] = min($quotaPeriod['day'], 28);
+			if ($quotaPeriod['day'] < 1) {
+				throw new Exception('Invalid quota period day');
+			}
+			if ($quotaPeriod['day'] > 28) {
+				throw new Exception('Invalid quota period day');
+			}
 		} elseif ($quotaPeriod['unit'] !== 'day') {
 			throw new Exception('Invalid quota period unit');
 		}

@@ -57,11 +57,11 @@ class QuotaRuleMapper extends QBMapper {
 			)->andWhere(
 				$qb->expr()->orX(
 					$qb->expr()->andX(
-						$qb->expr()->eq('u.entity_type', $qb->createNamedParameter('user', IQueryBuilder::PARAM_STR)),
+						$qb->expr()->eq('u.entity_type', $qb->createNamedParameter(EntityType::USER->value, IQueryBuilder::PARAM_INT)),
 						$qb->expr()->eq('u.entity_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
 					),
 					$qb->expr()->andX(
-						$qb->expr()->eq('u.entity_type', $qb->createNamedParameter('group', IQueryBuilder::PARAM_STR)),
+						$qb->expr()->eq('u.entity_type', $qb->createNamedParameter(EntityType::GROUP->value, IQueryBuilder::PARAM_INT)),
 						$qb->expr()->in('u.entity_id', $qb->createNamedParameter($groups, IQueryBuilder::PARAM_STR_ARRAY))
 					),
 
@@ -76,11 +76,11 @@ class QuotaRuleMapper extends QBMapper {
 	 * @param int $quotaType
 	 * @param int $amount
 	 * @param int $priority
-	 * @param bool $pool
+	 * @param int $pool
 	 * @return int
 	 * @throws Exception
 	 */
-	public function addRule(int $quotaType, int $amount, int $priority, bool $pool): int {
+	public function addRule(int $quotaType, int $amount, int $priority, int $pool): int {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->insert($this->getTableName())
@@ -89,7 +89,7 @@ class QuotaRuleMapper extends QBMapper {
 					'type' => $qb->createNamedParameter($quotaType, IQueryBuilder::PARAM_INT),
 					'amount' => $qb->createNamedParameter($amount, IQueryBuilder::PARAM_INT),
 					'priority' => $qb->createNamedParameter($priority, IQueryBuilder::PARAM_INT),
-					'pool' => $qb->createNamedParameter($pool, IQueryBuilder::PARAM_BOOL)
+					'pool' => $qb->createNamedParameter($pool, IQueryBuilder::PARAM_INT)
 				]
 			);
 		$qb->executeStatement();
@@ -100,18 +100,18 @@ class QuotaRuleMapper extends QBMapper {
 	 * @param int $quotaType
 	 * @param int $amount
 	 * @param int $priority
-	 * @param bool $pool
+	 * @param int $pool
 	 * @return void
 	 * @throws Exception
 	 */
-	public function updateRule(int $id, int $quotaType, int $amount, int $priority, bool $pool): void {
+	public function updateRule(int $id, int $quotaType, int $amount, int $priority, int $pool): void {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->update($this->getTableName())
 			->set('type', $qb->createNamedParameter($quotaType, IQueryBuilder::PARAM_INT))
 			->set('amount', $qb->createNamedParameter($amount, IQueryBuilder::PARAM_INT))
 			->set('priority', $qb->createNamedParameter($priority, IQueryBuilder::PARAM_INT))
-			->set('pool', $qb->createNamedParameter($pool, IQueryBuilder::PARAM_BOOL))
+			->set('pool', $qb->createNamedParameter($pool, IQueryBuilder::PARAM_INT))
 			->where(
 				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
 			);

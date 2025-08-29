@@ -9,6 +9,7 @@ namespace OCA\OpenAi\Service;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Db\EntityType;
 use OCA\OpenAi\Db\QuotaRuleMapper;
 use OCA\OpenAi\Db\QuotaUserMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -77,7 +78,7 @@ class QuotaRuleService {
 			$result = $rule->jsonSerialize();
 			$result['entities'] = array_map(static function ($u) use ($userManager) {
 				$displayName = $u->getEntityId();
-				if ($u->getEntityType() === 'user') {
+				if ($u->getEntityType() === EntityType::USER->value) {
 					$user = $userManager->get($u->getEntityId());
 					$displayName = $user->getDisplayName();
 				}
@@ -97,7 +98,7 @@ class QuotaRuleService {
 	 * @throws Exception
 	 */
 	public function addRule(): array {
-		$id = $this->quotaRuleMapper->addRule(0, 0, 0, false);
+		$id = $this->quotaRuleMapper->addRule(0, 0, 0, 0);
 		$this->clearCache();
 		return [
 			'id' => $id,
@@ -170,11 +171,7 @@ class QuotaRuleService {
 				$this->logger->warning('Invalid entity', $e);
 				throw new Exception('Invalid entity');
 			}
-			$validTypes = [
-				'user',
-				'group',
-			];
-			if (!isset($e['entity_type'], $e['entity_id']) || !in_array($e['entity_type'], $validTypes) || !is_string($e['entity_id'])) {
+			if (!isset($e['entity_type'], $e['entity_id']) || EntityType::tryFrom($e['entity_type']) === null || !is_string($e['entity_id'])) {
 				$this->logger->warning('Invalid entity', $e);
 				throw new Exception('Invalid entity');
 			}

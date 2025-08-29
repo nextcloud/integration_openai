@@ -12,6 +12,11 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
+enum EntityType: int {
+	case USER = 0;
+	case GROUP = 1;
+}
+
 /**
  * @extends QBMapper<QuotaUser>
  */

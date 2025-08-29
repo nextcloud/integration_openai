@@ -22,11 +22,11 @@
 		<template #option="option">
 			<div class="select-suggestion">
 				<NcAvatar
-					v-if="option.entity_type === 'user'"
+					v-if="option.entity_type === ENTITY_TYPES.user"
 					:user="option.entity_id"
 					:show-user-status="false" />
 				<NcAvatar
-					v-else-if="option.entity_type === 'group'"
+					v-else-if="option.entity_type === ENTITY_TYPES.group"
 					:display-name="option.display_name"
 					:is-no-user="true"
 					:disable-tooltip="true"
@@ -44,11 +44,11 @@
 		</template>
 		<template #selected-option="option">
 			<NcAvatar
-				v-if="option.entity_type === 'user'"
+				v-if="option.entity_type === ENTITY_TYPES.user"
 				:user="option.entity_id"
 				:show-user-status="false" />
 			<NcAvatar
-				v-else-if="option.entity_type === 'group'"
+				v-else-if="option.entity_type === ENTITY_TYPES.group"
 				:display-name="option.display_name"
 				:is-no-user="true"
 				:disable-tooltip="true"
@@ -81,9 +81,10 @@ import axios from '@nextcloud/axios'
 import NcAvatar from '@nextcloud/vue/components/NcAvatar'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 
-const typeIconClass = {
-	user: 'icon-user',
-	group: 'icon-group',
+const typeIconClass = ['icon-user', 'icon-group']
+const ENTITY_TYPES = {
+	user: 0,
+	group: 1,
 }
 
 export default {
@@ -118,6 +119,7 @@ export default {
 			suggestions: [],
 			query: '',
 			currentUser: getCurrentUser(),
+			ENTITY_TYPES,
 		}
 	},
 
@@ -128,15 +130,15 @@ export default {
 				.filter((s) => {
 					return (
 						s.source === 'users'
-								&& !this.value.find((u) => u.entity_type === 'user' && u.entity_id === s.id)
+								&& !this.value.find((u) => u.entity_type === ENTITY_TYPES.user && u.entity_id === s.id)
 					)
 				})
 				.map((s) => {
 					return {
 						entity_id: s.id,
-						entity_type: 'user',
+						entity_type: ENTITY_TYPES.user,
 						display_name: s.label,
-						id: 'user-' + s.id,
+						id: ENTITY_TYPES.user + '-' + s.id,
 					}
 				})
 
@@ -149,14 +151,14 @@ export default {
 				if (
 					lowerCurrent.match(lowerQuery)
 						&& !this.value.find(
-							(u) => u.entity_type === 'user' && u.entity_id === this.currentUser.uid,
+							(u) => u.entity_type === ENTITY_TYPES.user && u.entity_id === this.currentUser.uid,
 						)
 				) {
 					result.push({
 						entity_id: this.currentUser.uid,
-						entity_type: 'user',
+						entity_type: ENTITY_TYPES.user,
 						display_name: this.currentUser.displayName,
-						id: 'user-' + this.currentUser.uid,
+						id: ENTITY_TYPES.user + '-' + this.currentUser.uid,
 					})
 				}
 			}
@@ -167,15 +169,15 @@ export default {
 				.filter((s) => {
 					return (
 						s.source === 'groups'
-								&& !this.value.find((u) => u.entity_type === 'group' && u.entity_id === s.id)
+								&& !this.value.find((u) => u.entity_type === ENTITY_TYPES.group && u.entity_id === s.id)
 					)
 				})
 				.map((s) => {
 					return {
 						entity_id: s.id,
-						entity_type: 'group',
+						entity_type: ENTITY_TYPES.group,
 						display_name: s.label,
-						id: 'group-' + s.id,
+						id: ENTITY_TYPES.group + '-' + s.id,
 					}
 				})
 			result.push(...groups)

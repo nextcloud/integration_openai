@@ -46,9 +46,8 @@ class Version030800Date20250812122830 extends SimpleMigrationStep {
 			$table->addColumn('priority', Types::INTEGER, [
 				'notnull' => true
 			]);
-			$table->addColumn('pool', Types::BOOLEAN, [
-				'notnull' => false,
-				'default' => false,
+			$table->addColumn('pool', Types::INTEGER, [
+				'notnull' => true
 			]);
 			$table->setPrimaryKey(['id']);
 			$table->addIndex(['type'], 'oai_rule_type');
@@ -62,7 +61,7 @@ class Version030800Date20250812122830 extends SimpleMigrationStep {
 			$table->addColumn('rule_id', Types::BIGINT, [
 				'notnull' => true,
 			]);
-			$table->addColumn('entity_type', Types::STRING, [
+			$table->addColumn('entity_type', Types::INTEGER, [
 				'notnull' => true,
 			]);
 			$table->addColumn('entity_id', Types::STRING, [

@@ -15,22 +15,22 @@ use ReturnTypeWillChange;
 /**
  * @method int getRuleId()
  * @method void setRuleId(int $ruleId)
- * @method string getEntityType()
- * @method void setEntityType(string $entityType)
+ * @method int getEntityType()
+ * @method void setEntityType(int $entityType)
  * @method string getEntityId()
  * @method void setEntityId(string $entityId)
  */
 class QuotaUser extends Entity implements JsonSerializable {
 	/** @var int */
 	protected $ruleId;
-	/** @var string */
+	/** @var int */
 	protected $entityType;
 	/** @var string */
 	protected $entityId;
 
 	public function __construct() {
 		$this->addType('rule_id', Types::INTEGER);
-		$this->addType('entity_type', Types::STRING);
+		$this->addType('entity_type', Types::INTEGER);
 		$this->addType('entity_id', Types::STRING);
 	}
 

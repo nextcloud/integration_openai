@@ -46,7 +46,10 @@ export default {
 
 	data() {
 		return {
-			state: loadState('integration_openai', 'rules', []),
+			state: loadState('integration_openai', 'rules', []).map((rule) => {
+				rule.pool = rule.pool === 1
+				return rule
+			}),
 		}
 	},
 

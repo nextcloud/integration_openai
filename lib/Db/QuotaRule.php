@@ -21,8 +21,8 @@ use ReturnTypeWillChange;
  * @method void setAmount(int $amount)
  * @method int getPriority()
  * @method void setPriority(int $priority)
- * @method bool getPool()
- * @method void setPool(bool $pool)
+ * @method int getPool()
+ * @method void setPool(int $pool)
  */
 class QuotaRule extends Entity implements JsonSerializable {
 	/** @var int */
@@ -31,14 +31,14 @@ class QuotaRule extends Entity implements JsonSerializable {
 	protected $amount;
 	/** @var int */
 	protected $priority;
-	/** @var bool */
+	/** @var int */
 	protected $pool;
 
 	public function __construct() {
 		$this->addType('type', Types::INTEGER);
 		$this->addType('amount', Types::INTEGER);
 		$this->addType('priority', Types::INTEGER);
-		$this->addType('pool', Types::BOOLEAN);
+		$this->addType('pool', Types::INTEGER);
 	}
 
 	#[ReturnTypeWillChange]
