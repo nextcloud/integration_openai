@@ -16,9 +16,10 @@
 			<NcInputField
 				id="quota"
 				:model-value="value.length"
+				:min="1"
 				class="input"
 				type="number"
-				@update:model-value="update('length', $event)" />
+				@update:model-value="$event >= 1 && update('length', $event)" />
 			<NcSelect
 				:model-value="unitOptionName"
 				:options="unitOptions"
@@ -31,9 +32,11 @@
 			<NcInputField
 				id="quota"
 				:model-value="value?.day ?? 1"
+				:min="1"
+				:max="28"
 				class="input"
 				type="number"
-				@update:model-value="update('day', $event)" />
+				@update:model-value="$event >= 1 && $event <= 28 && update('day', $event)" />
 		</div>
 		<NcNoteCard type="success">
 			{{ resetText }}
@@ -114,6 +117,9 @@ export default {
 	display: flex;
 	align-items: center;
 	gap: 5px;
+	.select {
+		margin-bottom: 0;
+	}
 }
 
 .container {
