@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "OpenAI Integration" : "Integração OpenAI",
+    "Quota exceeded" : "Cota excedida",
     "Text generation quota exceeded" : "Cota de geração de texto excedida",
     "Image generation quota exceeded" : "Cota de geração de imagens excedida",
     "Audio transcription quota exceeded" : "Cota de transcrição de áudio excedida",

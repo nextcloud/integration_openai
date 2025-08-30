@@ -161,6 +161,8 @@
     "Days" : "天",
     "Months" : "月",
     "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["配額將根據最近%n天的使用量執行"],
+    "_Quota will reset for all the users every month on day number {nth_day}_::_Quota will reset for all the users every %n months on day number {nth_day}_" : ["所有用戶的配額將每隔%n個月的第 {nth_day} 天重設。"],
+    "Quota enforcement time" : "配額執行時間",
     "Reset quota every" : "重設配額，每",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "每日配額是浮動配額，而每月配額則在每月的某一天重設。",
     "On day" : "在特定日期",

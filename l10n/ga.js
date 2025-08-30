@@ -163,6 +163,8 @@ OC.L10N.register(
     "Days" : "Laethanta",
     "Months" : "Míonna",
     "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanach","Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanacha","Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanacha","Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanacha","Cuirfear an cuóta i bhfeidhm bunaithe ar an %n lá úsáide deireanacha"],
+    "_Quota will reset for all the users every month on day number {nth_day}_::_Quota will reset for all the users every %n months on day number {nth_day}_" : ["Athshocrófar an cuóta do na húsáideoirí uile gach mí ar an lá uimhir {nth_day}","Athshocrófar an cuóta do na húsáideoirí uile gach %n mí ar an lá uimhir {nth_day}","Athshocrófar an cuóta do na húsáideoirí uile gach %n mí ar an lá uimhir {nth_day}","Athshocrófar an cuóta do na húsáideoirí uile gach %n mí ar an lá uimhir {nth_day}","Athshocrófar an cuóta do na húsáideoirí uile gach %n mí ar an lá uimhir {nth_day}"],
+    "Quota enforcement time" : "Am forfheidhmithe cuóta",
     "Reset quota every" : "Athshocraigh an cuóta gach",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Is cuótaí ar snámh iad cuótaí laethúla agus athshocraítear iad go míosúil ar lá áirithe den mhí.",
     "On day" : "Ar an lá",

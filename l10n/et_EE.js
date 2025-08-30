@@ -136,6 +136,8 @@ OC.L10N.register(
     "Days" : "Päeva",
     "Months" : "Kuud",
     "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["Kvooti kontrollitakse viimase %n päeva kasutusel alusel","Kvooti kontrollitakse viimase %n päeva kasutusel alusel"],
+    "_Quota will reset for all the users every month on day number {nth_day}_::_Quota will reset for all the users every %n months on day number {nth_day}_" : ["Kõikide kasutajate kvoot nullitakse iga kuu {nth_day}-ndal kuupäeval","Kõikide kasutajate kvoot nullitakse iga %n kuu järel {nth_day}-ndal kuupäeval"],
+    "Quota enforcement time" : "Kvoodi jõustamise aeg",
     "Reset quota every" : "Lähtesta kvoot iga",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Igapäevased kvoodid on libisevad kvoodid ja igakuine nullimine toimub kindlal kuupäeval?",
     "On day" : "Päeval",
