@@ -161,6 +161,8 @@
     "Days" : "Days",
     "Months" : "Months",
     "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["Quota will be enforced based on last %n day of usage","Quota will be enforced based on last %n days of usage"],
+    "_Quota will reset for all the users every month on day number {nth_day}_::_Quota will reset for all the users every %n months on day number {nth_day}_" : ["Quota will reset for all the users every month on day number {nth_day}","Quota will reset for all the users every %n months on day number {nth_day}"],
+    "Quota enforcement time" : "Quota enforcement time",
     "Reset quota every" : "Reset quota every",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Daily quotas are floating quotas while monthly reset on a certain day of the month",
     "On day" : "On day",
