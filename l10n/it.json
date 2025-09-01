@@ -147,6 +147,8 @@
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provider di sintesi vocale (ad esempio per trascrivere registrazioni di conversazioni)",
     "Text-to-speech provider" : "Fornitore di servizi di sintesi vocale",
     "Analyze image provider" : "Analizza il fornitore di immagini",
+    "This quota period is from {startDate} to {endDate}" : "Questo periodo di quota è da {startDate} a {endDate}",
+    "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["La quota viene mantenuta per un periodo variabile dell'ultimo %n giorno","La quota viene mantenuta per un periodo variabile degli ultimi %n giorni","The quota is kept over a floating period of the last %n days"],
     "OpenAI options saved" : "Opzioni OpenAI salvate",
     "Failed to save OpenAI options" : "Impossibile salvare le opzioni OpenAI",
     "Your administrator defined a custom service address" : "L'amministratore ha definito un indirizzo di servizio personalizzato",
@@ -156,7 +158,14 @@
     "Usage quota info" : "Informazioni sulla quota di utilizzo",
     "Usage" : "Utilizzo",
     "Specifying your own API key will allow unlimited usage" : "Specificando la tua chiave API potrai usufruire di un utilizzo illimitato",
+    "Days" : "Giorni",
     "Months" : "Mesi",
+    "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["La quota verrà applicata in base all'ultimo%n giorno di utilizzo","La quota verrà applicata in base agli ultimi %n giorni di utilizzo","La quota verrà applicata in base agli ultimi %n giorni di utilizzo"],
+    "_Quota will reset for all the users every month on day number {nth_day}_::_Quota will reset for all the users every %n months on day number {nth_day}_" : ["La quota verrà reimpostata per tutti gli utenti ogni mese nel giorno numero {nth_day}","La quota verrà reimpostata per tutti gli utenti ogni %n mesi sul numero del giorno {nth_day}","La quota verrà reimpostata per tutti gli utenti ogni %n mesi sul numero del giorno {nth_day}"],
+    "Quota enforcement time" : "Tempo di applicazione delle quote",
+    "Reset quota every" : "Reimposta la quota ogni",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Le quote giornaliere sono quote variabili mentre quelle mensili vengono reimpostate in un determinato giorno del mese",
+    "On day" : "Di giorno",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilizza \"{newParam}\" parametro invece del deprecato \"{deprecatedParam}\""
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
