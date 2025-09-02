@@ -92,7 +92,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeEnumValues(): array {
 		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
-		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices')) ?: Application::DEFAULT_SPEECH_VOICES;
+		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
 		$models = $this->openAiAPIService->getModelEnumValues($this->userId);
 		$enumValues = [
 			'voice' => array_map(function ($v) { return new ShapeEnumValue($v, $v); }, $voices),
@@ -106,16 +106,16 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeDefaults(): array {
 		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
-		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice') ?: Application::DEFAULT_SPEECH_VOICE;
+		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
 		$adminLlmModel = $isUsingOpenAi
 			? 'gpt-4o-audio-preview'
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id');
+			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', lazy: true);
 		$defaults = [
 			'voice' => $adminVoice,
 			'llm_model' => $adminLlmModel,
 		];
 		if (!$isUsingOpenAi) {
-			$adminTtsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id') ?: Application::DEFAULT_SPEECH_MODEL_ID;
+			$adminTtsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
 			$defaults['tts_model'] = $adminTtsModel;
 			$defaults['speed'] = 1;
 		}
@@ -164,7 +164,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		if (isset($input['tts_model']) && is_string($input['tts_model'])) {
 			$ttsModel = $input['tts_model'];
 		} else {
-			$ttsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID) ?: Application::DEFAULT_SPEECH_MODEL_ID;
+			$ttsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
 		}
 
 		if (isset($input['llm_model']) && is_string($input['llm_model'])) {
@@ -173,14 +173,14 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
 			$llmModel = $isUsingOpenAi
 				? 'gpt-4o-audio-preview'
-				: ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID);
+				: ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID);
 		}
 
 
 		if (isset($input['voice']) && is_string($input['voice'])) {
 			$outputVoice = $input['voice'];
 		} else {
-			$outputVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE) ?: Application::DEFAULT_SPEECH_VOICE;
+			$outputVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE, lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
 		}
 
 		$speed = 1;
@@ -195,8 +195,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			}
 		}
 
-		$sttModel = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID) ?: Application::DEFAULT_MODEL_ID;
-		$serviceName = $this->appConfig->getValueString(Application::APP_ID, 'service_name') ?: Application::APP_ID;
+		$sttModel = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
+		$serviceName = $this->appConfig->getValueString(Application::APP_ID, 'service_name', lazy: true) ?: Application::APP_ID;
 
 		// Using the chat API if connected to OpenAI
 		// there is an issue if the history mostly contains text, the model will answer text even if we add the audio modality
