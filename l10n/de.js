@@ -149,7 +149,7 @@ OC.L10N.register(
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Sprache-zu-Text-Anbieter (zum Beispiel zum Transkribieren von Talk-Gesprächsaufzeichnungen)",
     "Text-to-speech provider" : "Text-zu-Sprache-Anbieter",
     "Analyze image provider" : "Bildanbieter analysieren",
-    "This quota period is from {startDate} to {endDate}" : "Dieser Kontigentzeitraum läuft vom {startDate} bis zum {endDate}",
+    "This quota period is from {startDate} to {endDate}" : "Dieser Kontingentzeitraum läuft vom {startDate} bis zum {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Das Kontingent wird über einen variablen Zeitraum des letzten %n Tages gehalten","Das Kontingent wird über einen variablen Zeitraum der letzten %n Tage gehalten"],
     "OpenAI options saved" : "OpenAI-Einstellungen gespeichert",
     "Failed to save OpenAI options" : "OpenAI-Einstellungen konnten nicht gespeichert werden",

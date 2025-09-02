@@ -147,6 +147,8 @@
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provedor de fala-para-texto (para transcrever gravações do Talk, por exemplo)",
     "Text-to-speech provider" : "Provedor texto-para-fala",
     "Analyze image provider" : "Provedor para analisar imagem",
+    "This quota period is from {startDate} to {endDate}" : "Este período de cota é de {startDate} a {endDate}",
+    "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["A cota é mantida durante um período flutuante do último %n dia.","A cota é mantida durante um período flutuante dos últimos %n de dias.","A cota é mantida durante um período flutuante dos últimos %n dias."],
     "OpenAI options saved" : "Opções da OpenAI salvas",
     "Failed to save OpenAI options" : "Falha ao salvar as opções da OpenAI",
     "Your administrator defined a custom service address" : "Seu administrador definiu um endereço de serviço personalizado",
@@ -158,6 +160,12 @@
     "Specifying your own API key will allow unlimited usage" : "Especificar sua própria chave API permitirá uso ilimitado",
     "Days" : "Dias",
     "Months" : "Meses",
+    "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["A cota será imposta com base no último %n dia de uso.","A cota será imposta com base nos últimos %n de dias de uso.","A cota será imposta com base nos últimos %n dias de uso."],
+    "_Quota will reset for all the users every month on day number {nth_day}_::_Quota will reset for all the users every %n months on day number {nth_day}_" : ["A cota será reiniciada para todos os usuários todos os meses no dia {nth_day}.","A cota será reiniciada para todos os usuários a cada %n de meses, no dia {nth_day}.","A cota será reiniciada para todos os usuários a cada %n meses, no dia {nth_day}."],
+    "Quota enforcement time" : "Tempo de imposição da cota",
+    "Reset quota every" : "Reiniciar cota a cada",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "As cotas diárias são cotas flutuantes, enquanto as mensais são redefinidas em um determinado dia do mês.",
+    "On day" : "No dia",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Use o parâmetro \"{newParam}\" em vez do obsoleto \"{deprecatedParam}\""
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
