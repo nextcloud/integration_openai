@@ -147,6 +147,8 @@
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Proveedor de voz a texto (para transcribir grabaciones de Talk, por ejemplo)",
     "Text-to-speech provider" : "Proveedor de texto a voz",
     "Analyze image provider" : "Proveedor de imágenes de Analyze",
+    "This quota period is from {startDate} to {endDate}" : "Este período de cuota es desde {startDate} hasta {endDate}",
+    "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["La cuota se mantiene en un período flotante del último %n día","La cuota se mantiene en un período flotante de los últimos %n días","La cuota se mantiene en un período flotante de los últimos %n días"],
     "OpenAI options saved" : "Las opciones de OpenAI fueron guardadas",
     "Failed to save OpenAI options" : "Fallo al guardar las opciones de OpenAI",
     "Your administrator defined a custom service address" : "Su administrador ha definido una dirección de servicio personalizada",
@@ -158,6 +160,12 @@
     "Specifying your own API key will allow unlimited usage" : "Especificar su propia clave API le permitirá uso ilimitado",
     "Days" : "Días",
     "Months" : "Meses",
+    "_Quota will be enforced based on last %n day of usage_::_Quota will be enforced based on last %n days of usage_" : ["La cuota se impondrá basándose en el último %n día de uso","La cuota se impondrá basándose en los últimos %n días de uso","La cuota se impondrá basándose en los últimos %n días de uso"],
+    "_Quota will reset for all the users every month on day number {nth_day}_::_Quota will reset for all the users every %n months on day number {nth_day}_" : ["La cuota será restablecida para todos los usuarios cada mes en el día número {nth_day}","La cuota será restablecida para todos los usuarios cada %n meses en el día número {nth_day}","La cuota será restablecida para todos los usuarios cada %n meses en el día número {nth_day}"],
+    "Quota enforcement time" : "Período de imposición de cuota",
+    "Reset quota every" : "Restablecer cuota cada",
+    "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "La cuotas diarias son cuotas flotantes mientras que las mensuales son restablecidas en cierto día del mes",
+    "On day" : "El día",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilice el parámetro \"{newParam}\" en vez del parámetro deprecado \"{deprecatedParam}\""
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }
