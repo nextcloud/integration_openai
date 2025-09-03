@@ -9,6 +9,7 @@ namespace OCA\OpenAi\Settings;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\QuotaRuleService;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
@@ -18,6 +19,7 @@ class Admin implements ISettings {
 	public function __construct(
 		private IInitialState $initialStateService,
 		private OpenAiSettingsService $openAiSettingsService,
+		private QuotaRuleService $quotaRuleService,
 		private IAppManager $appManager,
 	) {
 	}
@@ -32,6 +34,8 @@ class Admin implements ISettings {
 		$isAssistantEnabled = $this->appManager->isEnabledForUser('assistant');
 		$adminConfig['assistant_enabled'] = $isAssistantEnabled;
 		$this->initialStateService->provideInitialState('admin-config', $adminConfig);
+		$rules = $this->quotaRuleService->getRules();
+		$this->initialStateService->provideInitialState('rules', $rules);
 		return new TemplateResponse(Application::APP_ID, 'adminSettings');
 	}
 

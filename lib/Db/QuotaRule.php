@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * SPDX-FileCopyrightText: 2023 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2025 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -15,34 +15,29 @@ use OCP\DB\Types;
 use ReturnTypeWillChange;
 
 /**
- * @method string getUserId()
- * @method void setUserId(string $userId)
  * @method int getType()
  * @method void setType(int $type)
- * @method int getUnits()
- * @method void setUnits(int $units)
- * @method int getTimestamp()
- * @method void setTimestamp(int $timestamp)
+ * @method int getAmount()
+ * @method void setAmount(int $amount)
+ * @method int getPriority()
+ * @method void setPriority(int $priority)
  * @method int getPool()
  * @method void setPool(int $pool)
  */
-class QuotaUsage extends Entity implements JsonSerializable {
-	/** @var string */
-	protected $userId;
+class QuotaRule extends Entity implements JsonSerializable {
 	/** @var int */
 	protected $type;
 	/** @var int */
-	protected $units;
+	protected $amount;
 	/** @var int */
-	protected $timestamp;
+	protected $priority;
 	/** @var int */
 	protected $pool;
 
 	public function __construct() {
-		$this->addType('user_id', Types::STRING);
 		$this->addType('type', Types::INTEGER);
-		$this->addType('units', Types::INTEGER);
-		$this->addType('timestamp', Types::INTEGER);
+		$this->addType('amount', Types::INTEGER);
+		$this->addType('priority', Types::INTEGER);
 		$this->addType('pool', Types::INTEGER);
 	}
 
@@ -50,10 +45,9 @@ class QuotaUsage extends Entity implements JsonSerializable {
 	public function jsonSerialize() {
 		return [
 			'id' => $this->getId(),
-			'user_id' => $this->getUserId(),
 			'type' => $this->getType(),
-			'units' => $this->getUnits(),
-			'timestamp' => $this->getTimestamp(),
+			'amount' => $this->getAmount(),
+			'priority' => $this->getPriority(),
 			'pool' => $this->getPool()
 		];
 	}
