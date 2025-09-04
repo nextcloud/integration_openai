@@ -44,6 +44,8 @@ OC.L10N.register(
     "Your administrator defined a custom service address" : "Your administrator defined a custom service address",
     "Leave the API key empty to use the one defined by administrators" : "Leave the API key empty to use the one defined by administrators",
     "Days" : "روزها",
-    "Months" : "ماه‌ها"
+    "Months" : "ماه‌ها",
+    "No recommendations. Start typing." : "هیچ توصیه‌ای وجود ندارد. شروع به نوشتن کنید.",
+    "Category" : "دسته"
 },
 "nplurals=2; plural=(n > 1);");

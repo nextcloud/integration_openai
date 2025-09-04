@@ -10,6 +10,9 @@ OC.L10N.register(
     "Size" : "Size",
     "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Authentication",
-    "API key" : "API key"
+    "API key" : "API key",
+    "No recommendations. Start typing." : "No recommendations. Start typing.",
+    "Category" : "Category",
+    "Save" : "დამახსოვრება"
 },
 "nplurals=2; plural=(n!=1);");

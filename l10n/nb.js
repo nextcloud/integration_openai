@@ -80,6 +80,10 @@ OC.L10N.register(
     "Usage" : "Bruk",
     "Specifying your own API key will allow unlimited usage" : "Å spesifisere din egen API-nøkkel vil tillate ubegrenset bruk",
     "Days" : "Dager",
-    "Months" : "Måneder"
+    "Months" : "Måneder",
+    "No recommendations. Start typing." : "Ingen anbefalinger. Start å skrive.",
+    "No result." : "Ingen resultat.",
+    "Category" : "Kategori",
+    "Save" : "Lagre"
 },
 "nplurals=2; plural=(n != 1);");

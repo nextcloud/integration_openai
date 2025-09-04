@@ -136,7 +136,6 @@ OC.L10N.register(
     "Default voice to use" : "Zu verwendende Standardstimme",
     "Usage limits" : "Nutzungsbeschränkungen",
     "Usage quotas per time period" : "Nutzungskontingente pro Zeitraum",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Für jeden Kontingenttyp kann ein Kontingent pro Benutzer festgelegt werden. Wenn der Benutzer keinen eigenen API-Schlüssel angegeben hat, wird dieses Kontingent erzwungen.",
     "\"0\" means unlimited usage for a particular quota type." : "„0“ bedeutet unbegrenzte Nutzung für einen bestimmten Kontingenttyp.",
     "Quota type" : "Kontingenttyp",
     "Per-user quota / period" : "Kontingent/Zeitraum pro Benutzer",
@@ -168,6 +167,8 @@ OC.L10N.register(
     "Reset quota every" : "Kontingent zurücksetzen jede",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Tägliche Kontingente sind variable Kontingente, während monatliche Kontingente an einem bestimmten Tag des Monats zurückgesetzt werden.",
     "On day" : "Am Tag",
+    "No recommendations. Start typing." : "Keine Empfehlungen. Beginnen Sie mit der Eingabe.",
+    "Category" : "Kategorie",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden"
 },
 "nplurals=2; plural=(n != 1);");

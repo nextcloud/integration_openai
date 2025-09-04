@@ -11,6 +11,9 @@ OC.L10N.register(
     "Authentication" : "Автентикација",
     "Authentication method" : "Начин на автентификација",
     "API key" : "API key",
-    "Months" : "Месеци"
+    "Months" : "Месеци",
+    "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
+    "No result." : "Нема резултати.",
+    "Save" : "Сними"
 },
 "nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;");

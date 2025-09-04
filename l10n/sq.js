@@ -9,6 +9,9 @@ OC.L10N.register(
     "Request timeout (seconds)" : "Kohë skadimi kërkese (sekonda)",
     "Authentication" : "Mirëfilltësim",
     "Authentication method" : "Metodë mirëfilltësimi",
-    "API key" : "Kyç API"
+    "API key" : "Kyç API",
+    "Category" : "Kategori",
+    "Save" : "Ruaje",
+    "Delete" : "Fshi"
 },
 "nplurals=2; plural=(n != 1);");

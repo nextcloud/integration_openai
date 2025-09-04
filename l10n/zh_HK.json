@@ -134,7 +134,6 @@
     "Default voice to use" : "默認使用的嗓音",
     "Usage limits" : "使用量限制",
     "Usage quotas per time period" : "每個時段的使用量配額",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "每種配額類型可設定每個使用者的配額。如果使用者未提供自己的 API 金鑰，則會強制執行此配額。",
     "\"0\" means unlimited usage for a particular quota type." : "「0」表示特定配額類型的使用量不受限制。",
     "Quota type" : "配額類型",
     "Per-user quota / period" : "每個用戶的配額/週期",
@@ -166,6 +165,12 @@
     "Reset quota every" : "重設配額，每",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "每日配額是浮動配額，而每月配額則在每月的某一天重設。",
     "On day" : "在特定日期",
+    "Who?" : "誰？",
+    "No recommendations. Start typing." : "沒有建議。開始輸入。",
+    "No result." : "無結果。",
+    "Category" : "分類",
+    "Save" : "保存",
+    "Delete" : "刪除",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "使用「{newParam}」參數而非棄用的「{deprecatedParam}」"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

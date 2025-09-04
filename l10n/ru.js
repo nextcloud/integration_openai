@@ -76,7 +76,6 @@ OC.L10N.register(
     "Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks." : "Максимальное количество выходных токенов, сгенерированных для одного текстового запроса на генерацию. Это также применяется для задач преобразования текста в речь.",
     "Usage limits" : "Ограничения на использование",
     "Usage quotas per time period" : "Квоты использования за определенный период времени",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Для каждого типа квоты может быть установлена квота под конкретного пользователя. Если пользователь не предоставил свой API ключ, эта квота будет применена.",
     "\"0\" means unlimited usage for a particular quota type." : "\"0\" означает безлимитное использование для определенного типа квоты.",
     "Quota type" : "Тип квоты",
     "Per-user quota / period" : "Квота / период для каждого пользователя",
@@ -91,6 +90,12 @@ OC.L10N.register(
     "Usage quota info" : "Информация о квоте использования",
     "Usage" : "Использование",
     "Specifying your own API key will allow unlimited usage" : "Указание вашего собственного ключа API позволит использовать его неограниченно",
-    "Months" : "Месяц(ев)"
+    "Months" : "Месяц(ев)",
+    "Who?" : "Кто?",
+    "No recommendations. Start typing." : "Начните вводить имя...",
+    "No result." : "Нет результатов",
+    "Category" : "Категория",
+    "Save" : "Сохранить",
+    "Delete" : "Удалить"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");

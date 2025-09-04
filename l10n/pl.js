@@ -101,6 +101,12 @@ OC.L10N.register(
     "Usage quota info" : "Informacja o wykorzystanym limicie. ",
     "Usage" : "Użycie",
     "Specifying your own API key will allow unlimited usage" : "Wprowadź własny klucz API aby umożliwić nieograniczone korzystanie",
-    "Months" : "Miesiące"
+    "Months" : "Miesiące",
+    "Who?" : "Kto?",
+    "No recommendations. Start typing." : "Brak rekomendacji. Możesz napisać.",
+    "No result." : "Brak wyników.",
+    "Category" : "Kategoria",
+    "Save" : "Zapisz",
+    "Delete" : "Usuń"
 },
 "nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);");

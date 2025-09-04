@@ -17,6 +17,8 @@ OC.L10N.register(
     "Authentication method" : "Auðkenningarmáti",
     "API key" : "API-lykill",
     "Days" : "Dagar",
-    "Months" : "Mánuðir"
+    "Months" : "Mánuðir",
+    "No recommendations. Start typing." : "Engar tillögur. Byrjaðu að skrifa.",
+    "Category" : "Flokkur"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

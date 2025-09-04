@@ -14,6 +14,8 @@ OC.L10N.register(
     "Authentication method" : "שיטת אימות",
     "API key" : "מפתח API",
     "Days" : "ימים",
-    "Months" : "חודשים"
+    "Months" : "חודשים",
+    "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",
+    "Category" : "קטגוריה"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

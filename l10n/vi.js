@@ -11,6 +11,11 @@ OC.L10N.register(
     "Authentication" : "Xác thực",
     "Authentication method" : "Phương thức xác thực",
     "Days" : "Ngày",
-    "Months" : "Tháng"
+    "Months" : "Tháng",
+    "No recommendations. Start typing." : "Không có khuyến nghị. Bắt đầu gõ.",
+    "No result." : "Không có kết quả",
+    "Category" : "Hạng mục",
+    "Save" : "Lưu",
+    "Delete" : "Xóa"
 },
 "nplurals=1; plural=0;");

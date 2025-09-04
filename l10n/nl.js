@@ -15,6 +15,12 @@ OC.L10N.register(
     "Authentication" : "Authenticatie",
     "Authentication method" : "Authenticatiemethode",
     "API key" : "API-sleutel",
-    "Months" : "Maanden"
+    "Months" : "Maanden",
+    "Who?" : "Wie?",
+    "No recommendations. Start typing." : "Geen aanbevelingen. Begin te typen.",
+    "No result." : "Geen resultaat.",
+    "Category" : "Categorie",
+    "Save" : "Opslaan",
+    "Delete" : "Verwijderen"
 },
 "nplurals=2; plural=(n != 1);");

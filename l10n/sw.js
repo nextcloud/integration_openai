@@ -19,6 +19,12 @@ OC.L10N.register(
     "Authentication" : "Uthibitisho",
     "API key" : "Ufunguo wa API",
     "Days" : "Siku",
-    "Months" : "Miezi"
+    "Months" : "Miezi",
+    "Who?" : "Nani?",
+    "No recommendations. Start typing." : "Hakuna maoni. Anza kuchapisha",
+    "No result." : "Hakuna matokeo",
+    "Category" : "Kipengele",
+    "Save" : "Hifadhi",
+    "Delete" : "Futa"
 },
 "nplurals=2; plural=(n != 1);");

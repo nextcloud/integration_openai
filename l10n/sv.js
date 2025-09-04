@@ -42,6 +42,12 @@ OC.L10N.register(
     "Your administrator defined a custom service address" : "Din administratör har definierat en anpassad service-adress",
     "Leave the API key empty to use the one defined by administrators" : "Lämna API-nyckeln tom för att använda den som definierats av administratörer",
     "Days" : "Dagar",
-    "Months" : "Månader"
+    "Months" : "Månader",
+    "Who?" : "Vem?",
+    "No recommendations. Start typing." : "Inga rekommendationer. Börja skriva.",
+    "No result." : "Inga resultat.",
+    "Category" : "Kategori",
+    "Save" : "Spara",
+    "Delete" : "Radera"
 },
 "nplurals=2; plural=(n != 1);");

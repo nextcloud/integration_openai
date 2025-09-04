@@ -134,7 +134,6 @@
     "Default voice to use" : "Використовувати голос за замовчуванням",
     "Usage limits" : "Обмеження щодо використання",
     "Usage quotas per time period" : "Квоти використання за період часу",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Для кожного типу квоти можна встановити квоту на користувача. Якщо користувач не надав власний ключ API, ця квота буде застосовуватися.",
     "\"0\" means unlimited usage for a particular quota type." : "«0» означає необмежене використання для певного типу квоти.",
     "Quota type" : "Тип квоти",
     "Per-user quota / period" : "Квота на користувача / період",
@@ -158,6 +157,12 @@
     "Specifying your own API key will allow unlimited usage" : "Вказавши власний ключ API, ви зможете використовувати його необмежену кількість разів",
     "Days" : "Дні",
     "Months" : "Місяці",
+    "Who?" : "Хто?",
+    "No recommendations. Start typing." : "Почніть вводити ім'я користувача",
+    "No result." : "Жодного результату.",
+    "Category" : "Категорія",
+    "Save" : "Зберегти",
+    "Delete" : "Видалити",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Використовуйте параметр \"{newParam}\" замість застарілого \"{deprecatedParam}\""
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);"
 }

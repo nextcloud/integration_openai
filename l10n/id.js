@@ -13,6 +13,8 @@ OC.L10N.register(
     "Authentication method" : "Metode otentikasi",
     "API key" : "Kunci API",
     "Days" : "Hari",
-    "Months" : "Bulan"
+    "Months" : "Bulan",
+    "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",
+    "Category" : "Kategori"
 },
 "nplurals=1; plural=0;");

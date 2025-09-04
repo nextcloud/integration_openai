@@ -136,7 +136,6 @@ OC.L10N.register(
     "Default voice to use" : "Kullanılacak varsayılan ses",
     "Usage limits" : "Kullanım sınırları",
     "Usage quotas per time period" : "Dönem başına kullanım kotaları",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Her kota türü için kullanıcı başına bir kota ayarlanabilir. Kullanıcı kendi API anahtarını kullanmıyorsa, bu kota uygulanır.",
     "\"0\" means unlimited usage for a particular quota type." : "\"0\" değeri, belirli bir kota türünün sınırsız kullanımı sağlar.",
     "Quota type" : "Kota türü",
     "Per-user quota / period" : "Kullanıcı başına kota / dönem",
@@ -168,6 +167,12 @@ OC.L10N.register(
     "Reset quota every" : "Kota sıfırlanma sıklığı",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Aylık kotalar, her ayın belirli bir gününde sıfırlanırken, günlük kotalar değişken kotalardır",
     "On day" : "Şu günde",
+    "Who?" : "Kim?",
+    "No recommendations. Start typing." : "Herhangi bir öneri yok. Yazmaya başlayın.",
+    "No result." : "Herhangi bir sonuç yok.",
+    "Category" : "Kategori",
+    "Save" : "Kaydet",
+    "Delete" : "Sil",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Kullanımdan kaldırılan \"{deprecatedParam}\" yerine \"{newParam}\" parametresini kullanın"
 },
 "nplurals=2; plural=(n > 1);");

@@ -43,6 +43,9 @@ OC.L10N.register(
     "API key" : "APIキー",
     "Usage limits" : "使用制限",
     "Quota type" : "クォータのタイプ",
-    "Months" : "月"
+    "Months" : "月",
+    "No recommendations. Start typing." : "推奨事項はありません。 入力を開始します。",
+    "Category" : "カテゴリー",
+    "Save" : "保存する"
 },
 "nplurals=1; plural=0;");

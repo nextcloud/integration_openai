@@ -134,7 +134,6 @@ OC.L10N.register(
     "Default voice to use" : "Výchozí hlas který používat",
     "Usage limits" : "Limity využití",
     "Usage quotas per time period" : "Kvóty využití na časové období",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Je možné nastavit kvótu pro jednotlivé uživatele pro každý z typů kvóty. Pokud uživatel nezadal svůj vlastní klíč k API, bude vynucována tato kvóta.",
     "\"0\" means unlimited usage for a particular quota type." : "„0“ (nula) znamená neomezené využívání v rámci konkrétního typu kvóty.",
     "Quota type" : "Typ kvóty",
     "Per-user quota / period" : "Kvóta/období pro jednotlivého uživatele",
@@ -158,6 +157,9 @@ OC.L10N.register(
     "Specifying your own API key will allow unlimited usage" : "Zadání vašeho vlastního klíče k API umožní neomezené využívání",
     "Days" : "Dny",
     "Months" : "Měsíců",
+    "Quota enforcement time" : "Doba vynucování kvóty",
+    "Reset quota every" : "Resetovat kvótu každých",
+    "On day" : "V den",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Použít parametr „{newParam}“ namísto zastaralého „{deprecatedParam}“"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

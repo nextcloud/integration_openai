@@ -14,6 +14,12 @@ OC.L10N.register(
     "Authentication" : "Autenticatzione",
     "Authentication method" : "Mètodu de autenticatzione",
     "API key" : "Crae API",
-    "Months" : "Meses"
+    "Months" : "Meses",
+    "Who?" : "Chie?",
+    "No recommendations. Start typing." : "Peruna racumandatzione. Cumintza a iscrìere.",
+    "No result." : "Perunu resultadu.",
+    "Category" : "Categorias",
+    "Save" : "Sarva",
+    "Delete" : "Cantzella"
 },
 "nplurals=2; plural=(n != 1);");

@@ -30,6 +30,10 @@ OC.L10N.register(
     "OpenAI options saved" : "„OpenAI“ parinktys įrašytos",
     "Failed to save OpenAI options" : "Nepavyko įrašyti „OpenAI“ parinkčių",
     "You can create a free API key in your OpenAI account settings" : "Nemokamą API raktą galite susikurti „OpenAI“ paskyros nustatymuose",
-    "Usage" : "Naudojimas"
+    "Usage" : "Naudojimas",
+    "No recommendations. Start typing." : "Rekomendacijų nėra. Pradėkite rašyti.",
+    "No result." : "Nėra rezultatų.",
+    "Category" : "Kategorija",
+    "Save" : "Įrašyti"
 },
 "nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);");

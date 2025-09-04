@@ -115,7 +115,6 @@ OC.L10N.register(
     "Default voice to use" : "Vaikimisi kasutatav hääl",
     "Usage limits" : "Kasutuse piirangud",
     "Usage quotas per time period" : "Kasutuskvoodid ajavahemiku kohta",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Iga kvoodi tüübi kohta saad määrata kasutajakohase kvoodi. Kui kasutajal pole oma API võtit, siis see kvoodi kasutamine on ka jõustatud.",
     "\"0\" means unlimited usage for a particular quota type." : "„0“ tähendab antud kvoodi tüübi puhul piirangute puudumist.",
     "Quota type" : "Kvoodi tüüp",
     "Per-user quota / period" : "Kasutajakohane kvoot / ajavahemik",
@@ -141,6 +140,8 @@ OC.L10N.register(
     "Reset quota every" : "Lähtesta kvoot iga",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Igapäevased kvoodid on libisevad kvoodid ja igakuine nullimine toimub kindlal kuupäeval?",
     "On day" : "Päeval",
+    "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
+    "Category" : "Kategooria",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Aegunud parameetri „{deprecatedParam}“ asemel kasuta pigem „{newParam}“ parameetrit"
 },
 "nplurals=2; plural=(n != 1);");

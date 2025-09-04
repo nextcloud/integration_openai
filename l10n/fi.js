@@ -17,6 +17,8 @@ OC.L10N.register(
     "Authentication method" : "Tunnistautumistapa",
     "API key" : "API-avain",
     "Days" : "Päivää",
-    "Months" : "Kuukautta"
+    "Months" : "Kuukautta",
+    "No recommendations. Start typing." : "Ei suosituksia. Aloita kirjoittaminen.",
+    "Category" : "Kategoria"
 },
 "nplurals=2; plural=(n != 1);");

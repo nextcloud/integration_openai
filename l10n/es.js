@@ -136,7 +136,6 @@ OC.L10N.register(
     "Default voice to use" : "Voz predeterminada a utilizar",
     "Usage limits" : "Límites de uso",
     "Usage quotas per time period" : "Cuotas de uso por período de tiempo",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Una cuota de usuario para cada tipo de cuota puede ser definida. Si el usuario no ha provisto su propia clave API, esta cuota se hará obligatoria.",
     "\"0\" means unlimited usage for a particular quota type." : "\"0\" significa uso ilimitado para un tipo particular de cuota.",
     "Quota type" : "Tipo de cuota",
     "Per-user quota / period" : "Cuotas por usuario / período",
@@ -168,6 +167,8 @@ OC.L10N.register(
     "Reset quota every" : "Restablecer cuota cada",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "La cuotas diarias son cuotas flotantes mientras que las mensuales son restablecidas en cierto día del mes",
     "On day" : "El día",
+    "No recommendations. Start typing." : "Sin recomendaciones. Comience a escribir.",
+    "Category" : "Categoría",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilice el parámetro \"{newParam}\" en vez del parámetro deprecado \"{deprecatedParam}\""
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

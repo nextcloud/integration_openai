@@ -136,7 +136,6 @@ OC.L10N.register(
     "Default voice to use" : "Guth réamhshocraithe le húsáid",
     "Usage limits" : "Teorainneacha úsáide",
     "Usage quotas per time period" : "Cuótaí úsáide in aghaidh na tréimhse ama",
-    "A per-user quota for each quota type can be set. If the user has not provided their own API key, this quota will be enforced." : "Is féidir cuóta in aghaidh an úsáideora a shocrú do gach cineál cuóta. Mura bhfuil a n-eochair API féin curtha ar fáil ag an úsáideoir, cuirfear an cuóta seo i bhfeidhm.",
     "\"0\" means unlimited usage for a particular quota type." : "Ciallaíonn \"0\" úsáid gan teorainn le haghaidh cineál cuóta ar leith.",
     "Quota type" : "Cineál cuóta",
     "Per-user quota / period" : "Cuóta in aghaidh an úsáideora / tréimhse",
@@ -168,6 +167,8 @@ OC.L10N.register(
     "Reset quota every" : "Athshocraigh an cuóta gach",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Is cuótaí ar snámh iad cuótaí laethúla agus athshocraítear iad go míosúil ar lá áirithe den mhí.",
     "On day" : "Ar an lá",
+    "No recommendations. Start typing." : "Gan moltaí. Tosaigh ag clóscríobh.",
+    "Category" : "Catagóir",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Úsáid paraiméadar \"{newParam}\" in ionad an pharaiméadar \"{deprecatedParam}\""
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

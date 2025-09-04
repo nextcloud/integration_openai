@@ -15,6 +15,8 @@ OC.L10N.register(
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
     "Days" : "Días",
-    "Months" : "Meses"
+    "Months" : "Meses",
+    "No recommendations. Start typing." : "Sin recomendaciones. Empiece a escribir.",
+    "Category" : "Categoría"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

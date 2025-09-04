@@ -91,6 +91,12 @@ OC.L10N.register(
     "Usage" : "ئىشلىتىش",
     "Specifying your own API key will allow unlimited usage" : "ئۆزىڭىزنىڭ API ئاچقۇچىنى بەلگىلىسىڭىز چەكسىز ئىشلىتىشكە يول قويىدۇ",
     "Days" : "كۈنلەر",
-    "Months" : "ئايلار"
+    "Months" : "ئايلار",
+    "Who?" : "كىم؟",
+    "No recommendations. Start typing." : "تەۋسىيە يوق. يېزىشنى باشلاڭ.",
+    "No result." : "ھېچقانداق نەتىجە يوق.",
+    "Category" : "سەھىپە",
+    "Save" : "ساقلاش",
+    "Delete" : "ئۆچۈر"
 },
 "nplurals=2; plural=(n != 1);");

@@ -32,6 +32,12 @@ OC.L10N.register(
     "Usage limits" : "Omejitve uporabe",
     "Usage" : "Uporaba",
     "Days" : "Dnevi",
-    "Months" : "mesecev"
+    "Months" : "mesecev",
+    "Who?" : "Kdo?",
+    "No recommendations. Start typing." : "Seznam ni na voljo, poskusite z vpisom.",
+    "No result." : "Ni zadetkov",
+    "Category" : "Kategorija",
+    "Save" : "Shrani",
+    "Delete" : "Izbriši"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");
