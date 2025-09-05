@@ -167,8 +167,12 @@ OC.L10N.register(
     "Reset quota every" : "Réinitialiser le quota tous les",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Les quotas quotidiens sont des quotas flottants, tandis que les quotas mensuels sont réinitialisés à une date précise du mois",
     "On day" : "Le jour",
+    "Who?" : "Qui ?",
     "No recommendations. Start typing." : "Aucune suggestion. Commencez à écrire.",
+    "No result." : "Aucun résultat.",
     "Category" : "Catégorie",
+    "Save" : "Enregistrer",
+    "Delete" : "Supprimer",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utiliser le paramètre \"{newParam}\" au lieu de \"{deprecatedParam}\" qui est déprécié"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

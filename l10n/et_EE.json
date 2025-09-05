@@ -138,8 +138,12 @@
     "Reset quota every" : "Lähtesta kvoot iga",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Igapäevased kvoodid on libisevad kvoodid ja igakuine nullimine toimub kindlal kuupäeval?",
     "On day" : "Päeval",
+    "Who?" : "Kes?",
     "No recommendations. Start typing." : "Soovitusi pole. Alusta trükkimist.",
+    "No result." : "Vasteid ei leitud.",
     "Category" : "Kategooria",
+    "Save" : "Salvesta",
+    "Delete" : "Kustuta",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Aegunud parameetri „{deprecatedParam}“ asemel kasuta pigem „{newParam}“ parameetrit"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

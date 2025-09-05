@@ -17,6 +17,9 @@ OC.L10N.register(
     "Days" : "Días",
     "Months" : "Meses",
     "No recommendations. Start typing." : "Sin recomendaciones. Empiece a escribir.",
-    "Category" : "Categoría"
+    "No result." : "Sin resultado.",
+    "Category" : "Categoría",
+    "Save" : "Guardar",
+    "Delete" : "Eliminar"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

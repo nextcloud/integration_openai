@@ -20,6 +20,12 @@
     "OpenAI options saved" : "Опциите на OpenAI са записани",
     "Failed to save OpenAI options" : "Неуспешно записване на опциите на OpenAI",
     "Leave the API key empty to use the one defined by administrators" : "Оставяне на празен API ключ, за да се използва този, определен от администраторите",
-    "Months" : "Месеци"
+    "Months" : "Месеци",
+    "Who?" : "Кой?",
+    "No recommendations. Start typing." : "Няма препоръки. Започнете да пишете.",
+    "No result." : "Няма резултат.",
+    "Category" : "Категория",
+    "Save" : "Запиши",
+    "Delete" : "Изтриване"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

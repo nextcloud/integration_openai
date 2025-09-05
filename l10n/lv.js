@@ -13,9 +13,11 @@ OC.L10N.register(
     "API key" : "API atslēga",
     "Days" : "Dienas",
     "Months" : "Mēniši",
+    "Who?" : "Kurš?",
     "No recommendations. Start typing." : "Nav ieteikumu. Jāsāk rakstīt.",
     "No result." : "Nav iznākuma.",
     "Category" : "Kategorija",
-    "Save" : "Saglabāt"
+    "Save" : "Saglabāt",
+    "Delete" : "Izdzēst"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

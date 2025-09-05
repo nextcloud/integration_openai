@@ -114,8 +114,12 @@ OC.L10N.register(
     "Specifying your own API key will allow unlimited usage" : "Especificar a súa propia chave da API permitiralle un uso ilimitado",
     "Days" : "Días",
     "Months" : "Meses",
+    "Who?" : "Quen?",
     "No recommendations. Start typing." : "Non hai recomendacións. Comece a escribir.",
+    "No result." : "Sen resultados.",
     "Category" : "Categoría",
+    "Save" : "Gardar",
+    "Delete" : "Eliminar",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Empregue o parámetro «{newParam}» en troques do obsoleto «{deprecatedParam}»"
 },
 "nplurals=2; plural=(n != 1);");

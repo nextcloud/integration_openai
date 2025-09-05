@@ -11,6 +11,9 @@ OC.L10N.register(
     "Authentication method" : "Aŭtentiga metodo",
     "API key" : "API-ŝlosilo",
     "No recommendations. Start typing." : "Neniu propono. Ektajpu.",
-    "Category" : "Kategorio"
+    "No result." : "Nenia rezulto.",
+    "Category" : "Kategorio",
+    "Save" : "Konservi",
+    "Delete" : "Forigi"
 },
 "nplurals=2; plural=(n != 1);");

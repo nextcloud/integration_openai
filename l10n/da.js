@@ -122,8 +122,12 @@ OC.L10N.register(
     "Specifying your own API key will allow unlimited usage" : "Angivelse af din egen API nøgle vil tillade ubegrænset anvendelse",
     "Days" : "Dage",
     "Months" : "Måneder",
+    "Who?" : "Hvem?",
     "No recommendations. Start typing." : "Ingen anbefalinger. Begynd at skrive.",
+    "No result." : "Intet resultat",
     "Category" : "Kategori",
+    "Save" : "Gem",
+    "Delete" : "Slet",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Anvend parameteren \"{newParam}\" i stedet for den forældede \"{deprecatedParam}\""
 },
 "nplurals=2; plural=(n != 1);");

@@ -31,7 +31,11 @@ OC.L10N.register(
     "Leave the API key empty to use the one defined by administrators" : "Deja la clave de API vacía para usar la definida por los administradores",
     "Days" : "Días",
     "Months" : "Meses",
+    "Who?" : "¿Quién?",
     "No recommendations. Start typing." : "No hay recomendaciones. Comienza a escribir.",
-    "Category" : "Categoría"
+    "No result." : "Sin resultados.",
+    "Category" : "Categoría",
+    "Save" : "Guardar",
+    "Delete" : "Borrar"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

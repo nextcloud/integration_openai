@@ -17,6 +17,12 @@ OC.L10N.register(
     "API key" : "Clave de l'API",
     "OpenAI options saved" : "Guardáronse les opciones d'OpenAI",
     "Days" : "Díes",
-    "Months" : "Meses"
+    "Months" : "Meses",
+    "Who?" : "¿Quién?",
+    "No recommendations. Start typing." : "Nun hai nenguna recomendación. Comienza a escribir.",
+    "No result." : "Nun hai nengún resultáu.",
+    "Category" : "Categoría",
+    "Save" : "Guardar",
+    "Delete" : "Desaniciar"
 },
 "nplurals=2; plural=(n != 1);");

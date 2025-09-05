@@ -44,8 +44,11 @@ OC.L10N.register(
     "Usage limits" : "使用制限",
     "Quota type" : "クォータのタイプ",
     "Months" : "月",
+    "Who?" : "どちら様でしょうか？",
     "No recommendations. Start typing." : "推奨事項はありません。 入力を開始します。",
+    "No result." : "結果なし",
     "Category" : "カテゴリー",
-    "Save" : "保存する"
+    "Save" : "保存する",
+    "Delete" : "削除"
 },
 "nplurals=1; plural=0;");

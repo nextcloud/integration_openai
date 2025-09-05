@@ -110,8 +110,12 @@ OC.L10N.register(
     "Usage" : "Χρήση",
     "Specifying your own API key will allow unlimited usage" : "Ο καθορισμός του δικού σας κλειδιού API θα επιτρέψει απεριόριστη χρήση",
     "Months" : "Μήνες",
+    "Who?" : "Ποιος;",
     "No recommendations. Start typing." : "Δεν υπάρχουν συστάσεις. Αρχίστε να πληκτρολογείτε.",
+    "No result." : "Κανένα αποτέλεσμα.",
     "Category" : "Κατηγορία",
+    "Save" : "Αποθήκευση",
+    "Delete" : "Διαγραφή",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Χρησιμοποιήστε την παράμετρο \"{newParam}\" αντί για την καταργημένη \"{deprecatedParam}\""
 },
 "nplurals=2; plural=(n != 1);");

@@ -15,6 +15,9 @@ OC.L10N.register(
     "Days" : "Hari",
     "Months" : "Bulan",
     "No recommendations. Start typing." : "Tidak ada saran. Mulai mengetik.",
-    "Category" : "Kategori"
+    "No result." : "Tidak ada hasil.",
+    "Category" : "Kategori",
+    "Save" : "Simpan",
+    "Delete" : "Hapus"
 },
 "nplurals=1; plural=0;");

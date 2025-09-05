@@ -167,8 +167,12 @@ OC.L10N.register(
     "Reset quota every" : "Reset quota every",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "Daily quotas are floating quotas while monthly reset on a certain day of the month",
     "On day" : "On day",
+    "Who?" : "Who?",
     "No recommendations. Start typing." : "No recommendations. Start typing.",
+    "No result." : "No result.",
     "Category" : "Category",
+    "Save" : "Save",
+    "Delete" : "Delete",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\""
 },
 "nplurals=2; plural=(n != 1);");

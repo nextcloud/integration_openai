@@ -75,8 +75,11 @@ OC.L10N.register(
     "Specifying your own API key will allow unlimited usage" : "자신의 API 키를 지정하면 무제한 사용을 허용합니다.",
     "Days" : "일",
     "Months" : "개월",
+    "Who?" : "상대방 정보",
     "No recommendations. Start typing." : "추천 없음. 타이핑을 시작하십시오",
+    "No result." : "결과 없음",
     "Category" : "분류",
-    "Save" : "저장"
+    "Save" : "저장",
+    "Delete" : "삭제"
 },
 "nplurals=1; plural=0;");

@@ -18,7 +18,11 @@ OC.L10N.register(
     "API key" : "API-avain",
     "Days" : "Päivää",
     "Months" : "Kuukautta",
+    "Who?" : "Kuka?",
     "No recommendations. Start typing." : "Ei suosituksia. Aloita kirjoittaminen.",
-    "Category" : "Kategoria"
+    "No result." : "Ei tulosta.",
+    "Category" : "Kategoria",
+    "Save" : "Tallenna",
+    "Delete" : "Poista"
 },
 "nplurals=2; plural=(n != 1);");

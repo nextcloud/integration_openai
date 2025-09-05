@@ -160,6 +160,12 @@ OC.L10N.register(
     "Quota enforcement time" : "Doba vynucování kvóty",
     "Reset quota every" : "Resetovat kvótu každých",
     "On day" : "V den",
+    "Who?" : "Kdo?",
+    "No recommendations. Start typing." : "Žádná doporučení. Pište.",
+    "No result." : "No result.",
+    "Category" : "Kategorie",
+    "Save" : "Uložit",
+    "Delete" : "Smazat",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Použít parametr „{newParam}“ namísto zastaralého „{deprecatedParam}“"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

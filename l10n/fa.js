@@ -45,7 +45,11 @@ OC.L10N.register(
     "Leave the API key empty to use the one defined by administrators" : "Leave the API key empty to use the one defined by administrators",
     "Days" : "روزها",
     "Months" : "ماه‌ها",
+    "Who?" : "Who?",
     "No recommendations. Start typing." : "هیچ توصیه‌ای وجود ندارد. شروع به نوشتن کنید.",
-    "Category" : "دسته"
+    "No result." : "بدون نتیجه.",
+    "Category" : "دسته",
+    "Save" : "ذخیره",
+    "Delete" : "حذف"
 },
 "nplurals=2; plural=(n > 1);");

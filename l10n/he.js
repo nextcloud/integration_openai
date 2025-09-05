@@ -16,6 +16,9 @@ OC.L10N.register(
     "Days" : "ימים",
     "Months" : "חודשים",
     "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",
-    "Category" : "קטגוריה"
+    "No result." : "אין תוצאות.",
+    "Category" : "קטגוריה",
+    "Save" : "שמירה",
+    "Delete" : "מחיקה"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

@@ -48,7 +48,11 @@ OC.L10N.register(
     "Specifying your own API key will allow unlimited usage" : "A saját API-kulcs megadása korlátlan használatot tesz lehetővé",
     "Days" : "Napok",
     "Months" : "Hónapok",
+    "Who?" : "Ki?",
     "No recommendations. Start typing." : "Nincs javaslat. Kezdjen gépelni.",
-    "Category" : "Kategória"
+    "No result." : "Nincs találat.",
+    "Category" : "Kategória",
+    "Save" : "Mentés",
+    "Delete" : "Törlés"
 },
 "nplurals=2; plural=(n != 1);");

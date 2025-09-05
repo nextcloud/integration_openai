@@ -112,6 +112,12 @@
     "Specifying your own API key will allow unlimited usage" : "سيسمح تحديد مفتاح API الخاص بك باستعمال غير محدد الحصة",
     "Days" : "أيام",
     "Months" : "شهور",
+    "Who?" : "من؟",
+    "No recommendations. Start typing." : "لا توجد توصيات. إبدأ الكتابة.",
+    "No result." : "لا توجد أي نتيجة",
+    "Category" : "التصنيف",
+    "Save" : "حفظ",
+    "Delete" : "حذف",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "إستعمِل \"{newParam}\" بارامتراً عِوَضاً عن المُلغَى \"{deprecatedParam}\""
 },"pluralForm" :"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
 }

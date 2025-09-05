@@ -167,8 +167,12 @@ OC.L10N.register(
     "Reset quota every" : "Restablecer cuota cada",
     "Daily quotas are floating quotas while monthly reset on a certain day of the month" : "La cuotas diarias son cuotas flotantes mientras que las mensuales son restablecidas en cierto día del mes",
     "On day" : "El día",
+    "Who?" : "¿Quién?",
     "No recommendations. Start typing." : "Sin recomendaciones. Comience a escribir.",
+    "No result." : "Sin resultado.",
     "Category" : "Categoría",
+    "Save" : "Guardar",
+    "Delete" : "Eliminar",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilice el parámetro \"{newParam}\" en vez del parámetro deprecado \"{deprecatedParam}\""
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -27,6 +27,12 @@ OC.L10N.register(
     "Authentication method" : "Mètode d'autenticació",
     "API key" : "Clau de l'API",
     "Days" : "Dies",
-    "Months" : "Mesos"
+    "Months" : "Mesos",
+    "Who?" : "Qui?",
+    "No recommendations. Start typing." : "No hi ha cap recomanació. Comenceu a escriure.",
+    "No result." : "No hi ha resultats.",
+    "Category" : "Categoria",
+    "Save" : "Desar",
+    "Delete" : "Suprimir"
 },
 "nplurals=2; plural=(n != 1);");

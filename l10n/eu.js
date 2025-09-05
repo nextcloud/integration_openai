@@ -50,7 +50,11 @@ OC.L10N.register(
     "Usage" : "Erabilpena",
     "Days" : "Egunak",
     "Months" : "Hilabeteak",
+    "Who?" : "Nor?",
     "No recommendations. Start typing." : "Gomendiorik ez. Hasi idazten.",
-    "Category" : "Kategoria"
+    "No result." : "Emaitzarik ez.",
+    "Category" : "Kategoria",
+    "Save" : "Gorde",
+    "Delete" : "Ezabatu"
 },
 "nplurals=2; plural=(n != 1);");
