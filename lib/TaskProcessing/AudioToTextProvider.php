@@ -14,7 +14,12 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Files\File;
 use OCP\IAppConfig;
+use OCP\IL10N;
+use OCP\L10N\IFactory;
+use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -25,6 +30,8 @@ class AudioToTextProvider implements ISynchronousProvider {
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
 		private IAppConfig $appConfig,
+		private IFactory $l10nFactory,
+		private IL10N $l,
 	) {
 	}
 
@@ -53,15 +60,23 @@ class AudioToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShape(): array {
-		return [];
+		return ['language' => new ShapeDescriptor(
+			$this->l->t('Language'),
+			$this->l->t('The language of the audio file'),
+			EShapeType::Enum
+		)];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [];
+		$languageEnumValues = array_map(static function (array $language) {
+			return new ShapeEnumValue($language[1], $language[0]);
+		}, Application::AUDIO_TO_TEXT_LANGUAGES);
+		$detectLanguageEnumValue = new ShapeEnumValue($this->l->t('Detect language'), 'detect_language');
+		return ['language' => array_merge([$detectLanguageEnumValue], $languageEnumValues)];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		return [];
+		return ['language' => 'detect_language'];
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -81,11 +96,15 @@ class AudioToTextProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid input file');
 		}
 		$inputFile = $input['input'];
+		$language = $input['language'] ?? 'detect_language';
+		if (!is_string($language)) {
+			throw new RuntimeException('Invalid language');
+		}
 
 		$model = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
 
 		try {
-			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model);
+			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model, $language);
 			return ['output' => $transcription];
 		} catch (Exception $e) {
 			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
