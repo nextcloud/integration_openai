@@ -37,6 +37,7 @@ class OpenAiSettingsService {
 		'llm_extra_params' => 'string',
 		'quota_period' => 'array',
 		'quotas' => 'array',
+		'usage_storage_time' => 'integer',
 		'translation_provider_enabled' => 'boolean',
 		'llm_provider_enabled' => 'boolean',
 		't2i_provider_enabled' => 'boolean',
@@ -310,6 +311,10 @@ class OpenAiSettingsService {
 		return $quotas;
 	}
 
+	public function getUsageStorageTime() : int {
+		return $this->appConfig->getValueInt(Application::APP_ID, 'usage_storage_time', Application::DEFAULT_QUOTA_PERIOD, lazy: true);
+	}
+
 	/**
 	 * @return boolean
 	 */
@@ -397,6 +402,7 @@ class OpenAiSettingsService {
 			// Updated to get quota period
 			'quotas' => $this->getQuotas(),
 			// Get quotas from the config value and return it
+			'usage_storage_time' => $this->getUsageStorageTime(),
 			'translation_provider_enabled' => $this->getTranslationProviderEnabled(),
 			'llm_provider_enabled' => $this->getLlmProviderEnabled(),
 			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
@@ -522,6 +528,15 @@ class OpenAiSettingsService {
 		$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas, JSON_THROW_ON_ERROR), lazy: true);
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
 		$cache->clear(Application::QUOTA_RULES_CACHE_PREFIX);
+	}
+
+	/**
+	 * @param int $usageStorageTime
+	 * @return void
+	 */
+	public function setUsageStorageTime(int $usageStorageTime): void {
+		$usageStorageTime = max(1, $usageStorageTime);
+		$this->appConfig->setValueInt(Application::APP_ID, 'usage_storage_time', $usageStorageTime, lazy: true);
 	}
 
 	/**
@@ -832,6 +847,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['quotas'])) {
 			$this->setQuotas($adminConfig['quotas']);
+		}
+		if (isset($adminConfig['usage_storage_time'])) {
+			$this->setUsageStorageTime(intval($adminConfig['usage_storage_time']));
 		}
 		if (isset($adminConfig['use_max_completion_tokens_param'])) {
 			$this->setUseMaxCompletionParam($adminConfig['use_max_completion_tokens_param']);

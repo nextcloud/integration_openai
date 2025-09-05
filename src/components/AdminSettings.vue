@@ -546,6 +546,15 @@
 						</tr>
 					</tbody>
 				</table>
+				<div class="line">
+					<NcInputField
+						id="openai-api-usage-storage-time"
+						v-model="state.usage_storage_time"
+						class="input"
+						type="number"
+						:label="t('integration_openai', 'Time period (days) for usage storage')"
+						@update:model-value="onInput()" />
+				</div>
 				<div class="line-gap">
 					<NcDateTimePickerNative
 						v-model="quota_usage.start_date"
@@ -907,6 +916,7 @@ export default {
 				quotas: this.state.quotas,
 				tts_voices: this.state.tts_voices,
 				default_tts_voice: this.state.default_tts_voice,
+				usage_storage_time: this.state.usage_storage_time,
 			}
 			await this.saveOptions(values, false)
 		}, 2000),
