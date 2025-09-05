@@ -11,7 +11,10 @@ use Exception;
 use OCA\OpenAi\Service\QuotaRuleService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\Response;
+use OCP\AppFramework\Http\TextPlainResponse;
 use OCP\IRequest;
 
 class QuotaRuleController extends Controller {
@@ -77,6 +80,37 @@ class QuotaRuleController extends Controller {
 			return new DataResponse('');
 		} catch (Exception $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+		}
+	}
+	/**
+	 * Gets the quota usage between two dates
+	 * @param int $startDate
+	 * @param int $endDate
+	 * @param int $type
+	 * @return Http\StreamResponse|TextPlainResponse
+	 */
+	#[NoCSRFRequired]
+	public function getQuotaUsage(int $startDate, int $endDate, int $type): Response {
+		try {
+			$result = $this->quotaRuleService->getQuotaUsage($startDate, $endDate, $type);
+			$csv = fopen('php://memory', 'w');
+			try {
+				foreach ($result as $row) {
+					fputcsv($csv, $row);
+				}
+				rewind($csv);
+
+				$response = new Http\StreamResponse($csv, Http::STATUS_OK);
+				$response->setHeaders([
+					'Content-Type' => 'text/csv',
+					'Content-Disposition' => 'attachment; filename="quota_usage.csv"'
+				]);
+				return $response;
+			} catch (Exception $e) {
+				return new TextPlainResponse('Failed to get quota usage:' . $e->getMessage(), Http::STATUS_INTERNAL_SERVER_ERROR);
+			}
+		} catch (Exception $e) {
+			return new TextPlainResponse('Failed to get quota usage:' . $e->getMessage(), Http::STATUS_NOT_FOUND);
 		}
 	}
 }

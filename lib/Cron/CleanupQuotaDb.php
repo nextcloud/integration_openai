@@ -30,14 +30,15 @@ class CleanupQuotaDb extends TimedJob {
 	protected function run($argument) {
 		$this->logger->debug('Run cleanup job for OpenAI quota db');
 		$quota = $this->openAiSettingsService->getQuotaPeriod();
-		$days = $quota['length'];
+		$quotaDays = $quota['length'];
 		if ($quota['unit'] == 'month') {
-			$days *= 30;
+			$quotaDays *= 30;
 		}
+		$days = $this->openAiSettingsService->getUsageStorageTime();
 		$this->quotaUsageMapper->cleanupQuotaUsages(
 			// The mimimum period is limited to DEFAULT_QUOTA_PERIOD to not lose
 			// the stored quota usage data below this limit.
-			max($days, Application::DEFAULT_QUOTA_PERIOD)
+			max($quotaDays, $days, Application::DEFAULT_QUOTA_PERIOD)
 		);
 
 	}

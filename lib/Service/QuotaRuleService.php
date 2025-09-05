@@ -11,11 +11,13 @@ use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\EntityType;
 use OCA\OpenAi\Db\QuotaRuleMapper;
+use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Db\QuotaUserMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\ICacheFactory;
 use OCP\IGroupManager;
+use OCP\IL10N;
 use OCP\IUserManager;
 use Psr\Log\LoggerInterface;
 
@@ -27,6 +29,8 @@ class QuotaRuleService {
 		private IGroupManager $groupManager,
 		private ICacheFactory $cacheFactory,
 		private IUserManager $userManager,
+		private QuotaUsageMapper $quotaUsageMapper,
+		private IL10N $l10n,
 		private LoggerInterface $logger,
 	) {
 	}
@@ -177,5 +181,30 @@ class QuotaRuleService {
 				throw new Exception('Invalid entity');
 			}
 		}
+	}
+	public function getQuotaUsage(int $startDate, int $endDate, int $type): array {
+		$data = [[$this->l10n->t('Name'), $this->l10n->t('Usage')]];
+		$users = $this->quotaUsageMapper->getUsersQuotaUsage($startDate, $endDate, $type);
+		$pools = $this->quotaUsageMapper->getPoolsQuotaUsage($startDate, $endDate, $type);
+		$usersIdx = 0;
+		$poolsIdx = 0;
+		while ($usersIdx < count($users) && $poolsIdx < count($pools)) {
+			if ($users[$usersIdx]['usage'] > $pools[$poolsIdx]['usage']) {
+				$data[] = [$users[$usersIdx]['user_id'], $users[$usersIdx]['usage']];
+				$usersIdx++;
+			} else {
+				$data[] = [$this->l10n->t('Quota pool for rule %d', $pools[$poolsIdx]['pool']), $pools[$poolsIdx]['usage']];
+				$poolsIdx++;
+			}
+		}
+		while ($usersIdx < count($users)) {
+			$data[] = [$users[$usersIdx]['user_id'], $users[$usersIdx]['usage']];
+			$usersIdx++;
+		}
+		while ($poolsIdx < count($pools)) {
+			$data[] = [$this->l10n->t('Quota pool for rule %d', $pools[$poolsIdx]['pool']), $pools[$poolsIdx]['usage']];
+			$poolsIdx++;
+		}
+		return $data;
 	}
 }

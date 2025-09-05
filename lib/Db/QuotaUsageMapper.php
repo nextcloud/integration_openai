@@ -82,7 +82,7 @@ class QuotaUsageMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 
 		// Get the sum of the units used in the time period
-		$qb->select($qb->createFunction('SUM(units)'))
+		$qb->select($qb->func()->sum('units'))
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
@@ -113,7 +113,7 @@ class QuotaUsageMapper extends QBMapper {
 		$qb = $this->db->getQueryBuilder();
 
 		// Get the sum of the units used in the time period
-		$qb->select($qb->createFunction('SUM(units)'))
+		$qb->select($qb->func()->sum('units'))
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT))
@@ -170,7 +170,7 @@ class QuotaUsageMapper extends QBMapper {
 	public function getQuotaUnitsOfUser(string $userId, int $type): int {
 		$qb = $this->db->getQueryBuilder();
 
-		$qb->select($qb->createFunction('SUM(units)'))
+		$qb->select($qb->func()->sum('units'))
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('user_id', $qb->createNamedParameter($userId, IQueryBuilder::PARAM_STR))
@@ -273,5 +273,52 @@ class QuotaUsageMapper extends QBMapper {
 				$qb->expr()->lt('timestamp', $qb->createNamedParameter($periodStart, IQueryBuilder::PARAM_INT))
 			);
 		$qb->executeStatement();
+	}
+
+	/**
+	 * Gets quota usage of all users
+	 * @param int $startTime
+	 * @param int $endTime
+	 * @return array
+	 * @throws Exception
+	 * @throws RuntimeException
+	 */
+	public function getUsersQuotaUsage(int $startTime, int $endTime, $type): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('user_id')
+			->selectAlias($qb->func()->sum('units'), 'usage')
+			->from($this->getTableName())
+			->where($qb->expr()->gte('timestamp', $qb->createNamedParameter($startTime, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->lte('timestamp', $qb->createNamedParameter($endTime, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT)))
+			->groupBy('user_id')
+			->orderBy('usage', 'DESC');
+
+		return $qb->executeQuery()->fetchAll();
+	}
+	/**
+	 * Gets quota usage of all pools
+	 * @param int $startTime
+	 * @param int $endTime
+	 * @param int $type
+	 * @return array
+	 * @throws Exception
+	 * @throws RuntimeException
+	 */
+	public function getPoolsQuotaUsage(int $startTime, int $endTime, int $type): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('pool')
+			->selectAlias($qb->func()->sum('units'), 'usage')
+			->from($this->getTableName())
+			->where($qb->expr()->neq('pool', $qb->createNamedParameter(-1, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->gte('timestamp', $qb->createNamedParameter($startTime, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->lte('timestamp', $qb->createNamedParameter($endTime, IQueryBuilder::PARAM_INT)))
+			->andWhere($qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT)))
+			->groupBy('type', 'pool')
+			->orderBy('usage', 'DESC');
+
+		return $qb->executeQuery()->fetchAll();
 	}
 }
