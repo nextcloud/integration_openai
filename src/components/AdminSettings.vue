@@ -546,6 +546,30 @@
 						</tr>
 					</tbody>
 				</table>
+				<div class="line">
+					<NcInputField
+						id="openai-api-usage-storage-time"
+						v-model="state.usage_storage_time"
+						class="input"
+						type="number"
+						:label="t('integration_openai', 'Time period (days) for usage storage')"
+						@update:model-value="onInput()" />
+				</div>
+				<div class="line-gap">
+					<NcDateTimePickerNative
+						v-model="quota_usage.start_date"
+						:label="t('integration_openai', 'Start date')" />
+					<NcDateTimePickerNative
+						v-model="quota_usage.end_date"
+						:label="t('integration_openai', 'End date')" />
+					<NcSelect
+						v-model="quota_usage.quota_type"
+						:options="quotaTypes"
+						:input-label="t('integration_openai', 'Quota type')" />
+					<NcButton :href="downloadQuotaUsageUrl" class="download-button">
+						{{ t('integration_openai', 'Download quota usage') }}
+					</NcButton>
+				</div>
 				<h2>{{ t('integration_openai', 'Quota Rules') }}</h2>
 				<QuotaRules :quota-info="quotaInfo" />
 			</div>
@@ -605,6 +629,7 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
+import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
@@ -634,12 +659,14 @@ export default {
 		NcTextField,
 		NcInputField,
 		NcNoteCard,
+		NcDateTimePickerNative,
 		QuotaRules,
 	},
 
 	data() {
+		const state = loadState('integration_openai', 'admin-config')
 		return {
-			state: loadState('integration_openai', 'admin-config'),
+			state,
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
 			models: null,
@@ -655,10 +682,25 @@ export default {
 			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '1024x1024' }),
 			DEFAULT_MODEL_ITEM,
 			appSettingsAssistantUrl: generateUrl('/settings/apps/integration/assistant'),
+			quota_usage: {
+				quota_type: { id: 0, label: '' },
+				start_date: new Date(state.quota_start_date * 1000),
+				end_date: new Date(state.quota_end_date * 1000),
+			},
 		}
 	},
 
 	computed: {
+		quotaTypes() {
+			return (this.quotaInfo ?? []).map((q, idx) => ({ id: idx, label: q.type }))
+		},
+		downloadQuotaUsageUrl() {
+			return generateUrl('/apps/integration_openai/quota/download-usage?type={type}&startDate={startDate}&endDate={endDate}', {
+				type: this.quota_usage.quota_type?.id,
+				startDate: this.quota_usage.start_date / 1000,
+				endDate: this.quota_usage.end_date / 1000,
+			})
+		},
 		modelEndpointUrl() {
 			if (this.state.url === '') {
 				return 'https://api.openai.com/v1/models'
@@ -821,6 +863,9 @@ export default {
 			return axios.get(url)
 				.then((response) => {
 					this.quotaInfo = response.data
+					if (this.quotaInfo.length > 0) {
+						this.quota_usage.quota_type = { id: 0, label: this.quotaInfo[0].type }
+					}
 				})
 				.catch((error) => {
 					showError(
@@ -871,6 +916,7 @@ export default {
 				quotas: this.state.quotas,
 				tts_voices: this.state.tts_voices,
 				default_tts_voice: this.state.default_tts_voice,
+				usage_storage_time: this.state.usage_storage_time,
 			}
 			await this.saveOptions(values, false)
 		}, 2000),
@@ -947,8 +993,24 @@ export default {
 	}
 
 	.line {
-		display: flex;
 		align-items: center;
+	}
+
+	.line-gap {
+		gap: 8px;
+		align-items: normal;
+
+		.download-button {
+			align-self: flex-end;
+		}
+
+		> * {
+			margin-bottom: 20px;
+		}
+	}
+
+	.line, .line-gap {
+		display: flex;
 		margin-top: 12px;
 		.icon {
 			margin-right: 4px;
