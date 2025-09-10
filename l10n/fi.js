@@ -5,6 +5,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Virheellinen HTTP-metodi",
     "Bad credentials" : "Virheelliset kirjautumistiedot",
     "Detect language" : "Havaitse kieli",
+    "Generated response" : "Luotu vastaus",
     "Example: {example}" : "Esimerkki: {example}",
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "Authentication" : "Tunnistautuminen",
