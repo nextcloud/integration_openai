@@ -9,6 +9,14 @@
 			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
 		</h2>
 		<div id="openai-content">
+			<h4>
+				{{ t('integration_openai', 'Speech to Text Default Language') }}
+			</h4>
+			<NcSelect
+				v-model="state.stt_language"
+				:options="languages"
+				:input-label="t('integration_openai', 'Default language')"
+				@update:model-value="onInput()" />
 			<p v-if="state.is_custom_service" class="settings-hint">
 				<InformationOutlineIcon :size="20" class="icon" />
 				{{ t('integration_openai', 'Your administrator defined a custom service address') }}
@@ -131,6 +139,7 @@ import OpenAiIcon from './icons/OpenAiIcon.vue'
 
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
@@ -150,6 +159,7 @@ export default {
 		InformationOutlineIcon,
 		NcNoteCard,
 		NcTextField,
+		NcSelect,
 	},
 
 	props: [],
@@ -157,6 +167,7 @@ export default {
 	data() {
 		return {
 			state: loadState('integration_openai', 'config'),
+			languages: loadState('integration_openai', 'languages'),
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
@@ -186,6 +197,7 @@ export default {
 	methods: {
 		onInput: debounce(function() {
 			this.saveOptions({
+				stt_language: this.state.stt_language.value,
 			})
 		}, 2000),
 		onSensitiveInput: debounce(async function() {

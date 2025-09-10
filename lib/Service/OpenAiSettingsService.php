@@ -53,6 +53,7 @@ class OpenAiSettingsService {
 		'api_key' => 'string',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
+		'stt_language' => 'string',
 	];
 
 
@@ -156,6 +157,14 @@ class OpenAiSettingsService {
 		$encryptedUserApiKey = $this->config->getUserValue($userId, Application::APP_ID, 'api_key');
 		$userApiKey = $encryptedUserApiKey === '' ? '' : $this->crypto->decrypt($encryptedUserApiKey);
 		return $userApiKey ?: $fallBackApiKey;
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @return string
+	 */
+	public function getUserSTTLanguage(?string $userId): string {
+		return $this->config->getUserValue($userId, Application::APP_ID, 'stt_language', 'detect_language');
 	}
 
 	/**
@@ -408,7 +417,7 @@ class OpenAiSettingsService {
 
 	/**
 	 * Get the user config for the settings page
-	 * @return array{api_key: string, basic_password: string, basic_user: string, is_custom_service: bool, use_basic_auth: bool}
+	 * @return array{api_key: string, basic_password: string, basic_user: string, is_custom_service: bool, use_basic_auth: bool, stt_language: string}
 	 */
 	public function getUserConfig(string $userId): array {
 		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::OPENAI_API_BASE_URL;
@@ -418,6 +427,7 @@ class OpenAiSettingsService {
 			'basic_password' => $this->getUserBasicPassword($userId, false),
 			'use_basic_auth' => $this->getUseBasicAuth(),
 			'is_custom_service' => $isCustomService,
+			'stt_language' => $this->getUserSTTLanguage($userId)
 
 		];
 	}
@@ -542,6 +552,15 @@ class OpenAiSettingsService {
 			$this->config->setUserValue($userId, Application::APP_ID, 'api_key', $encryptedApiKey);
 		}
 		$this->invalidateModelsCache();
+	}
+
+	/**
+	 * @param string $userId
+	 * @param string $language
+	 * @throws PreConditionNotMetException
+	 */
+	public function setUserSTTLanguage(string $userId, string $language): void {
+		$this->config->setUserValue($userId, Application::APP_ID, 'stt_language', $language);
 	}
 
 	/**
@@ -885,6 +904,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($userConfig['basic_password'])) {
 			$this->setUserBasicPassword($userId, $userConfig['basic_password']);
+		}
+		if (isset($userConfig['stt_language'])) {
+			$this->setUserSttLanguage($userId, $userConfig['stt_language']);
 		}
 	}
 

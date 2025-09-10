@@ -15,7 +15,6 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Files\File;
 use OCP\IAppConfig;
 use OCP\IL10N;
-use OCP\L10N\IFactory;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
@@ -30,7 +29,6 @@ class AudioToTextProvider implements ISynchronousProvider {
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
 		private IAppConfig $appConfig,
-		private IFactory $l10nFactory,
 		private IL10N $l,
 	) {
 	}
@@ -72,11 +70,12 @@ class AudioToTextProvider implements ISynchronousProvider {
 			return new ShapeEnumValue($language[1], $language[0]);
 		}, Application::AUDIO_TO_TEXT_LANGUAGES);
 		$detectLanguageEnumValue = new ShapeEnumValue($this->l->t('Detect language'), 'detect_language');
-		return ['language' => array_merge([$detectLanguageEnumValue], $languageEnumValues)];
+		$defaultLanguageEnumValue = new ShapeEnumValue($this->l->t('Default'), 'default');
+		return ['language' => array_merge([$detectLanguageEnumValue, $defaultLanguageEnumValue], $languageEnumValues)];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		return ['language' => 'detect_language'];
+		return ['language' => 'default'];
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -96,7 +95,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid input file');
 		}
 		$inputFile = $input['input'];
-		$language = $input['language'] ?? 'detect_language';
+		$language = $input['language'] ?? 'default';
 		if (!is_string($language)) {
 			throw new RuntimeException('Invalid language');
 		}
