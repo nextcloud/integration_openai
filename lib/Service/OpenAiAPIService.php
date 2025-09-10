@@ -725,7 +725,7 @@ class OpenAiAPIService {
 		File $file,
 		bool $translate = false,
 		string $model = Application::DEFAULT_MODEL_ID,
-		string $language = 'detect_language',
+		string $language = 'default',
 	): string {
 		try {
 			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model, $language);
@@ -751,7 +751,7 @@ class OpenAiAPIService {
 		string $audioFileContent,
 		bool $translate = true,
 		string $model = Application::DEFAULT_MODEL_ID,
-		string $language = 'detect_language',
+		string $language = 'default',
 	): string {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -767,6 +767,10 @@ class OpenAiAPIService {
 			'response_format' => 'verbose_json',
 			// Verbose needed for extraction of audio duration
 		];
+		// Gets the user's preferred language if it's not the default one
+		if ($language === 'default') {
+			$language = $this->openAiSettingsService->getUserSTTLanguage($userId);
+		}
 		if ($language !== 'detect_language') {
 			$params['language'] = $language;
 		}
