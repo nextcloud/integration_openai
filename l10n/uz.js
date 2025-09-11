@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "sekundlar",
     "Bad HTTP method" : "Yomon HTTP usuli",
     "Bad credentials" : "Akkaunt ma'lumotlari xato",
+    "Name" : "Nomi",
     "Images" : "Tasvirlar",
     "Size" : "Size",
     "Authentication" : "Autentifikatsiya",

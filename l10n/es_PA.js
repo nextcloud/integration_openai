@@ -3,12 +3,14 @@ OC.L10N.register(
     {
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
+    "Name" : "Nombre",
     "Images" : "Imágenes",
     "Size" : "Tamaño",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
+    "Start date" : "Fecha de inicio",
     "Category" : "Categoría",
     "Save" : "Guardar",
     "Delete" : "Borrar"

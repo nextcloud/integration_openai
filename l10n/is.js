@@ -6,6 +6,7 @@ OC.L10N.register(
     "Unknown" : "Óþekkt",
     "seconds" : "sekúndum",
     "Bad credentials" : "Gölluð auðkenni",
+    "Name" : "Heiti",
     "Images" : "Myndir",
     "Speed" : "Hraði",
     "Detect language" : "Greina tungumál",
@@ -16,9 +17,13 @@ OC.L10N.register(
     "Authentication" : "Auðkenning",
     "Authentication method" : "Auðkenningarmáti",
     "API key" : "API-lykill",
+    "Start date" : "Upphafsdagur",
     "Days" : "Dagar",
     "Months" : "Mánuðir",
     "No recommendations. Start typing." : "Engar tillögur. Byrjaðu að skrifa.",
-    "Category" : "Flokkur"
+    "No result." : "Engar niðurstöður.",
+    "Category" : "Flokkur",
+    "Save" : "Vista",
+    "Delete" : "Eyða"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "detik",
     "Bad HTTP method" : "Metode HTTP tidak benar",
     "Bad credentials" : "Kredensial tidak benar",
+    "Name" : "Nama",
     "Images" : "Gambar",
     "Size" : "Ukuran",
     "Request timeout (seconds)" : "Minta waktu habis (detik)",

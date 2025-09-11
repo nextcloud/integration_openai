@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "secunde",
     "Bad HTTP method" : "Metodă HTTP nepotrivită",
     "Bad credentials" : "Credențiale greșite",
+    "Name" : "Nume",
     "Images" : "Imagini",
     "Question" : "Întrebare",
     "Authentication" : "Autentificare",

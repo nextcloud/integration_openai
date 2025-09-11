@@ -8,6 +8,7 @@ OC.L10N.register(
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "API key" : "Llave de API",
+    "Start date" : "Fecha de inicio",
     "Category" : "Categoría",
     "Save" : "Guardar",
     "Delete" : "Eliminar"

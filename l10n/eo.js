@@ -10,6 +10,7 @@ OC.L10N.register(
     "Authentication" : "Aŭtentigo",
     "Authentication method" : "Aŭtentiga metodo",
     "API key" : "API-ŝlosilo",
+    "Start date" : "Komencdato",
     "No recommendations. Start typing." : "Neniu propono. Ektajpu.",
     "No result." : "Nenia rezulto.",
     "Category" : "Kategorio",

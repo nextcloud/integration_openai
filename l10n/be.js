@@ -9,6 +9,7 @@ OC.L10N.register(
     "Question" : "Пытанне",
     "Detect language" : "Вызначыць мову",
     "Size" : "Памер",
+    "Voice" : "Голас",
     "Authentication" : "Аўтэнтыфікацыя",
     "API key" : "Ключ API",
     "Quota type" : "Тып квоты",

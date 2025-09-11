@@ -5,14 +5,17 @@ OC.L10N.register(
     "Image generation" : "Image generation",
     "Unknown" : "Unknown",
     "seconds" : "seconds",
+    "Name" : "სახელი",
     "Images" : "Images",
     "Question" : "Question",
     "Size" : "Size",
     "Request timeout (seconds)" : "Request timeout (seconds)",
     "Authentication" : "Authentication",
     "API key" : "API key",
+    "Start date" : "Start date",
     "No recommendations. Start typing." : "No recommendations. Start typing.",
     "Category" : "Category",
-    "Save" : "დამახსოვრება"
+    "Save" : "დამახსოვრება",
+    "Delete" : "წაშლა"
 },
 "nplurals=2; plural=(n!=1);");

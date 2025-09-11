@@ -4,6 +4,7 @@ OC.L10N.register(
     "Unknown" : "Desconegut",
     "seconds" : "segondas",
     "Bad credentials" : "Marrits identificants",
+    "Name" : "Nom",
     "Images" : "Imatges",
     "Question" : "Question",
     "Authentication" : "Autentificacion",

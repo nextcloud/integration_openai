@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "giây",
     "Bad HTTP method" : "Phương thức HTTP không hợp lệ",
     "Bad credentials" : "Thông tin đăng nhập không hợp lệ.",
+    "Name" : "Tên",
     "Images" : "Hình ảnh",
     "Size" : "Kích cỡ",
     "Authentication" : "Xác thực",

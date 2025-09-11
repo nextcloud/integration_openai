@@ -3,12 +3,14 @@ OC.L10N.register(
     {
     "Default" : "საწყისი პარამეტრები",
     "Unknown" : "უცნობია",
+    "Name" : "სახელი",
     "Images" : "სურათები",
     "Size" : "ზომა",
     "Request timeout (seconds)" : "მოთხოვნის დროის ამოწურვა (წამები)",
     "Authentication" : "აუტენტიფიკაცია",
     "Authentication method" : "აუტენტიფიკაციის მეთოდი",
     "API key" : "API გასაღები",
+    "Start date" : "დაწყების თარიღი",
     "Category" : "კატეგორია",
     "Save" : "შენახვა",
     "Delete" : "წაშლა"
