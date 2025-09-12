@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Nekonata",
     "seconds" : "sekundoj",
+    "Name" : "Nomo",
     "Images" : "Bildoj",
     "Speed" : "Rapideco",
     "Size" : "Grando",

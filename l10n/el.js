@@ -20,6 +20,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Κακή μέθοδος HTTP",
     "Bad credentials" : "Εσφαλμένα διαπιστευτήρια",
     "API request error: " : "Σφάλμα αιτήματος API: ",
+    "Name" : "Όνομα",
     "Usage" : "Χρήση",
     "Maximum output words" : "Μέγιστος αριθμός λέξεων εξόδου",
     "Model" : "Μοντέλο",

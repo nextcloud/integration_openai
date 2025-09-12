@@ -28,6 +28,7 @@ OC.L10N.register(
     "Bad credentials" : "Credenciales erróneas",
     "API request error: " : "Error en solicitud API:",
     "Invalid API Key/Basic Auth: " : "Clave API Inválida/Basic Auth:",
+    "Name" : "Nombre",
     "Usage" : "Uso",
     "Maximum output words" : "Máximo de palabras de salida",
     "The maximum number of words/tokens that can be generated in the output." : "El número máximo de palabras/tokens que pueden generarse en la salida.",

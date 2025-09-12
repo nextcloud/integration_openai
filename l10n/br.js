@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Unknown" : "Dianv",
+    "Name" : "Anv",
     "Images" : "Skeudenn",
     "Size" : "Ment",
     "Authentication method" : "Doare dilesa",

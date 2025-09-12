@@ -1,9 +1,11 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Прадвызначаныя",
     "Image generation" : "Генерацыя відарысаў",
     "Unknown" : "Невядомы",
     "seconds" : "с",
+    "Name" : "Назва",
     "Model" : "Мадэль",
     "Images" : "Відарысы",
     "Question" : "Пытанне",
@@ -13,6 +15,8 @@ OC.L10N.register(
     "Authentication" : "Аўтэнтыфікацыя",
     "API key" : "Ключ API",
     "Quota type" : "Тып квоты",
+    "Start date" : "Дата пачатку",
+    "End date" : "Дата заканчэння",
     "Quota Rules" : "Правілы квот",
     "Who?" : "Хто?",
     "No recommendations. Start typing." : "Няма рэкамендацый. Пачніце друкаваць.",
