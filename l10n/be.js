@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_watsonx",
     {
+    "Default" : "Прадвызначаныя",
     "Detect language" : "Вызначыць мову",
     "Model" : "Мадэль",
     "Authentication" : "Аўтэнтыфікацыя",
