@@ -36,6 +36,7 @@ OC.L10N.register(
     "Assistant app" : "Aplicación de asistente",
     "Service URL" : "URL do servizo",
     "Example: {example}" : "Exemplo: {example}",
+    "Leave empty to use {watsonxApiUrl}" : "Déixeo baleiro para empregar {watsonxApiUrl}",
     "With the current configuration, the target URL used to get the models is:" : "Coa configuración actual, o URL de destino utilizado para obter os modelos é:",
     "Service name (optional)" : "Nome do servizo (opcional)",
     "This name will be displayed as provider name in the AI admin settings" : "Este nome amosarase como nome do provedor na configuración do administrador da IA",
