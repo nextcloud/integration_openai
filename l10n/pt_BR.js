@@ -145,6 +145,8 @@ OC.L10N.register(
     "Current system-wide usage / period" : "Uso atual em todo o sistema / período",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Um limite por usuário para uso deste tipo de API (0 para ilimitado)",
     "Start date" : "Data de início",
+    "End date" : "Data final",
+    "Download quota usage" : "Uso da cota de downloads",
     "Quota Rules" : "Regras de Cota",
     "Select enabled features" : "Selecione recursos habilitados",
     "Translation provider (to translate Talk messages for example)" : "Provedor de tradução (para traduzir mensagens do Talk, por exemplo)",
