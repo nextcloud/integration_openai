@@ -9,6 +9,7 @@ OC.L10N.register(
     "Model" : "Мадэль",
     "Images" : "Відарысы",
     "Question" : "Пытанне",
+    "The answer to the question" : "Адказ на пытанне",
     "Detect language" : "Вызначыць мову",
     "Size" : "Памер",
     "Voice" : "Голас",
