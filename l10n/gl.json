@@ -126,6 +126,7 @@
     "Start date" : "Data de comezo",
     "Select enabled features" : "Seleccione as funcionalidades activadas",
     "Translation provider (to translate Talk messages for example)" : "Provedor de tradución (para traducir mensaxes de Parladoiro, por exemplo)",
+    "Text processing providers (to generate text, summarize, context write, etc.)" : "Provedor de procesamento de texto (para xerar texto, resumir, escribir contexto, etc.)",
     "Image generation provider" : "Provedor de xeración de imaxes",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provedor de conversión de voz a texto (para transcribir as gravacións de Parladoiro, por exemplo)",
     "Text-to-speech provider" : "Provedor de «texto a voz»",
