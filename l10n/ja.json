@@ -8,6 +8,7 @@
     "Bad credentials" : "不正な資格情報",
     "Detect language" : "言語を検出する",
     "Change Tone" : "トーンを変更",
+    "Ask a question about your data." : "データについて質問しする。",
     "Input text" : "テキストを入力",
     "Write a text that you want the assistant to rewrite in another tone." : "アシスタントに別のトーンで書き直してもらいたい文章を書く。",
     "Desired tone" : "希望するトーン",
