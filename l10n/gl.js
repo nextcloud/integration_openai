@@ -40,6 +40,7 @@ OC.L10N.register(
     "Images" : "Imaxes",
     "Images to ask a question about" : "Imaxes sobre as que facer unha pregunta",
     "Question" : "Pregunta",
+    "What to ask about the image." : "Que preguntar sobre a imaxe.",
     "Generated response" : "Resposta xerada",
     "The answer to the question" : "A resposta á pregunta",
     "The model used to generate the completion" : "O modelo utilizado para xerar a conclusión",
