@@ -2,10 +2,16 @@ OC.L10N.register(
     "integration_watsonx",
     {
     "Default" : "Прадвызначаныя",
+    "tokens" : "токены",
     "Detect language" : "Вызначыць мову",
+    "The maximum number of words/tokens that can be generated in the completion." : "Максімальная колькасць слоў/токенаў, якія можна згенераваць падчас завяршэння.",
     "Model" : "Мадэль",
     "Authentication" : "Аўтэнтыфікацыя",
+    "Max input tokens per request" : "Максімальная колькасць уваходных токенаў на запыт",
+    "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "Падзяліць запыт на фрагменты, кожны з якіх не перавышае зададзеную колькасць токенаў (0 адключае фрагментацыю)",
     "Quota type" : "Тып квоты",
+    "Max new tokens per request" : "Максімальная колькасць новых токенаў на запыт",
+    "Maximum number of new tokens generated for a single text generation prompt" : "Максімальная колькасць выходных токенаў, якія ствараюцца для аднаго запыту генерацыі тэксту",
     "API key" : "Ключ API"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");
