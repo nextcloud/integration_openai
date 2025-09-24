@@ -132,7 +132,7 @@ OC.L10N.register(
     "Your administrator defined a custom service address" : "Sinu serveri peakasutaja on teenuse aadressi eelseadistanud",
     "Leave the API key empty to use the one defined by administrators" : "Kasutamaks peakasutaja eelseadistatud väärtust jäta API võtme väli tühjaks",
     "You can create a free API key in your OpenAI account settings" : "API võtme saad luua oma OpenAI kasutajakonto seadistustes",
-    "Leave the username and password empty to use the ones defined by your administrator" : "Kasutamaks peakasutaja eelseadistatud kasutajanime ja saäasõna jäta vastavad väljad tühjaks",
+    "Leave the username and password empty to use the ones defined by your administrator" : "Kasutamaks peakasutaja eelseadistatud kasutajanime ja salasõna jäta vastavad väljad tühjaks",
     "Usage quota info" : "Kasutuskvoodi teave",
     "Days" : "Päeva",
     "Months" : "Kuud",
