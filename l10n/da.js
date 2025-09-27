@@ -8,6 +8,7 @@ OC.L10N.register(
     "Text generation" : "Tekstgenerering",
     "Image generation" : "Billedgenerering",
     "Audio transcription" : "Lydtransskription",
+    "Text to speech" : "Tekst til tale",
     "Unknown" : "Ukendt",
     "tokens" : "tokens",
     "images" : "fotos",
