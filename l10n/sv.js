@@ -8,6 +8,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Felaktig HTTP-metod",
     "Bad credentials" : "Ogiltiga inloggningsuppgifter",
     "Name" : "Namn",
+    "Analyze images" : "Analysera bilder",
     "Images" : "Bilder",
     "Question" : "Fråga",
     "Generated response" : "Genererat svar",
