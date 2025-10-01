@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
+    "Name" : "Nombre",
     "Images" : "Imágenes",
     "Size" : "Tamaño",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
