@@ -8,6 +8,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.8.0 – 2025-10-06
+
+### Added
+- add chunking to ChangeTone, ContextWrite, ProofreadProvider, ReformulateProvider, TopicsProvider, and TranslateProvider @lukasdotcom [#240](https://github.com/nextcloud/integration_openai/pull/240)
+- implement auto detection for task types and toggle for analyze image @lukasdotcom [#252](https://github.com/nextcloud/integration_openai/pull/252)
+- add notification when quota exceeded @lukasdotcom [#254](https://github.com/nextcloud/integration_openai/pull/254)
+- add monthly quota periods @lukasdotcom [#256](https://github.com/nextcloud/integration_openai/pull/256)
+- implement quota rules @lukasdotcom [#255](https://github.com/nextcloud/integration_openai/pull/255)
+- add quota report download @lukasdotcom [#257](https://github.com/nextcloud/integration_openai/pull/257)
+- add config for how long to store usage @lukasdotcom [#257](https://github.com/nextcloud/integration_openai/pull/257)
+- add AI app category @janepie [#275](https://github.com/nextcloud/integration_openai/pull/275)
+- specify language for AudioToText @lukasdotcom [#266](https://github.com/nextcloud/integration_openai/pull/266)
+- add user preference to set default language for AudioToText @lukasdotcom [#266](https://github.com/nextcloud/integration_openai/pull/266)
+
+### Changed
+- update context needed for the quota reset day @lukasdotcom [#265](https://github.com/nextcloud/integration_openai/pull/265)
+- add openai api info in the readme @kyteinsky [#268](https://github.com/nextcloud/integration_openai/pull/268)
+- lazy load most app config values, store them as lazy too @julien-nc [#246](https://github.com/nextcloud/integration_openai/pull/246)
+- bump max NC version to 33
+- hint about the v1 in the custom service url info text @kyteinsky [#279](https://github.com/nextcloud/integration_openai/pull/279)
+- change default completion model to 4.1 mini @lukasdotcom [#271](https://github.com/nextcloud/integration_openai/pull/271)
+
+### Fixed
+- use admin specified max tokens as default for all tasks it makes sense for @lukasdotcom [#239](https://github.com/nextcloud/integration_openai/pull/239)
+- admin settings style and quota fixes @kyteinsky [#241](https://github.com/nextcloud/integration_openai/pull/241)
+- fix default tts model selector for vue3 @lukasdotcom [#247](https://github.com/nextcloud/integration_openai/pull/247)
+- fix empty argument gets encoded as [] instead of {} @lukasdotcom [#243](https://github.com/nextcloud/integration_openai/pull/243)
+- fix custom unreachable service handling, store the model list in the DB @julien-nc [#277](https://github.com/nextcloud/integration_openai/pull/277)
+
+
 ## 3.7.1 – 2025-07-16
 
 ### Fixed
