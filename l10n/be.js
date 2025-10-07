@@ -21,7 +21,7 @@ OC.L10N.register(
     "Max input tokens per request" : "Максімальная колькасць уваходных токенаў на запыт",
     "Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)" : "Падзяліць запыт на фрагменты, кожны з якіх не перавышае зададзеную колькасць токенаў (0 адключае фрагментацыю)",
     "Max output tokens per request" : "Максімальная колькасць выходных токенаў на запыт",
-    "Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks." : "Максімальная колькасць выходных токенаў, якія ствараюцца для аднаго запыту генерацыі тэксту. Гэта таксама датычыцца задач пераўтварэння маўлення ў тэкст.",
+    "Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks." : "Максімальная колькасць выходных токенаў, якія ствараюцца для аднаго запыту генерацыі тэксту. Гэта таксама датычыцца заданняў пераўтварэння маўлення ў тэкст.",
     "Quota type" : "Тып квоты",
     "Start date" : "Дата пачатку",
     "End date" : "Дата заканчэння",
