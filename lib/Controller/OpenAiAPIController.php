@@ -31,7 +31,7 @@ class OpenAiAPIController extends Controller {
 	#[NoAdminRequired]
 	public function getModels(): DataResponse {
 		try {
-			$response = $this->openAiAPIService->getModels($this->userId);
+			$response = $this->openAiAPIService->getModels($this->userId, true);
 			return new DataResponse($response);
 		} catch (Exception $e) {
 			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
