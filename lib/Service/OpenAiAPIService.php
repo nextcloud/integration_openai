@@ -116,36 +116,40 @@ class OpenAiAPIService {
 	 */
 	public function getModels(?string $userId, bool $refresh = false): array {
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
+		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . ($userId ?? '');
+		$adminCacheKey = Application::MODELS_CACHE_KEY . '-main';
+
 		if (!$refresh) {
 			if ($this->modelsMemoryCache !== null) {
 				$this->logger->debug('Getting OpenAI models from the memory cache');
 				return $this->modelsMemoryCache;
 			}
 
-			$userCacheKey = Application::MODELS_CACHE_KEY . '_' . ($userId ?? '');
-			$adminCacheKey = Application::MODELS_CACHE_KEY . '-main';
-
 			// try to get models from the user cache first
 			if ($userId !== null) {
 				$userCachedModels = $cache->get($userCacheKey);
 				if ($userCachedModels) {
 					$this->logger->debug('Getting OpenAI models from user cache for user ' . $userId);
+					$this->modelsMemoryCache = $userCachedModels;
 					return $userCachedModels;
 				}
 			}
 
 			// if the user has an API key or uses basic auth, skip the admin cache
-			if (!(
-				$this->openAiSettingsService->getUserApiKey($userId, false) !== ''
-				|| (
-					$this->openAiSettingsService->getUseBasicAuth()
-					&& $this->openAiSettingsService->getUserBasicUser($userId) !== ''
-					&& $this->openAiSettingsService->getUserBasicPassword($userId) !== ''
+			if ($userId === null || (
+				$this->openAiSettingsService->getUserApiKey($userId, false) === ''
+				&& (
+					!$this->openAiSettingsService->getUseBasicAuth()
+					|| $this->openAiSettingsService->getUserBasicUser($userId) === ''
+					|| $this->openAiSettingsService->getUserBasicPassword($userId) === ''
 				)
 			)) {
-				// if no user cache or userId is null, try to get from the admin cache
+				// here we know there is either no user cache or userId is null
+				// so if there is no user-defined service credentials
+				// we try to get the models from the admin cache
 				if ($adminCachedModels = $cache->get($adminCacheKey)) {
 					$this->logger->debug('Getting OpenAI models from the main distributed cache');
+					$this->modelsMemoryCache = $adminCachedModels;
 					return $adminCachedModels;
 				}
 			}
@@ -159,6 +163,7 @@ class OpenAiAPIService {
 			try {
 				$newCache = json_decode($modelsObjectString, true) ?? $fallbackModels;
 			} catch (Throwable $e) {
+				$this->logger->warning('Could not decode the model JSON string', ['model_string', $modelsObjectString, 'exception' => $e]);
 				$newCache = $fallbackModels;
 			}
 			$cache->set($userId !== null ? $userCacheKey : $adminCacheKey, $newCache, Application::MODELS_CACHE_TTL);
@@ -167,9 +172,7 @@ class OpenAiAPIService {
 		}
 
 		// we know we are refreshing so we clear the caches and make the network request
-		$adminCacheKey = Application::MODELS_CACHE_KEY . '-main';
 		$cache->remove($adminCacheKey);
-		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . ($userId ?? '');
 		$cache->remove($userCacheKey);
 
 		try {
