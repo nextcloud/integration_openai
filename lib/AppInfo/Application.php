@@ -40,7 +40,7 @@ class Application extends App implements IBootstrap {
 	public const USER_AGENT = 'Nextcloud OpenAI/LocalAI integration';
 
 	public const DEFAULT_MODEL_ID = 'Default';
-	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-3.5-turbo';
+	public const DEFAULT_COMPLETION_MODEL_ID = 'gpt-4.1-mini';
 	public const DEFAULT_IMAGE_MODEL_ID = 'dall-e-2';
 	public const DEFAULT_TRANSCRIPTION_MODEL_ID = 'whisper-1';
 	public const DEFAULT_SPEECH_MODEL_ID = 'tts-1-hd';

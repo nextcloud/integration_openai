@@ -775,7 +775,7 @@ export default {
 					}
 					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
 					const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
-						|| this.models.find(m => m.id === 'gpt-3.5-turbo')
+						|| this.models.find(m => m.id === 'gpt-4.1-mini')
 						|| this.models[1]
 						|| this.models[0]
 
