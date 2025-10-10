@@ -47,7 +47,6 @@ OC.L10N.register(
     "Example: {example}" : "مىسال: {example}",
     "Leave empty to use {openaiApiUrl}" : "{openaiApiUrl} use نى ئىشلىتىش ئۈچۈن بوش قويۇڭ",
     "With the current configuration, the target URL used to get the models is:" : "نۆۋەتتىكى سەپلىمىسى بىلەن مودېللارغا ئېرىشىش ئۈچۈن ئىشلىتىلىدىغان نىشان URL:",
-    "This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server." : "بۇ APIA نىڭ يىلتىز يولى بىلەن بىللە يەرلىك AI مىسالىڭىزنىڭ ئادرېسىنى (ياكى OpenAI غا ئوخشاش API نى ئىجرا قىلىدىغان ھەر قانداق مۇلازىمەت) نى ئۆز ئىچىگە ئېلىشى كېرەك. بۇ URL نى Nextcloud مۇلازىمېتىرىڭىز زىيارەت قىلىدۇ.",
     "This can be a local address with a port like {example}. In this case, make sure 'allow_local_remote_servers' is set to true in config.php." : "بۇ {example} like غا ئوخشاش ئېغىز بىلەن يەرلىك ئادرېس بولالايدۇ. بۇ خىل ئەھۋالدا ، config.php دا 'allow_local_remote_servers' نىڭ توغرىلانغانلىقىنى جەزملەشتۈرۈڭ.",
     "Service name (optional)" : "مۇلازىمەت ئىسمى (ئىختىيارىي)",
     "Example: LocalAI of university ABC" : "مىسال: ABC ئۇنىۋېرسىتېتنىڭ LocalAI",

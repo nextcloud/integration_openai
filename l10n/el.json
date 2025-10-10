@@ -98,7 +98,6 @@
     "Example: {example}" : "Παράδειγμα: {example}",
     "Leave empty to use {openaiApiUrl}" : "Αφήστε κενό για να χρησιμοποιήσετε {openaiApiUrl}",
     "With the current configuration, the target URL used to get the models is:" : "Με την τρέχουσα διαμόρφωση, η διεύθυνση URL προορισμού που χρησιμοποιείται για τη λήψη των μοντέλων είναι:",
-    "This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server." : "Αυτό θα πρέπει να περιλαμβάνει τη διεύθυνση της εγκατάστασης LocalAI σας (ή οποιασδήποτε υπηρεσίας που υλοποιεί ένα API παρόμοιο με αυτό της OpenAI) μαζί με τη ρίζα διαδρομής του API. Αυτή η διεύθυνση URL θα προσπελαστεί από τον διακομιστή Nextcloud σας.",
     "This can be a local address with a port like {example}. In this case, make sure 'allow_local_remote_servers' is set to true in config.php." : "Αυτό μπορεί να είναι μια τοπική διεύθυνση με μια θύρα όπως {example}. Σε αυτήν την περίπτωση, βεβαιωθείτε ότι το 'allow_local_remote_servers' έχει οριστεί σε true στο config.php.",
     "Service name (optional)" : "Όνομα υπηρεσίας (προαιρετικό)",
     "Example: LocalAI of university ABC" : "Παράδειγμα: LocalAI του πανεπιστημίου ABC",

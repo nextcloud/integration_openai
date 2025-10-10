@@ -99,7 +99,6 @@ OC.L10N.register(
     "Example: {example}" : "Příklad: {example}",
     "Leave empty to use {openaiApiUrl}" : "Pro využití {openaiApiUrl} nevyplňujte",
     "With the current configuration, the target URL used to get the models is:" : "Při stávajícím nastavení je cílová URL, sloužící pro získání modelů:",
-    "This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server." : "Toto by mělo obsahovat adresu vámi využívané instance LocalAI (nebo jiné služby implementující API podobné tomu od OpenAI), společně s popisem umístění kořene API rozhraní. K této adrese bude přistupováno vámi využívaným Nextcloud serverem.",
     "This can be a local address with a port like {example}. In this case, make sure 'allow_local_remote_servers' is set to true in config.php." : "Toto může být lokální adresa s portem jako {example}. V tomto případě zajistěte, aby v config.php bylo 'allow_local_remote_servers' nastaveno na true.",
     "Service name (optional)" : "Název služby (volitelné)",
     "Example: LocalAI of university ABC" : "Příklad: MístníAI univerzity ABC",

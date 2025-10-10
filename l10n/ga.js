@@ -100,7 +100,6 @@ OC.L10N.register(
     "Example: {example}" : "Sampla: {example}",
     "Leave empty to use {openaiApiUrl}" : "Fág folamh chun {openaiApiUrl} a úsáid",
     "With the current configuration, the target URL used to get the models is:" : "Leis an gcumraíocht reatha, is é an URL sprice a úsáidtear chun na samhlacha a fháil:",
-    "This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. This URL will be accessed by your Nextcloud server." : "Ba cheart go gcuimseodh sé seo seoladh do chás LocalAI (nó aon seirbhís a chuireann API cosúil le OpenAI chun feidhme) mar aon le bunchosán an API. Beidh rochtain ag do fhreastalaí Nextcloud ar an URL seo.",
     "This can be a local address with a port like {example}. In this case, make sure 'allow_local_remote_servers' is set to true in config.php." : "Is féidir gur seoladh áitiúil é seo le port mar {example}. Sa chás seo, déan cinnte go bhfuil 'allow_local_remote_servers' socraithe go fíor i config.php.",
     "Service name (optional)" : "Ainm seirbhíse (roghnach)",
     "Example: LocalAI of university ABC" : "Sampla: LocalAI na hollscoile ABC",
