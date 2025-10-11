@@ -10,6 +10,7 @@ OC.L10N.register(
     "Images" : "Tasvirlar",
     "Size" : "Size",
     "Authentication" : "Autentifikatsiya",
+    "API key" : "API kaliti",
     "Category" : "Kategoriya",
     "Save" : "Saqlash",
     "Delete" : "O'chirish"
