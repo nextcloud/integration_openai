@@ -5,6 +5,7 @@ OC.L10N.register(
     "Unknown" : "უცნობია",
     "Name" : "სახელი",
     "Images" : "სურათები",
+    "Language" : "ენა",
     "Size" : "ზომა",
     "Request timeout (seconds)" : "მოთხოვნის დროის ამოწურვა (წამები)",
     "Authentication" : "აუტენტიფიკაცია",

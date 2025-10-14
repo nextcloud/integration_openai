@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "sekonda",
     "Name" : "Emër",
     "Images" : "Imazhe ",
+    "Language" : "Gjuha",
     "Size" : "Madhësi",
     "Request timeout (seconds)" : "Kohë skadimi kërkese (sekonda)",
     "Authentication" : "Mirëfilltësim",

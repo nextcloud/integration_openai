@@ -8,6 +8,7 @@ OC.L10N.register(
     "Bad credentials" : "Akkaunt ma'lumotlari xato",
     "Name" : "Nomi",
     "Images" : "Tasvirlar",
+    "Language" : "Language",
     "Size" : "Size",
     "Authentication" : "Autentifikatsiya",
     "API key" : "API kaliti",

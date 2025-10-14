@@ -8,6 +8,7 @@ OC.L10N.register(
     "Name" : "Nosaukums",
     "Images" : "Attēli",
     "Speed" : "Ātrums",
+    "Language" : "Valoda",
     "Size" : "Izmērs",
     "Authentication" : "Autentifikācija",
     "Authentication method" : "Autentificēšanās veids",

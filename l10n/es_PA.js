@@ -5,6 +5,7 @@ OC.L10N.register(
     "seconds" : "segundos",
     "Name" : "Nombre",
     "Images" : "Imágenes",
+    "Language" : "Idioma",
     "Size" : "Tamaño",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",

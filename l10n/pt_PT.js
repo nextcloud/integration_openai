@@ -9,6 +9,7 @@ OC.L10N.register(
     "Name" : "Nome",
     "Images" : "Imagens",
     "Speed" : "velocidade",
+    "Language" : "Idioma",
     "Size" : "Altura",
     "Request timeout (seconds)" : "Pedido expira (segundos)",
     "Authentication" : "Autenticação",

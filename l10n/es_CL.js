@@ -4,6 +4,7 @@ OC.L10N.register(
     "Unknown" : "Desconocido",
     "Name" : "Nombre",
     "Images" : "Imágenes",
+    "Language" : "Idioma",
     "Size" : "Tamaño",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
