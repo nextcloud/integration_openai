@@ -5,6 +5,7 @@
     "Text generation" : "텍스트 생성",
     "Image generation" : "이미지 생성",
     "Audio transcription" : "음성 전사",
+    "Text to speech" : "글 읽기",
     "Unknown" : "알 수 없음",
     "tokens" : "토큰",
     "seconds" : "초",

@@ -7,6 +7,7 @@ OC.L10N.register(
     "Text generation" : "文本生成",
     "Image generation" : "图像生成",
     "Audio transcription" : "音频转写",
+    "Text to speech" : "文字转语音",
     "Unknown" : "未知",
     "tokens" : "令牌",
     "images" : "图像",
