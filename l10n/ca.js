@@ -15,6 +15,7 @@ OC.L10N.register(
     "Question" : "Pregunta",
     "Generated response" : "Resposta generada",
     "Speed" : "Velocitat",
+    "Language" : "Llengua",
     "Change Tone" : "Canvia el to",
     "Input text" : "Text d'entrada",
     "Write a text that you want the assistant to rewrite in another tone." : "Escriu un text que vols que l'assistent torni a escriure en un altre to.",
