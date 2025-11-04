@@ -8,7 +8,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 3.8.0 – 2025-10-06
+## 3.9.0 – 2025-11-04
+
+### Fixed
+- correct app version release
+
+
+## 3.8.0 – 2025-11-04
 
 ### Added
 - add chunking to ChangeTone, ContextWrite, ProofreadProvider, ReformulateProvider, TopicsProvider, and TranslateProvider @lukasdotcom [#240](https://github.com/nextcloud/integration_openai/pull/240)
