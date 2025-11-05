@@ -29,6 +29,9 @@ class Version030900Date20251006152735 extends SimpleMigrationStep {
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
 		// we refresh the model list to make sure they are stored in oc_appconfig
 		// so they are available immediately after the app upgrade to populate the task types enum values
-		$this->openAIAPIService->getModels(null, true);
+		try {
+			$this->openAIAPIService->getModels(null, true);
+		} catch (\Exception) {
+		}
 	}
 }
