@@ -39,6 +39,7 @@
     "Desired tone" : "희망하는 톤",
     "In which tone should your text be rewritten?" : "텍스트를 어떤 어조로 다시 씁니까?",
     "The rewritten text in the desired tone, written by the assistant:" : "원하는 톤으로 어시스턴트에 의해서 다시 쓴 텍스트:",
+    "Size" : "크기",
     "Prompt" : "프롬프트",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON 객체. 사용 가능한 모든 파라미터 리스트를 가져오려면 API 문서를 확인하십시오. 예: {example}",
     "Failed to load models" : "모델을 불러오지 못했습니다.",
