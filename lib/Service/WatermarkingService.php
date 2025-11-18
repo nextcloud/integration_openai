@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * SPDX-FileCopyrightText: 2022 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
 namespace OCA\OpenAi\Service;
 
 use lsolesen\pel\PelEntryUndefined;
@@ -25,15 +30,17 @@ class WatermarkingService {
 		$white = imagecolorallocate($img, 255, 255, 255);
 		$black = imagecolorallocate($img, 0, 0, 0);
 
-		$w  = imagefontwidth($font) * strlen($text);
-		$h  = imagefontheight($font);
+		$w = imagefontwidth($font) * strlen($text);
+		$h = imagefontheight($font);
 		$px = imagesx($img) - $w - 10;
 		$py = imagesy($img) - $h - 10;
 
 		// draw 1-pixel black outline by offsetting in 4 directions
 		for ($dx = -1; $dx <= 1; $dx++) {
 			for ($dy = -1; $dy <= 1; $dy++) {
-				if ($dx || $dy) imagestring($img, $font, $px + $dx, $py + $dy,  $text, $black);
+				if ($dx || $dy) {
+					imagestring($img, $font, $px + $dx, $py + $dy, $text, $black);
+				}
 			}
 		}
 		imagestring($img, $font, $px, $py, $text, $white);
@@ -87,8 +94,11 @@ class WatermarkingService {
 		file_put_contents($tempFile, $audio);
 
 		$getID3 = new \getID3;
-		$getID3->setOption(array('encoding'=>'UTF-8'));
-		\getid3_lib::IncludeDependency(GETID3_INCLUDEPATH.'write.php', __FILE__, true);
+		$getID3->setOption(['encoding' => 'UTF-8']);
+		/**
+		 * @psalm-suppress UndefinedConstant
+		 */
+		\getid3_lib::IncludeDependency(GETID3_INCLUDEPATH . 'write.php', __FILE__, true);
 		$tagwriter = new \getid3_writetags();
 		$tagwriter->filename = $tempFile;
 		$tagwriter->tagformats = ['id3v2.4'];
