@@ -28,3 +28,9 @@ path = ["img/app.svg", "img/app-dark.svg"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025 OpenAI LLC"
 SPDX-License-Identifier = "LicenseRef-OpenAITrademarks"
+
+[[annotations]]
+path = ["tests/res/trees.jpg", "tests/res/speech.mp3"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
