@@ -48,7 +48,6 @@ class WatermarkingService {
 	}
 
 	private function addImageExifComment(string $text, string $filename): string {
-		require_once(__DIR__ . '/../../vendor/fileeye/pel/autoload.php');
 		$peljpeg = new PelJpeg($filename);
 		$exif = $peljpeg->getExif();
 		if (!$exif) {
@@ -83,7 +82,25 @@ class WatermarkingService {
 		return $peljpeg->getBytes();
 	}
 
-	public function markAudio():void {
+	public function markAudio(string $audio): string {
+		$tempFile = $this->tempManager->getTemporaryFile('.mp3');
+		file_put_contents($tempFile, $audio);
 
+		$getID3 = new \getID3;
+		$getID3->setOption(array('encoding'=>'UTF-8'));
+		\getid3_lib::IncludeDependency(GETID3_INCLUDEPATH.'write.php', __FILE__, true);
+		$tagwriter = new \getid3_writetags();
+		$tagwriter->filename = $tempFile;
+		$tagwriter->tagformats = ['id3v2.4'];
+		$tagwriter->tag_encoding = 'UTF-8';
+		$tagwriter->tag_data = ['comment' => [self::COMMENT]];
+		$tagwriter->WriteTags();
+
+		$newAudio = file_get_contents($tempFile);
+		if (!$newAudio) {
+			throw new \Exception('Unable to read audio file');
+		}
+
+		return $newAudio;
 	}
 }

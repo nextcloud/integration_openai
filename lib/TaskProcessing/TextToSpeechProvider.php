@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\WatermarkingService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -28,6 +29,7 @@ class TextToSpeechProvider implements ISynchronousProvider {
 		private LoggerInterface $logger,
 		private IAppConfig $appConfig,
 		private ?string $userId,
+		private WatermarkingService $watermarkingService,
 	) {
 	}
 
@@ -153,7 +155,9 @@ class TextToSpeechProvider implements ISynchronousProvider {
 				$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
 				throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
 			}
-			return ['speech' => $apiResponse['body']];
+			$audio = $this->watermarkingService->markAudio($apiResponse['body']);
+
+			return ['speech' => $audio];
 		} catch (\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
