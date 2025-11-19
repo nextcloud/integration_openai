@@ -161,9 +161,5 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function boot(IBootContext $context): void {
-		// Load PHP Exif Library for adding image metadata
-		require_once(__DIR__ . '/../../vendor/fileeye/pel/autoload.php');
-		// Load getID3 library for adding audio metadata
-		require_once(__DIR__ . '/../../vendor/james-heinrich/getid3/getid3/getid3.php');
 	}
 }

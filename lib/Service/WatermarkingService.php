@@ -61,6 +61,10 @@ class WatermarkingService {
 	}
 
 	private function addImageExifComment(string $text, string $filename): string {
+		// Load PHP Exif Library for adding image metadata
+		// We hope that it's not loaded yet. PHPScoper was a nightmare with this dep
+		require_once(__DIR__ . '/../../vendor/fileeye/pel/autoload.php');
+		
 		$peljpeg = new PelJpeg($filename);
 		$exif = $peljpeg->getExif();
 		if (!$exif) {
@@ -97,6 +101,10 @@ class WatermarkingService {
 
 	public function markAudio(string $audio): string {
 		try {
+			// Load getID3 library for adding audio metadata
+			// We hope that it's not loaded yet. PHPScoper was a nightmare with this dep
+			require_once(__DIR__ . '/../../vendor/james-heinrich/getid3/getid3/getid3.php');
+
 			$tempFile = $this->tempManager->getTemporaryFile('.mp3');
 			file_put_contents($tempFile, $audio);
 
