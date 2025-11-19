@@ -64,7 +64,7 @@ class WatermarkingService {
 		// Load PHP Exif Library for adding image metadata
 		// We hope that it's not loaded yet. PHPScoper was a nightmare with this dep
 		require_once(__DIR__ . '/../../vendor/fileeye/pel/autoload.php');
-		
+
 		$peljpeg = new PelJpeg($filename);
 		$exif = $peljpeg->getExif();
 		if (!$exif) {
