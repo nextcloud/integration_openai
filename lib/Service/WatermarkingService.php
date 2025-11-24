@@ -29,7 +29,7 @@ class WatermarkingService {
 			$text = self::COMMENT;
 
 			$img = imagecreatefromstring($image);
-			$font = 5;// built-in font 1-5
+			$font = 2;// built-in font 1-5
 			$white = imagecolorallocate($img, 255, 255, 255);
 			$black = imagecolorallocate($img, 0, 0, 0);
 

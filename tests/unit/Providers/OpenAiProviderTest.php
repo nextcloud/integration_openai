@@ -622,7 +622,7 @@ class OpenAiProviderTest extends TestCase {
 	}
 
 	public function testTextToImageProvider(): void {
-		$TTSProvider = new TextToImageProvider(
+		$TextToImageProvider = new TextToImageProvider(
 			$this->openAiApiService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
@@ -665,7 +665,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $TTSProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
+		$result = $TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
 		$this->assertArrayHasKey('images', $result);
 		$this->assertArrayHasKey(0, $result['images']);
 
