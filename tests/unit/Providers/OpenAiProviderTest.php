@@ -665,7 +665,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
+		$result = $TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText, 'numberOfImages' => 1], fn () => null);
 		$this->assertArrayHasKey('images', $result);
 		$this->assertArrayHasKey(0, $result['images']);
 

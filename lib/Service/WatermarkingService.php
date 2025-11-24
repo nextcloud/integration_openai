@@ -7,14 +7,17 @@
 
 namespace OCA\OpenAi\Service;
 
-use lsolesen\pel\PelEntryUndefined;
-use lsolesen\pel\PelExif;
-use lsolesen\pel\PelIfd;
-use lsolesen\pel\PelJpeg;
-use lsolesen\pel\PelTag;
-use lsolesen\pel\PelTiff;
+use OCA\OpenAi\Vendor\getid3_lib;
+use OCA\OpenAi\Vendor\getid3_writetags;
+use OCA\OpenAi\Vendor\lsolesen\pel\PelEntryUndefined;
+use OCA\OpenAi\Vendor\lsolesen\pel\PelExif;
+use OCA\OpenAi\Vendor\lsolesen\pel\PelIfd;
+use OCA\OpenAi\Vendor\lsolesen\pel\PelJpeg;
+use OCA\OpenAi\Vendor\lsolesen\pel\PelTag;
+use OCA\OpenAi\Vendor\lsolesen\pel\PelTiff;
 use OCP\ITempManager;
 use Psr\Log\LoggerInterface;
+use const OCA\OpenAi\Vendor\GETID3_INCLUDEPATH;
 
 class WatermarkingService {
 	public const COMMENT = 'Generated with Artificial Intelligence';
@@ -61,10 +64,6 @@ class WatermarkingService {
 	}
 
 	private function addImageExifComment(string $text, string $filename): string {
-		// Load PHP Exif Library for adding image metadata
-		// We hope that it's not loaded yet. PHPScoper was a nightmare with this dep
-		require_once(__DIR__ . '/../../vendor/fileeye/pel/autoload.php');
-
 		$peljpeg = new PelJpeg($filename);
 		$exif = $peljpeg->getExif();
 		if (!$exif) {
@@ -101,20 +100,16 @@ class WatermarkingService {
 
 	public function markAudio(string $audio): string {
 		try {
-			// Load getID3 library for adding audio metadata
-			// We hope that it's not loaded yet. PHPScoper was a nightmare with this dep
-			require_once(__DIR__ . '/../../vendor/james-heinrich/getid3/getid3/getid3.php');
-
 			$tempFile = $this->tempManager->getTemporaryFile('.mp3');
 			file_put_contents($tempFile, $audio);
 
-			$getID3 = new \getID3;
+			$getID3 = new \OCA\OpenAi\Vendor\getID3;
 			$getID3->setOption(['encoding' => 'UTF-8']);
 			/**
 			 * @psalm-suppress UndefinedConstant
 			 */
-			\getid3_lib::IncludeDependency(GETID3_INCLUDEPATH . 'write.php', __FILE__, true);
-			$tagwriter = new \getid3_writetags();
+			getid3_lib::IncludeDependency(GETID3_INCLUDEPATH . 'write.php', __FILE__, true);
+			$tagwriter = new getid3_writetags();
 			$tagwriter->filename = $tempFile;
 			$tagwriter->tagformats = ['id3v2.4'];
 			$tagwriter->tag_encoding = 'UTF-8';

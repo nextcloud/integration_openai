@@ -65,6 +65,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer remove nextcloud/ocp --dev
+          composer i # twice because of php-scoper
           composer i
 
 
