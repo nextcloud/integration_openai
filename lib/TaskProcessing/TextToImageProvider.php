@@ -16,13 +16,13 @@ use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToImage;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class TextToImageProvider implements ISynchronousProvider {
+class TextToImageProvider implements ISynchronousWatermarkingProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -106,7 +106,7 @@ class TextToImageProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(?string $userId, array $input, callable $reportProgress, bool $includeWatermark = true): array {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
@@ -158,12 +158,12 @@ class TextToImageProvider implements ISynchronousProvider {
 			foreach ($urls as $url) {
 				$imageResponse = $client->get($url, $requestOptions);
 				$image = $imageResponse->getBody();
-				$image = $this->watermarkingService->markImage($image);
+				$image = $includeWatermark ? $this->watermarkingService->markImage($image) : $image;
 				$output['images'][] = $image;
 			}
 			foreach ($b64s as $b64) {
 				$imagePayload = base64_decode($b64);
-				$image = $this->watermarkingService->markImage($imagePayload);
+				$image = $includeWatermark ? $this->watermarkingService->markImage($imagePayload) : $imagePayload;
 				$output['images'][] = $image;
 			}
 			$endTime = time();

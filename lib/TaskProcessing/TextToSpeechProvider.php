@@ -15,13 +15,13 @@ use OCA\OpenAi\Service\WatermarkingService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class TextToSpeechProvider implements ISynchronousProvider {
+class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -115,13 +115,17 @@ class TextToSpeechProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(?string $userId, array $input, callable $reportProgress, bool $includeWatermark = true): array {
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new RuntimeException('Invalid prompt');
 		}
 		// For OpenAI the text input limit is 4096 characters (https://platform.openai.com/docs/api-reference/audio/createSpeech#audio-createspeech-input)
 		$prompt = $input['input'];
+
+		if ($includeWatermark) {
+			$prompt .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
+		}
 
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
@@ -155,7 +159,7 @@ class TextToSpeechProvider implements ISynchronousProvider {
 				$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
 				throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
 			}
-			$audio = $this->watermarkingService->markAudio($apiResponse['body']);
+			$audio = $includeWatermark ? $this->watermarkingService->markAudio($apiResponse['body']) : $apiResponse['body'];
 
 			return ['speech' => $audio];
 		} catch (\Exception $e) {
