@@ -579,12 +579,14 @@ class OpenAiProviderTest extends TestCase {
 	public function testTextToSpeechProvider(): void {
 		$TTSProvider = new TextToSpeechProvider(
 			$this->openAiApiService,
-			$this->createMock(\OCP\IL10N::class),
+			$l10n = $this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			\OCP\Server::get(IAppConfig::class),
 			self::TEST_USER1,
 			\OCP\Server::get(WatermarkingService::class),
 		);
+
+		$l10n->method('t')->willReturn('This was generated using Artificial Intelligence.');
 
 		$inputText = 'This is a test prompt';
 
