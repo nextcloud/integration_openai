@@ -65,7 +65,6 @@ jobs:
       - name: Install dependencies
         run: |
           composer remove nextcloud/ocp --dev  --no-scripts
-          composer i # twice because of php-scoper
           composer i
 
       - name: Check for vulnerable PHP dependencies

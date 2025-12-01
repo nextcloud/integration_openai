@@ -134,7 +134,6 @@ jobs:
         working-directory: apps/${{ env.APP_NAME }}
         run: |
           composer remove nextcloud/ocp --dev --no-scripts
-          composer i # twice because of php-scoper
           composer i
 
       - name: Set up Nextcloud
