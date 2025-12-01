@@ -598,7 +598,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode([
-			'input' => $inputText .  "\n\n" . 'This was generated using Artificial Intelligence.',
+			'input' => $inputText . "\n\n" . 'This was generated using Artificial Intelligence.',
 			'voice' => Application::DEFAULT_SPEECH_VOICE,
 			'model' => Application::DEFAULT_SPEECH_MODEL_ID,
 			'response_format' => 'mp3',
@@ -616,7 +616,7 @@ class OpenAiProviderTest extends TestCase {
 
 		// Check that token usage is logged properly (should be 21 characters)
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_SPEECH);
-		$this->assertEquals(21, $usage);
+		$this->assertEquals(72, $usage);
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}

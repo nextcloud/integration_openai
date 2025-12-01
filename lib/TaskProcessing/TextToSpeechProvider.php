@@ -124,7 +124,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		$prompt = $input['input'];
 
 		if ($includeWatermark) {
-			$prompt .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
+			$prompt .= "\n\n" . 'This was generated using Artificial Intelligence.';
 		}
 
 		if (isset($input['model']) && is_string($input['model'])) {
