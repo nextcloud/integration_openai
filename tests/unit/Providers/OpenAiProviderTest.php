@@ -598,7 +598,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode([
-			'input' => $inputText,
+			'input' => $inputText .  "\n\n" . 'This was generated using Artificial Intelligence.',
 			'voice' => Application::DEFAULT_SPEECH_VOICE,
 			'model' => Application::DEFAULT_SPEECH_MODEL_ID,
 			'response_format' => 'mp3',
