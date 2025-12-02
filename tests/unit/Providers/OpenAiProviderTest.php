@@ -18,11 +18,13 @@ use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\ProofreadProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
+use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TranslateProvider;
@@ -577,21 +579,28 @@ class OpenAiProviderTest extends TestCase {
 	public function testTextToSpeechProvider(): void {
 		$TTSProvider = new TextToSpeechProvider(
 			$this->openAiApiService,
-			$this->createMock(\OCP\IL10N::class),
+			$l10n = $this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			\OCP\Server::get(IAppConfig::class),
 			self::TEST_USER1,
+			\OCP\Server::get(WatermarkingService::class),
 		);
+
+		$l10n->method('t')->willReturn('This was generated using Artificial Intelligence.');
 
 		$inputText = 'This is a test prompt';
 
-		$response = 'BINARYDATA';
+		$response = file_get_contents(__DIR__ . '/../../res/speech.mp3');
+
+		if (!$response) {
+			throw new \RuntimeException('Could not read test resourcce `speech.mp3`');
+		}
 
 		$url = self::OPENAI_API_BASE . 'audio/speech';
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode([
-			'input' => $inputText,
+			'input' => $inputText . "\n\n" . 'This was generated using Artificial Intelligence.',
 			'voice' => Application::DEFAULT_SPEECH_VOICE,
 			'model' => Application::DEFAULT_SPEECH_MODEL_ID,
 			'response_format' => 'mp3',
@@ -605,11 +614,66 @@ class OpenAiProviderTest extends TestCase {
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
 		$result = $TTSProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
-		$this->assertEquals(['speech' => 'BINARYDATA'], $result);
+		$this->assertArrayHasKey('speech', $result);
 
 		// Check that token usage is logged properly (should be 21 characters)
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_SPEECH);
-		$this->assertEquals(21, $usage);
+		$this->assertEquals(72, $usage);
+		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testTextToImageProvider(): void {
+		$TextToImageProvider = new TextToImageProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(IClientService::class),
+			\OCP\Server::get(IAppConfig::class),
+			self::TEST_USER1,
+			\OCP\Server::get(WatermarkingService::class),
+		);
+
+		$inputText = 'This is a test prompt';
+
+		$responseImage = file_get_contents(__DIR__ . '/../../res/trees.jpg');
+
+		if (!$responseImage) {
+			throw new \RuntimeException('Could not read test resourcce `trees.jpg`');
+		}
+
+		$response = json_encode([
+			'data' => [
+				[
+					'b64_json' => base64_encode($responseImage),
+				]
+			]
+		]);
+
+		$url = self::OPENAI_API_BASE . 'images/generations';
+
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'prompt' => $inputText,
+			'size' => '1024x1024',
+			'n' => 1,
+			'model' => Application::DEFAULT_IMAGE_MODEL_ID,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText, 'numberOfImages' => 1], fn () => null);
+		$this->assertArrayHasKey('images', $result);
+		$this->assertArrayHasKey(0, $result['images']);
+
+		// Check that token usage is logged properly (should be 21 characters)
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_IMAGE);
+		$this->assertEquals(1, $usage);
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
