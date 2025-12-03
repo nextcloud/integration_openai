@@ -560,7 +560,7 @@ class OpenAiAPIService {
 						'type' => 'input_audio',
 						'input_audio' => [
 							'data' => $userAudioPromptBase64,
-							'format' => 'mp3',
+							'format' => 'wav',
 						],
 					],
 				],
