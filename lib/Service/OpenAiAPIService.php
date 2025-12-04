@@ -490,6 +490,7 @@ class OpenAiAPIService {
 	 * @param string|null $toolMessage JSON string with role, content, tool_call_id
 	 * @param array|null $tools
 	 * @param string|null $userAudioPromptBase64
+	 * @param string|null $userAudioPromptFormat
 	 * @return array{messages: array<string>, tool_calls: array<string>, audio_messages: list<array<string, mixed>>}
 	 * @throws Exception
 	 */
@@ -505,6 +506,7 @@ class OpenAiAPIService {
 		?string $toolMessage = null,
 		?array $tools = null,
 		?string $userAudioPromptBase64 = null,
+		?string $userAudioPromptFormat = null,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -560,7 +562,7 @@ class OpenAiAPIService {
 						'type' => 'input_audio',
 						'input_audio' => [
 							'data' => $userAudioPromptBase64,
-							'format' => 'wav',
+							'format' => $userAudioPromptFormat ?? 'wav',
 						],
 					],
 				],
