@@ -25,6 +25,15 @@ use RuntimeException;
 
 class AudioToAudioChatProvider implements ISynchronousProvider {
 
+	// OpenAI supports wav and mp3
+	// https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages
+	private const SUPPORTED_INPUT_AUDIO_FORMATS = [
+		'audio/mp3' => 'mp3',
+		'audio/mpeg' => 'mp3',
+		'audio/wav' => 'wav',
+		'audio/x-wav' => 'wav',
+	];
+
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IL10N $l,
@@ -213,6 +222,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		string $sttModel, string $llmModel, string $ttsModel, float $speed, string $serviceName,
 	): array {
 		$result = [];
+		$audioInputMimetype = mime_content_type($inputFile->fopen('rb'));
+		$audioInputFormat = self::SUPPORTED_INPUT_AUDIO_FORMATS[$audioInputMimetype] ?? 'wav';
 		$b64Audio = base64_encode($inputFile->getContent());
 		$extraParams = [
 			'modalities' => ['text', 'audio'],
@@ -221,7 +232,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$systemPrompt .= ' Producing text responses will break the user interface. Important: You have multimodal voice capability, and you use voice exclusively to respond.';
 		$completion = $this->openAiAPIService->createChatCompletion(
 			$userId, $llmModel, null, $systemPrompt, $history, 1, 1000,
-			$extraParams, null, null, $b64Audio,
+			$extraParams, null, null, $b64Audio, $audioInputFormat
 		);
 		$message = array_pop($completion['audio_messages']);
 		// TODO find a way to force the model to answer with audio when there is only text in the history
