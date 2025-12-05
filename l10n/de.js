@@ -79,6 +79,7 @@ OC.L10N.register(
     "OpenAI's Text to Speech" : "Text zu Sprache von OpenAI",
     "Voice" : "Sprachnachrichten",
     "The voice to use" : "Die zu verwendende Stimme",
+    "This was generated using Artificial Intelligence." : "Dies wurde mit künstlicher Intelligenz erstellt.",
     "Generate speech" : "Sprache erstellen",
     "Generate speech from a transcript" : "Sprache aus einem Transkript erstellen",
     "Prompt" : "Prompt",

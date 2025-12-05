@@ -77,6 +77,7 @@
     "OpenAI's Text to Speech" : "OpenAI 的文字轉語音",
     "Voice" : "語音",
     "The voice to use" : "要使用的語音",
+    "This was generated using Artificial Intelligence." : "此內容由人工智慧產生。",
     "Generate speech" : "產生語音",
     "Generate speech from a transcript" : "從轉錄稿產生語音",
     "Prompt" : "提示詞",

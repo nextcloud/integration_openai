@@ -4,6 +4,7 @@ OC.L10N.register(
     "Default" : "Predvolené",
     "Text generation" : "Generovanie textu",
     "Image generation" : "Generovanie obrázka",
+    "Text to speech" : "Text na reč",
     "Unknown" : "Neznámy",
     "seconds" : "sekúnd",
     "Bad HTTP method" : "Zlá metóda HTTP",
