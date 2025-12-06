@@ -77,6 +77,7 @@
     "OpenAI's Text to Speech" : "Téacs go Caint OpenAI",
     "Voice" : "Guth",
     "The voice to use" : "An guth le húsáid",
+    "This was generated using Artificial Intelligence." : "Gineadh é seo ag baint úsáide as Intleacht Shaorga.",
     "Generate speech" : "Gin urlabhra",
     "Generate speech from a transcript" : "Gin urlabhra ó thrascríbhinn",
     "Prompt" : "Leid",
