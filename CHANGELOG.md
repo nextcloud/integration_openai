@@ -8,6 +8,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.0.0 - 2025-12-09
+
+### Added
+- add watermark and metadata to generated images and audio @marcelklehr [#295](https://github.com/nextcloud/integration_openai/pull/295)
+- adjust audio input chat format @julien-nc [#303](https://github.com/nextcloud/integration_openai/pull/303)
+- detect audio input format when sending it as a message to the chat completion endpoint, support wav and mp3 @julien-nc [#306](https://github.com/nextcloud/integration_openai/pull/306)
+
+### Changed
+- drop support for NC < 33 @marcelklehr [#295](https://github.com/nextcloud/integration_openai/pull/295)
+
+
 ## 3.9.1 – 2025-11-05
 
 ### Fixed
