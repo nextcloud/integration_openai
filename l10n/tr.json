@@ -77,6 +77,7 @@
     "OpenAI's Text to Speech" : "OpenAI yazıdan konuşmaya",
     "Voice" : "Ses",
     "The voice to use" : "Kullanılacak ses",
+    "This was generated using Artificial Intelligence." : "Bu içerik yapay zeka tarafından oluşturulmuştur.",
     "Generate speech" : "Konuşma oluştur",
     "Generate speech from a transcript" : "Bir yazıya dönüştürme sonucundan konuşma oluştur",
     "Prompt" : "İstem",
