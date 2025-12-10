@@ -102,9 +102,9 @@ class TextToTextChatProvider implements ISynchronousProvider {
 		}
 		$systemPrompt = $input['system_prompt'];
 
-		if (isset($input['memories']) && is_array($input['memories'])) {
+		if (isset($input['memories']) && is_array($input['memories']) && count($input['memories'])) {
 			/** @psalm-suppress InvalidArgument */
-			$systemPrompt .= "\n\nIf they are relevant, take into account the following memories:\n" . implode("\n\n", $input['memories']) . "\n\nDo not mention these memories explicitly. You may use them as context, but do not repeat them. At most, you can mention that you remember something.";
+			$systemPrompt .= "\n\nYou can remember things from other conversations with the user. If they are relevant, take into account the following memories:\n" . implode("\n\n", $input['memories']) . "\n\nDo not mention these memories explicitly. You may use them as context, but do not repeat them. At most, you can mention that you remember something.";
 		}
 
 		if (!isset($input['history']) || !is_array($input['history'])) {
