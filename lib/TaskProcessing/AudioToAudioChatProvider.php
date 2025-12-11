@@ -81,6 +81,11 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$this->l->t('The voice used to generate speech'),
 				EShapeType::Enum
 			),
+			'memories' => new ShapeDescriptor(
+				$this->l->t('Memories'),
+				$this->l->t('The memories to be injected into the chat session.'),
+				EShapeType::ListOfTexts
+			),
 		];
 		if (!$isUsingOpenAi) {
 			$ois['tts_model'] = new ShapeDescriptor(
@@ -164,6 +169,11 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			throw new RuntimeException('Invalid system_prompt');
 		}
 		$systemPrompt = $input['system_prompt'];
+
+		if (isset($input['memories']) && is_array($input['memories']) && count($input['memories'])) {
+			/** @psalm-suppress InvalidArgument */
+			$systemPrompt .= "\n\nYou can remember things from other conversation with the user. If they are relevant, take into account the following memories:\n" . implode("\n\n", $input['memories']) . "\n\nDo not mention these memories explicitly. You may use them as context, but do not repeat them. At most, you can mention that you remember something.";
+		}
 
 		if (!isset($input['history']) || !is_array($input['history'])) {
 			throw new RuntimeException('Invalid chat history, array expected');
