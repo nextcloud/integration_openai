@@ -48,6 +48,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "ໂມເດວທີ່ໃຊ້ເພື່ອສ້າງຂໍ້ຄວາມຕໍ່",
     "Output voice" : "ສຽງເວົ້າຂອງຜົນລັບ",
     "The voice used to generate speech" : "ສຽງເວົ້າທີ່ໃຊ້ເພື່ອສ້າງຄຳເວົ້າ",
+    "Memories" : "ຄວາມຊົງຈຳ",
     "Text-to-speech model" : "ໂມເດວຂໍ້ຄວາມເປັນສຽງເວົ້າ",
     "The model used to generate the speech" : "ໂມເດວທີ່ໃຊ້ເພື່ອສ້າງສຽງເວົ້າ",
     "Speed" : "ຄວາມໄວ",

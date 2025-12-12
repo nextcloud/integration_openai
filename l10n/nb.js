@@ -28,6 +28,7 @@ OC.L10N.register(
     "Images" : "Bilder",
     "Question" : "Spørsmål",
     "The model used to generate the completion" : "Modellen som brukes til å generere fullføringen",
+    "Memories" : "Minner",
     "Speed" : "Hastighet",
     "Language" : "Språk",
     "The maximum number of words/tokens that can be generated in the completion." : "Maksimalt antall ord/tokens som kan genereres i fullføringen.",

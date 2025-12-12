@@ -13,6 +13,7 @@ OC.L10N.register(
     "Images" : "تصاویر",
     "Question" : "پرسش",
     "Generated response" : "پاسخ تولید شده",
+    "Memories" : "Memories",
     "Speed" : "سرعت",
     "Language" : "زبان",
     "Change Tone" : "تغییر لحن",

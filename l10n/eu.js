@@ -23,6 +23,7 @@ OC.L10N.register(
     "Question" : "Galdera",
     "Generated response" : "Sortutako erantzuna",
     "The answer to the question" : "Galderaren erantzuna",
+    "Memories" : "Memoriak",
     "Speed" : "Abiadura",
     "Language" : "Hizkuntza",
     "Funnier" : "Xelebreagoa",

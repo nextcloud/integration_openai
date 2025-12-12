@@ -45,6 +45,7 @@
     "The model used to generate the completion" : "Le modèle utilisé pour générer la complétion",
     "Output voice" : "Voix de sortie",
     "The voice used to generate speech" : "Voix utilisée pour générée la synthèse vocale",
+    "Memories" : "Souvenirs",
     "Text-to-speech model" : "Modèle de synthèse vocale",
     "The model used to generate the speech" : "Le modèle utilisé pour générer la voix",
     "Speed" : "Vitesse",

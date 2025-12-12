@@ -15,6 +15,7 @@ OC.L10N.register(
     "Question" : "Vraag",
     "Generated response" : "Gegenereerd antwoord",
     "The answer to the question" : "Het antwoord op de vraag",
+    "Memories" : "Herinneringen",
     "Speed" : "Snelheid",
     "Language" : "Taal",
     "Change Tone" : "Wijzig toon",

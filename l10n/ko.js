@@ -26,6 +26,7 @@ OC.L10N.register(
     "Question" : "질문",
     "Generated response" : "생성된 응답",
     "The model used to generate the completion" : "완성을 생성하는데 사용된 모델",
+    "Memories" : "Memories",
     "Speed" : "속도",
     "Language" : "언어",
     "Friendlier" : "더 친근하게",

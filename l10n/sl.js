@@ -19,6 +19,7 @@ OC.L10N.register(
     "Maximum output words" : "Največje število besed odvoda",
     "Images" : "Slike",
     "Question" : "Vprašanje",
+    "Memories" : "Spomini",
     "Speed" : "Hitrost",
     "Language" : "Jezik",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",

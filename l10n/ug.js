@@ -33,6 +33,7 @@ OC.L10N.register(
     "Generated response" : "ھاسىل قىلىنغان جاۋاب",
     "The answer to the question" : "سوئالغا جاۋاب بېرىڭ",
     "The model used to generate the completion" : "تاماملاش ئۈچۈن ئىشلىتىلگەن مودېل",
+    "Memories" : "ئەسلىمىلەر",
     "Language" : "تىل",
     "The maximum number of words/tokens that can be generated in the completion." : "تاماملاشتا ھاسىل بولىدىغان ئەڭ كۆپ سۆز / بەلگە.",
     "Change Tone" : "تۈسىنى ئۆزگەرت",

@@ -16,6 +16,7 @@ OC.L10N.register(
     "Question" : "Fråga",
     "Generated response" : "Genererat svar",
     "The answer to the question" : "Svaret på frågan",
+    "Memories" : "Memories",
     "Speed" : "Hastighet",
     "Language" : "Språk",
     "Change Tone" : "Ändra ton",

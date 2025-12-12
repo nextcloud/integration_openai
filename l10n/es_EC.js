@@ -11,6 +11,7 @@ OC.L10N.register(
     "Model" : "Modelo",
     "Images" : "Imágenes",
     "Question" : "Pregunta",
+    "Memories" : "Memorias",
     "Language" : "Idioma",
     "Size" : "Tamaño",
     "Prompt" : "Promoción",

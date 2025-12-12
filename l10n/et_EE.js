@@ -47,6 +47,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "Loomel kasutatud mudel",
     "Output voice" : "Väljundhääl",
     "The voice used to generate speech" : "Kõnesünteesil kasutatav hääl",
+    "Memories" : "Mälestused",
     "Text-to-speech model" : "Kõnesünteesi mudel",
     "The model used to generate the speech" : "Kõnesünteesil kasutatav mudel",
     "Speed" : "Kiirus",

@@ -48,6 +48,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "Модель, що використовується для генерації завершення",
     "Output voice" : "Вихідний голос",
     "The voice used to generate speech" : "Голос, який використовується для генерування мовлення",
+    "Memories" : "Спогади",
     "Text-to-speech model" : "Модель перетворення тексту в мовлення",
     "The model used to generate the speech" : "Модель, що використовується для генерації мовлення",
     "Speed" : "Швидкість",

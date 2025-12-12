@@ -16,6 +16,7 @@ OC.L10N.register(
     "Model" : "Modelis",
     "Images" : "Paveikslai",
     "Question" : "Klausimas",
+    "Memories" : "Prisiminimai",
     "Speed" : "Greitis",
     "Language" : "Kalba",
     "Size" : "Dydis",

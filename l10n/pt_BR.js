@@ -48,6 +48,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "O modelo usado para gerar a conclusão",
     "Output voice" : "Voz de saída",
     "The voice used to generate speech" : "A voz usada para gerar a fala",
+    "Memories" : "Memórias",
     "Text-to-speech model" : "Modelo de texto-para-fala",
     "The model used to generate the speech" : "O modelo usado para gerar a fala",
     "Speed" : "Velocidade",

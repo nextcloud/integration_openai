@@ -8,6 +8,7 @@ OC.L10N.register(
     "Name" : "Име",
     "Images" : "Слики",
     "Question" : "Прашање",
+    "Memories" : "Memories",
     "Speed" : "Брзина",
     "Language" : "Јазик",
     "Authentication" : "Автентикација",

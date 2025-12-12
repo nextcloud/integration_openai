@@ -46,6 +46,7 @@
     "The model used to generate the completion" : "An tsamhail a úsáidtear chun an críochnú a ghiniúint",
     "Output voice" : "Guth aschuir",
     "The voice used to generate speech" : "An guth a úsáidtear chun urlabhra a ghiniúint",
+    "Memories" : "Cuimhní cinn",
     "Text-to-speech model" : "Múnla téacs-go-hurlabhra",
     "The model used to generate the speech" : "An tsamhail a úsáideadh chun an chaint a ghiniúint",
     "Speed" : "Luas",

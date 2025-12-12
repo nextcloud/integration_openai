@@ -8,6 +8,7 @@ OC.L10N.register(
     "Name" : "Nombre",
     "Detect language" : "Detectar idioma",
     "Images" : "Imágenes",
+    "Memories" : "Recuerdos",
     "Language" : "Idioma",
     "Input text" : "Ingresar texto",
     "Size" : "Tamaño",
