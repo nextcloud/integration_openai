@@ -48,6 +48,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "用來產生補齊的模型",
     "Output voice" : "輸出語音",
     "The voice used to generate speech" : "用來產生語音的聲音",
+    "Memories" : "回憶",
     "Text-to-speech model" : "文字轉語音模型",
     "The model used to generate the speech" : "要用來產生語音的模型",
     "Speed" : "速度",

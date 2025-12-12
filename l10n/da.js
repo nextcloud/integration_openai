@@ -34,6 +34,7 @@ OC.L10N.register(
     "Generated response" : "Genereret respons",
     "The answer to the question" : "Svaret på sprøgsmålet",
     "The model used to generate the completion" : "Den model, der anvendes til at generere færdiggørelsen",
+    "Memories" : "Minder",
     "Speed" : "Hastighed",
     "Language" : "Sprog",
     "Friendlier" : "Venligere",

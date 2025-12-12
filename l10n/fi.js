@@ -14,6 +14,7 @@ OC.L10N.register(
     "Question" : "Kysymys",
     "Generated response" : "Luotu vastaus",
     "The answer to the question" : "Vastaus kysymykseen",
+    "Memories" : "Muistot",
     "Speed" : "Nopeus",
     "Language" : "Kieli",
     "Prompt" : "Kehote",

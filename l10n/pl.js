@@ -34,6 +34,7 @@ OC.L10N.register(
     "Generated response" : "Wygenerowana odpowiedź",
     "The answer to the question" : "Odpowiedź na pytanie",
     "The model used to generate the completion" : "Model językowy użyty do wygenerowania uzupełnienia",
+    "Memories" : "Wspomnienia",
     "Speed" : "Prędkość",
     "Language" : "Język",
     "Friendlier" : "Przyjaźniejszy",

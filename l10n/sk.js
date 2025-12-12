@@ -14,6 +14,7 @@ OC.L10N.register(
     "Images" : "Obrázky",
     "Question" : "Otázka",
     "Generated response" : "Vygenerovaná odpoveď",
+    "Memories" : "Spomienky",
     "Speed" : "Rýchlosť",
     "Language" : "Jazyk",
     "Change Tone" : "Zmeniť tón",

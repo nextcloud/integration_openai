@@ -8,6 +8,7 @@ OC.L10N.register(
     "Bad credentials" : "Credenciais inválidas",
     "Name" : "Nome",
     "Images" : "Imagens",
+    "Memories" : "Memories",
     "Speed" : "velocidade",
     "Language" : "Idioma",
     "Size" : "Altura",

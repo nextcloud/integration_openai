@@ -17,6 +17,7 @@ OC.L10N.register(
     "Model" : "Modell",
     "Images" : "Képek",
     "Question" : "Kérdés",
+    "Memories" : "Emlékek",
     "Speed" : "Sebesség",
     "Language" : "Nyelv",
     "Size" : "?éret",

@@ -29,6 +29,7 @@ OC.L10N.register(
     "Question" : "问题",
     "Generated response" : "生成的回复",
     "The answer to the question" : "问题的答案",
+    "Memories" : "回忆",
     "Speed" : "速度",
     "Language" : "语言",
     "Change Tone" : "更改语气",

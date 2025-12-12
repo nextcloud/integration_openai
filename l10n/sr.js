@@ -48,6 +48,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "Модел који се користи за генерисање довршавања",
     "Output voice" : "Глас излаза",
     "The voice used to generate speech" : "Глас који се користи за генерисање говора",
+    "Memories" : "Успомене",
     "Text-to-speech model" : "Модел за претварање текста у говор",
     "The model used to generate the speech" : "Модел који се користи за генерисање говора",
     "Speed" : "Брзина",

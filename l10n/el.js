@@ -48,6 +48,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "Το μοντέλο που χρησιμοποιείται για τη δημιουργία της ολοκλήρωσης",
     "Output voice" : "Φωνή εξόδου",
     "The voice used to generate speech" : "Η φωνή που χρησιμοποιείται για τη δημιουργία ομιλίας",
+    "Memories" : "Αναμνήσεις",
     "Text-to-speech model" : "Μοντέλο μετατροπής κειμένου σε ομιλία",
     "The model used to generate the speech" : "Το μοντέλο που χρησιμοποιείται για τη δημιουργία της ομιλίας",
     "Speed" : "Ταχύτητα",

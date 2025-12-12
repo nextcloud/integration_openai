@@ -48,6 +48,7 @@ OC.L10N.register(
     "The model used to generate the completion" : "Das zur Generierung der Vervollständigung verwendete Modell",
     "Output voice" : "Ausgabestimme",
     "The voice used to generate speech" : "Die Stimme, die für die Sprachgenerierung verwendet wird",
+    "Memories" : "Memories",
     "Text-to-speech model" : "Text-zu-Sprache-Modell",
     "The model used to generate the speech" : "Das Modell, das zur Erzeugung der Sprache verwendet wird",
     "Speed" : "Geschwindigkeit",
