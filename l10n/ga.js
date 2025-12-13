@@ -49,6 +49,7 @@ OC.L10N.register(
     "Output voice" : "Guth aschuir",
     "The voice used to generate speech" : "An guth a úsáidtear chun urlabhra a ghiniúint",
     "Memories" : "Cuimhní cinn",
+    "The memories to be injected into the chat session." : "Na cuimhní cinn atá le hinstealladh isteach sa seisiún comhrá.",
     "Text-to-speech model" : "Múnla téacs-go-hurlabhra",
     "The model used to generate the speech" : "An tsamhail a úsáideadh chun an chaint a ghiniúint",
     "Speed" : "Luas",

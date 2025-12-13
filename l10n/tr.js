@@ -49,6 +49,7 @@ OC.L10N.register(
     "Output voice" : "Çıktı sesi",
     "The voice used to generate speech" : "Oluşturulan konuşma için kullanılacak ses",
     "Memories" : "Anılar",
+    "The memories to be injected into the chat session." : "Anılar sohbet oturumuna eklenecek.",
     "Text-to-speech model" : "Yazıdan konuşmaya dönüştürme modeli",
     "The model used to generate the speech" : "Konuşmayı oluşturmakta kullanılacak model",
     "Speed" : "Hız",

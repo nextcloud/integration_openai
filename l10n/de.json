@@ -47,6 +47,7 @@
     "Output voice" : "Ausgabestimme",
     "The voice used to generate speech" : "Die Stimme, die für die Sprachgenerierung verwendet wird",
     "Memories" : "Memories",
+    "The memories to be injected into the chat session." : "Die Erinnerungen, die in die Chat-Sitzung eingefügt werden sollen.",
     "Text-to-speech model" : "Text-zu-Sprache-Modell",
     "The model used to generate the speech" : "Das Modell, das zur Erzeugung der Sprache verwendet wird",
     "Speed" : "Geschwindigkeit",
