@@ -11,6 +11,7 @@ OC.L10N.register(
     "Detect language" : "Detectar la llingua",
     "Images" : "Imáxenes",
     "Question" : "Entruga",
+    "Memories" : "Recuerdos",
     "Language" : "Llingua",
     "Size" : "Tamañu",
     "Voice" : "Voz",

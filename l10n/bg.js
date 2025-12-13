@@ -11,6 +11,7 @@ OC.L10N.register(
     "Detect language" : "Разпознаване на език",
     "Images" : "Изображения",
     "Question" : "Въпрос",
+    "Memories" : "Спомени",
     "Speed" : "Скорост",
     "Language" : "Език",
     "Prompt" : "Подкана",

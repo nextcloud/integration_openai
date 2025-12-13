@@ -49,6 +49,7 @@ OC.L10N.register(
     "Output voice" : "輸出語音",
     "The voice used to generate speech" : "用來產生語音的聲音",
     "Memories" : "回憶",
+    "The memories to be injected into the chat session." : "要注入到聊天工作階段的記憶。",
     "Text-to-speech model" : "文字轉語音模型",
     "The model used to generate the speech" : "要用來產生語音的模型",
     "Speed" : "速度",
