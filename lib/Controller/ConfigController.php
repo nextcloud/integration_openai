@@ -72,8 +72,11 @@ class ConfigController extends Controller {
 	 * @return DataResponse
 	 */
 	public function setAdminConfig(array $values): DataResponse {
-		if (isset($values['api_key']) || isset($values['basic_password']) || isset($values['basic_user']) || isset($values['url'])) {
-			return new DataResponse('', Http::STATUS_BAD_REQUEST);
+		$prefixes = ['', 'image_', 'tts_', 'stt_'];
+		foreach ($prefixes as $prefix) {
+			if (isset($values[$prefix . 'api_key']) || isset($values[$prefix . 'basic_password']) || isset($values[$prefix . 'basic_user']) || isset($values[$prefix . 'url'])) {
+				return new DataResponse('', Http::STATUS_BAD_REQUEST);
+			}
 		}
 		try {
 			$this->openAiSettingsService->setAdminConfig($values);

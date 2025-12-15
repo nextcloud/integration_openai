@@ -47,7 +47,31 @@ class OpenAiSettingsService {
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
-		'use_basic_auth' => 'boolean'
+		'use_basic_auth' => 'boolean',
+
+		'image_url' => 'string',
+		'image_service_name' => 'string',
+		'image_api_key' => 'string',
+		'image_basic_user' => 'string',
+		'image_basic_password' => 'string',
+		'image_use_basic_auth' => 'boolean',
+		'image_request_timeout' => 'integer',
+
+		'stt_url' => 'string',
+		'stt_service_name' => 'string',
+		'stt_api_key' => 'string',
+		'stt_basic_user' => 'string',
+		'stt_basic_password' => 'string',
+		'stt_use_basic_auth' => 'boolean',
+		'stt_request_timeout' => 'integer',
+
+		'tts_url' => 'string',
+		'tts_service_name' => 'string',
+		'tts_api_key' => 'string',
+		'tts_basic_user' => 'string',
+		'tts_basic_password' => 'string',
+		'tts_use_basic_auth' => 'boolean',
+		'tts_request_timeout' => 'integer',
 	];
 
 	private const USER_CONFIG_TYPES = [
@@ -385,6 +409,153 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getImageUrl(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_url', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getImageServiceName(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_service_name', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminImageApiKey(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_api_key', '', true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminImageBasicUser(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_basic_user', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminImageBasicPassword(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_basic_password', '', true);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getAdminImageUseBasicAuth(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_use_basic_auth', '0', lazy: true) === '1';
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getImageRequestTimeout(): int {
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'image_request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT), lazy: true)) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSttUrl(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'stt_url', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getSttServiceName(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'stt_service_name', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminSttApiKey(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'stt_api_key', '', true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminSttBasicUser(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'stt_basic_user', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminSttBasicPassword(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'stt_basic_password', '', true);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getAdminSttUseBasicAuth(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'stt_use_basic_auth', '0', lazy: true) === '1';
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getSttRequestTimeout(): int {
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'stt_request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT), lazy: true)) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTtsUrl(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'tts_url', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTtsServiceName(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'tts_service_name', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminTtsApiKey(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'tts_api_key', '', true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminTtsBasicUser(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'tts_basic_user', '', lazy: true);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAdminTtsBasicPassword(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'tts_basic_password', '', true);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getAdminTtsUseBasicAuth(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'tts_use_basic_auth', '0', lazy: true) === '1';
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getTtsRequestTimeout(): int {
+		return intval($this->appConfig->getValueString(Application::APP_ID, 'tts_request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT), lazy: true)) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
+	}
+
+	/**
 	 * Get the admin config for the settings page
 	 * @return mixed[]
 	 */
@@ -421,7 +592,31 @@ class OpenAiSettingsService {
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
 			'basic_password' => $this->getAdminBasicPassword(),
-			'use_basic_auth' => $this->getUseBasicAuth()
+			'use_basic_auth' => $this->getUseBasicAuth(),
+			// Get the service details for image, stt and tts
+			'image_url' => $this->getImageUrl(),
+			'image_service_name' => $this->getImageServiceName(),
+			'image_api_key' => $this->getAdminImageApiKey(),
+			'image_basic_user' => $this->getAdminImageBasicUser(),
+			'image_basic_password' => $this->getAdminImageBasicPassword(),
+			'image_use_basic_auth' => $this->getAdminImageUseBasicAuth(),
+			'image_request_timeout' => $this->getImageRequestTimeout(),
+
+			'stt_url' => $this->getSttUrl(),
+			'stt_service_name' => $this->getSttServiceName(),
+			'stt_api_key' => $this->getAdminSttApiKey(),
+			'stt_basic_user' => $this->getAdminSttBasicUser(),
+			'stt_basic_password' => $this->getAdminSttBasicPassword(),
+			'stt_use_basic_auth' => $this->getAdminSttUseBasicAuth(),
+			'stt_request_timeout' => $this->getSttRequestTimeout(),
+
+			'tts_url' => $this->getTtsUrl(),
+			'tts_service_name' => $this->getTtsServiceName(),
+			'tts_api_key' => $this->getAdminTtsApiKey(),
+			'tts_basic_user' => $this->getAdminTtsBasicUser(),
+			'tts_basic_password' => $this->getAdminTtsBasicPassword(),
+			'tts_use_basic_auth' => $this->getAdminTtsUseBasicAuth(),
+			'tts_request_timeout' => $this->getTtsRequestTimeout(),
 		];
 	}
 
@@ -802,6 +997,191 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @param string $url
+	 * @return void
+	 * @throws Exception
+	 */
+	public function setImageUrl(string $url): void {
+		if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
+			throw new Exception('Invalid image service URL');
+		}
+		$this->appConfig->setValueString(Application::APP_ID, 'image_url', $url, lazy: true);
+	}
+
+	/**
+	 * @param string $name
+	 * @return void
+	 */
+	public function setImageServiceName(string $name): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'image_service_name', $name, lazy: true);
+	}
+
+	/**
+	 * @param string $apiKey
+	 * @return void
+	 */
+	public function setAdminImageApiKey(string $apiKey): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'image_api_key', $apiKey, true, true);
+	}
+
+	/**
+	 * @param string $user
+	 * @return void
+	 */
+	public function setAdminImageBasicUser(string $user): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'image_basic_user', $user, lazy: true);
+	}
+
+	/**
+	 * @param string $password
+	 * @return void
+	 */
+	public function setAdminImageBasicPassword(string $password): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'image_basic_password', $password, true, true);
+	}
+
+	/**
+	 * @param bool $use
+	 * @return void
+	 */
+	public function setAdminImageUseBasicAuth(bool $use): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'image_use_basic_auth', $use ? '1' : '0', lazy: true);
+	}
+
+	/**
+	 * @param int $requestTimeout
+	 * @return void
+	 */
+	public function setImageRequestTimeout(int $requestTimeout): void {
+		// Validate input:
+		$requestTimeout = max(1, $requestTimeout);
+		$this->appConfig->setValueString(Application::APP_ID, 'image_request_timeout', strval($requestTimeout), lazy: true);
+	}
+	/**
+	 * @param string $url
+	 * @return void
+	 * @throws Exception
+	 */
+	public function setSttUrl(string $url): void {
+		if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
+			throw new Exception('Invalid STT service URL');
+		}
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_url', $url, lazy: true);
+	}
+
+	/**
+	 * @param string $name
+	 * @return void
+	 */
+	public function setSttServiceName(string $name): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_service_name', $name, lazy: true);
+	}
+
+	/**
+	 * @param string $apiKey
+	 * @return void
+	 */
+	public function setAdminSttApiKey(string $apiKey): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_api_key', $apiKey, true, true);
+	}
+
+	/**
+	 * @param string $user
+	 * @return void
+	 */
+	public function setAdminSttBasicUser(string $user): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_basic_user', $user, lazy: true);
+	}
+
+	/**
+	 * @param string $password
+	 * @return void
+	 */
+	public function setAdminSttBasicPassword(string $password): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_basic_password', $password, true, true);
+	}
+
+	/**
+	 * @param bool $use
+	 * @return void
+	 */
+	public function setAdminSttUseBasicAuth(bool $use): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_use_basic_auth', $use ? '1' : '0', lazy: true);
+	}
+
+	/**
+	 * @param int $requestTimeout
+	 * @return void
+	 */
+	public function setSttRequestTimeout(int $requestTimeout): void {
+		// Validate input:
+		$requestTimeout = max(1, $requestTimeout);
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_request_timeout', strval($requestTimeout), lazy: true);
+	}
+
+	/**
+	 * @param string $url
+	 * @return void
+	 * @throws Exception
+	 */
+	public function setTtsUrl(string $url): void {
+		if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
+			throw new Exception('Invalid TTS service URL');
+		}
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_url', $url, lazy: true);
+	}
+
+	/**
+	 * @param string $name
+	 * @return void
+	 */
+	public function setTtsServiceName(string $name): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_service_name', $name, lazy: true);
+	}
+
+	/**
+	 * @param string $apiKey
+	 * @return void
+	 */
+	public function setAdminTtsApiKey(string $apiKey): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_api_key', $apiKey, true, true);
+	}
+
+	/**
+	 * @param string $user
+	 * @return void
+	 */
+	public function setAdminTtsBasicUser(string $user): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_basic_user', $user, lazy: true);
+	}
+
+	/**
+	 * @param string $password
+	 * @return void
+	 */
+	public function setAdminTtsBasicPassword(string $password): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_basic_password', $password, true, true);
+	}
+
+	/**
+	 * @param bool $use
+	 * @return void
+	 */
+	public function setAdminTtsUseBasicAuth(bool $use): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_use_basic_auth', $use ? '1' : '0', lazy: true);
+	}
+
+	/**
+	 * @param int $requestTimeout
+	 * @return void
+	 */
+	public function setTtsRequestTimeout(int $requestTimeout): void {
+		// Validate input:
+		$requestTimeout = max(1, $requestTimeout);
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_request_timeout', strval($requestTimeout), lazy: true);
+	}
+
+	/**
 	 * Set the admin config for the settings page
 	 * @param mixed[] $adminConfig
 	 * @return void
@@ -909,6 +1289,81 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['tts_voices'])) {
 			$this->setAdminTtsVoices($adminConfig['tts_voices']);
 		}
+
+		if (isset($adminConfig['image_url'])) {
+			if (str_ends_with($adminConfig['image_url'], '/')) {
+				$adminConfig['image_url'] = substr($adminConfig['image_url'], 0, -1) ?: $adminConfig['image_url'];
+			}
+			$this->setImageUrl($adminConfig['image_url']);
+		}
+		if (isset($adminConfig['image_service_name'])) {
+			$this->setImageServiceName($adminConfig['image_service_name']);
+		}
+		if (isset($adminConfig['image_api_key'])) {
+			$this->setAdminImageApiKey($adminConfig['image_api_key']);
+		}
+		if (isset($adminConfig['image_basic_user'])) {
+			$this->setAdminImageBasicUser($adminConfig['image_basic_user']);
+		}
+		if (isset($adminConfig['image_basic_password'])) {
+			$this->setAdminImageBasicPassword($adminConfig['image_basic_password']);
+		}
+		if (isset($adminConfig['image_use_basic_auth'])) {
+			$this->setAdminImageUseBasicAuth($adminConfig['image_use_basic_auth']);
+		}
+		if (isset($adminConfig['image_request_timeout'])) {
+			$this->setImageRequestTimeout($adminConfig['image_request_timeout']);
+		}
+
+		if (isset($adminConfig['stt_url'])) {
+			if (str_ends_with($adminConfig['stt_url'], '/')) {
+				$adminConfig['stt_url'] = substr($adminConfig['stt_url'], 0, -1) ?: $adminConfig['stt_url'];
+			}
+			$this->setSttUrl($adminConfig['stt_url']);
+		}
+		if (isset($adminConfig['stt_service_name'])) {
+			$this->setSttServiceName($adminConfig['stt_service_name']);
+		}
+		if (isset($adminConfig['stt_api_key'])) {
+			$this->setAdminSttApiKey($adminConfig['stt_api_key']);
+		}
+		if (isset($adminConfig['stt_basic_user'])) {
+			$this->setAdminSttBasicUser($adminConfig['stt_basic_user']);
+		}
+		if (isset($adminConfig['stt_basic_password'])) {
+			$this->setAdminSttBasicPassword($adminConfig['stt_basic_password']);
+		}
+		if (isset($adminConfig['stt_use_basic_auth'])) {
+			$this->setAdminSttUseBasicAuth($adminConfig['stt_use_basic_auth']);
+		}
+		if (isset($adminConfig['stt_request_timeout'])) {
+			$this->setSttRequestTimeout($adminConfig['stt_request_timeout']);
+		}
+
+		if (isset($adminConfig['tts_url'])) {
+			if (str_ends_with($adminConfig['tts_url'], '/')) {
+				$adminConfig['tts_url'] = substr($adminConfig['tts_url'], 0, -1) ?: $adminConfig['tts_url'];
+			}
+			$this->setTtsUrl($adminConfig['tts_url']);
+		}
+		if (isset($adminConfig['tts_service_name'])) {
+			$this->setTtsServiceName($adminConfig['tts_service_name']);
+		}
+		if (isset($adminConfig['tts_api_key'])) {
+			$this->setAdminTtsApiKey($adminConfig['tts_api_key']);
+		}
+		if (isset($adminConfig['tts_basic_user'])) {
+			$this->setAdminTtsBasicUser($adminConfig['tts_basic_user']);
+		}
+		if (isset($adminConfig['tts_basic_password'])) {
+			$this->setAdminTtsBasicPassword($adminConfig['tts_basic_password']);
+		}
+		if (isset($adminConfig['tts_use_basic_auth'])) {
+			$this->setAdminTtsUseBasicAuth($adminConfig['tts_use_basic_auth']);
+		}
+		if (isset($adminConfig['tts_request_timeout'])) {
+			$this->setTtsRequestTimeout($adminConfig['tts_request_timeout']);
+		}
 	}
 
 	/**
@@ -1009,5 +1464,26 @@ class OpenAiSettingsService {
 	 */
 	public function setChatEndpointEnabled(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'chat_endpoint_enabled', $enabled ? '1' : '0', lazy: true);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function imageOverrideEnabled(): bool {
+		return !empty($this->getImageUrl());
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function sttOverrideEnabled(): bool {
+		return !empty($this->getSttUrl());
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function ttsOverrideEnabled(): bool {
+		return !empty($this->getTtsUrl());
 	}
 }
