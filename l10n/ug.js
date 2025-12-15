@@ -8,6 +8,7 @@ OC.L10N.register(
     "Text generation" : "تېكىست ئەۋلاد",
     "Image generation" : "رەسىم ھاسىل قىلىش",
     "Audio transcription" : "Audio transcription",
+    "Text to speech" : "تېكىستنى ئاۋازغا ئايلاندۇرۇش",
     "Unknown" : "نامەلۇم",
     "tokens" : "tokens",
     "images" : "سۈرەتلەر",
