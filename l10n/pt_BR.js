@@ -49,6 +49,7 @@ OC.L10N.register(
     "Output voice" : "Voz de saída",
     "The voice used to generate speech" : "A voz usada para gerar a fala",
     "Memories" : "Memórias",
+    "The memories to be injected into the chat session." : "As memórias a serem injetadas na sessão de bate-papo.",
     "Text-to-speech model" : "Modelo de texto-para-fala",
     "The model used to generate the speech" : "O modelo usado para gerar a fala",
     "Speed" : "Velocidade",
