@@ -40,9 +40,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->isUsingOpenAi()
-			? $this->l->t('OpenAI\'s DALL-E 2')
-			: $this->openAiAPIService->getServiceName();
+		return $this->openAiAPIService->getServiceName();
 	}
 
 	public function getTaskTypeId(): string {
