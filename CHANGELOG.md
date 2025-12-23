@@ -8,6 +8,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.1.0 - 2025-12-23
+
+### Added
+- add support for chat memories @marcelklehr [#310](https://github.com/nextcloud/integration_openai/pull/310)
+
+### Fixed
+- fix release archive: include Php dependencies, exclude stylelint and vite config files @julien-nc [#312](https://github.com/nextcloud/integration_openai/pull/312)
+
 ## 4.0.0 - 2025-12-09
 
 ### Added
