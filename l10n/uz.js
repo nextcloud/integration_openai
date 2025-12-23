@@ -12,6 +12,9 @@ OC.L10N.register(
     "Size" : "Size",
     "Authentication" : "Autentifikatsiya",
     "API key" : "API kaliti",
+    "Who?" : "Kim?",
+    "No recommendations. Start typing." : "Tavsiyalar yo'q. Yozishni boshlang.",
+    "No result." : "Natija yo'q.",
     "Category" : "Kategoriya",
     "Save" : "Saqlash",
     "Delete" : "O'chirish"
