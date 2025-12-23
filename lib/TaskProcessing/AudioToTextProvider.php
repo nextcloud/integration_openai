@@ -38,7 +38,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->openAiAPIService->getServiceName('stt');
 	}
 
 	public function getTaskTypeId(): string {
