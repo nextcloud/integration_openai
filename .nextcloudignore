@@ -33,7 +33,8 @@
 /psalm.xml
 /pyproject.toml
 /renovate.json
-/stylelint.config.js
+/stylelint.config.*
+/vite.config.*
 /webpack.config.js
 /webpack.js
 tests
