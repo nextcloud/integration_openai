@@ -31,6 +31,12 @@ class Admin implements ISettings {
 		$adminConfig = $this->openAiSettingsService->getAdminConfig();
 		$adminConfig['api_key'] = $adminConfig['api_key'] === '' ? '' : 'dummyApiKey';
 		$adminConfig['basic_password'] = $adminConfig['basic_password'] === '' ? '' : 'dummyPassword';
+		$adminConfig['image_api_key'] = $adminConfig['image_api_key'] === '' ? '' : 'dummyApiKey';
+		$adminConfig['image_basic_password'] = $adminConfig['image_basic_password'] === '' ? '' : 'dummyPassword';
+		$adminConfig['stt_api_key'] = $adminConfig['stt_api_key'] === '' ? '' : 'dummyApiKey';
+		$adminConfig['stt_basic_password'] = $adminConfig['stt_basic_password'] === '' ? '' : 'dummyPassword';
+		$adminConfig['tts_api_key'] = $adminConfig['tts_api_key'] === '' ? '' : 'dummyApiKey';
+		$adminConfig['tts_basic_password'] = $adminConfig['tts_basic_password'] === '' ? '' : 'dummyPassword';
 		$isAssistantEnabled = $this->appManager->isEnabledForUser('assistant');
 		$adminConfig['assistant_enabled'] = $isAssistantEnabled;
 		$adminConfig['quota_start_date'] = $this->openAiSettingsService->getQuotaStart();
