@@ -895,81 +895,83 @@ export default {
 				console.error(error)
 			})
 		},
-		getAllModels(shouldSave = true) {
-			this.getModels(shouldSave) // for text
-			this.getModels(shouldSave, 'image', 'imageModels')
-			this.getModels(shouldSave, 'stt', 'sttModels')
-			this.getModels(shouldSave, 'tts', 'ttsModels')
+		async getAllModels(shouldSave = true) {
+			const models = this.getModels() // for text
+			console.error(this.models)
+			const [imageModels, sttModels, ttsModels] = await Promise.all([
+				this.state.image_url === '' ? models : this.getModels('image'),
+				this.state.stt_url === '' ? models : this.getModels('stt'),
+				this.state.tts_url === '' ? models : this.getModels('tts'),
+			])
+			this.models = await models
+			this.imageModels = imageModels
+			this.sttModels = sttModels
+			this.ttsModels = ttsModels
+
+			const defaultCompletionModelId = this.state.default_completion_model_id
+			const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
+					|| this.models.find(m => m.id === 'gpt-4.1-mini')
+					|| this.models[1]
+					|| this.models[0]
+
+			const defaultImageModelId = this.state.default_image_model_id
+			const imageModelToSelect = this.imageModels.find(m => m.id === defaultImageModelId)
+					|| this.imageModels.find(m => m.id === 'dall-e-2')
+					|| this.imageModels[1]
+					|| this.imageModels[0]
+
+			const defaultSttModelId = this.state.default_stt_model_id
+			const sttModelToSelect = this.sttModels.find(m => m.id === defaultSttModelId)
+					|| this.sttModels.find(m => m.id.match(/whisper/i))
+					|| this.sttModels[1]
+					|| this.sttModels[0]
+
+			const defaultTtsModelId = this.state.default_tts_model_id
+			const ttsModelToSelect = this.ttsModels.find(m => m.id === defaultTtsModelId)
+					|| this.ttsModels.find(m => m.id.match(/tts/i))
+					|| this.ttsModels[1]
+					|| this.ttsModels[0]
+
+			this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
+			this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
+			this.selectedModel.stt = this.modelToNcSelectObject(sttModelToSelect)
+			this.selectedModel.tts = this.modelToNcSelectObject(ttsModelToSelect)
+
+			// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
+			if (shouldSave
+					|| this.state.default_completion_model_id !== this.selectedModel.text.id
+					|| this.state.default_image_model_id !== this.selectedModel.image.id) {
+				this.saveOptions({
+					default_completion_model_id: this.selectedModel.text.id,
+					default_image_model_id: this.selectedModel.image.id,
+					default_stt_model_id: this.selectedModel.stt.id,
+					default_tts_model_id: this.selectedModel.tts.id,
+				}, false)
+			}
+
+			this.state.default_completion_model_id = completionModelToSelect.id
+			this.state.default_image_model_id = imageModelToSelect.id
+			this.state.default_stt_model_id = sttModelToSelect.id
+			this.state.default_tts_model_id = ttsModelToSelect.id
 		},
-		getModels(shouldSave = true, serviceType = '', modelListName = 'models') {
-			this[modelListName] = null
-			if (!this.configured) {
-				return
-			}
-			// Check if the override is configured
-			if (modelListName !== 'models' && this.state[`${serviceType}_url`] === '') {
-				this[modelListName] = this.models
-				return this.models
-			}
+		getModels(serviceType = '') {
 			const url = generateUrl('/apps/integration_openai/models')
 			return axios.get(url, {
 				params: { serviceType },
-			})
-				.then((response) => {
-					this[modelListName] = response.data?.data ?? []
-					if (this.isUsingOpenAI && modelListName === 'models') {
-						this[modelListName].unshift(DEFAULT_MODEL_ITEM)
-					}
-					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
-					const completionModelToSelect = this[modelListName].find(m => m.id === defaultCompletionModelId)
-						|| this[modelListName].find(m => m.id === 'gpt-4.1-mini')
-						|| this[modelListName][1]
-						|| this[modelListName][0]
-
-					const defaultImageModelId = this.state.default_image_model_id || response.data?.default_image_model_id
-					const imageModelToSelect = this[modelListName].find(m => m.id === defaultImageModelId)
-						|| this[modelListName].find(m => m.id === 'dall-e-2')
-						|| this[modelListName][1]
-						|| this[modelListName][0]
-
-					const defaultSttModelId = this.state.default_stt_model_id || response.data?.default_stt_model_id
-					const sttModelToSelect = this[modelListName].find(m => m.id === defaultSttModelId)
-						|| this[modelListName].find(m => m.id.match(/whisper/i))
-						|| this[modelListName][1]
-						|| this[modelListName][0]
-
-					const defaultTtsModelId = this.state.default_tts_model_id || response.data?.default_tts_model_id
-					const ttsModelToSelect = this[modelListName].find(m => m.id === defaultTtsModelId)
-						|| this[modelListName].find(m => m.id.match(/tts/i))
-						|| this[modelListName][1]
-						|| this[modelListName][0]
-
-					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
-					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
-					this.selectedModel.stt = this.modelToNcSelectObject(sttModelToSelect)
-					this.selectedModel.tts = this.modelToNcSelectObject(ttsModelToSelect)
-
-					// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
-					if (shouldSave
-						|| this.state.default_completion_model_id !== this.selectedModel.text.id
-						|| this.state.default_image_model_id !== this.selectedModel.image.id) {
-						this.saveOptions({
-							default_completion_model_id: this.selectedModel.text.id,
-							default_image_model_id: this.selectedModel.image.id,
-						}, false)
-					}
-
-					this.state.default_completion_model_id = completionModelToSelect.id
-					this.state.default_image_model_id = imageModelToSelect.id
-				})
-				.catch((error) => {
-					showError(
-						t('integration_openai', 'Failed to load models')
+			}).then((response) => {
+				const result = response.data?.data ?? []
+				if (this.isUsingOpenAI) {
+					result.unshift(DEFAULT_MODEL_ITEM)
+				}
+				return result
+			}).catch((error) => {
+				showError(
+					t('integration_openai', 'Failed to load models')
 						+ ': ' + this.reduceStars(error.response?.data?.error),
-						{ timeout: 10000 },
-					)
-					console.error(error)
-				})
+					{ timeout: 10000 },
+				)
+				console.error(error)
+			})
 		},
 		onModelSelected(type, selected) {
 			console.debug(`Selected model: ${type}: ${selected}`)
