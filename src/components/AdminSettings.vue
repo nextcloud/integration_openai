@@ -17,18 +17,6 @@
 					</a>
 				</NcNoteCard>
 				<NcNoteCard type="info">
-					{{ t('integration_openai', 'OpenAI integration will use the default url for all types of generations that OpenAI supports, but the url and authentication can be overridden for specific tasks such as image generation, text to speech, and speech to text. ') }}
-				</NcNoteCard>
-				<div class="line">
-					<NcSelect
-						:model-value="serviceContext"
-						:options="serviceContextOptions"
-						:input-label="t('integration_openai', 'Configuration context')"
-						style="width: 350px;"
-						input-id="service-context-select"
-						@update:model-value="serviceContext=$event" />
-				</div>
-				<NcNoteCard type="info">
 					{{ t('integration_openai', 'Services with an OpenAI-compatible API:') }}
 					<div class="services">
 						<a class="external" href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>
@@ -43,19 +31,19 @@
 				<div class="line">
 					<NcTextField
 						id="openai-url"
-						v-model="currentUrl"
+						v-model="state.url"
 						class="input"
 						:label="t('integration_openai', 'Service URL')"
 						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080/v1' })"
-						:show-trailing-button="!!currentUrl"
+						:show-trailing-button="!!state.url"
 						@update:model-value="onSensitiveInput(true)"
-						@trailing-button-click="currentUrl = '' ; onSensitiveInput(true)">
+						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
 						<template #icon>
 							<EarthIcon :size="20" />
 						</template>
 					</NcTextField>
 					<NcButton variant="tertiary"
-						:title="t('integration_openai', 'Leave empty to use {openaiApiUrl}', { openaiApiUrl: defaultServiceUrl })">
+						:title="t('integration_openai', 'Leave empty to use {openaiApiUrl}', { openaiApiUrl: 'https://api.openai.com/v1' })">
 						<template #icon>
 							<HelpCircleOutlineIcon />
 						</template>
@@ -74,13 +62,13 @@
 				<div v-if="state.url !== ''" class="line">
 					<NcTextField
 						id="openai-service-name"
-						v-model="currentServiceName"
+						v-model="state.service_name"
 						class="input"
 						:label="t('integration_openai', 'Service name (optional)')"
 						:placeholder="t('integration_openai', 'Example: LocalAI of university ABC')"
-						:show-trailing-button="!!currentServiceName"
+						:show-trailing-button="!!state.service_name"
 						@update:model-value="onInput()"
-						@trailing-button-click="currentServiceName = '' ; onInput()" />
+						@trailing-button-click="state.service_name = '' ; onInput()" />
 					<NcButton variant="tertiary"
 						:title="t('integration_openai', 'This name will be displayed as provider name in the AI admin settings')">
 						<template #icon>
@@ -91,14 +79,14 @@
 				<div class="line">
 					<NcInputField
 						id="openai-api-timeout"
-						v-model="currentRequestTimeout"
+						v-model="state.request_timeout"
 						class="input"
 						type="number"
 						:label="t('integration_openai', 'Request timeout (seconds)')"
 						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
-						:show-trailing-button="!!currentRequestTimeout"
+						:show-trailing-button="!!state.request_timeout"
 						@update:model-value="onInput()"
-						@trailing-button-click="currentRequestTimeout = '' ; onInput()">
+						@trailing-button-click="state.request_timeout = '' ; onInput()">
 						<template #icon>
 							<TimerAlertOutlineIcon :size="20" />
 						</template>
@@ -118,66 +106,66 @@
 				<h2>
 					{{ t('integration_openai', 'Authentication') }}
 				</h2>
-				<div v-show="currentUrl !== ''" class="line column">
+				<div v-show="state.url !== ''" class="line column">
 					<label>
 						{{ t('integration_openai', 'Authentication method') }}
 					</label>
 					<div class="radios">
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:model-value="!currentUseBasicAuth"
+							:model-value="!state.use_basic_auth"
 							type="radio"
 							button-variant-grouped="horizontal"
 							name="auth_method"
-							@update:model-value="onCurrentUseBasicAuthChanged(false)">
+							@update:model-value="onCheckboxChanged(false, 'use_basic_auth')">
 							{{ t('assistant', 'API key') }}
 						</NcCheckboxRadioSwitch>
 						<NcCheckboxRadioSwitch
 							:button-variant="true"
-							:model-value="currentUseBasicAuth"
+							:model-value="state.use_basic_auth"
 							type="radio"
 							button-variant-grouped="horizontal"
 							name="auth_method"
-							@update:model-value="onCurrentUseBasicAuthChanged(true)">
+							@update:model-value="onCheckboxChanged(true, 'use_basic_auth')">
 							{{ t('assistant', 'Basic Authentication') }}
 						</NcCheckboxRadioSwitch>
 					</div>
 				</div>
-				<div v-show="currentUrl === '' || !state.currentUseBasicAuth" class="line">
+				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
 					<NcTextField
 						id="openai-api-key"
-						v-model="currentApiKey"
+						v-model="state.api_key"
 						class="input"
 						type="password"
 						:readonly="readonly"
 						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
-						:show-trailing-button="!!currentApiKey"
+						:show-trailing-button="!!state.api_key"
 						@update:model-value="onSensitiveInput(true)"
-						@trailing-button-click="currentApiKey = '' ; onSensitiveInput(true)"
+						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
 						@focus="readonly = false">
 						<template #icon>
 							<KeyOutlineIcon :size="20" />
 						</template>
 					</NcTextField>
 				</div>
-				<NcNoteCard v-show="currentUrl === ''" type="info">
+				<NcNoteCard v-show="state.url === ''" type="info">
 					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings') }}:
 					&nbsp;
 					<a :href="apiKeyUrl" target="_blank" class="external">
 						{{ apiKeyUrl }}
 					</a>
 				</NcNoteCard>
-				<div v-show="currentUrl !== '' && currentUseBasicAuth">
+				<div v-show="state.url !== '' && state.use_basic_auth">
 					<div class="line">
 						<NcTextField
 							id="openai-basic-user"
-							v-model="currentBasicUser"
+							v-model="state.basic_user"
 							class="input"
 							:readonly="readonly"
 							:label="t('integration_openai', 'Basic Auth user')"
-							:show-trailing-button="!!currentBasicUser"
+							:show-trailing-button="!!state.basic_user"
 							@update:model-value="onSensitiveInput(true)"
-							@trailing-button-click="currentBasicUser = '' ; onSensitiveInput(true)"
+							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)"
 							@focus="readonly = false">
 							<template #icon>
 								<AccountOutlineIcon :size="20" />
@@ -187,14 +175,14 @@
 					<div class="line">
 						<NcTextField
 							id="openai-basic-password"
-							v-model="currentBasicPassword"
+							v-model="state.basic_password"
 							class="input"
 							type="password"
 							:readonly="readonly"
 							:label="t('integration_openai', 'Basic Auth password')"
-							:show-trailing-button="!!currentBasicPassword"
+							:show-trailing-button="!!state.basic_password"
 							@update:model-value="onSensitiveInput(true)"
-							@trailing-button-click="currentBasicPassword = '' ; onSensitiveInput(true)"
+							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)"
 							@focus="readonly = false">
 							<template #icon>
 								<KeyOutlineIcon :size="20" />
@@ -343,6 +331,16 @@
 				<h2>
 					{{ t('integration_openai', 'Image generation') }}
 				</h2>
+				<ServiceOverridePanel
+					context-prefix="image"
+					:state="state"
+					:readonly="readonly"
+					:ai-task="t('integration_openai', 'image generation')"
+					:default-url="modelEndpointUrl"
+					@focus="readonly = false"
+					@input="handleOverrideInput"
+					@sensitive-input="handleOverrideSensitiveInput"
+					@checkbox-changed="onCheckboxChanged" />
 				<div v-if="imageModels"
 					class="line line-select">
 					<NcSelect
@@ -406,6 +404,16 @@
 				<h2>
 					{{ t('integration_openai', 'Audio transcription') }}
 				</h2>
+				<ServiceOverridePanel
+					context-prefix="stt"
+					:state="state"
+					:readonly="readonly"
+					:ai-task="t('integration_openai', 'audio transcription')"
+					:default-url="modelEndpointUrl"
+					@focus="readonly = false"
+					@input="handleOverrideInput"
+					@sensitive-input="handleOverrideSensitiveInput"
+					@checkbox-changed="onCheckboxChanged" />
 				<div v-if="sttModels"
 					class="line line-select">
 					<NcSelect
@@ -445,6 +453,16 @@
 			<h2>
 				{{ t('integration_openai', 'Text to speech') }}
 			</h2>
+			<ServiceOverridePanel
+				context-prefix="tts"
+				:state="state"
+				:readonly="readonly"
+				:ai-task="t('integration_openai', 'text to speech')"
+				:default-url="modelEndpointUrl"
+				@focus="readonly = false"
+				@input="handleOverrideInput"
+				@sensitive-input="handleOverrideSensitiveInput"
+				@checkbox-changed="onCheckboxChanged" />
 			<div v-if="ttsModels"
 				class="line line-select">
 				<NcSelect
@@ -623,11 +641,16 @@
 		</div>
 	</div>
 </template>
+
 <script>
+import AccountOutlineIcon from 'vue-material-design-icons/AccountOutline.vue'
 import CloseIcon from 'vue-material-design-icons/Close.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
+import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
+import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
 import QuotaRules from './Rules/QuotaRules.vue'
+
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -645,6 +668,7 @@ import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import QuotaPeriodPicker from './QuotaPeriodPicker.vue'
+import ServiceOverridePanel from './ServiceOverridePanel.vue'
 
 const DEFAULT_MODEL_ITEM = { id: 'Default' }
 
@@ -653,10 +677,14 @@ export default {
 
 	components: {
 		QuotaPeriodPicker,
+		ServiceOverridePanel,
 		OpenAiIcon,
+		AccountOutlineIcon,
 		CloseIcon,
 		EarthIcon,
 		HelpCircleOutlineIcon,
+		KeyOutlineIcon,
+		TimerAlertOutlineIcon,
 		NcButton,
 		NcSelect,
 		NcCheckboxRadioSwitch,
@@ -673,7 +701,6 @@ export default {
 			state,
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
-			serviceContext: { id: 'default', label: t('integration_openai', 'Default') },
 			models: null,
 			imageModels: null,
 			sttModels: null,
@@ -699,131 +726,6 @@ export default {
 	},
 
 	computed: {
-		serviceContextOptions() {
-			return [
-				{ id: 'default', label: t('integration_openai', 'Default') },
-				{ id: 'image', label: t('integration_openai', 'Override for Image Generation') },
-				{ id: 'stt', label: t('integration_openai', 'Override for Audio Transcription') },
-				{ id: 'tts', label: t('integration_openai', 'Override for Text to Speech') },
-			]
-		},
-		defaultServiceUrl() {
-			if (this.state.url === '' || this.serviceContext === 'default') {
-				return 'https://api.openai.com/v1'
-			}
-			return this.state.url
-		},
-		currentUrl: {
-			get() {
-				switch (this.serviceContext.id) {
-				case 'image': return this.state.image_url
-				case 'stt': return this.state.stt_url
-				case 'tts': return this.state.tts_url
-				default: return this.state.url
-				}
-			},
-			set(value) {
-				switch (this.serviceContext.id) {
-				case 'image': this.state.image_url = value; break
-				case 'stt': this.state.stt_url = value; break
-				case 'tts': this.state.tts_url = value; break
-				default: this.state.url = value; break
-				}
-				this.onSensitiveInput(true)
-			},
-		},
-		currentServiceName: {
-			get() {
-				switch (this.serviceContext.id) {
-				case 'image': return this.state.image_service_name
-				case 'stt': return this.state.stt_service_name
-				case 'tts': return this.state.tts_service_name
-				default: return this.state.service_name
-				}
-			},
-			set(value) {
-				switch (this.serviceContext.id) {
-				case 'image': this.state.image_service_name = value; break
-				case 'stt': this.state.stt_service_name = value; break
-				case 'tts': this.state.tts_service_name = value; break
-				default: this.state.service_name = value; break
-				}
-				this.onInput()
-			},
-		},
-		currentUseBasicAuth() {
-			switch (this.serviceContext.id) {
-			case 'image': return this.state.image_use_basic_auth
-			case 'stt': return this.state.stt_use_basic_auth
-			case 'tts': return this.state.tts_use_basic_auth
-			default: return this.state.use_basic_auth
-			}
-		},
-		currentApiKey: {
-			get() {
-				switch (this.serviceContext.id) {
-				case 'image': return this.state.image_api_key
-				case 'stt': return this.state.stt_api_key
-				case 'tts': return this.state.tts_api_key
-				default: return this.state.api_key
-				}
-			},
-			set(value) {
-				switch (this.serviceContext.id) {
-				case 'image': this.state.image_api_key = value; break
-				case 'stt': this.state.stt_api_key = value; break
-				case 'tts': this.state.tts_api_key = value; break
-				default: this.state.api_key = value; break
-				}
-				this.onSensitiveInput(true)
-			},
-		},
-		currentBasicUser: {
-			get() {
-				switch (this.serviceContext.id) {
-				case 'image': return this.state.image_basic_user
-				case 'stt': return this.state.stt_basic_user
-				case 'tts': return this.state.tts_basic_user
-				default: return this.state.basic_user
-				}
-			},
-			set(value) {
-				switch (this.serviceContext.id) {
-				case 'image': this.state.image_basic_user = value; break
-				case 'stt': this.state.stt_basic_user = value; break
-				case 'tts': this.state.tts_basic_user = value; break
-				default: this.state.basic_user = value; break
-				}
-				this.onSensitiveInput(true)
-			},
-		},
-		currentRequestTimeout: {
-			get() {
-				switch (this.serviceContext.id) {
-				case 'image': return this.state.image_request_timeout
-				case 'stt': return this.state.stt_request_timeout
-				case 'tts': return this.state.tts_request_timeout
-				default: return this.state.request_timeout
-				}
-			},
-			set(value) {
-				switch (this.serviceContext.id) {
-				case 'image': this.state.image_request_timeout = value; break
-				case 'stt': this.state.stt_request_timeout = value; break
-				case 'tts': this.state.tts_request_timeout = value; break
-				default: this.state.request_timeout = value; break
-				}
-				this.onSensitiveInput(true)
-			},
-		},
-		currentBasicPassword() {
-			switch (this.serviceContext.id) {
-			case 'image': return this.state.image_basic_password
-			case 'stt': return this.state.stt_basic_password
-			case 'tts': return this.state.tts_basic_password
-			default: return this.state.basic_password
-			}
-		},
 		quotaTypes() {
 			return (this.quotaInfo ?? []).map((q, idx) => ({ id: idx, label: q.type }))
 		},
@@ -835,12 +737,10 @@ export default {
 			})
 		},
 		modelEndpointUrl() {
-			let url = this.defaultServiceUrl
-			if (this.currentUrl !== '') {
-				url = this.currentUrl
+			if (this.state.url === '') {
+				return 'https://api.openai.com/v1/models'
 			}
-			console.info(`URL IS ${url}`)
-			return url.replace(/\/*$/, '/models')
+			return this.state.url.replace(/\/*$/, '/models')
 		},
 		isUsingOpenAI() {
 			return this.state.url === ''
@@ -1027,23 +927,13 @@ export default {
 		capitalizedWord(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)
 		},
-		onCurrentUseBasicAuthChanged(value) {
-			let key
-			switch (this.serviceContext.id) {
-			case 'image':
-				key = 'image_use_basic_auth'
-				break
-			case 'stt':
-				key = 'stt_use_basic_auth'
-				break
-			case 'tts':
-				key = 'tts_use_basic_auth'
-				break
-			default:
-				key = 'use_basic_auth'
-				break
-			}
-			this.onCheckboxChanged(value, key)
+		handleOverrideInput(values) {
+			Object.assign(this.state, values)
+			this.onInput()
+		},
+		handleOverrideSensitiveInput(values, getModels = true) {
+			Object.assign(this.state, values)
+			this.onSensitiveInput(getModels)
 		},
 		async onCheckboxChanged(newValue, key, getModels = true, sensitive = false) {
 			this.state[key] = newValue
@@ -1070,26 +960,17 @@ export default {
 			if (this.state.image_api_key !== 'dummyApiKey') {
 				values.image_api_key = (this.state.image_api_key ?? '').trim()
 			}
-			if (this.state.image_basic_user) {
-				values.image_basic_user = (this.state.image_basic_user ?? '').trim()
-			}
 			if (this.state.image_basic_password !== 'dummyPassword') {
 				values.image_basic_password = (this.state.image_basic_password ?? '').trim()
 			}
 			if (this.state.stt_api_key !== 'dummyApiKey') {
 				values.stt_api_key = (this.state.stt_api_key ?? '').trim()
 			}
-			if (this.state.stt_basic_user) {
-				values.stt_basic_user = (this.state.stt_basic_user ?? '').trim()
-			}
 			if (this.state.stt_basic_password !== 'dummyPassword') {
 				values.stt_basic_password = (this.state.stt_basic_password ?? '').trim()
 			}
 			if (this.state.tts_api_key !== 'dummyApiKey') {
 				values.tts_api_key = (this.state.tts_api_key ?? '').trim()
-			}
-			if (this.state.tts_basic_user) {
-				values.tts_basic_user = (this.state.tts_basic_user ?? '').trim()
 			}
 			if (this.state.tts_basic_password !== 'dummyPassword') {
 				values.tts_basic_password = (this.state.tts_basic_password ?? '').trim()
@@ -1234,7 +1115,7 @@ export default {
 		> input, .input {
 			width: 350px;
 			margin-top: 0;
-		}fu
+		}
 		> input:invalid {
 			border-color: var(--color-error);
 		}
