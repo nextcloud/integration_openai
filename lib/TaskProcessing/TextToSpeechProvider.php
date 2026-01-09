@@ -38,7 +38,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName('stt');
+		return $this->openAiAPIService->getServiceName(Application::SERVICE_TYPE_TTS);
 	}
 
 	public function getTaskTypeId(): string {
@@ -75,7 +75,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 			),
 			'speed' => new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->openAiAPIService->isUsingOpenAi('stt')
+				$this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)
 					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
@@ -87,7 +87,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
 		return [
 			'voice' => array_map(function ($v) { return new ShapeEnumValue($v, $v); }, $voices),
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId, 'tts'),
+			'model' => $this->openAiAPIService->getModelEnumValues($this->userId, Application::SERVICE_TYPE_TTS),
 		];
 	}
 
@@ -141,7 +141,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		$speed = 1;
 		if (isset($input['speed']) && is_numeric($input['speed'])) {
 			$speed = $input['speed'];
-			if ($this->openAiAPIService->isUsingOpenAi('stt')) {
+			if ($this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)) {
 				if ($speed > 4) {
 					$speed = 4;
 				} elseif ($speed < 0.25) {
