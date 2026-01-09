@@ -71,11 +71,11 @@ class OpenAiAPIService {
 	 */
 	public function isUsingOpenAi(?string $serviceType = null): bool {
 		$serviceUrl = '';
-		if ($serviceType === 'image') {
+		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
 			$serviceUrl = $this->openAiSettingsService->getImageUrl();
-		} elseif ($serviceType === 'stt') {
+		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
 			$serviceUrl = $this->openAiSettingsService->getSttUrl();
-		} elseif ($serviceType === 'tts') {
+		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
 			$serviceUrl = $this->openAiSettingsService->getTtsUrl();
 		}
 		if ($serviceUrl === '') {
@@ -91,20 +91,20 @@ class OpenAiAPIService {
 	 */
 	public function getServiceName(?string $serviceType = null): string {
 		if ($this->isUsingOpenAi($serviceType)) {
-			if ($serviceType === 'image') {
+			if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
 				return $this->l10n->t('OpenAI\'s DALL-E 2');
 			}
-			if ($serviceType === 'tts') {
+			if ($serviceType === Application::SERVICE_TYPE_TTS) {
 				$this->l10n->t('OpenAI\'s Text to Speech');
 			}
 			return 'OpenAI';
 		} else {
 			$serviceName = $this->openAiSettingsService->getServiceName();
-			if ($serviceType === 'image' && $this->openAiSettingsService->imageOverrideEnabled()) {
+			if ($serviceType === Application::SERVICE_TYPE_IMAGE && $this->openAiSettingsService->imageOverrideEnabled()) {
 				$serviceName = $this->openAiSettingsService->getImageServiceName();
-			} elseif ($serviceType === 'stt' && $this->openAiSettingsService->sttOverrideEnabled()) {
+			} elseif ($serviceType === Application::SERVICE_TYPE_STT && $this->openAiSettingsService->sttOverrideEnabled()) {
 				$serviceName = $this->openAiSettingsService->getSttServiceName();
-			} elseif ($serviceType === 'tts' && $this->openAiSettingsService->ttsOverrideEnabled()) {
+			} elseif ($serviceType === Application::SERVICE_TYPE_TTS && $this->openAiSettingsService->ttsOverrideEnabled()) {
 				$serviceName = $this->openAiSettingsService->getTtsServiceName();
 			}
 			if ($serviceName === '') {
@@ -672,7 +672,8 @@ class OpenAiAPIService {
 
 		foreach ($response['choices'] as $choice) {
 			// get tool calls only if this is the finish reason and it's defined and it's an array
-			if ($choice['finish_reason'] === 'tool_calls'
+			if (
+				$choice['finish_reason'] === 'tool_calls'
 				&& isset($choice['message']['tool_calls'])
 				&& is_array($choice['message']['tool_calls'])
 			) {
@@ -807,7 +808,7 @@ class OpenAiAPIService {
 		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
 		$contentType = 'multipart/form-data';
 
-		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType, serviceType: 'stt');
+		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType, serviceType: Application::SERVICE_TYPE_STT);
 
 		if (!isset($response['text'])) {
 			$this->logger->warning('Audio transcription error: ' . json_encode($response));
@@ -837,7 +838,11 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function requestImageCreation(
-		?string $userId, string $prompt, string $model, int $n = 1, string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE,
+		?string $userId,
+		string $prompt,
+		string $model,
+		int $n = 1,
+		string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -850,12 +855,11 @@ class OpenAiAPIService {
 			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
 		];
 
-		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST', serviceType: 'image');
+		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST', serviceType: Application::SERVICE_TYPE_IMAGE);
 
 		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
 			$this->logger->warning('OpenAI image generation error', ['api_response' => $apiResponse]);
 			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-
 		} else {
 			try {
 				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
@@ -905,7 +909,11 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function requestSpeechCreation(
-		?string $userId, string $prompt, string $model, string $voice, float $speed = 1,
+		?string $userId,
+		string $prompt,
+		string $model,
+		string $voice,
+		float $speed = 1,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH)) {
 			throw new Exception($this->l10n->t('Speech generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -919,7 +927,7 @@ class OpenAiAPIService {
 			'speed' => $speed,
 		];
 
-		$apiResponse = $this->request($userId, 'audio/speech', $params, 'POST', serviceType: 'tts');
+		$apiResponse = $this->request($userId, 'audio/speech', $params, 'POST', serviceType: Application::SERVICE_TYPE_TTS);
 
 		try {
 			$charCount = mb_strlen($prompt);
@@ -958,7 +966,7 @@ class OpenAiAPIService {
 	 * @return int
 	 */
 	public function getExpImgProcessingTime(): int {
-		return $this->isUsingOpenAi('image')
+		return $this->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)
 			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME), lazy: true))
 			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME), lazy: true));
 	}
@@ -971,7 +979,7 @@ class OpenAiAPIService {
 		$oldTime = floatval($this->getExpImgProcessingTime());
 		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
-		if ($this->isUsingOpenAi('image')) {
+		if ($this->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)) {
 			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)), lazy: true);
 		} else {
 			$this->appConfig->setValueString(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)), lazy: true);
@@ -999,21 +1007,21 @@ class OpenAiAPIService {
 			$useBasicAuth = false;
 			$timeout = 0;
 
-			if ($serviceType === 'image') {
+			if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
 				$serviceUrl = $this->openAiSettingsService->getImageUrl();
 				$apiKey = $this->openAiSettingsService->getAdminImageApiKey();
 				$basicUser = $this->openAiSettingsService->getAdminImageBasicUser();
 				$basicPassword = $this->openAiSettingsService->getAdminImageBasicPassword();
 				$useBasicAuth = $this->openAiSettingsService->getAdminImageUseBasicAuth();
 				$timeout = $this->openAiSettingsService->getImageRequestTimeout();
-			} elseif ($serviceType === 'stt') {
+			} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
 				$serviceUrl = $this->openAiSettingsService->getSttUrl();
 				$apiKey = $this->openAiSettingsService->getAdminSttApiKey();
 				$basicUser = $this->openAiSettingsService->getAdminSttBasicUser();
 				$basicPassword = $this->openAiSettingsService->getAdminSttBasicPassword();
 				$useBasicAuth = $this->openAiSettingsService->getAdminSttUseBasicAuth();
 				$timeout = $this->openAiSettingsService->getSttRequestTimeout();
-			} elseif ($serviceType === 'tts') {
+			} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
 				$serviceUrl = $this->openAiSettingsService->getTtsUrl();
 				$apiKey = $this->openAiSettingsService->getAdminTtsApiKey();
 				$basicUser = $this->openAiSettingsService->getAdminTtsBasicUser();
@@ -1133,12 +1141,12 @@ class OpenAiAPIService {
 			throw new Exception(
 				$this->l10n->t('API request error: ') . (
 					$e->getResponse()->getStatusCode() === 401
-						? $this->l10n->t('Invalid API Key/Basic Auth: ')
-						: ''
+					? $this->l10n->t('Invalid API Key/Basic Auth: ')
+					: ''
 				) . (
 					isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])
-						? $parsedResponseBody['error']['message']
-						: $e->getMessage()
+					? $parsedResponseBody['error']['message']
+					: $e->getMessage()
 				),
 				intval($e->getCode()),
 			);
@@ -1159,7 +1167,7 @@ class OpenAiAPIService {
 				'prompt' => 'a',
 				'model' => 'invalid-model',
 			];
-			$this->request(null, 'images/generations', $params, 'POST', logErrors: false, serviceType: 'image');
+			$this->request(null, 'images/generations', $params, 'POST', logErrors: false, serviceType: Application::SERVICE_TYPE_IMAGE);
 		} catch (Exception $e) {
 			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
 		}
@@ -1180,7 +1188,7 @@ class OpenAiAPIService {
 				'model' => 'invalid-model',
 				'file' => 'a',
 			];
-			$this->request(null, 'audio/translations', $params, 'POST', 'multipart/form-data', logErrors: false, serviceType: 'stt');
+			$this->request(null, 'audio/translations', $params, 'POST', 'multipart/form-data', logErrors: false, serviceType: Application::SERVICE_TYPE_STT);
 		} catch (Exception $e) {
 			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
 		}
@@ -1204,7 +1212,7 @@ class OpenAiAPIService {
 				'response_format' => 'mp3',
 			];
 
-			$this->request(null, 'audio/speech', $params, 'POST', logErrors: false, serviceType: 'tts');
+			$this->request(null, 'audio/speech', $params, 'POST', logErrors: false, serviceType: Application::SERVICE_TYPE_TTS);
 		} catch (Exception $e) {
 			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
 		}

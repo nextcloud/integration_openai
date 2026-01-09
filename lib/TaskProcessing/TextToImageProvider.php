@@ -40,7 +40,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName('image');
+		return $this->openAiAPIService->getServiceName(Application::SERVICE_TYPE_IMAGE);
 	}
 
 	public function getTaskTypeId(): string {
@@ -79,12 +79,12 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 
 	public function getOptionalInputShapeEnumValues(): array {
 		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId, serviceType: 'image'),
+			'model' => $this->openAiAPIService->getModelEnumValues($this->userId, serviceType: Application::SERVICE_TYPE_IMAGE),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi('image')
+		$adminModel = $this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', lazy: true);
 		return [
