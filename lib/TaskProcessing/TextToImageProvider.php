@@ -16,11 +16,12 @@ use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToImage;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class TextToImageProvider implements ISynchronousWatermarkingProvider {
 
@@ -110,7 +111,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new ProcessingException('Invalid prompt');
 		}
 		$prompt = $input['input'];
 
@@ -118,10 +119,20 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 		if (isset($input['numberOfImages']) && is_int($input['numberOfImages'])) {
 			$nbImages = $input['numberOfImages'];
 		}
+		if ($nbImages > 12) {
+			throw new UserFacingProcessingException('numberOfImages is out of bounds', userFacingMessage: $this->l->t('Cannot generate more than 12 images at once'));
+		}
+		if ($nbImages < 1) {
+			throw new UserFacingProcessingException('numberOfImages is out of bounds', userFacingMessage: $this->l->t('Cannot generate less than 1 image'));
+		}
 
 		$size = $this->appConfig->getValueString(Application::APP_ID, 'default_image_size', lazy: true) ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 		if (isset($input['size']) && is_string($input['size']) && preg_match('/^\d+x\d+$/', $input['size'])) {
 			$size = trim($input['size']);
+		}
+		[$x, $y] = explode('x', $size, 2);
+		if ((int)$x > 4096 || (int)$y > 4096) {
+			throw new UserFacingProcessingException('size is out of bounds', userFacingMessage: $this->l->t('Cannot generate images larger than 4096x4096'));
 		}
 
 		if (isset($input['model']) && is_string($input['model'])) {
@@ -150,7 +161,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 
 			if (empty($urls) && empty($b64s)) {
 				$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
-				throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
+				throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
 			}
 			$client = $this->clientService->newClient();
 			$requestOptions = $this->openAiAPIService->getImageRequestOptions($userId);
@@ -172,7 +183,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 			return $output;
 		} catch (\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
+			throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
 		}
 	}
 }
