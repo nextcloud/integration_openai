@@ -63,7 +63,7 @@ class Notifier implements INotifier {
 				break;
 		}
 
-		$link = $this->url->linkToRouteAbsolute('settings.PersonalSettings.index', ['section' => 'ai']))
+		$link = $this->url->linkToRouteAbsolute('settings.PersonalSettings.index', ['section' => 'ai']);
 		$iconUrl = $this->url->getAbsoluteURL($this->url->imagePath(Application::APP_ID, 'app-dark.svg'));
 
 		$notification->setParsedSubject($subject)
