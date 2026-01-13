@@ -63,16 +63,16 @@ class Notifier implements INotifier {
 				break;
 		}
 
-		$link = $this->url->getWebroot() . '/settings/user/ai';
+		$link = $this->url->linkToRouteAbsolute('settings.PersonalSettings.index', ['section' => 'ai']);
 		$iconUrl = $this->url->getAbsoluteURL($this->url->imagePath(Application::APP_ID, 'app-dark.svg'));
 
-		$notification
-			->setParsedSubject($subject)
+		$notification->setParsedSubject($subject)
 			->setParsedMessage($content)
 			->setLink($link)
 			->setIcon($iconUrl);
 
 		$actionLabel = $params['actionLabel'] ?? $l->t('View quota');
+
 		$action = $notification->createAction();
 		$action->setLabel($actionLabel)
 			->setParsedLabel($actionLabel)
