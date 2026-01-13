@@ -55,7 +55,7 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * @param string $userId
+	 * @param string $userId It can be an empty string
 	 * @param int $type
 	 * @param int $usage
 	 * @throws Exception If there is an error creating the quota usage.
