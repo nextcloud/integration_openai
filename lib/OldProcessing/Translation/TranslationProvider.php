@@ -13,8 +13,8 @@ use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCP\IAppConfig;
 use OCP\ICacheFactory;
-use OCP\IConfig;
 use OCP\L10N\IFactory;
 use OCP\Translation\IDetectLanguageProvider;
 use OCP\Translation\ITranslationProvider;
@@ -28,7 +28,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		private IFactory $l10nFactory,
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
-		private IConfig $config,
+		private IAppConfig $appConfig,
 		private ?string $userId,
 		private OpenAiSettingsService $openAiSettingsService,
 	) {
@@ -71,7 +71,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 
 	public function detectLanguage(string $text): ?string {
 		$prompt = 'What language is this (answer with the language name only, in English): ' . $text;
-		$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, 100);
@@ -118,7 +118,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 				$this->logger->debug('OpenAI translation TO[' . $toLanguage . ']', ['app' => Application::APP_ID]);
 				$prompt = 'Translate to ' . $toLanguage . ': ' . $text;
 			}
-			$adminModel = $this->config->getAppValue(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+			$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
 
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, PHP_INT_MAX);
