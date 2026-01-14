@@ -15,11 +15,11 @@ use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToImage;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class TextToImageProvider implements ISynchronousProvider {
 
@@ -108,7 +108,7 @@ class TextToImageProvider implements ISynchronousProvider {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new ProcessingException('Invalid prompt');
 		}
 		$prompt = $input['input'];
 
@@ -117,9 +117,21 @@ class TextToImageProvider implements ISynchronousProvider {
 			$nbImages = $input['numberOfImages'];
 		}
 
+		if ($nbImages > 12) {
+			throw new ProcessingException('numberOfImages is out of bounds: Cannot generate more than 12 images');
+		}
+		if ($nbImages < 1) {
+			throw new ProcessingException('numberOfImages is out of bounds: Cannot generate less than 1 image');
+		}
+
 		$size = $this->appConfig->getValueString(Application::APP_ID, 'default_image_size', lazy: true) ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 		if (isset($input['size']) && is_string($input['size']) && preg_match('/^\d+x\d+$/', $input['size'])) {
 			$size = trim($input['size']);
+		}
+
+		[$x, $y] = explode('x', $size, 2);
+		if ((int)$x > 4096 || (int)$y > 4096) {
+			throw new ProcessingException('size is out of bounds: should be within 4096x4096');
 		}
 
 		if (isset($input['model']) && is_string($input['model'])) {
@@ -148,7 +160,7 @@ class TextToImageProvider implements ISynchronousProvider {
 
 			if (empty($urls) && empty($b64s)) {
 				$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
-				throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
+				throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
 			}
 			$client = $this->clientService->newClient();
 			$requestOptions = $this->openAiAPIService->getImageRequestOptions($userId);
@@ -167,7 +179,7 @@ class TextToImageProvider implements ISynchronousProvider {
 			return $output;
 		} catch (\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
+			throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
 		}
 	}
 }
