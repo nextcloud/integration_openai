@@ -765,7 +765,7 @@ export default {
 						id: m.id,
 						value: m.id,
 						label: m.id
-									+ (m.owned_by ? ' (' + m.owned_by + ')' : ''),
+							+ (m.owned_by ? ' (' + m.owned_by + ')' : ''),
 					}
 				})
 			}
@@ -796,8 +796,8 @@ export default {
 			})
 		},
 		async getAllModels(shouldSave = true) {
-			const models = this.getModels() // for text
-			console.error(this.models)
+			const models = this.getModels() // Gets the default models. getModels returns a promise
+			console.debug(this.models)
 			const [imageModels, sttModels, ttsModels] = await Promise.all([
 				this.state.image_url === '' ? models : this.getModels('image'),
 				this.state.stt_url === '' ? models : this.getModels('stt'),
@@ -840,7 +840,9 @@ export default {
 			// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
 			if (shouldSave
 					|| this.state.default_completion_model_id !== this.selectedModel.text.id
-					|| this.state.default_image_model_id !== this.selectedModel.image.id) {
+					|| this.state.default_image_model_id !== this.selectedModel.image.id
+					|| this.state.default_stt_model_id !== this.selectedModel.stt.id
+					|| this.state.default_tts_model_id !== this.selectedModel.tts.id) {
 				this.saveOptions({
 					default_completion_model_id: this.selectedModel.text.id,
 					default_image_model_id: this.selectedModel.image.id,

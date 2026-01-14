@@ -106,15 +106,15 @@ class ServiceOverrideTest extends TestCase {
 		\OCP\Server::get(\OCP\IUserManager::class)->removeBackend($backend);
 
 		$openAiSettingsService = \OCP\Server::get(OpenAiSettingsService::class);
-		$openAiSettingsService->setImageUrl('');
-		$openAiSettingsService->setTtsUrl('');
-		$openAiSettingsService->setSttUrl('');
+		$openAiSettingsService->setImageServiceUrl('');
+		$openAiSettingsService->setTtsServiceUrl('');
+		$openAiSettingsService->setSttServiceUrl('');
 
 		parent::tearDownAfterClass();
 	}
 
 	public function testTextToSpeechProvider(): void {
-		$this->openAiSettingsService->setTtsUrl(self::OVERRIDE_SPEECH_BASE);
+		$this->openAiSettingsService->setTtsServiceUrl(self::OVERRIDE_SPEECH_BASE);
 		$this->openAiSettingsService->setAdminTtsApiKey(self::APIKEY_SPEECH);
 		$this->openAiSettingsService->setTtsRequestTimeout(self::REQUEST_TIMEOUT_SPEECH);
 
@@ -156,7 +156,7 @@ class ServiceOverrideTest extends TestCase {
 	}
 
 	public function testTextToImageProvider(): void {
-		$this->openAiSettingsService->setImageUrl(self::OVERRIDE_IMAGE_BASE);
+		$this->openAiSettingsService->setImageServiceUrl(self::OVERRIDE_IMAGE_BASE);
 		$this->openAiSettingsService->setAdminImageApiKey(self::APIKEY_IMAGE);
 		$this->openAiSettingsService->setImageRequestTimeout(self::REQUEST_TIMEOUT_IMAGE);
 
@@ -207,7 +207,7 @@ class ServiceOverrideTest extends TestCase {
 	}
 
 	public function testAudioToTextProvider(): void {
-		$this->openAiSettingsService->setSttUrl(self::OVERRIDE_TRANSCRIPTION_BASE);
+		$this->openAiSettingsService->setSttServiceUrl(self::OVERRIDE_TRANSCRIPTION_BASE);
 		$this->openAiSettingsService->setAdminSttApiKey(self::APIKEY_TRANSCRIPTION);
 		$this->openAiSettingsService->setSttRequestTimeout(self::REQUEST_TIMEOUT_TRANSCRIPTION);
 

@@ -411,7 +411,7 @@ class OpenAiSettingsService {
 	/**
 	 * @return string
 	 */
-	public function getImageUrl(): string {
+	public function getImageServiceUrl(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'image_url', '', lazy: true);
 	}
 
@@ -460,7 +460,7 @@ class OpenAiSettingsService {
 	/**
 	 * @return string
 	 */
-	public function getSttUrl(): string {
+	public function getSttServiceUrl(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'stt_url', '', lazy: true);
 	}
 
@@ -509,7 +509,7 @@ class OpenAiSettingsService {
 	/**
 	 * @return string
 	 */
-	public function getTtsUrl(): string {
+	public function getTtsServiceUrl(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'tts_url', '', lazy: true);
 	}
 
@@ -594,7 +594,7 @@ class OpenAiSettingsService {
 			'basic_password' => $this->getAdminBasicPassword(),
 			'use_basic_auth' => $this->getUseBasicAuth(),
 			// Get the service details for image, stt and tts
-			'image_url' => $this->getImageUrl(),
+			'image_url' => $this->getImageServiceUrl(),
 			'image_service_name' => $this->getImageServiceName(),
 			'image_api_key' => $this->getAdminImageApiKey(),
 			'image_basic_user' => $this->getAdminImageBasicUser(),
@@ -602,7 +602,7 @@ class OpenAiSettingsService {
 			'image_use_basic_auth' => $this->getAdminImageUseBasicAuth(),
 			'image_request_timeout' => $this->getImageRequestTimeout(),
 
-			'stt_url' => $this->getSttUrl(),
+			'stt_url' => $this->getSttServiceUrl(),
 			'stt_service_name' => $this->getSttServiceName(),
 			'stt_api_key' => $this->getAdminSttApiKey(),
 			'stt_basic_user' => $this->getAdminSttBasicUser(),
@@ -610,7 +610,7 @@ class OpenAiSettingsService {
 			'stt_use_basic_auth' => $this->getAdminSttUseBasicAuth(),
 			'stt_request_timeout' => $this->getSttRequestTimeout(),
 
-			'tts_url' => $this->getTtsUrl(),
+			'tts_url' => $this->getTtsServiceUrl(),
 			'tts_service_name' => $this->getTtsServiceName(),
 			'tts_api_key' => $this->getAdminTtsApiKey(),
 			'tts_basic_user' => $this->getAdminTtsBasicUser(),
@@ -1001,7 +1001,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function setImageUrl(string $url): void {
+	public function setImageServiceUrl(string $url): void {
 		if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
 			throw new Exception('Invalid image service URL');
 		}
@@ -1062,7 +1062,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function setSttUrl(string $url): void {
+	public function setSttServiceUrl(string $url): void {
 		if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
 			throw new Exception('Invalid STT service URL');
 		}
@@ -1124,7 +1124,7 @@ class OpenAiSettingsService {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function setTtsUrl(string $url): void {
+	public function setTtsServiceUrl(string $url): void {
 		if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
 			throw new Exception('Invalid TTS service URL');
 		}
@@ -1203,10 +1203,7 @@ class OpenAiSettingsService {
 			$this->setRequestTimeout($adminConfig['request_timeout']);
 		}
 		if (isset($adminConfig['url'])) {
-			if (str_ends_with($adminConfig['url'], '/')) {
-				$adminConfig['url'] = substr($adminConfig['url'], 0, -1) ?: $adminConfig['url'];
-			}
-			$this->setServiceUrl($adminConfig['url']);
+			$this->setServiceUrl(rtrim($adminConfig['url'], " /"));
 		}
 		if (isset($adminConfig['service_name'])) {
 			$this->setServiceName($adminConfig['service_name']);
@@ -1291,10 +1288,7 @@ class OpenAiSettingsService {
 		}
 
 		if (isset($adminConfig['image_url'])) {
-			if (str_ends_with($adminConfig['image_url'], '/')) {
-				$adminConfig['image_url'] = substr($adminConfig['image_url'], 0, -1) ?: $adminConfig['image_url'];
-			}
-			$this->setImageUrl($adminConfig['image_url']);
+			$this->setImageServiceUrl(rtrim($adminConfig['image_url'], " /"));
 		}
 		if (isset($adminConfig['image_service_name'])) {
 			$this->setImageServiceName($adminConfig['image_service_name']);
@@ -1316,10 +1310,7 @@ class OpenAiSettingsService {
 		}
 
 		if (isset($adminConfig['stt_url'])) {
-			if (str_ends_with($adminConfig['stt_url'], '/')) {
-				$adminConfig['stt_url'] = substr($adminConfig['stt_url'], 0, -1) ?: $adminConfig['stt_url'];
-			}
-			$this->setSttUrl($adminConfig['stt_url']);
+			$this->setSttServiceUrl(rtrim($adminConfig['stt_url'], " /"));
 		}
 		if (isset($adminConfig['stt_service_name'])) {
 			$this->setSttServiceName($adminConfig['stt_service_name']);
@@ -1341,10 +1332,7 @@ class OpenAiSettingsService {
 		}
 
 		if (isset($adminConfig['tts_url'])) {
-			if (str_ends_with($adminConfig['tts_url'], '/')) {
-				$adminConfig['tts_url'] = substr($adminConfig['tts_url'], 0, -1) ?: $adminConfig['tts_url'];
-			}
-			$this->setTtsUrl($adminConfig['tts_url']);
+			$this->setTtsServiceUrl(rtrim($adminConfig['tts_url'], " /"));
 		}
 		if (isset($adminConfig['tts_service_name'])) {
 			$this->setTtsServiceName($adminConfig['tts_service_name']);
@@ -1470,20 +1458,20 @@ class OpenAiSettingsService {
 	 * @return bool
 	 */
 	public function imageOverrideEnabled(): bool {
-		return !empty($this->getImageUrl());
+		return !empty($this->getImageServiceUrl());
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function sttOverrideEnabled(): bool {
-		return !empty($this->getSttUrl());
+		return !empty($this->getSttServiceUrl());
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function ttsOverrideEnabled(): bool {
-		return !empty($this->getTtsUrl());
+		return !empty($this->getTtsServiceUrl());
 	}
 }

@@ -4,6 +4,9 @@
 -->
 <template>
 	<div>
+		<NcNoteCard v-if="localState.url!==''" type="info">
+			{{ t('integration_openai', 'Service url overridden for {task} to {url}', { task:aiTask, url: localState.url }) }}
+		</NcNoteCard>
 		<div class="line">
 			<NcButton
 				@click="isExpanded = !isExpanded">

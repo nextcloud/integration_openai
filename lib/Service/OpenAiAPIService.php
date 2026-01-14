@@ -38,7 +38,7 @@ use function json_encode;
  */
 class OpenAiAPIService {
 	private IClient $client;
-	private ?array $modelsMemoryCache = null;
+	private array $modelsMemoryCache = [];
 
 	public function __construct(
 		private LoggerInterface $logger,
@@ -72,11 +72,11 @@ class OpenAiAPIService {
 	public function isUsingOpenAi(?string $serviceType = null): bool {
 		$serviceUrl = '';
 		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
-			$serviceUrl = $this->openAiSettingsService->getImageUrl();
+			$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
 		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
-			$serviceUrl = $this->openAiSettingsService->getSttUrl();
+			$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
 		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
-			$serviceUrl = $this->openAiSettingsService->getTtsUrl();
+			$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
 		}
 		if ($serviceUrl === '') {
 			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
@@ -146,11 +146,12 @@ class OpenAiAPIService {
 		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . ($userId ?? '') . '_' . ($serviceType ?? 'main');
 		$adminCacheKey = Application::MODELS_CACHE_KEY . '-main' . '_' . ($serviceType ?? 'main');
 		$dbCacheKey = $serviceType ? 'models' . '_' . $serviceType : 'models';
+		$memoryCacheKey = $serviceType ?? 'default';
 
 		if (!$refresh) {
-			if ($this->modelsMemoryCache !== null) {
+			if (array_key_exists($memoryCacheKey, $this->modelsMemoryCache)) {
 				$this->logger->debug('Getting OpenAI models from the memory cache');
-				return $this->modelsMemoryCache;
+				return $this->modelsMemoryCache[$memoryCacheKey];
 			}
 
 			// try to get models from the user cache first
@@ -158,7 +159,7 @@ class OpenAiAPIService {
 				$userCachedModels = $cache->get($userCacheKey);
 				if ($userCachedModels) {
 					$this->logger->debug('Getting OpenAI models from user cache for user ' . $userId);
-					$this->modelsMemoryCache = $userCachedModels;
+					$this->modelsMemoryCache[$memoryCacheKey] = $userCachedModels;
 					return $userCachedModels;
 				}
 			}
@@ -177,7 +178,7 @@ class OpenAiAPIService {
 				// we try to get the models from the admin cache
 				if ($adminCachedModels = $cache->get($adminCacheKey)) {
 					$this->logger->debug('Getting OpenAI models from the main distributed cache');
-					$this->modelsMemoryCache = $adminCachedModels;
+					$this->modelsMemoryCache[$memoryCacheKey] = $adminCachedModels;
 					return $adminCachedModels;
 				}
 			}
@@ -195,7 +196,7 @@ class OpenAiAPIService {
 				$newCache = $fallbackModels;
 			}
 			$cache->set($userId !== null ? $userCacheKey : $adminCacheKey, $newCache, Application::MODELS_CACHE_TTL);
-			$this->modelsMemoryCache = $newCache;
+			$this->modelsMemoryCache[$memoryCacheKey] = $newCache;
 			return $newCache;
 		}
 
@@ -225,7 +226,7 @@ class OpenAiAPIService {
 		}
 
 		$cache->set($userId !== null ? $userCacheKey : $adminCacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
-		$this->modelsMemoryCache = $modelsResponse;
+		$this->modelsMemoryCache[$memoryCacheKey] = $modelsResponse;
 		// we always store the model list after getting it
 		$modelsObjectString = json_encode($modelsResponse);
 		$this->appConfig->setValueString(Application::APP_ID, $dbCacheKey, $modelsObjectString);
@@ -1007,31 +1008,29 @@ class OpenAiAPIService {
 			$useBasicAuth = false;
 			$timeout = 0;
 
-			if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
-				$serviceUrl = $this->openAiSettingsService->getImageUrl();
+			if ($serviceType === Application::SERVICE_TYPE_IMAGE && $this->openAiSettingsService->imageOverrideEnabled()) {
+				$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
 				$apiKey = $this->openAiSettingsService->getAdminImageApiKey();
 				$basicUser = $this->openAiSettingsService->getAdminImageBasicUser();
 				$basicPassword = $this->openAiSettingsService->getAdminImageBasicPassword();
 				$useBasicAuth = $this->openAiSettingsService->getAdminImageUseBasicAuth();
 				$timeout = $this->openAiSettingsService->getImageRequestTimeout();
-			} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
-				$serviceUrl = $this->openAiSettingsService->getSttUrl();
+			} elseif ($serviceType === Application::SERVICE_TYPE_STT && $this->openAiSettingsService->sttOverrideEnabled()) {
+				$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
 				$apiKey = $this->openAiSettingsService->getAdminSttApiKey();
 				$basicUser = $this->openAiSettingsService->getAdminSttBasicUser();
 				$basicPassword = $this->openAiSettingsService->getAdminSttBasicPassword();
 				$useBasicAuth = $this->openAiSettingsService->getAdminSttUseBasicAuth();
 				$timeout = $this->openAiSettingsService->getSttRequestTimeout();
-			} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
-				$serviceUrl = $this->openAiSettingsService->getTtsUrl();
+			} elseif ($serviceType === Application::SERVICE_TYPE_TTS && $this->openAiSettingsService->ttsOverrideEnabled()) {
+				$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
 				$apiKey = $this->openAiSettingsService->getAdminTtsApiKey();
 				$basicUser = $this->openAiSettingsService->getAdminTtsBasicUser();
 				$basicPassword = $this->openAiSettingsService->getAdminTtsBasicPassword();
 				$useBasicAuth = $this->openAiSettingsService->getAdminTtsUseBasicAuth();
 				$timeout = $this->openAiSettingsService->getTtsRequestTimeout();
-			}
-
-			// Currently only supporting user api keys for the default service
-			if (empty($serviceUrl)) {
+			} else {
+				// Currently only supporting user api keys for the default service
 				$serviceUrl = $this->openAiSettingsService->getServiceUrl();
 				if ($serviceUrl === '') {
 					$serviceUrl = Application::OPENAI_API_BASE_URL;
@@ -1159,7 +1158,7 @@ class OpenAiAPIService {
 	 * @return bool whether the T2I provider is available
 	 */
 	public function isT2IAvailable(): bool {
-		if ($this->isUsingOpenAi() || $this->openAiSettingsService->imageOverrideEnabled()) {
+		if ($this->openAiSettingsService->imageOverrideEnabled() || $this->isUsingOpenAi()) {
 			return true;
 		}
 		try {
@@ -1180,7 +1179,7 @@ class OpenAiAPIService {
 	 * @return bool whether the STT provider is available
 	 */
 	public function isSTTAvailable(): bool {
-		if ($this->isUsingOpenAi() || $this->openAiSettingsService->sttOverrideEnabled()) {
+		if ($this->openAiSettingsService->sttOverrideEnabled() || $this->isUsingOpenAi()) {
 			return true;
 		}
 		try {
@@ -1201,7 +1200,7 @@ class OpenAiAPIService {
 	 * @return bool whether the TTS provider is available
 	 */
 	public function isTTSAvailable(): bool {
-		if ($this->isUsingOpenAi() || $this->openAiSettingsService->ttsOverrideEnabled()) {
+		if ($this->openAiSettingsService->ttsOverrideEnabled() || $this->isUsingOpenAi()) {
 			return true;
 		}
 		try {
