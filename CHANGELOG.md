@@ -8,6 +8,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.10.0 – 2026-01-14
+
+### Added
+- adjust audio input chat message format @julien-nc [#304](https://github.com/nextcloud/integration_openai/pull/304)
+- detect audio input format when sending it as a message to the chat completion endpoint, support wav and mp3 @julien-nc [#307](https://github.com/nextcloud/integration_openai/pull/307)
+
+
+### Fixed
+- fix: use absolute URL in notifications @joshtrichards [#322](https://github.com/nextcloud/integration_openai/pull/322)
+- fix(OldProcessing): use IAppConfig to get the selected model @kyteinsky [#323](https://github.com/nextcloud/integration_openai/pull/323)
+- fix(TextToImageProvider): Use userFacingErrorMessages @marcelklehr [#321](https://github.com/nextcloud/integration_openai/pull/321)
+- set max NC version to 32
+
+
 ## 3.9.1 – 2025-11-05
 
 ### Fixed
