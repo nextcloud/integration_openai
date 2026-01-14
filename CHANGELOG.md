@@ -8,6 +8,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.1.1 - 2025-01-14
+
+### Fixed
+- fix: use absolute URL in notifications @joshtrichards [#317](https://github.com/nextcloud/integration_openai/pull/317)
+- fix(TextToImageProvider): Use userFacingErrorMessages @marcelklehr [#315](https://github.com/nextcloud/integration_openai/pull/315)
+- fix(OldProcessing): use IAppConfig to get the selected model @kyteinsky [#318](https://github.com/nextcloud/integration_openai/pull/318)
+
+
 ## 4.1.0 - 2025-12-23
 
 ### Added
