@@ -118,10 +118,10 @@ class TextToImageProvider implements ISynchronousProvider {
 		}
 
 		if ($nbImages > 12) {
-			throw new ProcessingException('numberOfImages is out of bounds');
+			throw new ProcessingException('numberOfImages is out of bounds: Cannot generate more than 12 images');
 		}
 		if ($nbImages < 1) {
-			throw new ProcessingException('numberOfImages is out of bounds');
+			throw new ProcessingException('numberOfImages is out of bounds: Cannot generate less than 1 image');
 		}
 
 		$size = $this->appConfig->getValueString(Application::APP_ID, 'default_image_size', lazy: true) ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
@@ -131,7 +131,7 @@ class TextToImageProvider implements ISynchronousProvider {
 
 		[$x, $y] = explode('x', $size, 2);
 		if ((int)$x > 4096 || (int)$y > 4096) {
-			throw new ProcessingException('size is out of bounds');
+			throw new ProcessingException('size is out of bounds: should be within 4096x4096');
 		}
 
 		if (isset($input['model']) && is_string($input['model'])) {
