@@ -34,11 +34,12 @@ class QuotaRuleService {
 		private LoggerInterface $logger,
 	) {
 	}
+
 	/**
 	 * Returns the quota rule for the given user
 	 *
 	 * @param int $quotaType
-	 * @param string $userId
+	 * @param string $userId It can be an empty string
 	 * @return array
 	 */
 	public function getRule(int $quotaType, string $userId) {
@@ -46,9 +47,13 @@ class QuotaRuleService {
 		$cacheKey = Application::QUOTA_RULES_CACHE_PREFIX . $quotaType . '-' . $userId;
 		$rule = $cache->get($cacheKey);
 		if ($rule === null) {
-			$user = $this->userManager->get($userId);
-			$groups = $this->groupManager->getUserGroupIds($user);
 			try {
+				$user = $this->userManager->get($userId);
+				if ($user === null) {
+					// re-use the db exception for not found users
+					throw new DoesNotExistException('User not found: ' . $userId);
+				}
+				$groups = $this->groupManager->getUserGroupIds($user);
 				$rule = $this->quotaRuleMapper->getRule($quotaType, $userId, $groups)->jsonSerialize();
 			} catch (DoesNotExistException|MultipleObjectsReturnedException) {
 				$rule = [
