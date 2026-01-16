@@ -232,7 +232,7 @@
 						v-model="selectedModel.text"
 						class="model-select"
 						:clearable="state.default_completion_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels"
+						:options="formattedModels(models)"
 						:input-label="t('integration_openai', 'Default completion model to use')"
 						:no-wrap="true"
 						input-id="openai-model-select"
@@ -331,13 +331,23 @@
 				<h2>
 					{{ t('integration_openai', 'Image generation') }}
 				</h2>
-				<div v-if="models"
+				<ServiceOverridePanel
+					context-prefix="image"
+					:state="state"
+					:readonly="readonly"
+					:ai-task="t('integration_openai', 'image generation')"
+					:default-url="modelEndpointUrl"
+					@focus="readonly = false"
+					@input="handleOverrideInput"
+					@sensitive-input="handleOverrideSensitiveInput"
+					@checkbox-changed="onCheckboxChanged" />
+				<div v-if="imageModels"
 					class="line line-select">
 					<NcSelect
 						v-model="selectedModel.image"
 						class="model-select"
 						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels"
+						:options="formattedModels(imageModels)"
 						:input-label="t('integration_openai', 'Default image generation model to use')"
 						:no-wrap="true"
 						input-id="openai-model-select"
@@ -394,13 +404,23 @@
 				<h2>
 					{{ t('integration_openai', 'Audio transcription') }}
 				</h2>
-				<div v-if="models"
+				<ServiceOverridePanel
+					context-prefix="stt"
+					:state="state"
+					:readonly="readonly"
+					:ai-task="t('integration_openai', 'audio transcription')"
+					:default-url="modelEndpointUrl"
+					@focus="readonly = false"
+					@input="handleOverrideInput"
+					@sensitive-input="handleOverrideSensitiveInput"
+					@checkbox-changed="onCheckboxChanged" />
+				<div v-if="sttModels"
 					class="line line-select">
 					<NcSelect
 						v-model="selectedModel.stt"
 						class="model-select"
 						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels"
+						:options="formattedModels(sttModels)"
 						:input-label="t('integration_openai', 'Default transcription model to use')"
 						:no-wrap="true"
 						input-id="openai-stt-model-select"
@@ -433,13 +453,23 @@
 			<h2>
 				{{ t('integration_openai', 'Text to speech') }}
 			</h2>
-			<div v-if="models"
+			<ServiceOverridePanel
+				context-prefix="tts"
+				:state="state"
+				:readonly="readonly"
+				:ai-task="t('integration_openai', 'text to speech')"
+				:default-url="modelEndpointUrl"
+				@focus="readonly = false"
+				@input="handleOverrideInput"
+				@sensitive-input="handleOverrideSensitiveInput"
+				@checkbox-changed="onCheckboxChanged" />
+			<div v-if="ttsModels"
 				class="line line-select">
 				<NcSelect
 					v-model="selectedModel.tts"
 					class="model-select"
 					:clearable="state.default_tts_model_id !== DEFAULT_MODEL_ITEM.id"
-					:options="formattedModels"
+					:options="formattedModels(ttsModels)"
 					:input-label="t('integration_openai', 'Default speech generation model to use')"
 					:no-wrap="true"
 					input-id="openai-tts-model-select"
@@ -638,6 +668,7 @@ import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import QuotaPeriodPicker from './QuotaPeriodPicker.vue'
+import ServiceOverridePanel from './ServiceOverridePanel.vue'
 
 const DEFAULT_MODEL_ITEM = { id: 'Default' }
 
@@ -646,13 +677,14 @@ export default {
 
 	components: {
 		QuotaPeriodPicker,
+		ServiceOverridePanel,
 		OpenAiIcon,
-		KeyOutlineIcon,
-		CloseIcon,
 		AccountOutlineIcon,
+		CloseIcon,
 		EarthIcon,
-		TimerAlertOutlineIcon,
 		HelpCircleOutlineIcon,
+		KeyOutlineIcon,
+		TimerAlertOutlineIcon,
 		NcButton,
 		NcSelect,
 		NcCheckboxRadioSwitch,
@@ -670,6 +702,9 @@ export default {
 			// to prevent some browsers to fill fields with remembered passwords
 			readonly: true,
 			models: null,
+			imageModels: null,
+			sttModels: null,
+			ttsModels: null,
 			selectedModel: {
 				text: null,
 				image: null,
@@ -713,9 +748,19 @@ export default {
 		configured() {
 			return !!this.state.url || !!this.state.api_key || !!this.state.basic_user || !!this.state.basic_password
 		},
-		formattedModels() {
-			if (this.models) {
-				return this.models.map(m => {
+	},
+
+	mounted() {
+		if (this.configured) {
+			this.getAllModels(false)
+		}
+		this.loadQuotaInfo()
+	},
+
+	methods: {
+		formattedModels(models) {
+			if (models) {
+				return models.map(m => {
 					return {
 						id: m.id,
 						value: m.id,
@@ -726,16 +771,6 @@ export default {
 			}
 			return []
 		},
-	},
-
-	mounted() {
-		if (this.configured) {
-			this.getModels(false)
-		}
-		this.loadQuotaInfo()
-	},
-
-	methods: {
 		modelToNcSelectObject(model) {
 			return {
 				id: model.id,
@@ -760,69 +795,85 @@ export default {
 				console.error(error)
 			})
 		},
+		async getAllModels(shouldSave = true) {
+			const models = this.getModels() // Gets the default models. getModels returns a promise
+			console.debug(this.models)
+			const [imageModels, sttModels, ttsModels] = await Promise.all([
+				this.state.image_url === '' ? models : this.getModels('image'),
+				this.state.stt_url === '' ? models : this.getModels('stt'),
+				this.state.tts_url === '' ? models : this.getModels('tts'),
+			])
+			this.models = await models
+			this.imageModels = imageModels
+			this.sttModels = sttModels
+			this.ttsModels = ttsModels
 
-		getModels(shouldSave = true) {
-			this.models = null
-			if (!this.configured) {
-				return
+			const defaultCompletionModelId = this.state.default_completion_model_id
+			const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
+					|| this.models.find(m => m.id === 'gpt-4.1-mini')
+					|| this.models[1]
+					|| this.models[0]
+
+			const defaultImageModelId = this.state.default_image_model_id
+			const imageModelToSelect = this.imageModels.find(m => m.id === defaultImageModelId)
+					|| this.imageModels.find(m => m.id === 'dall-e-2')
+					|| this.imageModels[1]
+					|| this.imageModels[0]
+
+			const defaultSttModelId = this.state.default_stt_model_id
+			const sttModelToSelect = this.sttModels.find(m => m.id === defaultSttModelId)
+					|| this.sttModels.find(m => m.id.match(/whisper/i))
+					|| this.sttModels[1]
+					|| this.sttModels[0]
+
+			const defaultTtsModelId = this.state.default_tts_model_id
+			const ttsModelToSelect = this.ttsModels.find(m => m.id === defaultTtsModelId)
+					|| this.ttsModels.find(m => m.id.match(/tts/i))
+					|| this.ttsModels[1]
+					|| this.ttsModels[0]
+
+			this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
+			this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
+			this.selectedModel.stt = this.modelToNcSelectObject(sttModelToSelect)
+			this.selectedModel.tts = this.modelToNcSelectObject(ttsModelToSelect)
+
+			// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
+			if (shouldSave
+					|| this.state.default_completion_model_id !== this.selectedModel.text.id
+					|| this.state.default_image_model_id !== this.selectedModel.image.id
+					|| this.state.default_stt_model_id !== this.selectedModel.stt.id
+					|| this.state.default_tts_model_id !== this.selectedModel.tts.id) {
+				this.saveOptions({
+					default_completion_model_id: this.selectedModel.text.id,
+					default_image_model_id: this.selectedModel.image.id,
+					default_stt_model_id: this.selectedModel.stt.id,
+					default_tts_model_id: this.selectedModel.tts.id,
+				}, false)
 			}
+
+			this.state.default_completion_model_id = completionModelToSelect.id
+			this.state.default_image_model_id = imageModelToSelect.id
+			this.state.default_stt_model_id = sttModelToSelect.id
+			this.state.default_tts_model_id = ttsModelToSelect.id
+		},
+		getModels(serviceType = '') {
 			const url = generateUrl('/apps/integration_openai/models')
-			return axios.get(url)
-				.then((response) => {
-					this.models = response.data?.data ?? []
-					if (this.isUsingOpenAI) {
-						this.models.unshift(DEFAULT_MODEL_ITEM)
-					}
-					const defaultCompletionModelId = this.state.default_completion_model_id || response.data?.default_completion_model_id
-					const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
-						|| this.models.find(m => m.id === 'gpt-4.1-mini')
-						|| this.models[1]
-						|| this.models[0]
-
-					const defaultImageModelId = this.state.default_image_model_id || response.data?.default_image_model_id
-					const imageModelToSelect = this.models.find(m => m.id === defaultImageModelId)
-						|| this.models.find(m => m.id === 'dall-e-2')
-						|| this.models[1]
-						|| this.models[0]
-
-					const defaultSttModelId = this.state.default_stt_model_id || response.data?.default_stt_model_id
-					const sttModelToSelect = this.models.find(m => m.id === defaultSttModelId)
-						|| this.models.find(m => m.id.match(/whisper/i))
-						|| this.models[1]
-						|| this.models[0]
-
-					const defaultTtsModelId = this.state.default_tts_model_id || response.data?.default_tts_model_id
-					const ttsModelToSelect = this.models.find(m => m.id === defaultTtsModelId)
-						|| this.models.find(m => m.id.match(/tts/i))
-						|| this.models[1]
-						|| this.models[0]
-
-					this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
-					this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
-					this.selectedModel.stt = this.modelToNcSelectObject(sttModelToSelect)
-					this.selectedModel.tts = this.modelToNcSelectObject(ttsModelToSelect)
-
-					// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
-					if (shouldSave
-						|| this.state.default_completion_model_id !== this.selectedModel.text.id
-						|| this.state.default_image_model_id !== this.selectedModel.image.id) {
-						this.saveOptions({
-							default_completion_model_id: this.selectedModel.text.id,
-							default_image_model_id: this.selectedModel.image.id,
-						}, false)
-					}
-
-					this.state.default_completion_model_id = completionModelToSelect.id
-					this.state.default_image_model_id = imageModelToSelect.id
-				})
-				.catch((error) => {
-					showError(
-						t('integration_openai', 'Failed to load models')
+			return axios.get(url, {
+				params: { serviceType },
+			}).then((response) => {
+				const result = response.data?.data ?? []
+				if (this.isUsingOpenAI) {
+					result.unshift(DEFAULT_MODEL_ITEM)
+				}
+				return result
+			}).catch((error) => {
+				showError(
+					t('integration_openai', 'Failed to load models')
 						+ ': ' + this.reduceStars(error.response?.data?.error),
-						{ timeout: 10000 },
-					)
-					console.error(error)
-				})
+					{ timeout: 10000 },
+				)
+				console.error(error)
+			})
 		},
 		onModelSelected(type, selected) {
 			console.debug(`Selected model: ${type}: ${selected}`)
@@ -878,17 +929,28 @@ export default {
 		capitalizedWord(word) {
 			return word.charAt(0).toUpperCase() + word.slice(1)
 		},
+		handleOverrideInput(values) {
+			Object.assign(this.state, values)
+			this.onInput()
+		},
+		handleOverrideSensitiveInput(values, getModels = true) {
+			Object.assign(this.state, values)
+			this.onSensitiveInput(getModels)
+		},
 		async onCheckboxChanged(newValue, key, getModels = true, sensitive = false) {
 			this.state[key] = newValue
 			await this.saveOptions({ [key]: this.state[key] }, sensitive)
 			if (getModels) {
-				this.getModels()
+				this.getAllModels()
 			}
 		},
 		onSensitiveInput: debounce(async function(getModels = true) {
 			const values = {
 				basic_user: (this.state.basic_user ?? '').trim(),
 				url: (this.state.url ?? '').trim(),
+				image_url: (this.state.image_url ?? '').trim(),
+				stt_url: (this.state.stt_url ?? '').trim(),
+				tts_url: (this.state.tts_url ?? '').trim(),
 			}
 			if (this.state.api_key !== 'dummyApiKey') {
 				values.api_key = (this.state.api_key ?? '').trim()
@@ -896,9 +958,29 @@ export default {
 			if (this.state.basic_password !== 'dummyPassword') {
 				values.basic_password = (this.state.basic_password ?? '').trim()
 			}
+
+			if (this.state.image_api_key !== 'dummyApiKey') {
+				values.image_api_key = (this.state.image_api_key ?? '').trim()
+			}
+			if (this.state.image_basic_password !== 'dummyPassword') {
+				values.image_basic_password = (this.state.image_basic_password ?? '').trim()
+			}
+			if (this.state.stt_api_key !== 'dummyApiKey') {
+				values.stt_api_key = (this.state.stt_api_key ?? '').trim()
+			}
+			if (this.state.stt_basic_password !== 'dummyPassword') {
+				values.stt_basic_password = (this.state.stt_basic_password ?? '').trim()
+			}
+			if (this.state.tts_api_key !== 'dummyApiKey') {
+				values.tts_api_key = (this.state.tts_api_key ?? '').trim()
+			}
+			if (this.state.tts_basic_password !== 'dummyPassword') {
+				values.tts_basic_password = (this.state.tts_basic_password ?? '').trim()
+			}
+
 			await this.saveOptions(values, true)
 			if (getModels) {
-				this.getModels()
+				this.getAllModels()
 			}
 			this.autoDetectFeatures()
 		}, 2000),
@@ -917,6 +999,15 @@ export default {
 				tts_voices: this.state.tts_voices,
 				default_tts_voice: this.state.default_tts_voice,
 				usage_storage_time: this.state.usage_storage_time,
+				image_service_name: this.state.image_service_name,
+				image_request_timeout: this.state.image_request_timeout,
+				image_use_basic_auth: this.state.image_use_basic_auth,
+				stt_service_name: this.state.stt_service_name,
+				stt_request_timeout: this.state.stt_request_timeout,
+				stt_use_basic_auth: this.state.stt_use_basic_auth,
+				tts_service_name: this.state.tts_service_name,
+				tts_request_timeout: this.state.tts_request_timeout,
+				tts_use_basic_auth: this.state.tts_use_basic_auth,
 			}
 			await this.saveOptions(values, false)
 		}, 2000),
