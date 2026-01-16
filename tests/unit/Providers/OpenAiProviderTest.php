@@ -521,42 +521,46 @@ class OpenAiProviderTest extends TestCase {
 		$inputText = 'This is a test prompt';
 		$n = 1;
 		$fromLang = 'Swedish';
-		$toLang = 'en';
+		$toLang = 'English';
+		$aiContent = ['translation' => 'This is a test response.'];
 
 		$response = '{
-            "id": "chatcmpl-123",
-            "object": "chat.completion",
-            "created": 1677652288,
-            "model": "gpt-3.5-turbo-0613",
-            "system_fingerprint": "fp_44709d6fcb",
-            "choices": [
-              {
-                "index": 0,
-                "message": {
-                  "role": "assistant",
-                  "content": "This is a test response."
-                },
-                "finish_reason": "stop"
-              }
-            ],
-            "usage": {
-              "prompt_tokens": 9,
-              "completion_tokens": 12,
-              "total_tokens": 21
-            }
-        }';
+			"id": "chatcmpl-123",
+			"object": "chat.completion",
+			"created": 1677652288,
+			"model": "gpt-4.1-mini",
+			"system_fingerprint": "fp_44709d6fcb",
+			"choices": [
+				{
+					"index": 0,
+					"message": {
+						"role": "assistant",
+						"content": ' . json_encode(json_encode($aiContent)) . '
+					},
+					"finish_reason": "stop"
+				}
+			],
+			"usage": {
+				"prompt_tokens": 9,
+				"completion_tokens": 12,
+				"total_tokens": 21
+			}
+		}';
 
 		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$prompt = 'Translate the following text from ' . $fromLang . ' to ' . $toLang . ': ' . PHP_EOL . PHP_EOL . $inputText;
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
-				['role' => 'user', 'content' => 'Translate from ' . $fromLang . ' to English (US): ' . $inputText],
+				['role' => 'system', 'content' => $translationProvider::SYSTEM_PROMPT],
+				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
+			...$translationProvider::JSON_RESPONSE_FORMAT,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -564,10 +568,18 @@ class OpenAiProviderTest extends TestCase {
 		$iResponse->method('getStatusCode')->willReturn(200);
 		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 
-		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+		$this->iClient->expects($this->once())->method('post')->with(
+			$this->equalTo($url),
+			$this->callback(function ($revdOptions) use ($options) {
+				$body = json_decode($revdOptions['body'], true);
+				$expectedBody = json_decode($options['body'], true);
+				$this->assertEquals($expectedBody, $body);
+				return true;
+			}),
+		)->willReturn($iResponse);
 
 		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => null);
-		$this->assertEquals(['output' => 'This is a test response.'], $result);
+		$this->assertEquals(['output' => $aiContent['translation']], $result);
 
 		// Check that token usage is logged properly
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);

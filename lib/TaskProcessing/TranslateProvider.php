@@ -19,14 +19,38 @@ use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\L10N\IFactory;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToTextTranslate;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class TranslateProvider implements ISynchronousProvider {
+
+	public const SYSTEM_PROMPT = 'You are a translations expert that ONLY outputs a valid JSON with the translated text in the following format: { "translation": "<translated text>" } .';
+	public const JSON_RESPONSE_FORMAT = [
+		'response_format' => [
+			'type' => 'json_schema',
+			'json_schema' => [
+				'name' => 'TranslationResponse',
+				'description' => 'A JSON object containing the translated text',
+				'strict' => true,
+				'schema' => [
+					'type' => 'object',
+					'properties' => [
+						'translation' => [
+							'type' => 'string',
+							'description' => 'The translated text',
+						],
+					],
+					'required' => [ 'translation' ],
+					'additionalProperties' => false,
+				],
+			],
+		],
+	];
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -144,7 +168,10 @@ class TranslateProvider implements ISynchronousProvider {
 		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid input text');
+			throw new ProcessingException('Invalid input text');
+		}
+		if (empty($input['input'])) {
+			throw new UserFacingProcessingException($this->l->t('Input text cannot be empty'));
 		}
 		$inputText = $input['input'];
 
@@ -160,13 +187,14 @@ class TranslateProvider implements ISynchronousProvider {
 		try {
 			$coreLanguages = $this->getCoreLanguagesByCode();
 
+			$fromLanguage = $input['origin_language'];
 			$toLanguage = $coreLanguages[$input['target_language']] ?? $input['target_language'];
 
 			if ($input['origin_language'] !== 'detect_language') {
 				$fromLanguage = $coreLanguages[$input['origin_language']] ?? $input['origin_language'];
-				$promptStart = 'Translate from ' . $fromLanguage . ' to ' . $toLanguage . ': ';
+				$promptStart = 'Translate the following text from ' . $fromLanguage . ' to ' . $toLanguage . ': ';
 			} else {
-				$promptStart = 'Translate to ' . $toLanguage . ': ';
+				$promptStart = 'Translate the following text to ' . $toLanguage . ': ';
 			}
 
 			foreach ($chunks as $chunk) {
@@ -180,33 +208,55 @@ class TranslateProvider implements ISynchronousProvider {
 					$reportProgress($progress);
 					continue;
 				}
-				$prompt = $promptStart . $chunk;
+				$prompt = $promptStart . PHP_EOL . PHP_EOL . $chunk;
 
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-					$completion = $completion['messages'];
+					$completionsObj = $this->openAiAPIService->createChatCompletion(
+						$userId, $model, $prompt, self::SYSTEM_PROMPT, null, 1, $maxTokens, self::JSON_RESPONSE_FORMAT
+					);
+					$completions = $completionsObj['messages'];
 				} else {
-					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+					$completions = $this->openAiAPIService->createCompletion(
+						$userId, $prompt . PHP_EOL . self::SYSTEM_PROMPT . PHP_EOL . PHP_EOL, 1, $model, $maxTokens
+					);
 				}
 
 				$reportProgress($progress);
 
-				if (count($completion) > 0) {
-					$completion = array_pop($completion);
-					$result .= $completion;
-					$cache->set($cacheKey, $completion);
+				if (count($completions) === 0) {
+					$this->logger->error('Empty translation response received for chunk');
 					continue;
 				}
 
-				throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage} for chunk");
+				$completion = array_pop($completions);
+				$decodedCompletion = json_decode($completion, true);
+				if (
+					!isset($decodedCompletion['translation'])
+					|| !is_string($decodedCompletion['translation'])
+					|| empty($decodedCompletion['translation'])
+				) {
+					$this->logger->error('Invalid translation response received for chunk', ['response' => $completion]);
+					continue;
+				}
+				$result .= $decodedCompletion['translation'];
+				$cache->set($cacheKey, $decodedCompletion['translation']);
+				continue;
 			}
 
 			$endTime = time();
 			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-			return ['output' => $result];
+
+			if (empty(trim($result))) {
+				throw new ProcessingException("Empty translation result from {$fromLanguage} to {$toLanguage}");
+			}
+			return ['output' => trim($result)];
 
 		} catch (Exception $e) {
-			throw new RuntimeException("Failed translate from {$fromLanguage} to {$toLanguage}", 0, $e);
+			throw new ProcessingException(
+				"Failed to translate from {$fromLanguage} to {$toLanguage}: {$e->getMessage()}",
+				$e->getCode(),
+				$e,
+			);
 		}
 	}
 }
