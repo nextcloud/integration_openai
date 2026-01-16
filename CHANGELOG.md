@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 4.2.0 - 2025-01-16
+## 4.2.0 - 2026-01-16
 
 ### Added
 
@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Handle empty userIds in quota accounting @kyteinsky [#319](https://github.com/nextcloud/integration_openai/pull/319)
 
-## 4.1.1 - 2025-01-14
+## 4.1.1 - 2026-01-14
 
 ### Fixed
 - fix: use absolute URL in notifications @joshtrichards [#317](https://github.com/nextcloud/integration_openai/pull/317)
