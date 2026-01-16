@@ -1203,7 +1203,7 @@ class OpenAiSettingsService {
 			$this->setRequestTimeout($adminConfig['request_timeout']);
 		}
 		if (isset($adminConfig['url'])) {
-			$this->setServiceUrl(rtrim($adminConfig['url'], " /"));
+			$this->setServiceUrl(rtrim($adminConfig['url'], ' /'));
 		}
 		if (isset($adminConfig['service_name'])) {
 			$this->setServiceName($adminConfig['service_name']);
@@ -1288,7 +1288,7 @@ class OpenAiSettingsService {
 		}
 
 		if (isset($adminConfig['image_url'])) {
-			$this->setImageServiceUrl(rtrim($adminConfig['image_url'], " /"));
+			$this->setImageServiceUrl(rtrim($adminConfig['image_url'], ' /'));
 		}
 		if (isset($adminConfig['image_service_name'])) {
 			$this->setImageServiceName($adminConfig['image_service_name']);
@@ -1310,7 +1310,7 @@ class OpenAiSettingsService {
 		}
 
 		if (isset($adminConfig['stt_url'])) {
-			$this->setSttServiceUrl(rtrim($adminConfig['stt_url'], " /"));
+			$this->setSttServiceUrl(rtrim($adminConfig['stt_url'], ' /'));
 		}
 		if (isset($adminConfig['stt_service_name'])) {
 			$this->setSttServiceName($adminConfig['stt_service_name']);
@@ -1332,7 +1332,7 @@ class OpenAiSettingsService {
 		}
 
 		if (isset($adminConfig['tts_url'])) {
-			$this->setTtsServiceUrl(rtrim($adminConfig['tts_url'], " /"));
+			$this->setTtsServiceUrl(rtrim($adminConfig['tts_url'], ' /'));
 		}
 		if (isset($adminConfig['tts_service_name'])) {
 			$this->setTtsServiceName($adminConfig['tts_service_name']);
