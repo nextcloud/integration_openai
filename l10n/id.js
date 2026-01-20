@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Default" : "Default",
+    "Image generation" : "Pembuatan gambar",
     "Unknown" : "Tidak diketahui",
     "seconds" : "detik",
     "Bad HTTP method" : "Metode HTTP tidak benar",
