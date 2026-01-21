@@ -18,6 +18,7 @@ use OCA\OpenAi\Service\WatermarkingService;
 use OCP\Files\File;
 use OCP\IAppConfig;
 use OCP\IL10N;
+use OCP\IUserManager;
 use OCP\L10N\IFactory;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
@@ -35,6 +36,7 @@ class AudioToAudioTranslateProvider implements ISynchronousWatermarkingProvider 
 		private IFactory $l10nFactory,
 		private IL10N $l,
 		private IAppConfig $appConfig,
+		private IUserManager $userManager,
 	) {
 	}
 
@@ -149,7 +151,14 @@ class AudioToAudioTranslateProvider implements ISynchronousWatermarkingProvider 
 		// TTS
 		$ttsPrompt = $translatedText;
 		if ($includeWatermark) {
-			$ttsPrompt .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
+			if ($userId !== null) {
+				$user = $this->userManager->getExistingUser($userId);
+				$lang = $this->l10nFactory->getUserLanguage($user);
+				$l = $this->l10nFactory->get(Application::APP_ID, $lang);
+				$ttsPrompt .= "\n\n" . $l->t('This was generated using Artificial Intelligence.');
+			} else {
+				$ttsPrompt .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
+			}
 		}
 		$ttsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
 		$voice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE, lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
