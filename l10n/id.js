@@ -19,6 +19,7 @@ OC.L10N.register(
     "The memories to be injected into the chat session." : "Memori yang akan disisipkan ke dalam sesi chat.",
     "Language" : "Bahasa",
     "Change Tone" : "Ubah Nada",
+    "Ask a question about your data." : "Ajukan pertanyaan tentang data Anda.",
     "Input text" : "Teks masukan",
     "Write a text that you want the assistant to rewrite in another tone." : "Tulis teks yang ingin Anda minta asisten tulis ulang dengan nada lain.",
     "Desired tone" : "Nada yang diinginkan",
