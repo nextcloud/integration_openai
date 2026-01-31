@@ -139,6 +139,7 @@ OC.L10N.register(
     "Use authentication for image retrieval request" : "Použíti pro požadavek na získání obrázku ověření se",
     "audio transcription" : "přepis ze zvuku",
     "Default transcription model to use" : "Výchozí přepisovací model, který použít",
+    "text to speech" : "text na řeč",
     "Default speech generation model to use" : "Výchozí model pro vytváření řeči",
     "TTS Voices" : "Hlasy pro řeč na text (TTS)",
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Seznam hlasů podporovaný koncovým bodem, který používáte. Jako výchozí je používán seznam od openai.",
@@ -208,6 +209,7 @@ OC.L10N.register(
     "Use shared quota" : "Použít sdílenou kvótu",
     "Save" : "Uložit",
     "Delete" : "Smazat",
+    "Service URL override" : "Přebití URL služby",
     "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Použít parametr „{newParam}“ namísto zastaralého „{deprecatedParam}“"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");
