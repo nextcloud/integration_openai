@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Default" : "Zadani",
+    "Image generation" : "Generiranje slika",
     "Unknown" : "Nepoznata pogreška",
     "seconds" : "sekunda",
     "Bad HTTP method" : "Pogrešna metoda HTTP-a",
@@ -17,6 +18,7 @@ OC.L10N.register(
     "Speed" : "Brzina",
     "Language" : "Jezik",
     "Change Tone" : "Promijeni ton",
+    "Ask a question about your data." : "Postavite pitanje o svojim podacima.",
     "Input text" : "Unesite tekst",
     "Write a text that you want the assistant to rewrite in another tone." : "Napišite tekst koji želite da asistent preoblikuje u drugom tonu.",
     "Desired tone" : "Željeni ton",
