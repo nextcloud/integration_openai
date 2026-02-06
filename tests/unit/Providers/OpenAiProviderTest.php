@@ -18,6 +18,7 @@ use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\TranslationService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
@@ -32,6 +33,7 @@ use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
+use OCP\L10N\IFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -49,6 +51,7 @@ class OpenAiProviderTest extends TestCase {
 	private OpenAiAPIService $openAiApiService;
 	private OpenAiSettingsService $openAiSettingsService;
 	private ChunkService $chunkService;
+	private TranslationService $translationService;
 	/**
 	 * @var MockObject|IClient
 	 */
@@ -88,6 +91,16 @@ class OpenAiProviderTest extends TestCase {
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
+		);
+
+		$this->translationService = \OCP\Server::get(TranslationService::class);
+		$this->translationService = new TranslationService(
+			$this->openAiSettingsService,
+			\OCP\Server::get(\Psr\Log\LoggerInterface::class),
+			$this->openAiApiService,
+			$this->chunkService,
+			\OCP\Server::get(ICacheFactory::class),
+			\OCP\Server::get(IFactory::class),
 		);
 
 		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
@@ -512,9 +525,7 @@ class OpenAiProviderTest extends TestCase {
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			\OCP\Server::get(\OCP\L10N\IFactory::class),
-			$this->createMock(\OCP\ICacheFactory::class),
-			$this->createMock(\Psr\Log\LoggerInterface::class),
-			$this->chunkService,
+			$this->translationService,
 			self::TEST_USER1,
 		);
 
@@ -554,13 +565,13 @@ class OpenAiProviderTest extends TestCase {
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
-				['role' => 'system', 'content' => $translationProvider::SYSTEM_PROMPT],
+				['role' => 'system', 'content' => TranslationService::SYSTEM_PROMPT],
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
-			...$translationProvider::JSON_RESPONSE_FORMAT,
+			...TranslationService::JSON_RESPONSE_FORMAT,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
