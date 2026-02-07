@@ -75,6 +75,7 @@
     "Size" : "Розмір",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Необов'язково. Розмір згенерованих зображень. Має бути у форматі 256x256. За замовчуванням %s",
     "The model used to generate the images" : "Модель, що використовується для генерації зображень",
+    "Cannot generate less than 1 image" : "Зґенерувати можна не менше 1 зображення",
     "Voice" : "Голос",
     "The voice to use" : "Голос для використання",
     "Generate speech" : "Генерування мовлення",

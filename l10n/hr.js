@@ -24,6 +24,7 @@ OC.L10N.register(
     "Desired tone" : "Željeni ton",
     "In which tone should your text be rewritten?" : "U kojem tonu treba preoblikovati vaš tekst?",
     "The rewritten text in the desired tone, written by the assistant:" : "Preoblikovani tekst u željenom tonu, koji je napisao asistent:",
+    "Cannot generate less than 1 image" : "Nije moguće generirati manje od 1 slike",
     "Generate speech" : "Generiraj govor",
     "Generate speech from a transcript" : "Generiraj govor iz transkripta",
     "Prompt" : "Upit",
