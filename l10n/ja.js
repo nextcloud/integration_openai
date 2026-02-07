@@ -37,6 +37,7 @@ OC.L10N.register(
     "The rewritten text in the desired tone, written by the assistant:" : "アシスタントが書き直した、希望するトーンの文章：",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "オプション。生成される画像のサイズ。256x256形式で指定する必要があります。デフォルトは %s",
     "The model used to generate the images" : "画像を生成するために使用されたモデル",
+    "Cannot generate less than 1 image" : "1枚未満の画像を生成できません",
     "Generate speech" : "スピーチの生成",
     "Generate speech from a transcript" : "原稿からスピーチを生成する",
     "Prompt" : "プロンプト",
