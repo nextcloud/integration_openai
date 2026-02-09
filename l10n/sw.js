@@ -50,6 +50,8 @@ OC.L10N.register(
     "The model used to generate the completion" : "Muundo uliotumika kuzalisha kukamilika",
     "Output voice" : "Sauti inayotoka",
     "The voice used to generate speech" : "Sauti inayotumika kutoa hotuba",
+    "Memories" : "Memories",
+    "The memories to be injected into the chat session." : "The memories to be injected into the chat session.",
     "Text-to-speech model" : "Muundo wa maandishi-hadi-hotuba",
     "The model used to generate the speech" : "Muundo uliotumika kutengeneza hotuba",
     "Speed" : "Kasi",
