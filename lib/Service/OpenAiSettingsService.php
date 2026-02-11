@@ -1364,7 +1364,7 @@ class OpenAiSettingsService {
 		// That the variable types are correct
 		foreach (array_keys($userConfig) as $key) {
 			if (gettype($userConfig[$key]) !== self::USER_CONFIG_TYPES[$key]) {
-				throw new Exception('Invalid type for key: ' . $key . '. Expected ' . self::ADMIN_CONFIG_TYPES[$key] . ', got ' . gettype($userConfig[$key]));
+				throw new Exception('Invalid type for key: ' . $key . '. Expected ' . self::USER_CONFIG_TYPES[$key] . ', got ' . gettype($userConfig[$key]));
 			}
 		}
 
