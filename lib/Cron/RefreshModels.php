@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Cron;
 
+use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
@@ -27,5 +28,9 @@ class RefreshModels extends TimedJob {
 	protected function run($argument) {
 		$this->logger->debug('Run daily model refresh job');
 		$this->openAIAPIService->getModels(null, true);
+		$this->openAIAPIService->getModels(null, true, Application::SERVICE_TYPE_TTS);
+		$this->openAIAPIService->getModels(null, true, Application::SERVICE_TYPE_STT);
+		$this->openAIAPIService->getModels(null, true, Application::SERVICE_TYPE_IMAGE);
+
 	}
 }
