@@ -75,6 +75,7 @@
     "Size" : "Tamaño",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Opcional. El tamaño de las imágenes generadas. Debe estar en formato 256x256. El valor por defecto es %s",
     "The model used to generate the images" : "El modelo utilizado para generar las imágenes",
+    "Cannot generate less than 1 image" : "No se puede generar menos de 1 imágen",
     "Voice" : "Voz",
     "The voice to use" : "La voz a utilizar",
     "Generate speech" : "Generar dictado",
