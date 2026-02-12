@@ -39,6 +39,7 @@ OC.L10N.register(
     "In which tone should your text be rewritten?" : "您的文本应该以何种语气重写？",
     "The rewritten text in the desired tone, written by the assistant:" : "由助手以所需的语气重写的文本：",
     "Size" : "尺寸",
+    "Cannot generate less than 1 image" : "至少需要生成一张图片",
     "Generate speech" : "生成语音",
     "Generate speech from a transcript" : "从转录生成语音",
     "Prompt" : "提示",
