@@ -142,6 +142,14 @@ class OpenAiAPIService {
 	 * @throws Exception
 	 */
 	public function getModels(?string $userId, bool $refresh = false, ?string $serviceType = null): array {
+		// Use default service type if service type is not overridden
+		if ($serviceType === Application::SERVICE_TYPE_IMAGE && !$this->openAiSettingsService->imageOverrideEnabled()) {
+			$serviceType = null;
+		} elseif ($serviceType === Application::SERVICE_TYPE_STT && !$this->openAiSettingsService->sttOverrideEnabled()) {
+			$serviceType = null;
+		} elseif ($serviceType === Application::SERVICE_TYPE_TTS && !$this->openAiSettingsService->ttsOverrideEnabled()) {
+			$serviceType = null;
+		}
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
 		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . ($userId ?? '') . '_' . ($serviceType ?? 'main');
 		$adminCacheKey = Application::MODELS_CACHE_KEY . '-main' . '_' . ($serviceType ?? 'main');
