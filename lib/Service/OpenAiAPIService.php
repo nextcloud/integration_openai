@@ -916,7 +916,7 @@ class OpenAiAPIService {
 	 * @return void
 	 */
 	public function updateExpTextProcessingTime(int $runtime): void {
-		$oldTime = floatval($this->getExpImgProcessingTime());
+		$oldTime = floatval($this->getExpTextProcessingTime());
 		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
 		if ($this->isUsingOpenAi()) {
