@@ -76,6 +76,7 @@ OC.L10N.register(
     "Size" : "Taille",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Facultatif. La taille des images générées. Doit être au format 256x256. Par défaut elle est de %s",
     "The model used to generate the images" : "Le modèle utilisé pour générer les images",
+    "Cannot generate less than 1 image" : "Impossible de générer moins d'une image",
     "Voice" : "Voix",
     "The voice to use" : "La voix à utiliser",
     "Generate speech" : "Générer une synthèse vocale",
