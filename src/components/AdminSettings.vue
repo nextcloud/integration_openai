@@ -607,36 +607,38 @@
 				<h2>
 					{{ t('integration_openai', 'Select enabled features') }}
 				</h2>
-				<NcFormBoxSwitch
-					:model-value="state.translation_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'translation_provider_enabled', false)">
-					{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
-				</NcFormBoxSwitch>
-				<NcFormBoxSwitch
-					:model-value="state.llm_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'llm_provider_enabled', false)">
-					{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write, etc.)') }}
-				</NcFormBoxSwitch>
-				<NcFormBoxSwitch
-					:model-value="state.t2i_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 't2i_provider_enabled', false)">
-					{{ t('integration_openai', 'Image generation provider') }}
-				</NcFormBoxSwitch>
-				<NcFormBoxSwitch
-					:model-value="state.stt_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'stt_provider_enabled', false)">
-					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
-				</NcFormBoxSwitch>
-				<NcFormBoxSwitch
-					:model-value="state.tts_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
-					{{ t('integration_openai', 'Text-to-speech provider') }}
-				</NcFormBoxSwitch>
-				<NcFormBoxSwitch
-					:model-value="state.analyze_image_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'analyze_image_provider_enabled', false)">
-					{{ t('integration_openai', 'Analyze image provider') }}
-				</NcFormBoxSwitch>
+				<NcFormBox class="features-form-box">
+					<NcFormBoxSwitch
+						:model-value="state.translation_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'translation_provider_enabled', false)">
+						{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.llm_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'llm_provider_enabled', false)">
+						{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write, etc.)') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.t2i_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 't2i_provider_enabled', false)">
+						{{ t('integration_openai', 'Image generation provider') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.stt_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'stt_provider_enabled', false)">
+						{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.tts_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
+						{{ t('integration_openai', 'Text-to-speech provider') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.analyze_image_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'analyze_image_provider_enabled', false)">
+						{{ t('integration_openai', 'Analyze image provider') }}
+					</NcFormBoxSwitch>
+				</NcFormBox>
 			</div>
 		</div>
 	</div>
@@ -656,6 +658,7 @@ import OpenAiIcon from './icons/OpenAiIcon.vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
+import NcFormBox from '@nextcloud/vue/components/NcFormBox'
 import NcFormBoxSwitch from '@nextcloud/vue/components/NcFormBoxSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
@@ -689,6 +692,7 @@ export default {
 		NcButton,
 		NcSelect,
 		NcCheckboxRadioSwitch,
+		NcFormBox,
 		NcFormBoxSwitch,
 		NcTextField,
 		NcInputField,
@@ -1141,5 +1145,10 @@ export default {
 }
 .notecard {
 	max-width: 900px;
+}
+
+.features-form-box {
+	width: max-content;
+	max-width: 100%;
 }
 </style>
