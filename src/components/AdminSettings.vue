@@ -320,11 +320,11 @@
 					</NcButton>
 				</div>
 				<div class="line">
-					<NcCheckboxRadioSwitch
+					<NcFormBoxSwitch
 						:model-value="state.use_max_completion_tokens_param"
 						@update:model-value="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
 						{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
-					</NcCheckboxRadioSwitch>
+					</NcFormBoxSwitch>
 				</div>
 			</div>
 			<div>
@@ -393,11 +393,11 @@
 					</NcButton>
 				</div>
 				<div class="line">
-					<NcCheckboxRadioSwitch
+					<NcFormBoxSwitch
 						:model-value="state.image_request_auth"
 						@update:model-value="onCheckboxChanged($event, 'image_request_auth', false)">
 						{{ t('integration_openai', 'Use authentication for image retrieval request') }}
-					</NcCheckboxRadioSwitch>
+					</NcFormBoxSwitch>
 				</div>
 			</div>
 			<div>
@@ -607,36 +607,38 @@
 				<h2>
 					{{ t('integration_openai', 'Select enabled features') }}
 				</h2>
-				<NcCheckboxRadioSwitch
-					:model-value="state.translation_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'translation_provider_enabled', false)">
-					{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:model-value="state.llm_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'llm_provider_enabled', false)">
-					{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write, etc.)') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:model-value="state.t2i_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 't2i_provider_enabled', false)">
-					{{ t('integration_openai', 'Image generation provider') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:model-value="state.stt_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'stt_provider_enabled', false)">
-					{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:model-value="state.tts_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
-					{{ t('integration_openai', 'Text-to-speech provider') }}
-				</NcCheckboxRadioSwitch>
-				<NcCheckboxRadioSwitch
-					:model-value="state.analyze_image_provider_enabled"
-					@update:model-value="onCheckboxChanged($event, 'analyze_image_provider_enabled', false)">
-					{{ t('integration_openai', 'Analyze image provider') }}
-				</NcCheckboxRadioSwitch>
+				<NcFormBox class="features-form-box">
+					<NcFormBoxSwitch
+						:model-value="state.translation_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'translation_provider_enabled', false)">
+						{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.llm_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'llm_provider_enabled', false)">
+						{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write, etc.)') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.t2i_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 't2i_provider_enabled', false)">
+						{{ t('integration_openai', 'Image generation provider') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.stt_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'stt_provider_enabled', false)">
+						{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.tts_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
+						{{ t('integration_openai', 'Text-to-speech provider') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.analyze_image_provider_enabled"
+						@update:model-value="onCheckboxChanged($event, 'analyze_image_provider_enabled', false)">
+						{{ t('integration_openai', 'Analyze image provider') }}
+					</NcFormBoxSwitch>
+				</NcFormBox>
 			</div>
 		</div>
 	</div>
@@ -656,6 +658,8 @@ import OpenAiIcon from './icons/OpenAiIcon.vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
+import NcFormBox from '@nextcloud/vue/components/NcFormBox'
+import NcFormBoxSwitch from '@nextcloud/vue/components/NcFormBoxSwitch'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
@@ -688,6 +692,8 @@ export default {
 		NcButton,
 		NcSelect,
 		NcCheckboxRadioSwitch,
+		NcFormBox,
+		NcFormBoxSwitch,
 		NcTextField,
 		NcInputField,
 		NcNoteCard,
@@ -1139,5 +1145,10 @@ export default {
 }
 .notecard {
 	max-width: 900px;
+}
+
+.features-form-box {
+	width: max-content;
+	max-width: 100%;
 }
 </style>
