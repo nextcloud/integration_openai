@@ -77,6 +77,7 @@ OC.L10N.register(
     "Size" : "Μέγεθος",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Προαιρετικό. Το μέγεθος των δημιουργημένων εικόνων. Πρέπει να είναι σε μορφή 256x256. Προεπιλογή είναι %s",
     "The model used to generate the images" : "Το μοντέλο που χρησιμοποιείται για τη δημιουργία των εικόνων",
+    "Cannot generate less than 1 image" : "Δεν είναι δυνατή η δημιουργία λιγότερης από 1 εικόνας",
     "Voice" : "Φωνή",
     "The voice to use" : "Η φωνή που θα χρησιμοποιηθεί",
     "Generate speech" : "Δημιουργία ομιλίας",
