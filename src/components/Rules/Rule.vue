@@ -38,12 +38,11 @@
 				type="number"
 				:label="t('integration_openai', 'Rule Priority')"
 				@update:model-value="update('priority', $event)" />
-			<NcCheckboxRadioSwitch
+			<NcFormBoxSwitch
 				:model-value="ruleData.pool"
-				type="switch"
 				@update:model-value="update('pool', $event)">
 				{{ t('integration_openai', 'Use shared quota') }}
-			</NcCheckboxRadioSwitch>
+			</NcFormBoxSwitch>
 			<NcButton v-if="needSaving"
 				:disabled="saving"
 				variant="success"
@@ -62,7 +61,7 @@
 
 <script>
 import NcInputField from '@nextcloud/vue/components/NcInputField'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcFormBoxSwitch from '@nextcloud/vue/components/NcFormBoxSwitch'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import DeleteOutlineIcon from 'vue-material-design-icons/DeleteOutline.vue'
@@ -79,7 +78,7 @@ export default {
 		NcInputField,
 		NcSelect,
 		MultiselectWho,
-		NcCheckboxRadioSwitch,
+		NcFormBoxSwitch,
 		DeleteOutlineIcon,
 	},
 
