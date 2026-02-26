@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.3.0 - 2026-02-26
+
+### Changed
+
+- Update checkboxes to use new NcFormBoxSwitch component @lukasdotcom [#343](https://github.com/nextcloud/integration_openai/pull/343)
+
+### Fixed
+
+- Fix incorrect method call in updateExpTetProcessingTime @printminion-co [#334](https://github.com/nextcloud/integration_openai/pull/334)
+- Fix empty model list for image, tts, and stt when not overriden @lukasdotcom [#342](https://github.com/nextcloud/integration_openai/pull/342)
+- Fix wrong user config error @lukasdotcom [#341](https://github.com/nextcloud/integration_openai/pull/341)
+
 ## 4.2.0 - 2026-01-16
 
 ### Added
