@@ -8,6 +8,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.10.1 - 2026-02-26
+
+### Fixed
+- Fix incorrect method call in updateExpTetProcessingTime @printminion-co [#334](https://github.com/nextcloud/integration_openai/pull/334)
+- Fix wrong user config error @lukasdotcom [#341](https://github.com/nextcloud/integration_openai/pull/341)
+
 ## 3.10.0 – 2026-01-14
 
 ### Added
