@@ -139,36 +139,46 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
 		}
 
+		$useChatEndpoint = $this->appConfig->getValueString(Application::APP_ID, 'image_request_chat', lazy: true) === '1';
+
 		try {
-			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $model, $nbImages, $size);
-			$b64s = array_map(static function (array $result) {
-				return $result['b64_json'] ?? null;
-			}, $apiResponse['data']);
-			$b64s = array_filter($b64s, static function (?string $b64) {
-				return $b64 !== null;
-			});
-			$b64s = array_values($b64s);
+			if ($useChatEndpoint) {
+				$b64s = $this->openAiAPIService->generateImageWithChatCompletion($userId, $prompt, $model, $nbImages, $size);
+				if (empty($b64s)) {
+					$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
+					throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
+				}
+			} else {
+				$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $model, $nbImages, $size);
+				$b64s = array_map(static function (array $result) {
+					return $result['b64_json'] ?? null;
+				}, $apiResponse['data']);
+				$b64s = array_filter($b64s, static function (?string $b64) {
+					return $b64 !== null;
+				});
+				$b64s = array_values($b64s);
 
-			$urls = array_map(static function (array $result) {
-				return $result['url'] ?? null;
-			}, $apiResponse['data']);
-			$urls = array_filter($urls, static function (?string $url) {
-				return $url !== null;
-			});
-			$urls = array_values($urls);
+				$urls = array_map(static function (array $result) {
+					return $result['url'] ?? null;
+				}, $apiResponse['data']);
+				$urls = array_filter($urls, static function (?string $url) {
+					return $url !== null;
+				});
+				$urls = array_values($urls);
 
-			if (empty($urls) && empty($b64s)) {
-				$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
-				throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
-			}
-			$client = $this->clientService->newClient();
-			$requestOptions = $this->openAiAPIService->getImageRequestOptions($userId);
-			$output = ['images' => []];
-			foreach ($urls as $url) {
-				$imageResponse = $client->get($url, $requestOptions);
-				$image = $imageResponse->getBody();
-				$image = $includeWatermark ? $this->watermarkingService->markImage($image) : $image;
-				$output['images'][] = $image;
+				if (empty($urls) && empty($b64s)) {
+					$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
+					throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
+				}
+				$client = $this->clientService->newClient();
+				$requestOptions = $this->openAiAPIService->getImageRequestOptions($userId);
+				$output = ['images' => []];
+				foreach ($urls as $url) {
+					$imageResponse = $client->get($url, $requestOptions);
+					$image = $imageResponse->getBody();
+					$image = $includeWatermark ? $this->watermarkingService->markImage($image) : $image;
+					$output['images'][] = $image;
+				}
 			}
 			foreach ($b64s as $b64) {
 				$imagePayload = base64_decode($b64);

@@ -399,6 +399,13 @@
 						{{ t('integration_openai', 'Use authentication for image retrieval request') }}
 					</NcFormBoxSwitch>
 				</div>
+				<div class="line">
+					<NcFormBoxSwitch
+						:model-value="state.image_request_chat"
+						@update:model-value="onCheckboxChanged($event, 'image_request_chat', false)">
+						{{ t('integration_openai', 'Use the chat completion endpoint to generate images (only works with multimodal models)') }}
+					</NcFormBoxSwitch>
+				</div>
 			</div>
 			<div>
 				<h2>
@@ -802,17 +809,57 @@ export default {
 			})
 		},
 		async getAllModels(shouldSave = true) {
-			const models = this.getModels() // Gets the default models. getModels returns a promise
+			const modelsPromise = this.getModels() // Gets the default models. getModels returns a promise
 			console.debug(this.models)
 			const [imageModels, sttModels, ttsModels] = await Promise.all([
-				this.state.image_url === '' ? models : this.getModels('image'),
-				this.state.stt_url === '' ? models : this.getModels('stt'),
-				this.state.tts_url === '' ? models : this.getModels('tts'),
+				this.state.image_url === '' ? modelsPromise : this.getModels('image'),
+				this.state.stt_url === '' ? modelsPromise : this.getModels('stt'),
+				this.state.tts_url === '' ? modelsPromise : this.getModels('tts'),
 			])
-			this.models = await models
+			this.models = await modelsPromise
+			// TODO show all models if the filtered list is empty
+			// rename imageModels to imageServiceModels
+			// add an imageModels computed that filters
+			// should we have a switch to toggle multimodal calls?
 			this.imageModels = imageModels
+				.filter(m => {
+					const isOpenAiImageModel = [
+						'gpt-image-1.5',
+						'dall-e-2',
+						'dall-e-3',
+						'gpt-image-1',
+						'gpt-image-1-mini',
+					].includes(m.id)
+					const hasModalities = m.architecture?.input_modalities?.includes('text')
+						&& m.architecture?.output_modalities?.includes('image')
+					return isOpenAiImageModel || hasModalities
+				})
 			this.sttModels = sttModels
+				.filter(m => {
+					const isOpenAiTranscriptionModel = [
+						'gpt-4o-transcribe',
+						'gpt-4o-mini-transcribe',
+						'gpt-4o-mini-transcribe-2025-12-15',
+						'whisper-1',
+						'gpt-4o-transcribe-diarize',
+					].includes(m.id)
+					const hasModalities = m.architecture?.input_modalities?.includes('audio')
+						&& m.architecture?.input_modalities?.includes('text')
+						&& m.architecture?.output_modalities?.includes('text')
+					return isOpenAiTranscriptionModel || hasModalities
+				})
 			this.ttsModels = ttsModels
+				.filter(m => {
+					const isOpenAiTtsModel = [
+						'tts-1',
+						'tts-1-hd',
+						'gpt-4o-mini-tts',
+						'gpt-4o-mini-tts-2025-12-15',
+					].includes(m.id)
+					const hasModalities = m.architecture?.input_modalities?.includes('text')
+						&& m.architecture?.output_modalities?.includes('audio')
+					return isOpenAiTtsModel || hasModalities
+				})
 
 			const defaultCompletionModelId = this.state.default_completion_model_id
 			const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)

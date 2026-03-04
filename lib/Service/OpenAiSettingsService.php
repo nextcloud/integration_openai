@@ -31,6 +31,7 @@ class OpenAiSettingsService {
 		'default_image_model_id' => 'string',
 		'default_image_size' => 'string',
 		'image_request_auth' => 'boolean',
+		'image_request_chat' => 'boolean',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
 		'use_max_completion_tokens_param' => 'boolean',
@@ -573,6 +574,7 @@ class OpenAiSettingsService {
 			'default_image_model_id' => $this->getAdminDefaultImageModelId(),
 			'default_image_size' => $this->getAdminDefaultImageSize(),
 			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
+			'image_request_chat' => $this->getIsImageGenerationUsingChatEndpoint(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
 			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
@@ -663,6 +665,13 @@ class OpenAiSettingsService {
 		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 		$default = $isUsingOpenAI ? '0' : '1';
 		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default, lazy: true) === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getIsImageGenerationUsingChatEndpoint(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_chat', '0', lazy: true) === '1';
 	}
 
 	/**
@@ -1229,6 +1238,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['image_request_auth'])) {
 			$this->setIsImageRetrievalAuthenticated($adminConfig['image_request_auth']);
 		}
+		if (isset($adminConfig['image_request_chat'])) {
+			$this->setIsImageGenerationUsingChatEndpoint($adminConfig['image_request_chat']);
+		}
 		if (isset($adminConfig['chunk_size'])) {
 			$this->setChunkSize(intval($adminConfig['chunk_size']));
 		}
@@ -1405,6 +1417,14 @@ class OpenAiSettingsService {
 	 */
 	public function setIsImageRetrievalAuthenticated(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'image_request_auth', $enabled ? '1' : '0', lazy: true);
+	}
+
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setIsImageGenerationUsingChatEndpoint(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'image_request_chat', $enabled ? '1' : '0', lazy: true);
 	}
 
 	/**
