@@ -32,6 +32,7 @@ class OpenAiSettingsService {
 		'default_image_size' => 'string',
 		'image_request_auth' => 'boolean',
 		'image_request_chat' => 'boolean',
+		'stt_request_chat' => 'boolean',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
 		'use_max_completion_tokens_param' => 'boolean',
@@ -575,6 +576,7 @@ class OpenAiSettingsService {
 			'default_image_size' => $this->getAdminDefaultImageSize(),
 			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
 			'image_request_chat' => $this->getIsImageGenerationUsingChatEndpoint(),
+			'stt_request_chat' => $this->getIsSttUsingChatEndpoint(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
 			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
@@ -672,6 +674,13 @@ class OpenAiSettingsService {
 	 */
 	public function getIsImageGenerationUsingChatEndpoint(): bool {
 		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_chat', '0', lazy: true) === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getIsSttUsingChatEndpoint(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'stt_request_chat', '0', lazy: true) === '1';
 	}
 
 	/**
@@ -1241,6 +1250,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['image_request_chat'])) {
 			$this->setIsImageGenerationUsingChatEndpoint($adminConfig['image_request_chat']);
 		}
+		if (isset($adminConfig['stt_request_chat'])) {
+			$this->setIsSttUsingChatEndpoint($adminConfig['stt_request_chat']);
+		}
 		if (isset($adminConfig['chunk_size'])) {
 			$this->setChunkSize(intval($adminConfig['chunk_size']));
 		}
@@ -1425,6 +1437,14 @@ class OpenAiSettingsService {
 	 */
 	public function setIsImageGenerationUsingChatEndpoint(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'image_request_chat', $enabled ? '1' : '0', lazy: true);
+	}
+
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setIsSttUsingChatEndpoint(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'stt_request_chat', $enabled ? '1' : '0', lazy: true);
 	}
 
 	/**

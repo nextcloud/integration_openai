@@ -954,6 +954,101 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * Transcribe audio with the chat completion endpoint
+	 *
+	 * @param string|null $userId
+	 * @param File $file
+	 * @param string $model
+	 * @param string $language
+	 * @return string
+	 * @throws Exception
+	 */
+	public function transcribeWithChatCompletion(
+		?string $userId,
+		File $file,
+		string $model = Application::DEFAULT_MODEL_ID,
+		string $language = 'default',
+	): string {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
+			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
+
+		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
+			? Application::DEFAULT_TRANSCRIPTION_MODEL_ID
+			: $model;
+
+		try {
+			$audioBase64 = base64_encode($file->getContent());
+		} catch (NotPermittedException|LockedException|GenericFileException $e) {
+			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		$extension = pathinfo($file->getName(), PATHINFO_EXTENSION);
+		$audioFormat = in_array($extension, ['wav', 'mp3', 'mp4', 'ogg', 'flac', 'webm']) ? $extension : 'wav';
+
+		$textPrompt = 'Transcribe the following audio file. Return only the transcription text, nothing else.';
+		if ($language !== 'default' && $language !== 'detect_language') {
+			$textPrompt .= ' The audio language is ' . $language . '.';
+		}
+
+		$messages = [
+			[
+				'role' => 'user',
+				'content' => [
+					[
+						'type' => 'input_audio',
+						'input_audio' => [
+							'data' => $audioBase64,
+							'format' => $audioFormat,
+						],
+					],
+					[
+						'type' => 'text',
+						'text' => $textPrompt,
+					],
+				],
+			],
+		];
+
+		$params = [
+			'model' => $modelRequestParam,
+			'messages' => $messages,
+			'modalities' => ['text'],
+		];
+
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
+
+		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
+		if ($adminExtraParams !== null) {
+			$params = array_merge($adminExtraParams, $params);
+		}
+
+		$response = $this->request($userId, 'chat/completions', $params, 'POST', serviceType: Application::SERVICE_TYPE_STT);
+
+		if (!isset($response['choices'])) {
+			$this->logger->warning('Audio transcription via chat completion error: ' . json_encode($response));
+			throw new Exception($this->l10n->t('Unknown audio transcription error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		try {
+			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, 1);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not create quota usage for audio transcription', ['exception' => $e]);
+		}
+
+		foreach ($response['choices'] as $choice) {
+			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
+				return $choice['message']['content'];
+			}
+		}
+
+		throw new Exception($this->l10n->t('No transcription returned'), Http::STATUS_INTERNAL_SERVER_ERROR);
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @return array
 	 */

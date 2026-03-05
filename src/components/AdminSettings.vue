@@ -456,6 +456,13 @@
 				<NcNoteCard v-else type="info">
 					{{ t('integration_openai', 'No models to list') }}
 				</NcNoteCard>
+				<div class="line">
+					<NcFormBoxSwitch
+						:model-value="state.stt_request_chat"
+						@update:model-value="onCheckboxChanged($event, 'stt_request_chat', false)">
+						{{ t('integration_openai', 'Use the chat completion endpoint to transcribe audio (only works with multimodal models)') }}
+					</NcFormBoxSwitch>
+				</div>
 			</div>
 			<h2>
 				{{ t('integration_openai', 'Text to speech') }}
