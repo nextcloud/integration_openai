@@ -914,6 +914,7 @@ class OpenAiAPIService {
 		$params = [
 			'model' => $modelRequestParam,
 			'messages' => $messages,
+			'modalities' => ['image'],
 		];
 
 		if ($userId !== null) {
