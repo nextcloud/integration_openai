@@ -101,13 +101,18 @@ class AudioToTextProvider implements ISynchronousProvider {
 		}
 
 		$model = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
+		$useChatEndpoint = $this->appConfig->getValueString(Application::APP_ID, 'stt_request_chat', lazy: true) === '1';
 
 		try {
-			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model, $language);
+			if ($useChatEndpoint) {
+				$transcription = $this->openAiAPIService->transcribeWithChatCompletion($userId, $inputFile, $model, $language);
+			} else {
+				$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model, $language);
+			}
 			return ['output' => $transcription];
 		} catch (Exception $e) {
-			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
+			$this->logger->warning('OpenAI\'s audio transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
+			throw new RuntimeException('OpenAI\'s audio transcription failed with: ' . $e->getMessage());
 		}
 	}
 }
