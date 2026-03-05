@@ -143,7 +143,13 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 
 		try {
 			if ($useChatEndpoint) {
-				$b64s = $this->openAiAPIService->generateImageWithChatCompletion($userId, $prompt, $model, $nbImages, $size);
+				$b64s = [];
+				foreach (range(1, $nbImages) as $i) {
+					$b64 = $this->openAiAPIService->generateImageWithChatCompletion($userId, $prompt, $model, $size);
+					if ($b64 !== null && $b64 !== '') {
+						$b64s[] = $b64;
+					}
+				}
 				if (empty($b64s)) {
 					$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed: no image returned');
 					throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
