@@ -538,6 +538,13 @@
 				:no-wrap="true"
 				input-id="openai-tts-voices-select"
 				@click="onInput()" />
+			<div class="line">
+				<NcFormBoxSwitch
+					:model-value="state.tts_request_chat"
+					@update:model-value="onCheckboxChanged($event, 'tts_request_chat', false)">
+					{{ t('integration_openai', 'Use the chat completion endpoint to generate speech (only works with multimodal models)') }}
+				</NcFormBoxSwitch>
+			</div>
 			<div>
 				<h2 style="margin: 10px 0 -10px 0">
 					{{ t('integration_openai', 'Usage limits') }}
