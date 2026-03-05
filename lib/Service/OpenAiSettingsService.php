@@ -33,6 +33,7 @@ class OpenAiSettingsService {
 		'image_request_auth' => 'boolean',
 		'image_request_chat' => 'boolean',
 		'stt_request_chat' => 'boolean',
+		'tts_request_chat' => 'boolean',
 		'chunk_size' => 'integer',
 		'max_tokens' => 'integer',
 		'use_max_completion_tokens_param' => 'boolean',
@@ -577,6 +578,7 @@ class OpenAiSettingsService {
 			'image_request_auth' => $this->getIsImageRetrievalAuthenticated(),
 			'image_request_chat' => $this->getIsImageGenerationUsingChatEndpoint(),
 			'stt_request_chat' => $this->getIsSttUsingChatEndpoint(),
+			'tts_request_chat' => $this->getIsTtsUsingChatEndpoint(),
 			'chunk_size' => strval($this->getChunkSize()),
 			'max_tokens' => $this->getMaxTokens(),
 			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
@@ -681,6 +683,13 @@ class OpenAiSettingsService {
 	 */
 	public function getIsSttUsingChatEndpoint(): bool {
 		return $this->appConfig->getValueString(Application::APP_ID, 'stt_request_chat', '0', lazy: true) === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getIsTtsUsingChatEndpoint(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'tts_request_chat', '0', lazy: true) === '1';
 	}
 
 	/**
@@ -1253,6 +1262,9 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['stt_request_chat'])) {
 			$this->setIsSttUsingChatEndpoint($adminConfig['stt_request_chat']);
 		}
+		if (isset($adminConfig['tts_request_chat'])) {
+			$this->setIsTtsUsingChatEndpoint($adminConfig['tts_request_chat']);
+		}
 		if (isset($adminConfig['chunk_size'])) {
 			$this->setChunkSize(intval($adminConfig['chunk_size']));
 		}
@@ -1445,6 +1457,14 @@ class OpenAiSettingsService {
 	 */
 	public function setIsSttUsingChatEndpoint(bool $enabled): void {
 		$this->appConfig->setValueString(Application::APP_ID, 'stt_request_chat', $enabled ? '1' : '0', lazy: true);
+	}
+
+	/**
+	 * @param bool $enabled
+	 * @return void
+	 */
+	public function setIsTtsUsingChatEndpoint(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'tts_request_chat', $enabled ? '1' : '0', lazy: true);
 	}
 
 	/**

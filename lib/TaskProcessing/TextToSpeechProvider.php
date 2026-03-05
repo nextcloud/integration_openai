@@ -151,7 +151,13 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		}
 
 		try {
-			$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $prompt, $model, $voice, $speed);
+			$useChatEndpoint = $this->appConfig->getValueString(Application::APP_ID, 'tts_request_chat', lazy: true) === '1';
+
+			if ($useChatEndpoint) {
+				$apiResponse = $this->openAiAPIService->sttWithChatCompletion($userId, $prompt, $model, $voice, $speed);
+			} else {
+				$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $prompt, $model, $voice, $speed);
+			}
 
 			if (!isset($apiResponse['body'])) {
 				$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
@@ -161,8 +167,8 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 
 			return ['speech' => $audio];
 		} catch (\Exception $e) {
-			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
+			$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
+			throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage());
 		}
 	}
 }

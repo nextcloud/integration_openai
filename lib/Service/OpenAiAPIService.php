@@ -1049,6 +1049,202 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * Generate speech with the chat completion endpoint using the audio modality
+	 * This requires stream: true as the OpenAI API mandates streaming for audio output
+	 *
+	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param string $model
+	 * @param string $voice
+	 * @param float $speed
+	 * @return array{body: string}
+	 * @throws Exception
+	 */
+	public function sttWithChatCompletion(
+		?string $userId,
+		string $prompt,
+		string $model,
+		string $voice,
+		float $speed = 1,
+	): array {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH)) {
+			throw new Exception($this->l10n->t('Speech generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
+
+		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
+			? Application::DEFAULT_SPEECH_MODEL_ID
+			: $model;
+
+		$messages = [
+			[
+				'role' => 'user',
+				'content' => 'Read the following text aloud: ' . $prompt,
+			],
+		];
+
+		$params = [
+			'model' => $modelRequestParam,
+			'messages' => $messages,
+			'modalities' => ['text', 'audio'],
+			'audio' => [
+				'voice' => $voice === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_VOICE : $voice,
+				'format' => 'pcm16',
+			],
+			'stream' => true,
+		];
+
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
+
+		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
+		if ($adminExtraParams !== null) {
+			$params = array_merge($adminExtraParams, $params);
+		}
+
+		// Build the request manually since we need to handle streaming
+		$serviceType = Application::SERVICE_TYPE_TTS;
+		if ($serviceType === Application::SERVICE_TYPE_TTS && $this->openAiSettingsService->ttsOverrideEnabled()) {
+			$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
+			$apiKey = $this->openAiSettingsService->getAdminTtsApiKey();
+			$basicUser = $this->openAiSettingsService->getAdminTtsBasicUser();
+			$basicPassword = $this->openAiSettingsService->getAdminTtsBasicPassword();
+			$useBasicAuth = $this->openAiSettingsService->getAdminTtsUseBasicAuth();
+			$timeout = $this->openAiSettingsService->getTtsRequestTimeout();
+		} else {
+			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+			if ($serviceUrl === '') {
+				$serviceUrl = Application::OPENAI_API_BASE_URL;
+			}
+			$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
+			$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
+			$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
+			$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
+			$timeout = $this->openAiSettingsService->getRequestTimeout();
+		}
+
+		$url = rtrim($serviceUrl, '/') . '/chat/completions';
+		$options = [
+			'timeout' => $timeout,
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Content-Type' => 'application/json',
+			],
+			'body' => json_encode($params),
+		];
+
+		if ($this->isUsingOpenAi($serviceType) || !$useBasicAuth) {
+			if ($apiKey !== '') {
+				$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
+			}
+		} else {
+			if ($basicUser !== '' && $basicPassword !== '') {
+				$options['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
+			}
+		}
+
+		if (!$this->isUsingOpenAi($serviceType)) {
+			$options['nextcloud']['allow_local_address'] = true;
+		}
+
+		try {
+			$response = $this->client->post($url, $options);
+		} catch (ClientException|ServerException $e) {
+			$responseBody = $e->getResponse()->getBody();
+			$parsedResponseBody = json_decode($responseBody, true);
+			$this->logger->warning('API request error: ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
+			throw new Exception(
+				$this->l10n->t('API request error: ') . (
+					$parsedResponseBody['error']['message'] ?? $e->getMessage()
+				),
+				intval($e->getCode()),
+			);
+		}
+
+		$body = $response->getBody();
+
+		// Parse SSE stream to accumulate audio base64 chunks
+		$audioBase64 = '';
+		$lines = explode("\n", $body);
+		foreach ($lines as $line) {
+			$line = trim($line);
+			if ($line === '' || $line === 'data: [DONE]') {
+				continue;
+			}
+			if (!str_starts_with($line, 'data: ')) {
+				continue;
+			}
+			$jsonStr = substr($line, 6);
+			$data = json_decode($jsonStr, true);
+			if ($data === null) {
+				continue;
+			}
+			if (isset($data['choices']) && is_array($data['choices'])) {
+				foreach ($data['choices'] as $choice) {
+					if (isset($choice['delta']['audio']['data']) && is_string($choice['delta']['audio']['data'])) {
+						$audioBase64 .= $choice['delta']['audio']['data'];
+					}
+				}
+			}
+		}
+
+		if ($audioBase64 === '') {
+			$this->logger->warning('Speech generation via chat completion error: no audio data in stream');
+			throw new Exception($this->l10n->t('No speech returned'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		$audioData = base64_decode($audioBase64);
+		if ($audioData === false) {
+			throw new Exception($this->l10n->t('Failed to decode audio data'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		// pcm16 is raw PCM: 24kHz, 16-bit, mono, little-endian
+		// Wrap it in a WAV container so audio players can read it
+		$audioData = $this->pcm16ToWav($audioData, 24000, 16, 1);
+
+		try {
+			$charCount = mb_strlen($prompt);
+			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_SPEECH . '. Error: ' . $e->getMessage());
+		}
+
+		return ['body' => $audioData];
+	}
+
+	/**
+	 * Convert raw PCM16 data to a WAV file by prepending a RIFF/WAV header
+	 *
+	 * @param string $pcmData Raw PCM audio data
+	 * @param int $sampleRate Sample rate in Hz (e.g. 24000)
+	 * @param int $bitsPerSample Bits per sample (e.g. 16)
+	 * @param int $numChannels Number of channels (e.g. 1 for mono)
+	 * @return string WAV file content
+	 */
+	private function pcm16ToWav(string $pcmData, int $sampleRate, int $bitsPerSample, int $numChannels): string {
+		$dataSize = strlen($pcmData);
+		$byteRate = $sampleRate * $numChannels * $bitsPerSample / 8;
+		$blockAlign = $numChannels * $bitsPerSample / 8;
+		$chunkSize = 36 + $dataSize;
+
+		$header = pack('A4', 'RIFF');              // ChunkID
+		$header .= pack('V', $chunkSize);          // ChunkSize
+		$header .= pack('A4', 'WAVE');             // Format
+		$header .= pack('A4', 'fmt ');             // Subchunk1ID
+		$header .= pack('V', 16);                  // Subchunk1Size (PCM)
+		$header .= pack('v', 1);                   // AudioFormat (1 = PCM)
+		$header .= pack('v', $numChannels);        // NumChannels
+		$header .= pack('V', $sampleRate);         // SampleRate
+		$header .= pack('V', (int)$byteRate);      // ByteRate
+		$header .= pack('v', (int)$blockAlign);    // BlockAlign
+		$header .= pack('v', $bitsPerSample);      // BitsPerSample
+		$header .= pack('A4', 'data');             // Subchunk2ID
+		$header .= pack('V', $dataSize);           // Subchunk2Size
+
+		return $header . $pcmData;
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @return array
 	 */
