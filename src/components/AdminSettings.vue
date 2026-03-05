@@ -817,11 +817,8 @@ export default {
 				this.state.tts_url === '' ? modelsPromise : this.getModels('tts'),
 			])
 			this.models = await modelsPromise
-			// TODO show all models if the filtered list is empty
-			// rename imageModels to imageServiceModels
-			// add an imageModels computed that filters
-			// should we have a switch to toggle multimodal calls?
-			this.imageModels = imageModels
+
+			const filteredImageModels = imageModels
 				.filter(m => {
 					const isOpenAiImageModel = [
 						'gpt-image-1.5',
@@ -834,7 +831,10 @@ export default {
 						&& m.architecture?.output_modalities?.includes('image')
 					return isOpenAiImageModel || hasModalities
 				})
-			this.sttModels = sttModels
+			// if no models fit, show them all
+			this.imageModels = filteredImageModels.length > 0 ? filteredImageModels : imageModels
+
+			const filteredSttModels = sttModels
 				.filter(m => {
 					const isOpenAiTranscriptionModel = [
 						'gpt-4o-transcribe',
@@ -848,7 +848,9 @@ export default {
 						&& m.architecture?.output_modalities?.includes('text')
 					return isOpenAiTranscriptionModel || hasModalities
 				})
-			this.ttsModels = ttsModels
+			this.sttModels = filteredSttModels.length > 0 ? filteredSttModels : sttModels
+
+			const filteredTtsModel = ttsModels
 				.filter(m => {
 					const isOpenAiTtsModel = [
 						'tts-1',
@@ -860,6 +862,7 @@ export default {
 						&& m.architecture?.output_modalities?.includes('audio')
 					return isOpenAiTtsModel || hasModalities
 				})
+			this.ttsModels = filteredTtsModel.length > 0 ? filteredTtsModel : ttsModels
 
 			const defaultCompletionModelId = this.state.default_completion_model_id
 			const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
