@@ -880,6 +880,79 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * Generate one image with the chat completion endpoint
+	 * The n parameter seems to be ignored so we don't use it
+	 *
+	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param string $model
+	 * @param string $size
+	 * @return string|null
+	 * @throws Exception
+	 */
+	public function generateImageWithChatCompletion(
+		?string $userId,
+		string $prompt,
+		string $model,
+		string $size,
+	): ?string {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
+			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
+
+		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
+			? Application::DEFAULT_IMAGE_MODEL_ID
+			: $model;
+
+		$messages = [
+			[
+				'role' => 'user',
+				'content' => 'Generate an image with size ' . $size . '. Here is the image description: ' . $prompt,
+			],
+		];
+
+		$params = [
+			'model' => $modelRequestParam,
+			'messages' => $messages,
+		];
+
+		if ($userId !== null) {
+			$params['user'] = $userId;
+		}
+
+		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
+		if ($adminExtraParams !== null) {
+			$params = array_merge($adminExtraParams, $params);
+		}
+
+		$response = $this->request($userId, 'chat/completions', $params, 'POST', serviceType: Application::SERVICE_TYPE_IMAGE);
+
+		if (!isset($response['choices'])) {
+			$this->logger->warning('Image generation error: ' . json_encode($response));
+			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		try {
+			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, 1);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+		}
+
+		foreach ($response['choices'] as $choice) {
+			if (isset($choice['message']['images']) && is_array($choice['message']['images'])) {
+				foreach ($choice['message']['images'] as $image) {
+					if (isset($image['image_url']['url']) && is_string($image['image_url']['url'])) {
+						$imagePayload = $image['image_url']['url'];
+						return preg_replace('/^data:image\/(png|jpeg|jpg);base64,/', '', $imagePayload);
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @return array
 	 */
@@ -1167,6 +1240,10 @@ class OpenAiAPIService {
 	 */
 	public function isT2IAvailable(): bool {
 		if ($this->openAiSettingsService->imageOverrideEnabled() || $this->isUsingOpenAi()) {
+			return true;
+		}
+		// let's assume we can generate image if the admin wants to use the chat completion endpoint to generate images
+		if ($this->openAiSettingsService->getIsImageGenerationUsingChatEndpoint()) {
 			return true;
 		}
 		try {
