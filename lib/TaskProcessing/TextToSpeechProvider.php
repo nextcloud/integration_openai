@@ -86,7 +86,9 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 	public function getOptionalInputShapeEnumValues(): array {
 		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
 		return [
-			'voice' => array_map(function ($v) { return new ShapeEnumValue($v, $v); }, $voices),
+			'voice' => array_map(function ($v) {
+				return new ShapeEnumValue($v, $v);
+			}, $voices),
 			'model' => $this->openAiAPIService->getModelEnumValues($this->userId, Application::SERVICE_TYPE_TTS),
 		];
 	}
