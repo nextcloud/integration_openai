@@ -76,6 +76,7 @@
     "Size" : "Dimensione",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Facoltativo. La dimensione delle immagini generate. Devono essere in formato 256x256. Il valore predefinito è %s",
     "The model used to generate the images" : "Il modello utilizzato per generare le immagini",
+    "Cannot generate less than 1 image" : "Non è possibile generare meno di 1 immagine",
     "Voice" : "Voce",
     "The voice to use" : "La voce da usare",
     "This was generated using Artificial Intelligence." : "Questo è stato generato utilizzando l'intelligenza artificiale.",
