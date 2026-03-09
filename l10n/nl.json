@@ -23,6 +23,7 @@
     "In which tone should your text be rewritten?" : "In welke toon wil je de tekst herschreven hebben?",
     "The rewritten text in the desired tone, written by the assistant:" : "De herschreven tekst in de gewenste toon, geschreven door de assistent:",
     "Size" : "Grootte",
+    "Cannot generate less than 1 image" : "Kan niet minder dan 1 afbeelding genereren",
     "Generate speech" : "Genereer spraak",
     "Generate speech from a transcript" : "Genereer spraak op basis van een tekst",
     "Prompt" : "Prompt",
