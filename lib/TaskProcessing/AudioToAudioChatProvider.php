@@ -109,7 +109,9 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
 		$models = $this->openAiAPIService->getModelEnumValues($this->userId);
 		$enumValues = [
-			'voice' => array_map(function ($v) { return new ShapeEnumValue($v, $v); }, $voices),
+			'voice' => array_map(function ($v) {
+				return new ShapeEnumValue($v, $v);
+			}, $voices),
 			'llm_model' => $models,
 		];
 		if (!$isUsingOpenAi) {
