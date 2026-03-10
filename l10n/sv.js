@@ -25,6 +25,7 @@ OC.L10N.register(
     "Desired tone" : "Önskad ton",
     "In which tone should your text be rewritten?" : "I vilken ton ska din text skrivas om?",
     "The rewritten text in the desired tone, written by the assistant:" : "Den omskrivna texten i önskad ton, skriven av assistenten:",
+    "Cannot generate less than 1 image" : "Kan inte generera mindre än 1 bild",
     "Generate speech" : "Generera tal",
     "Generate speech from a transcript" : "Generera tal från en transkription",
     "Prompt" : "Uppmaning",
