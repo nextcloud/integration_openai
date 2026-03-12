@@ -885,6 +885,7 @@ class OpenAiAPIService {
 	 */
 	public function getImageRequestOptions(?string $userId): array {
 		$requestOptions = [
+			'timeout' => $this->openAiSettingsService->getRequestTimeout(),
 			'headers' => [
 				'User-Agent' => Application::USER_AGENT,
 			],
@@ -908,8 +909,6 @@ class OpenAiAPIService {
 				$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
 				$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
 				$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
-
-				$requestOptions['timeout'] = $this->openAiSettingsService->getRequestTimeout();
 			}
 			if ($useBasicAuth) {
 				if ($basicUser !== '' && $basicPassword !== '') {
