@@ -34,7 +34,7 @@
 			"@composer bin all install --ansi",
 			"grep -r 'OCA\\\\OpenAi\\\\Vendor' ./vendor || vendor/bin/php-scoper add-prefix --prefix='OCA\\OpenAi\\Vendor' --output-dir=\".\" --working-dir=\"./vendor/\" -f --config=\"../scoper.inc.php\"",
 			"composer dump-autoload",
-			"composer update --no-scripts"
+			"composer install --no-scripts"
 		]
 	},
 	"require-dev": {

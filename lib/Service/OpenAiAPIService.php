@@ -884,24 +884,37 @@ class OpenAiAPIService {
 	 * @return array
 	 */
 	public function getImageRequestOptions(?string $userId): array {
-		$timeout = $this->openAiSettingsService->getRequestTimeout();
 		$requestOptions = [
-			'timeout' => $timeout,
+			'timeout' => $this->openAiSettingsService->getRequestTimeout(),
 			'headers' => [
 				'User-Agent' => Application::USER_AGENT,
 			],
 		];
 
 		if ($this->openAiSettingsService->getIsImageRetrievalAuthenticated()) {
-			$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
-			if ($useBasicAuth) {
+			if ($this->openAiSettingsService->imageOverrideEnabled()) {
+				$useBasicAuth = $this->openAiSettingsService->getAdminImageUseBasicAuth();
+
+				$apiKey = $this->openAiSettingsService->getAdminImageApiKey();
+				$basicUser = $this->openAiSettingsService->getAdminImageBasicUser();
+				$basicPassword = $this->openAiSettingsService->getAdminImageBasicPassword();
+
+				$requestOptions['timeout'] = $this->openAiSettingsService->getImageRequestTimeout();
+			} else {
+				// image service settings are not overridden
+				$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
+
+				// this has no equivalent when the service URL is overridden
+				// so the user-defined credentials will be ignored
+				$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
 				$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
 				$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
+			}
+			if ($useBasicAuth) {
 				if ($basicUser !== '' && $basicPassword !== '') {
 					$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
 				}
 			} else {
-				$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
 				$requestOptions['headers']['Authorization'] = 'Bearer ' . $apiKey;
 			}
 		}
@@ -1007,15 +1020,11 @@ class OpenAiAPIService {
 	 * @return array decoded request result or error
 	 * @throws Exception
 	 */
-	public function request(?string $userId, string $endPoint, array $params = [], string $method = 'GET', ?string $contentType = null, bool $logErrors = true, ?string $serviceType = null): array {
+	public function request(
+		?string $userId, string $endPoint, array $params = [], string $method = 'GET',
+		?string $contentType = null, bool $logErrors = true, ?string $serviceType = null,
+	): array {
 		try {
-			$serviceUrl = '';
-			$apiKey = '';
-			$basicUser = '';
-			$basicPassword = '';
-			$useBasicAuth = false;
-			$timeout = 0;
-
 			if ($serviceType === Application::SERVICE_TYPE_IMAGE && $this->openAiSettingsService->imageOverrideEnabled()) {
 				$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
 				$apiKey = $this->openAiSettingsService->getAdminImageApiKey();

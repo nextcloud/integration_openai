@@ -660,6 +660,11 @@ class OpenAiSettingsService {
 	 */
 	public function getIsImageRetrievalAuthenticated(): bool {
 		$serviceUrl = $this->getServiceUrl();
+		// the image_request_auth default depends on the service used for image generation
+		// if we override it, we check the one we are really gonna use
+		if ($this->imageOverrideEnabled()) {
+			$serviceUrl = $this->getImageServiceUrl();
+		}
 		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 		$default = $isUsingOpenAI ? '0' : '1';
 		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default, lazy: true) === '1';
