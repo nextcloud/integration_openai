@@ -22,6 +22,7 @@
     "Language" : "Jezik",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",
     "Size" : "Velikost",
+    "Cannot generate less than 1 image" : "Ne morem izdelati manj kot 1 sliko",
     "OpenAI and LocalAI integration" : "Združevalnik OpenAI in LocalAI",
     "Integration of OpenAI and LocalAI services" : "Storitve OpenAI in LocalAI",
     "Service URL" : "Naslov URL storitve",
