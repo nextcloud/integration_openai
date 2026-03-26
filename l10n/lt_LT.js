@@ -20,6 +20,7 @@ OC.L10N.register(
     "Speed" : "Greitis",
     "Language" : "Kalba",
     "Size" : "Dydis",
+    "Cannot generate less than 1 image" : "Negalima sugeneruoti mažiau nei 1 vaizdo",
     "OpenAI and LocalAI integration" : "„OpenAI“ ir „LocalAI“ integracija",
     "Failed to load models" : "Nepavyko įkelti modelių",
     "Example: {example}" : "Pavyzdys: {example}",
