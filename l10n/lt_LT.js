@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Default" : "Numatytasis",
     "Text generation" : "Teksto generavimas",
+    "Image generation" : "Paveikslėlio generavimas",
     "Unknown" : "Nežinoma",
     "seconds" : "sekundes",
     "Unknown text generation error" : "Nežinoma teksto generavimo klaida",

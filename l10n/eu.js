@@ -34,6 +34,7 @@ OC.L10N.register(
     "In which tone should your text be rewritten?" : "Ze tonuan berridatzi beharko litzateke zure testua?",
     "The rewritten text in the desired tone, written by the assistant:" : "Berridatzitako testua nahi den tonuan, laguntzaileak idatzita:",
     "Size" : "Tamaina",
+    "Cannot generate less than 1 image" : "Ezin da irudi 1 baino gutxiago sortu",
     "Generate speech" : "Sortu diskurtsoa",
     "Generate speech from a transcript" : "Sortu diskurtsoa transkripzio batean oinarrituta",
     "Prompt" : "Galdera",
