@@ -19,6 +19,7 @@
     "Speed" : "Sebesség",
     "Language" : "Nyelv",
     "Size" : "?éret",
+    "Cannot generate less than 1 image" : "Nem lehet 1-nél kevesebb képet előállítani",
     "Prompt" : "Prompt",
     "OpenAI and LocalAI integration" : "OpenAI és LocalAI integráció",
     "Integration of OpenAI and LocalAI services" : "OpenAI és LocalAI szolgáltatások integrációja",
