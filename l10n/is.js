@@ -13,6 +13,7 @@ OC.L10N.register(
     "Language" : "Tungumál",
     "Input text" : "Inntakstexti",
     "Size" : "Stærð",
+    "Cannot generate less than 1 image" : "Get ekki útbúið minna en 1 mynd",
     "Prompt" : "Kvaðning",
     "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Authentication" : "Auðkenning",
