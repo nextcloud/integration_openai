@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Default" : "Por defecto",
     "Unknown" : "Desconocido",
     "Name" : "Nombre",
     "Images" : "Imágenes",
