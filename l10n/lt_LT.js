@@ -33,6 +33,7 @@ OC.L10N.register(
     "The rewritten text in the desired tone, written by the assistant:" : "Asistento perrašytas tekstas, atitinkantis pageidaujamą toną:",
     "Size" : "Dydis",
     "Cannot generate less than 1 image" : "Negalima sugeneruoti mažiau nei 1 vaizdo",
+    "Voice" : "Balsas",
     "Generate speech" : "Sugeneruoti kalbą",
     "Generate speech from a transcript" : "Sugeneruoti kalbą pagal transkripciją",
     "Prompt" : "Užduotis",
