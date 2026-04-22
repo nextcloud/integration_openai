@@ -56,6 +56,8 @@ OC.L10N.register(
     "Failed to save OpenAI options" : "Nepavyko įrašyti „OpenAI“ parinkčių",
     "Default language" : "Numatytoji kalba",
     "You can create a free API key in your OpenAI account settings" : "Nemokamą API raktą galite susikurti „OpenAI“ paskyros nustatymuose",
+    "Days" : "Dienos",
+    "Months" : "Mėnesiai",
     "Who?" : "Kas?",
     "No recommendations. Start typing." : "Rekomendacijų nėra. Pradėkite rašyti.",
     "No result." : "Nėra rezultatų.",
