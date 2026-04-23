@@ -107,6 +107,7 @@ OC.L10N.register(
     "Leave the username and password empty to use the ones defined by your administrator" : "Pozostaw nazwę użytkownika i hasło puste, aby użyć tych zdefiniowanych przez administratora",
     "Usage quota info" : "Informacja o wykorzystanym limicie. ",
     "Specifying your own API key will allow unlimited usage" : "Wprowadź własny klucz API aby umożliwić nieograniczone korzystanie",
+    "Days" : "Dni",
     "Months" : "Miesiące",
     "Who?" : "Kto?",
     "No recommendations. Start typing." : "Brak rekomendacji. Możesz napisać.",

@@ -70,6 +70,7 @@
     "Default language" : "默认语言",
     "Your administrator defined a custom service address" : "您的管理员定义了一个自定义服务地址",
     "Leave the API key empty to use the one defined by administrators" : "将API密钥留空以使用管理员定义的API密钥",
+    "Days" : "天",
     "Months" : "月",
     "Who?" : "谁？",
     "No recommendations. Start typing." : "无建议。开始输入。",

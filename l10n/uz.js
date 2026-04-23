@@ -15,6 +15,7 @@ OC.L10N.register(
     "Prompt" : "Tezkor",
     "Authentication" : "Autentifikatsiya",
     "API key" : "API kaliti",
+    "Days" : "Kunlar",
     "Who?" : "Kim?",
     "No recommendations. Start typing." : "Tavsiyalar yo'q. Yozishni boshlang.",
     "No result." : "Natija yo'q.",
