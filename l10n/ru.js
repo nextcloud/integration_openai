@@ -46,6 +46,7 @@ OC.L10N.register(
     "Desired tone" : "Желаемый тон",
     "In which tone should your text be rewritten?" : "В каком тоне следует переписать ваш текст?",
     "The rewritten text in the desired tone, written by the assistant:" : "Переписанный текст в нужном тоне, написанный ассистентом:",
+    "Cannot generate less than 1 image" : "Невозможно создать менее 1 изображения",
     "Generate speech" : "Сгенерировать речь",
     "Generate speech from a transcript" : "Сгенерировать речь из транскрипта",
     "Prompt" : "Подсказка",
