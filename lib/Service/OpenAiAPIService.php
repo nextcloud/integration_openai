@@ -47,6 +47,7 @@ class OpenAiAPIService {
 		private ICacheFactory $cacheFactory,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
+		private StreamingService $streamingService,
 		private INotificationManager $notificationManager,
 		private QuotaRuleService $quotaRuleService,
 		IClientService $clientService,
@@ -514,6 +515,98 @@ class OpenAiAPIService {
 		return $completions;
 	}
 
+	public function createStreamedChatCompletion(
+		?string $userId,
+		string $model,
+		?string $userPrompt = null,
+		?string $systemPrompt = null,
+		?array $history = null,
+		int $n = 1,
+		?int $maxTokens = null,
+		?array $extraParams = null,
+		?string $toolMessage = null,
+		?array $tools = null,
+		?string $userAudioPromptBase64 = null,
+		?string $userAudioPromptFormat = null,
+	): \Generator {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
+			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
+
+		$params = $this->buildChatCompletionRequestParams(
+			$userId,
+			$model,
+			$userPrompt,
+			$systemPrompt,
+			$history,
+			$n,
+			$maxTokens,
+			$extraParams,
+			$toolMessage,
+			$tools,
+			$userAudioPromptBase64,
+			$userAudioPromptFormat,
+			true,
+		);
+
+		$response = $this->request(
+			$userId,
+			'chat/completions',
+			$params,
+			'POST',
+			null,
+			true,
+			null,
+			0,
+			true,
+		);
+
+		$streamResult = yield from $this->streamingService->parseStreamChatResponse($response);
+
+		if (isset($streamResult['usage']['total_tokens'])) {
+			$usage = $streamResult['usage']['total_tokens'];
+			try {
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			}
+		}
+
+		return $this->normalizeChatCompletionResponse($streamResult);
+	}
+
+	public function createChatCompletion(
+		?string $userId,
+		string $model,
+		?string $userPrompt = null,
+		?string $systemPrompt = null,
+		?array $history = null,
+		int $n = 1,
+		?int $maxTokens = null,
+		?array $extraParams = null,
+		?string $toolMessage = null,
+		?array $tools = null,
+		?string $userAudioPromptBase64 = null,
+		?string $userAudioPromptFormat = null,
+	): array {
+		$response = $this->requestChatCompletion(
+			$userId, $model, $userPrompt, $systemPrompt, $history,
+			$n, $maxTokens, $extraParams, $toolMessage, $tools,
+			$userAudioPromptBase64, $userAudioPromptFormat,
+			false,
+		);
+
+		if (isset($response['usage'], $response['usage']['total_tokens'])) {
+			$usage = $response['usage']['total_tokens'];
+			try {
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			}
+		}
+		return $this->normalizeChatCompletionResponse($response);
+	}
+
 	/**
 	 * Returns an array of completions
 	 *
@@ -529,10 +622,10 @@ class OpenAiAPIService {
 	 * @param array|null $tools
 	 * @param string|null $userAudioPromptBase64
 	 * @param string|null $userAudioPromptFormat
-	 * @return array{messages: array<string>, tool_calls: array<string>, audio_messages: list<array<string, mixed>>}
+	 * @return array{messages?: array<string>, tool_calls?: array<string>, audio_messages?: list<array<string, mixed>>, usage?: array<string, mixed>}
 	 * @throws Exception
 	 */
-	public function createChatCompletion(
+	public function requestChatCompletion(
 		?string $userId,
 		string $model,
 		?string $userPrompt = null,
@@ -545,11 +638,62 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?string $userAudioPromptBase64 = null,
 		?string $userAudioPromptFormat = null,
+		bool $stream = false,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
+		$params = $this->buildChatCompletionRequestParams(
+			$userId,
+			$model,
+			$userPrompt,
+			$systemPrompt,
+			$history,
+			$n,
+			$maxTokens,
+			$extraParams,
+			$toolMessage,
+			$tools,
+			$userAudioPromptBase64,
+			$userAudioPromptFormat,
+			$stream,
+		);
+
+		return $this->request($userId, 'chat/completions', $params, 'POST');
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @param string $model
+	 * @param string|null $userPrompt
+	 * @param string|null $systemPrompt
+	 * @param array|null $history
+	 * @param int $n
+	 * @param int|null $maxTokens
+	 * @param array|null $extraParams
+	 * @param string|null $toolMessage
+	 * @param array|null $tools
+	 * @param string|null $userAudioPromptBase64
+	 * @param string|null $userAudioPromptFormat
+	 * @param bool $stream
+	 * @return array<string, mixed>
+	 */
+	private function buildChatCompletionRequestParams(
+		?string $userId,
+		string $model,
+		?string $userPrompt = null,
+		?string $systemPrompt = null,
+		?array $history = null,
+		int $n = 1,
+		?int $maxTokens = null,
+		?array $extraParams = null,
+		?string $toolMessage = null,
+		?array $tools = null,
+		?string $userAudioPromptBase64 = null,
+		?string $userAudioPromptFormat = null,
+		bool $stream = false,
+	): array {
 		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
 			? Application::DEFAULT_COMPLETION_MODEL_ID
 			: $model;
@@ -566,7 +710,7 @@ class OpenAiAPIService {
 			];
 		}
 		if ($history !== null) {
-			foreach ($history as $i => $historyEntry) {
+			foreach ($history as $historyEntry) {
 				$message = json_decode($historyEntry, true);
 				if ($message['role'] === 'human') {
 					$message['role'] = 'user';
@@ -635,6 +779,7 @@ class OpenAiAPIService {
 			'model' => $modelRequestParam,
 			'messages' => $messages,
 			'n' => $n,
+			'stream' => $stream,
 		];
 
 		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
@@ -662,61 +807,14 @@ class OpenAiAPIService {
 		if ($extraParams !== null) {
 			$params = array_merge($extraParams, $params);
 		}
-
-		$response = $this->request($userId, 'chat/completions', $params, 'POST');
-
-		if (!isset($response['choices'])) {
-			$this->logger->warning('Text generation error: ' . json_encode($response));
-			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		if ($stream && $this->isUsingOpenAi()) {
+			$params['stream_options'] = array_merge(
+				is_array($params['stream_options'] ?? null) ? $params['stream_options'] : [],
+				['include_usage' => true],
+			);
 		}
 
-		if (isset($response['usage'], $response['usage']['total_tokens'])) {
-			$usage = $response['usage']['total_tokens'];
-			try {
-				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
-			} catch (DBException $e) {
-				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			}
-		}
-		$completions = [
-			'messages' => [],
-			'tool_calls' => [],
-			'audio_messages' => [],
-		];
-
-		foreach ($response['choices'] as $choice) {
-			// get tool calls only if this is the finish reason and it's defined and it's an array
-			if (
-				$choice['finish_reason'] === 'tool_calls'
-				&& isset($choice['message']['tool_calls'])
-				&& is_array($choice['message']['tool_calls'])
-			) {
-				// fix the tool_calls format, make it like expected by the context_agent app
-				$choice['message']['tool_calls'] = array_map(static function ($toolCall) {
-					$toolCall['function']['id'] = $toolCall['id'];
-					$toolCall['function']['args'] = json_decode($toolCall['function']['arguments']) ?: (object)[];
-					unset($toolCall['function']['arguments']);
-					return $toolCall['function'];
-				}, $choice['message']['tool_calls']);
-
-				$toolCalls = json_encode($choice['message']['tool_calls']);
-				if ($toolCalls === false) {
-					$this->logger->debug('Tool calls JSON encoding error: ' . json_last_error_msg());
-				} else {
-					$completions['tool_calls'][] = $toolCalls;
-				}
-			}
-
-			// always try to get a message
-			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
-				$completions['messages'][] = $choice['message']['content'];
-			}
-			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
-				$completions['audio_messages'][] = $choice['message'];
-			}
-		}
-
-		return $completions;
+		return $params;
 	}
 
 	/**
@@ -1030,41 +1128,16 @@ class OpenAiAPIService {
 		?string $userId, string $endPoint, array $params = [], string $method = 'GET',
 		?string $contentType = null, bool $logErrors = true, ?string $serviceType = null,
 		int $retryCount = 0,
+		bool $stream = false,
 	): array {
 		try {
-			if ($serviceType === Application::SERVICE_TYPE_IMAGE && $this->openAiSettingsService->imageOverrideEnabled()) {
-				$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
-				$apiKey = $this->openAiSettingsService->getAdminImageApiKey();
-				$basicUser = $this->openAiSettingsService->getAdminImageBasicUser();
-				$basicPassword = $this->openAiSettingsService->getAdminImageBasicPassword();
-				$useBasicAuth = $this->openAiSettingsService->getAdminImageUseBasicAuth();
-				$timeout = $this->openAiSettingsService->getImageRequestTimeout();
-			} elseif ($serviceType === Application::SERVICE_TYPE_STT && $this->openAiSettingsService->sttOverrideEnabled()) {
-				$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
-				$apiKey = $this->openAiSettingsService->getAdminSttApiKey();
-				$basicUser = $this->openAiSettingsService->getAdminSttBasicUser();
-				$basicPassword = $this->openAiSettingsService->getAdminSttBasicPassword();
-				$useBasicAuth = $this->openAiSettingsService->getAdminSttUseBasicAuth();
-				$timeout = $this->openAiSettingsService->getSttRequestTimeout();
-			} elseif ($serviceType === Application::SERVICE_TYPE_TTS && $this->openAiSettingsService->ttsOverrideEnabled()) {
-				$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
-				$apiKey = $this->openAiSettingsService->getAdminTtsApiKey();
-				$basicUser = $this->openAiSettingsService->getAdminTtsBasicUser();
-				$basicPassword = $this->openAiSettingsService->getAdminTtsBasicPassword();
-				$useBasicAuth = $this->openAiSettingsService->getAdminTtsUseBasicAuth();
-				$timeout = $this->openAiSettingsService->getTtsRequestTimeout();
-			} else {
-				// Currently only supporting user api keys for the default service
-				$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-				if ($serviceUrl === '') {
-					$serviceUrl = Application::OPENAI_API_BASE_URL;
-				}
-				$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
-				$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
-				$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
-				$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
-				$timeout = $this->openAiSettingsService->getRequestTimeout();
-			}
+			$context = $this->getRequestContext($userId, $serviceType);
+			$serviceUrl = $context['serviceUrl'];
+			$apiKey = $context['apiKey'];
+			$basicUser = $context['basicUser'];
+			$basicPassword = $context['basicPassword'];
+			$useBasicAuth = $context['useBasicAuth'];
+			$timeout = $context['timeout'];
 
 			$url = rtrim($serviceUrl, '/') . '/' . $endPoint;
 			$options = [
@@ -1099,6 +1172,13 @@ class OpenAiAPIService {
 				// $options['headers']['Content-Type'] = $contentType;
 			} else {
 				$options['headers']['Content-Type'] = $contentType;
+			}
+
+			if ($stream) {
+				$options['headers']['Accept'] = 'text/event-stream';
+				// $options['headers']['Accept-Encoding'] = 'identity';
+				$options['stream'] = true;
+				// $options['decode'] = false;
 			}
 
 			if (count($params) > 0) {
@@ -1138,19 +1218,36 @@ class OpenAiAPIService {
 			}
 			$body = $response->getBody();
 			$respCode = $response->getStatusCode();
+			$contentTypeHeader = $response->getHeader('Content-Type');
 
 			if ($respCode >= 400) {
 				return ['error' => $this->l10n->t('Bad credentials')];
 			}
-			if (str_starts_with(strtolower($response->getHeader('Content-Type')), 'application/json')) {
+			if (str_starts_with(strtolower($contentTypeHeader), 'application/json')) {
+				if (is_resource($body)) {
+					$body = stream_get_contents($body);
+				}
+				if (!is_string($body)) {
+					$this->logger->warning('Could not read the JSON response body', ['body_type' => gettype($body)]);
+					return ['error' => 'Could not read the JSON response body'];
+				}
 				$parsedBody = json_decode($body, true);
 				if ($parsedBody === null) {
 					$this->logger->warning('Could not JSON parse the response', ['body' => $body]);
 					return ['error' => 'Could not JSON parse the response'];
 				}
+				if ($stream) {
+					return [
+						'body' => $parsedBody,
+						'content-type' => $contentTypeHeader,
+					];
+				}
 				return $parsedBody;
 			}
-			return ['body' => $body];
+			return [
+				'body' => $body,
+				'content-type' => $contentTypeHeader,
+			];
 		} catch (ClientException|ServerException $e) {
 			if ($e->getResponse()->getStatusCode() === Http::STATUS_TOO_MANY_REQUESTS) {
 				if ($retryCount < 3 && $this->isCLI) {
@@ -1174,7 +1271,7 @@ class OpenAiAPIService {
 					}
 					$this->logger->warning("Rate limit exceeded, retrying in $sleep seconds", ['retry_count' => $retryCount]);
 					sleep($sleep);
-					return $this->request($userId, $endPoint, $params, $method, $contentType, $logErrors, $serviceType, $retryCount + 1);
+					return $this->request($userId, $endPoint, $params, $method, $contentType, $logErrors, $serviceType, $retryCount + 1, $stream);
 				} else {
 					$this->logger->warning('Rate limit exceeded, maximum retries reached', ['retry_count' => $retryCount]);
 				}
@@ -1201,6 +1298,116 @@ class OpenAiAPIService {
 				intval($e->getCode()),
 			);
 		}
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @param string|null $serviceType
+	 * @return array{serviceUrl: string, apiKey: string, basicUser: string, basicPassword: string, useBasicAuth: bool, timeout: int}
+	 */
+	private function getRequestContext(?string $userId, ?string $serviceType = null): array {
+		if ($serviceType === Application::SERVICE_TYPE_IMAGE && $this->openAiSettingsService->imageOverrideEnabled()) {
+			return [
+				'serviceUrl' => $this->openAiSettingsService->getImageServiceUrl(),
+				'apiKey' => $this->openAiSettingsService->getAdminImageApiKey(),
+				'basicUser' => $this->openAiSettingsService->getAdminImageBasicUser(),
+				'basicPassword' => $this->openAiSettingsService->getAdminImageBasicPassword(),
+				'useBasicAuth' => $this->openAiSettingsService->getAdminImageUseBasicAuth(),
+				'timeout' => $this->openAiSettingsService->getImageRequestTimeout(),
+			];
+		}
+		if ($serviceType === Application::SERVICE_TYPE_STT && $this->openAiSettingsService->sttOverrideEnabled()) {
+			return [
+				'serviceUrl' => $this->openAiSettingsService->getSttServiceUrl(),
+				'apiKey' => $this->openAiSettingsService->getAdminSttApiKey(),
+				'basicUser' => $this->openAiSettingsService->getAdminSttBasicUser(),
+				'basicPassword' => $this->openAiSettingsService->getAdminSttBasicPassword(),
+				'useBasicAuth' => $this->openAiSettingsService->getAdminSttUseBasicAuth(),
+				'timeout' => $this->openAiSettingsService->getSttRequestTimeout(),
+			];
+		}
+		if ($serviceType === Application::SERVICE_TYPE_TTS && $this->openAiSettingsService->ttsOverrideEnabled()) {
+			return [
+				'serviceUrl' => $this->openAiSettingsService->getTtsServiceUrl(),
+				'apiKey' => $this->openAiSettingsService->getAdminTtsApiKey(),
+				'basicUser' => $this->openAiSettingsService->getAdminTtsBasicUser(),
+				'basicPassword' => $this->openAiSettingsService->getAdminTtsBasicPassword(),
+				'useBasicAuth' => $this->openAiSettingsService->getAdminTtsUseBasicAuth(),
+				'timeout' => $this->openAiSettingsService->getTtsRequestTimeout(),
+			];
+		}
+
+		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+		if ($serviceUrl === '') {
+			$serviceUrl = Application::OPENAI_API_BASE_URL;
+		}
+
+		return [
+			'serviceUrl' => $serviceUrl,
+			'apiKey' => $this->openAiSettingsService->getUserApiKey($userId, true),
+			'basicUser' => $this->openAiSettingsService->getUserBasicUser($userId, true),
+			'basicPassword' => $this->openAiSettingsService->getUserBasicPassword($userId, true),
+			'useBasicAuth' => $this->openAiSettingsService->getUseBasicAuth(),
+			'timeout' => $this->openAiSettingsService->getRequestTimeout(),
+		];
+	}
+
+	/**
+	 * @param array<string, mixed> $response
+	 * @return array{messages: array<string>, tool_calls: array<string>, audio_messages: list<array<string, mixed>>}
+	 * @throws Exception
+	 */
+	private function normalizeChatCompletionResponse(array $response): array {
+		if (!isset($response['choices']) || !is_array($response['choices'])) {
+			$this->logger->warning('Text generation error: ' . json_encode($response));
+			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		$completions = [
+			'messages' => [],
+			'tool_calls' => [],
+			'audio_messages' => [],
+		];
+
+		foreach ($response['choices'] as $choice) {
+			if (!is_array($choice)) {
+				continue;
+			}
+
+			if (
+				($choice['finish_reason'] ?? null) === 'tool_calls'
+				&& isset($choice['message']['tool_calls'])
+				&& is_array($choice['message']['tool_calls'])
+			) {
+				$formattedToolCalls = array_map(static function ($toolCall) {
+					if (!is_array($toolCall) || !isset($toolCall['function']) || !is_array($toolCall['function'])) {
+						return null;
+					}
+					$function = $toolCall['function'];
+					$function['id'] = $toolCall['id'] ?? ($function['id'] ?? '');
+					$function['args'] = json_decode($function['arguments'] ?? '{}') ?: (object)[];
+					unset($function['arguments']);
+					return $function;
+				}, $choice['message']['tool_calls']);
+				$formattedToolCalls = array_values(array_filter($formattedToolCalls, static fn ($toolCall) => is_array($toolCall)));
+
+				$toolCalls = json_encode($formattedToolCalls);
+				if ($toolCalls === false) {
+					$this->logger->debug('Tool calls JSON encoding error: ' . json_last_error_msg());
+				} else {
+					$completions['tool_calls'][] = $toolCalls;
+				}
+			}
+
+			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
+				$completions['messages'][] = $choice['message']['content'];
+			}
+			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
+				$completions['audio_messages'][] = $choice['message'];
+			}
+		}
+
+		return $completions;
 	}
 
 	/**

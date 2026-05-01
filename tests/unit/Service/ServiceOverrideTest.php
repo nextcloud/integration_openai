@@ -18,6 +18,7 @@ use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\StreamingService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
@@ -86,6 +87,9 @@ class ServiceOverrideTest extends TestCase {
 			\OCP\Server::get(ICacheFactory::class),
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
+			new StreamingService(
+				$this->createMock(\OCP\IL10N::class),
+			),
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
