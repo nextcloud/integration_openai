@@ -514,6 +514,115 @@ class OpenAiAPIService {
 		return $completions;
 	}
 
+	public function createStreamedChatCompletion(
+		?string $userId,
+		string $model,
+		?string $userPrompt = null,
+		?string $systemPrompt = null,
+		?array $history = null,
+		int $n = 1,
+		?int $maxTokens = null,
+		?array $extraParams = null,
+		?string $toolMessage = null,
+		?array $tools = null,
+		?string $userAudioPromptBase64 = null,
+		?string $userAudioPromptFormat = null,
+	): \Generator {
+		$response = $this->requestChatCompletion(
+			$userId, $model, $userPrompt, $systemPrompt, $history,
+			$n, $maxTokens, $extraParams, $toolMessage, $tools,
+			$userAudioPromptBase64, $userAudioPromptFormat,
+			true,
+		);
+
+		if (!isset($response['body']) || !isset($response['content-type']) || $response['content-type'] !== 'text/event-stream') {
+			throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		echo 'STREAMED chat completion with ' . $model . "\n";
+		echo gettype($response['body']);
+
+		yield 'plop';
+
+		return [];
+	}
+
+	public function createChatCompletion(
+		?string $userId,
+		string $model,
+		?string $userPrompt = null,
+		?string $systemPrompt = null,
+		?array $history = null,
+		int $n = 1,
+		?int $maxTokens = null,
+		?array $extraParams = null,
+		?string $toolMessage = null,
+		?array $tools = null,
+		?string $userAudioPromptBase64 = null,
+		?string $userAudioPromptFormat = null,
+	): array {
+		$response = $this->requestChatCompletion(
+			$userId, $model, $userPrompt, $systemPrompt, $history,
+			$n, $maxTokens, $extraParams, $toolMessage, $tools,
+			$userAudioPromptBase64, $userAudioPromptFormat,
+			false,
+		);
+
+		if (!isset($response['choices'])) {
+			$this->logger->warning('Text generation error: ' . json_encode($response));
+			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		if (isset($response['usage'], $response['usage']['total_tokens'])) {
+			$usage = $response['usage']['total_tokens'];
+			try {
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			}
+		}
+		$completions = [
+			'messages' => [],
+			'tool_calls' => [],
+			'audio_messages' => [],
+		];
+
+		foreach ($response['choices'] as $choice) {
+			// get tool calls only if this is the finish reason and it's defined and it's an array
+			if (
+				$choice['finish_reason'] === 'tool_calls'
+				&& isset($choice['message']['tool_calls'])
+				&& is_array($choice['message']['tool_calls'])
+			) {
+				// fix the tool_calls format, make it like expected by the context_agent app
+				$choice['message']['tool_calls'] = array_map(static function ($toolCall) {
+					$toolCall['function']['id'] = $toolCall['id'];
+					$toolCall['function']['args'] = json_decode($toolCall['function']['arguments']) ?: (object)[];
+					unset($toolCall['function']['arguments']);
+					return $toolCall['function'];
+				}, $choice['message']['tool_calls']);
+
+				$toolCalls = json_encode($choice['message']['tool_calls']);
+				if ($toolCalls === false) {
+					$this->logger->debug('Tool calls JSON encoding error: ' . json_last_error_msg());
+				} else {
+					$completions['tool_calls'][] = $toolCalls;
+				}
+			}
+
+			// always try to get a message
+			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
+				$completions['messages'][] = $choice['message']['content'];
+			}
+			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
+				$completions['audio_messages'][] = $choice['message'];
+			}
+		}
+
+		echo 'NORMAL chat completion with ' . $model . "\n";
+		return $completions;
+	}
+
 	/**
 	 * Returns an array of completions
 	 *
@@ -532,7 +641,7 @@ class OpenAiAPIService {
 	 * @return array{messages: array<string>, tool_calls: array<string>, audio_messages: list<array<string, mixed>>}
 	 * @throws Exception
 	 */
-	public function createChatCompletion(
+	public function requestChatCompletion(
 		?string $userId,
 		string $model,
 		?string $userPrompt = null,
@@ -545,6 +654,7 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?string $userAudioPromptBase64 = null,
 		?string $userAudioPromptFormat = null,
+		bool $stream = false,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -635,6 +745,7 @@ class OpenAiAPIService {
 			'model' => $modelRequestParam,
 			'messages' => $messages,
 			'n' => $n,
+			'stream' => $stream,
 		];
 
 		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
@@ -663,60 +774,7 @@ class OpenAiAPIService {
 			$params = array_merge($extraParams, $params);
 		}
 
-		$response = $this->request($userId, 'chat/completions', $params, 'POST');
-
-		if (!isset($response['choices'])) {
-			$this->logger->warning('Text generation error: ' . json_encode($response));
-			throw new Exception($this->l10n->t('Unknown text generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-
-		if (isset($response['usage'], $response['usage']['total_tokens'])) {
-			$usage = $response['usage']['total_tokens'];
-			try {
-				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
-			} catch (DBException $e) {
-				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-			}
-		}
-		$completions = [
-			'messages' => [],
-			'tool_calls' => [],
-			'audio_messages' => [],
-		];
-
-		foreach ($response['choices'] as $choice) {
-			// get tool calls only if this is the finish reason and it's defined and it's an array
-			if (
-				$choice['finish_reason'] === 'tool_calls'
-				&& isset($choice['message']['tool_calls'])
-				&& is_array($choice['message']['tool_calls'])
-			) {
-				// fix the tool_calls format, make it like expected by the context_agent app
-				$choice['message']['tool_calls'] = array_map(static function ($toolCall) {
-					$toolCall['function']['id'] = $toolCall['id'];
-					$toolCall['function']['args'] = json_decode($toolCall['function']['arguments']) ?: (object)[];
-					unset($toolCall['function']['arguments']);
-					return $toolCall['function'];
-				}, $choice['message']['tool_calls']);
-
-				$toolCalls = json_encode($choice['message']['tool_calls']);
-				if ($toolCalls === false) {
-					$this->logger->debug('Tool calls JSON encoding error: ' . json_last_error_msg());
-				} else {
-					$completions['tool_calls'][] = $toolCalls;
-				}
-			}
-
-			// always try to get a message
-			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
-				$completions['messages'][] = $choice['message']['content'];
-			}
-			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
-				$completions['audio_messages'][] = $choice['message'];
-			}
-		}
-
-		return $completions;
+		return $this->request($userId, 'chat/completions', $params, 'POST');
 	}
 
 	/**
@@ -1150,7 +1208,10 @@ class OpenAiAPIService {
 				}
 				return $parsedBody;
 			}
-			return ['body' => $body];
+			return [
+				'body' => $body,
+				'content-type' => $response->getHeader('Content-Type'),
+			];
 		} catch (ClientException|ServerException $e) {
 			if ($e->getResponse()->getStatusCode() === Http::STATUS_TOO_MANY_REQUESTS) {
 				if ($retryCount < 3 && $this->isCLI) {
