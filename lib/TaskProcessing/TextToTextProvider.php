@@ -129,6 +129,7 @@ class TextToTextProvider implements ISynchronousProvider {
 					foreach ($chunks as $chunk) {
 						// TODO use the future "updateOutput" callback
 						$fullOutput .= $chunk;
+						echo 'chunk: ' . $chunk . "\n";
 					}
 					$completion = [$fullOutput];
 				} else {

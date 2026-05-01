@@ -549,13 +549,22 @@ class OpenAiAPIService {
 			true,
 		);
 
-		yield from $this->streamingService->streamRequest(
+		$streamResult = yield from $this->streamingService->streamRequest(
 			$userId,
 			'chat/completions',
 			$params,
 			null,
 			$this->isUsingOpenAi(),
 		);
+
+		if (isset($streamResult['usage']['total_tokens'])) {
+			$usage = $streamResult['usage']['total_tokens'];
+			try {
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			}
+		}
 
 		return [];
 	}
@@ -835,6 +844,12 @@ class OpenAiAPIService {
 		}
 		if ($extraParams !== null) {
 			$params = array_merge($extraParams, $params);
+		}
+		if ($stream && $this->isUsingOpenAi()) {
+			$params['stream_options'] = array_merge(
+				is_array($params['stream_options'] ?? null) ? $params['stream_options'] : [],
+				['include_usage' => true],
+			);
 		}
 
 		return $params;

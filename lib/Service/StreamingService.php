@@ -28,7 +28,7 @@ class StreamingService {
 	 * @param array<string, mixed> $params
 	 * @param string|null $serviceType
 	 * @param bool $isUsingOpenAi
-	 * @return \Generator<string>
+	 * @return \Generator<string, mixed, mixed, array{usage?: array<string, mixed>}>
 	 * @throws Exception
 	 */
 	public function streamRequest(
@@ -79,6 +79,7 @@ class StreamingService {
 			$rawBody = '';
 			$queuedPartials = [];
 			$done = false;
+			$usage = null;
 
 			$ch = curl_init($url);
 			if ($ch === false) {
@@ -126,9 +127,9 @@ class StreamingService {
 
 						return $length;
 					},
-					CURLOPT_WRITEFUNCTION => function ($curl, string $chunk) use (&$contentType, &$eventBuffer, &$rawBody, &$queuedPartials, &$done): int {
+					CURLOPT_WRITEFUNCTION => function ($curl, string $chunk) use (&$contentType, &$eventBuffer, &$rawBody, &$queuedPartials, &$done, &$usage): int {
 						if (str_starts_with(strtolower($contentType), 'text/event-stream')) {
-							$queuedPartials = [...$queuedPartials, ...$this->parseSseChunk($chunk, $eventBuffer, $done)];
+							$queuedPartials = [...$queuedPartials, ...$this->parseSseChunk($chunk, $eventBuffer, $done, $usage)];
 						} else {
 							$rawBody .= $chunk;
 						}
@@ -165,7 +166,7 @@ class StreamingService {
 				}
 
 				if (!$done && str_starts_with(strtolower($contentType), 'text/event-stream')) {
-					foreach ($this->parseSseChunk('', $eventBuffer, $done, true) as $partial) {
+					foreach ($this->parseSseChunk('', $eventBuffer, $done, $usage, true) as $partial) {
 						yield $partial;
 					}
 				}
@@ -212,7 +213,7 @@ class StreamingService {
 					throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
 				}
 
-				return;
+				return $usage === null ? [] : ['usage' => $usage];
 			} finally {
 				curl_multi_remove_handle($multiHandle, $ch);
 				curl_close($ch);
@@ -276,10 +277,11 @@ class StreamingService {
 	/**
 	 * @param string $event
 	 * @param bool $done
+	 * @param array<string, mixed>|null $usage
 	 * @return string[]
 	 * @throws Exception
 	 */
-	private function parseSseEvent(string $event, bool &$done): array {
+	private function parseSseEvent(string $event, bool &$done, ?array &$usage): array {
 		$dataLines = [];
 		foreach (explode("\n", trim($event)) as $line) {
 			if ($line === '' || str_starts_with($line, ':') || !str_starts_with($line, 'data:')) {
@@ -302,6 +304,9 @@ class StreamingService {
 		if (!is_array($payload)) {
 			throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
+		if (isset($payload['usage']) && is_array($payload['usage'])) {
+			$usage = $payload['usage'];
+		}
 
 		$partials = [];
 		foreach ($payload['choices'] ?? [] as $choice) {
@@ -319,25 +324,26 @@ class StreamingService {
 	 * @param string $chunk
 	 * @param string $buffer
 	 * @param bool $done
+	 * @param array<string, mixed>|null $usage
 	 * @param bool $flush
 	 * @return string[]
 	 * @throws Exception
 	 */
-	private function parseSseChunk(string $chunk, string &$buffer, bool &$done, bool $flush = false): array {
+	private function parseSseChunk(string $chunk, string &$buffer, bool &$done, ?array &$usage, bool $flush = false): array {
 		$buffer .= str_replace(["\r\n", "\r"], "\n", $chunk);
 		$partials = [];
 
 		while (($delimiterPos = strpos($buffer, "\n\n")) !== false) {
 			$event = substr($buffer, 0, $delimiterPos);
 			$buffer = substr($buffer, $delimiterPos + 2);
-			$partials = [...$partials, ...$this->parseSseEvent($event, $done)];
+			$partials = [...$partials, ...$this->parseSseEvent($event, $done, $usage)];
 			if ($done) {
 				return $partials;
 			}
 		}
 
 		if ($flush && trim($buffer) !== '') {
-			$partials = [...$partials, ...$this->parseSseEvent($buffer, $done)];
+			$partials = [...$partials, ...$this->parseSseEvent($buffer, $done, $usage)];
 			$buffer = '';
 		}
 
