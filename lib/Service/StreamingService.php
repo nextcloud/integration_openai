@@ -81,6 +81,8 @@ class StreamingService {
 			$done = false;
 			$usage = null;
 
+			// TODO check if there is a way to progressively get a streamed response with IClient
+			// if not, try to preserve the IClient setup (proxy, timeout, certificate bundle, DNS pinning, allow_local_remote_servers etc...)
 			$ch = curl_init($url);
 			if ($ch === false) {
 				throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
