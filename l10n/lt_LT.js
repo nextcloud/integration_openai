@@ -23,6 +23,7 @@ OC.L10N.register(
     "Generated response" : "Generuoti atsakymą",
     "The answer to the question" : "Atsakymas į klausimą",
     "Memories" : "Prisiminimai",
+    "The memories to be injected into the chat session." : "Į pokalbio sesiją įterptini prisiminimai.",
     "Speed" : "Greitis",
     "Language" : "Kalba",
     "Change Tone" : "Pakeisti toną",
