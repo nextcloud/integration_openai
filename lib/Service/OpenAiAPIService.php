@@ -47,6 +47,7 @@ class OpenAiAPIService {
 		private ICacheFactory $cacheFactory,
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
+		private StreamingService $streamingService,
 		private INotificationManager $notificationManager,
 		private QuotaRuleService $quotaRuleService,
 		IClientService $clientService,
@@ -528,21 +529,33 @@ class OpenAiAPIService {
 		?string $userAudioPromptBase64 = null,
 		?string $userAudioPromptFormat = null,
 	): \Generator {
-		$response = $this->requestChatCompletion(
-			$userId, $model, $userPrompt, $systemPrompt, $history,
-			$n, $maxTokens, $extraParams, $toolMessage, $tools,
-			$userAudioPromptBase64, $userAudioPromptFormat,
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
+			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
+
+		$params = $this->buildChatCompletionRequestParams(
+			$userId,
+			$model,
+			$userPrompt,
+			$systemPrompt,
+			$history,
+			$n,
+			$maxTokens,
+			$extraParams,
+			$toolMessage,
+			$tools,
+			$userAudioPromptBase64,
+			$userAudioPromptFormat,
 			true,
 		);
 
-		if (!isset($response['body']) || !isset($response['content-type']) || $response['content-type'] !== 'text/event-stream') {
-			throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
-		}
-
-		echo 'STREAMED chat completion with ' . $model . "\n";
-		echo gettype($response['body']);
-
-		yield 'plop';
+		yield from $this->streamingService->streamRequest(
+			$userId,
+			'chat/completions',
+			$params,
+			null,
+			$this->isUsingOpenAi(),
+		);
 
 		return [];
 	}
@@ -660,6 +673,56 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
+		$params = $this->buildChatCompletionRequestParams(
+			$userId,
+			$model,
+			$userPrompt,
+			$systemPrompt,
+			$history,
+			$n,
+			$maxTokens,
+			$extraParams,
+			$toolMessage,
+			$tools,
+			$userAudioPromptBase64,
+			$userAudioPromptFormat,
+			$stream,
+		);
+
+		return $this->request($userId, 'chat/completions', $params, 'POST');
+	}
+
+	/**
+	 * @param string|null $userId
+	 * @param string $model
+	 * @param string|null $userPrompt
+	 * @param string|null $systemPrompt
+	 * @param array|null $history
+	 * @param int $n
+	 * @param int|null $maxTokens
+	 * @param array|null $extraParams
+	 * @param string|null $toolMessage
+	 * @param array|null $tools
+	 * @param string|null $userAudioPromptBase64
+	 * @param string|null $userAudioPromptFormat
+	 * @param bool $stream
+	 * @return array<string, mixed>
+	 */
+	private function buildChatCompletionRequestParams(
+		?string $userId,
+		string $model,
+		?string $userPrompt = null,
+		?string $systemPrompt = null,
+		?array $history = null,
+		int $n = 1,
+		?int $maxTokens = null,
+		?array $extraParams = null,
+		?string $toolMessage = null,
+		?array $tools = null,
+		?string $userAudioPromptBase64 = null,
+		?string $userAudioPromptFormat = null,
+		bool $stream = false,
+	): array {
 		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
 			? Application::DEFAULT_COMPLETION_MODEL_ID
 			: $model;
@@ -676,7 +739,7 @@ class OpenAiAPIService {
 			];
 		}
 		if ($history !== null) {
-			foreach ($history as $i => $historyEntry) {
+			foreach ($history as $historyEntry) {
 				$message = json_decode($historyEntry, true);
 				if ($message['role'] === 'human') {
 					$message['role'] = 'user';
@@ -774,7 +837,7 @@ class OpenAiAPIService {
 			$params = array_merge($extraParams, $params);
 		}
 
-		return $this->request($userId, 'chat/completions', $params, 'POST');
+		return $params;
 	}
 
 	/**
