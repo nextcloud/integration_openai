@@ -10,6 +10,7 @@ namespace OCA\OpenAi\Service;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\AppFramework\Http;
+use OCP\Http\Client\IClientService;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 
@@ -18,6 +19,7 @@ class StreamingService {
 		private LoggerInterface $logger,
 		private IL10N $l10n,
 		private OpenAiSettingsService $openAiSettingsService,
+		private IClientService $clientService,
 		private bool $isCLI,
 	) {
 	}
@@ -60,16 +62,16 @@ class StreamingService {
 			}
 
 			$headers = [
-				'User-Agent: ' . Application::USER_AGENT,
-				'Content-Type: application/json',
-				'Accept: text/event-stream',
+				'User-Agent' => Application::USER_AGENT,
+				'Content-Type' => 'application/json',
+				'Accept' => 'text/event-stream',
 			];
 			if ($isUsingOpenAi || !$useBasicAuth) {
 				if ($apiKey !== '') {
-					$headers[] = 'Authorization: Bearer ' . $apiKey;
+					$headers['Authorization'] = 'Bearer ' . $apiKey;
 				}
 			} elseif ($basicUser !== '' && $basicPassword !== '') {
-				$headers[] = 'Authorization: Basic ' . base64_encode($basicUser . ':' . $basicPassword);
+				$headers['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
 			}
 
 			$contentType = '';
@@ -77,150 +79,87 @@ class StreamingService {
 			$retryAfter = '';
 			$eventBuffer = '';
 			$rawBody = '';
-			$queuedPartials = [];
 			$done = false;
 			$usage = null;
 
-			// TODO check if there is a way to progressively get a streamed response with IClient
-			// if not, try to preserve the IClient setup (proxy, timeout, certificate bundle, DNS pinning, allow_local_remote_servers etc...)
-			$ch = curl_init($url);
-			if ($ch === false) {
+			$response = $this->clientService->newClient()->post($url, [
+				'body' => $payload,
+				'headers' => $headers,
+				'timeout' => $timeout,
+				'stream' => true,
+				'nextcloud' => [
+					'allow_local_address' => !$isUsingOpenAi,
+				],
+			]);
+
+			$contentType = $response->getHeader('Content-Type');
+			$statusCode = $response->getStatusCode();
+			$retryAfter = $response->getHeader('Retry-After');
+			$body = $response->getBody();
+
+			if (!is_resource($body)) {
 				throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
 			}
-			$multiHandle = curl_multi_init();
 
-			try {
-				curl_setopt_array($ch, [
-					CURLOPT_POST => true,
-					CURLOPT_POSTFIELDS => $payload,
-					CURLOPT_HTTPHEADER => $headers,
-					CURLOPT_TIMEOUT => $timeout,
-					CURLOPT_RETURNTRANSFER => false,
-					CURLOPT_HEADER => false,
-					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-					CURLOPT_BUFFERSIZE => 1024,
-					CURLOPT_HEADERFUNCTION => function ($curl, string $headerLine) use (&$contentType, &$statusCode, &$retryAfter): int {
-						$trimmed = trim($headerLine);
-						$length = strlen($headerLine);
-
-						if ($trimmed === '') {
-							return $length;
-						}
-
-						if (preg_match('/^HTTP\/\S+\s+(\d+)/', $trimmed, $matches) === 1) {
-							$statusCode = (int)$matches[1];
-							$contentType = '';
-							$retryAfter = '';
-							return $length;
-						}
-
-						$separatorPos = strpos($trimmed, ':');
-						if ($separatorPos === false) {
-							return $length;
-						}
-
-						$name = strtolower(trim(substr($trimmed, 0, $separatorPos)));
-						$value = trim(substr($trimmed, $separatorPos + 1));
-						if ($name === 'content-type') {
-							$contentType = $value;
-						} elseif ($name === 'retry-after') {
-							$retryAfter = $value;
-						}
-
-						return $length;
-					},
-					CURLOPT_WRITEFUNCTION => function ($curl, string $chunk) use (&$contentType, &$eventBuffer, &$rawBody, &$queuedPartials, &$done, &$usage): int {
-						if (str_starts_with(strtolower($contentType), 'text/event-stream')) {
-							$queuedPartials = [...$queuedPartials, ...$this->parseSseChunk($chunk, $eventBuffer, $done, $usage)];
-						} else {
-							$rawBody .= $chunk;
-						}
-
-						return strlen($chunk);
-					},
-				]);
-
-				curl_multi_add_handle($multiHandle, $ch);
-
-				do {
-					do {
-						$multiExecResult = curl_multi_exec($multiHandle, $active);
-					} while ($multiExecResult === CURLM_CALL_MULTI_PERFORM);
-
-					while ($queuedPartials !== []) {
-						yield array_shift($queuedPartials);
-					}
-
-					if ($multiExecResult !== CURLM_OK) {
-						throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
-					}
-
-					if ($active) {
-						$selectResult = curl_multi_select($multiHandle, 1.0);
-						if ($selectResult === -1) {
-							usleep(10000);
-						}
-					}
-				} while ($active);
-
-				while ($queuedPartials !== []) {
-					yield array_shift($queuedPartials);
+			while (!feof($body)) {
+				$chunk = fread($body, 8192);
+				if ($chunk === false) {
+					throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
 				}
-
-				if (!$done && str_starts_with(strtolower($contentType), 'text/event-stream')) {
-					foreach ($this->parseSseChunk('', $eventBuffer, $done, $usage, true) as $partial) {
-						yield $partial;
-					}
-				}
-
-				if (curl_errno($ch) !== 0) {
-					throw new Exception('cURL error: ' . curl_error($ch), Http::STATUS_INTERNAL_SERVER_ERROR);
-				}
-
-				if ($statusCode === 0) {
-					$statusCode = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-				}
-
-				if ($statusCode === Http::STATUS_TOO_MANY_REQUESTS && $retryCount < 3 && $this->isCLI) {
-					if ($retryAfter === '' || (string)(int)$retryAfter !== $retryAfter) {
-						$retryAfterTime = $retryAfter === '' ? false : strtotime($retryAfter);
-						$sleep = $retryAfterTime === false ? random_int(10, 120) : max(0, $retryAfterTime - time());
-					} else {
-						$sleep = (int)$retryAfter;
-					}
-					$sleep += random_int(5, 30);
-					$this->logger->warning("Rate limit exceeded, retrying in $sleep seconds", ['retry_count' => $retryCount]);
-					sleep($sleep);
-					$retryCount++;
+				if ($chunk === '') {
 					continue;
 				}
 
-				if ($statusCode >= 400) {
-					$parsedResponseBody = json_decode($rawBody, true);
-					throw new Exception(
-						$this->l10n->t('API request error: ') . (
-							$statusCode === 401
-							? $this->l10n->t('Invalid API Key/Basic Auth: ')
-							: ''
-						) . (
-							isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])
-							? $parsedResponseBody['error']['message']
-							: 'HTTP ' . $statusCode
-						),
-						$statusCode,
-					);
+				if (str_starts_with(strtolower($contentType), 'text/event-stream')) {
+					foreach ($this->parseSseChunk($chunk, $eventBuffer, $done, $usage) as $partial) {
+						yield $partial;
+					}
+				} else {
+					$rawBody .= $chunk;
 				}
-
-				if (!str_starts_with(strtolower($contentType), 'text/event-stream')) {
-					throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
-				}
-
-				return $usage === null ? [] : ['usage' => $usage];
-			} finally {
-				curl_multi_remove_handle($multiHandle, $ch);
-				curl_close($ch);
-				curl_multi_close($multiHandle);
 			}
+
+			if (!$done && str_starts_with(strtolower($contentType), 'text/event-stream')) {
+				foreach ($this->parseSseChunk('', $eventBuffer, $done, $usage, true) as $partial) {
+					yield $partial;
+				}
+			}
+
+			if ($statusCode === Http::STATUS_TOO_MANY_REQUESTS && $retryCount < 3 && $this->isCLI) {
+				if ($retryAfter === '' || (string)(int)$retryAfter !== $retryAfter) {
+					$retryAfterTime = $retryAfter === '' ? false : strtotime($retryAfter);
+					$sleep = $retryAfterTime === false ? random_int(10, 120) : max(0, $retryAfterTime - time());
+				} else {
+					$sleep = (int)$retryAfter;
+				}
+				$sleep += random_int(5, 30);
+				$this->logger->warning("Rate limit exceeded, retrying in $sleep seconds", ['retry_count' => $retryCount]);
+				sleep($sleep);
+				$retryCount++;
+				continue;
+			}
+
+			if ($statusCode >= 400) {
+				$parsedResponseBody = json_decode($rawBody, true);
+				throw new Exception(
+					$this->l10n->t('API request error: ') . (
+						$statusCode === 401
+						? $this->l10n->t('Invalid API Key/Basic Auth: ')
+						: ''
+					) . (
+						isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])
+						? $parsedResponseBody['error']['message']
+						: 'HTTP ' . $statusCode
+					),
+					$statusCode,
+				);
+			}
+
+			if (!str_starts_with(strtolower($contentType), 'text/event-stream')) {
+				throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			}
+
+			return $usage === null ? [] : ['usage' => $usage];
 		}
 	}
 
