@@ -11,6 +11,7 @@ use OCA\OpenAi\Capabilities;
 use OCA\OpenAi\Notification\Notifier;
 use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
 use OCA\OpenAi\TaskProcessing\AudioToAudioChatProvider;
+use OCA\OpenAi\TaskProcessing\AudioToTextEnhancedProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneTaskType;
@@ -108,6 +109,9 @@ class Application extends App implements IBootstrap {
 		}
 		if ($this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(AudioToTextProvider::class);
+			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
+				$context->registerTaskProcessingProvider(AudioToTextEnhancedProvider::class);
+			}
 		}
 
 		$serviceUrl = $this->appConfig->getValueString(Application::APP_ID, 'url');
