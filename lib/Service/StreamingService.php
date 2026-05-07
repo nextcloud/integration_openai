@@ -8,98 +8,37 @@
 namespace OCA\OpenAi\Service;
 
 use Exception;
-use OCA\OpenAi\AppInfo\Application;
 use OCP\AppFramework\Http;
-use OCP\Http\Client\IClientService;
 use OCP\IL10N;
-use Psr\Log\LoggerInterface;
 
 class StreamingService {
 	public function __construct(
-		private LoggerInterface $logger,
 		private IL10N $l10n,
-		private OpenAiSettingsService $openAiSettingsService,
-		private IClientService $clientService,
-		private bool $isCLI,
 	) {
 	}
 
 	/**
-	 * @param string|null $userId
-	 * @param string $endPoint
-	 * @param array<string, mixed> $params
-	 * @param string|null $serviceType
-	 * @param bool $isUsingOpenAi
-	 * @return \Generator<string, mixed, mixed, array{usage?: array<string, mixed>}>
+	 * @param array{body?: mixed, content-type?: mixed} $response
+	 * @return \Generator<string, mixed, mixed, array{usage?: array<string, mixed>, choices?: array<int, array<string, mixed>>}>
 	 * @throws Exception
 	 */
-	public function streamRequest(
-		?string $userId,
-		string $endPoint,
-		array $params,
-		?string $serviceType,
-		bool $isUsingOpenAi,
-	): \Generator {
-		$retryCount = 0;
+	public function parseStreamChatResponse(array $response): \Generator {
+		if (isset($response['error']) && is_string($response['error'])) {
+			throw new Exception($response['error'], Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
 
-		while (true) {
-			$context = $this->getRequestContext($userId, $serviceType);
-			$serviceUrl = $context['serviceUrl'];
-			$apiKey = $context['apiKey'];
-			$basicUser = $context['basicUser'];
-			$basicPassword = $context['basicPassword'];
-			$useBasicAuth = $context['useBasicAuth'];
-			$timeout = $context['timeout'];
+		$contentType = strtolower((string)($response['content-type'] ?? ''));
+		$body = $response['body'] ?? null;
 
-			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
-				throw new Exception('An API key is required for api.openai.com', Http::STATUS_UNAUTHORIZED);
-			}
-
-			$url = rtrim($serviceUrl, '/') . '/' . $endPoint;
-			$payload = json_encode($params);
-			if ($payload === false) {
-				throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
-			}
-
-			$headers = [
-				'User-Agent' => Application::USER_AGENT,
-				'Content-Type' => 'application/json',
-				'Accept' => 'text/event-stream',
-			];
-			if ($isUsingOpenAi || !$useBasicAuth) {
-				if ($apiKey !== '') {
-					$headers['Authorization'] = 'Bearer ' . $apiKey;
-				}
-			} elseif ($basicUser !== '' && $basicPassword !== '') {
-				$headers['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
-			}
-
-			$contentType = '';
-			$statusCode = 0;
-			$retryAfter = '';
-			$eventBuffer = '';
-			$rawBody = '';
-			$done = false;
-			$usage = null;
-
-			$response = $this->clientService->newClient()->post($url, [
-				'body' => $payload,
-				'headers' => $headers,
-				'timeout' => $timeout,
-				'stream' => true,
-				'nextcloud' => [
-					'allow_local_address' => !$isUsingOpenAi,
-				],
-			]);
-
-			$contentType = $response->getHeader('Content-Type');
-			$statusCode = $response->getStatusCode();
-			$retryAfter = $response->getHeader('Retry-After');
-			$body = $response->getBody();
-
+		if (str_starts_with($contentType, 'text/event-stream')) {
 			if (!is_resource($body)) {
 				throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
 			}
+
+			$eventBuffer = '';
+			$done = false;
+			$usage = null;
+			$choices = [];
 
 			while (!feof($body)) {
 				$chunk = fread($body, 8192);
@@ -110,119 +49,50 @@ class StreamingService {
 					continue;
 				}
 
-				if (str_starts_with(strtolower($contentType), 'text/event-stream')) {
-					foreach ($this->parseSseChunk($chunk, $eventBuffer, $done, $usage) as $partial) {
-						yield $partial;
-					}
-				} else {
-					$rawBody .= $chunk;
-				}
-			}
-
-			if (!$done && str_starts_with(strtolower($contentType), 'text/event-stream')) {
-				foreach ($this->parseSseChunk('', $eventBuffer, $done, $usage, true) as $partial) {
+				foreach ($this->parseSseChunk($chunk, $eventBuffer, $done, $usage, $choices) as $partial) {
 					yield $partial;
 				}
 			}
 
-			if ($statusCode === Http::STATUS_TOO_MANY_REQUESTS && $retryCount < 3 && $this->isCLI) {
-				if ($retryAfter === '' || (string)(int)$retryAfter !== $retryAfter) {
-					$retryAfterTime = $retryAfter === '' ? false : strtotime($retryAfter);
-					$sleep = $retryAfterTime === false ? random_int(10, 120) : max(0, $retryAfterTime - time());
-				} else {
-					$sleep = (int)$retryAfter;
+			if (!$done) {
+				foreach ($this->parseSseChunk('', $eventBuffer, $done, $usage, $choices, true) as $partial) {
+					yield $partial;
 				}
-				$sleep += random_int(5, 30);
-				$this->logger->warning("Rate limit exceeded, retrying in $sleep seconds", ['retry_count' => $retryCount]);
-				sleep($sleep);
-				$retryCount++;
-				continue;
 			}
 
-			if ($statusCode >= 400) {
-				$parsedResponseBody = json_decode($rawBody, true);
-				throw new Exception(
-					$this->l10n->t('API request error: ') . (
-						$statusCode === 401
-						? $this->l10n->t('Invalid API Key/Basic Auth: ')
-						: ''
-					) . (
-						isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])
-						? $parsedResponseBody['error']['message']
-						: 'HTTP ' . $statusCode
-					),
-					$statusCode,
-				);
+			$result = [];
+			if ($usage !== null) {
+				$result['usage'] = $usage;
 			}
-
-			if (!str_starts_with(strtolower($contentType), 'text/event-stream')) {
-				throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			if ($choices !== []) {
+				ksort($choices);
+				$result['choices'] = array_values($choices);
 			}
-
-			return $usage === null ? [] : ['usage' => $usage];
-		}
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param string|null $serviceType
-	 * @return array{serviceUrl: string, apiKey: string, basicUser: string, basicPassword: string, useBasicAuth: bool, timeout: int}
-	 */
-	private function getRequestContext(?string $userId, ?string $serviceType = null): array {
-		if ($serviceType === Application::SERVICE_TYPE_IMAGE && $this->openAiSettingsService->imageOverrideEnabled()) {
-			return [
-				'serviceUrl' => $this->openAiSettingsService->getImageServiceUrl(),
-				'apiKey' => $this->openAiSettingsService->getAdminImageApiKey(),
-				'basicUser' => $this->openAiSettingsService->getAdminImageBasicUser(),
-				'basicPassword' => $this->openAiSettingsService->getAdminImageBasicPassword(),
-				'useBasicAuth' => $this->openAiSettingsService->getAdminImageUseBasicAuth(),
-				'timeout' => $this->openAiSettingsService->getImageRequestTimeout(),
-			];
-		}
-		if ($serviceType === Application::SERVICE_TYPE_STT && $this->openAiSettingsService->sttOverrideEnabled()) {
-			return [
-				'serviceUrl' => $this->openAiSettingsService->getSttServiceUrl(),
-				'apiKey' => $this->openAiSettingsService->getAdminSttApiKey(),
-				'basicUser' => $this->openAiSettingsService->getAdminSttBasicUser(),
-				'basicPassword' => $this->openAiSettingsService->getAdminSttBasicPassword(),
-				'useBasicAuth' => $this->openAiSettingsService->getAdminSttUseBasicAuth(),
-				'timeout' => $this->openAiSettingsService->getSttRequestTimeout(),
-			];
-		}
-		if ($serviceType === Application::SERVICE_TYPE_TTS && $this->openAiSettingsService->ttsOverrideEnabled()) {
-			return [
-				'serviceUrl' => $this->openAiSettingsService->getTtsServiceUrl(),
-				'apiKey' => $this->openAiSettingsService->getAdminTtsApiKey(),
-				'basicUser' => $this->openAiSettingsService->getAdminTtsBasicUser(),
-				'basicPassword' => $this->openAiSettingsService->getAdminTtsBasicPassword(),
-				'useBasicAuth' => $this->openAiSettingsService->getAdminTtsUseBasicAuth(),
-				'timeout' => $this->openAiSettingsService->getTtsRequestTimeout(),
-			];
+			return $result;
 		}
 
-		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		if ($serviceUrl === '') {
-			$serviceUrl = Application::OPENAI_API_BASE_URL;
+		if (!is_array($body)) {
+			throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		return [
-			'serviceUrl' => $serviceUrl,
-			'apiKey' => $this->openAiSettingsService->getUserApiKey($userId, true),
-			'basicUser' => $this->openAiSettingsService->getUserBasicUser($userId, true),
-			'basicPassword' => $this->openAiSettingsService->getUserBasicPassword($userId, true),
-			'useBasicAuth' => $this->openAiSettingsService->getUseBasicAuth(),
-			'timeout' => $this->openAiSettingsService->getRequestTimeout(),
-		];
+		foreach ($body['choices'] ?? [] as $choice) {
+			if (isset($choice['message']['content']) && is_string($choice['message']['content']) && $choice['message']['content'] !== '') {
+				yield $choice['message']['content'];
+			}
+		}
+
+		return $body;
 	}
 
 	/**
 	 * @param string $event
 	 * @param bool $done
 	 * @param array<string, mixed>|null $usage
+	 * @param array<int, array<string, mixed>> $choices
 	 * @return string[]
 	 * @throws Exception
 	 */
-	private function parseSseEvent(string $event, bool &$done, ?array &$usage): array {
+	private function parseSseEvent(string $event, bool &$done, ?array &$usage, array &$choices): array {
 		$dataLines = [];
 		foreach (explode("\n", trim($event)) as $line) {
 			if ($line === '' || str_starts_with($line, ':') || !str_starts_with($line, 'data:')) {
@@ -251,10 +121,44 @@ class StreamingService {
 
 		$partials = [];
 		foreach ($payload['choices'] ?? [] as $choice) {
+			if (!is_array($choice)) {
+				continue;
+			}
+
+			$index = isset($choice['index']) && is_int($choice['index']) ? $choice['index'] : count($choices);
+			if (!isset($choices[$index])) {
+				$choices[$index] = [
+					'index' => $index,
+					'message' => [],
+				];
+			}
+
+			if (isset($choice['finish_reason'])) {
+				$choices[$index]['finish_reason'] = $choice['finish_reason'];
+			}
+
 			if (isset($choice['delta']['content']) && is_string($choice['delta']['content']) && $choice['delta']['content'] !== '') {
+				$choices[$index]['message']['content'] = ($choices[$index]['message']['content'] ?? '') . $choice['delta']['content'];
 				$partials[] = $choice['delta']['content'];
 			} elseif (isset($choice['message']['content']) && is_string($choice['message']['content']) && $choice['message']['content'] !== '') {
+				$choices[$index]['message']['content'] = $choice['message']['content'];
 				$partials[] = $choice['message']['content'];
+			}
+
+			if (isset($choice['delta']['audio']) && is_array($choice['delta']['audio'])) {
+				$existingAudio = $choices[$index]['message']['audio'] ?? [];
+				if (!is_array($existingAudio)) {
+					$existingAudio = [];
+				}
+				$choices[$index]['message']['audio'] = array_merge($existingAudio, $choice['delta']['audio']);
+			} elseif (isset($choice['message']['audio']) && is_array($choice['message']['audio'])) {
+				$choices[$index]['message']['audio'] = $choice['message']['audio'];
+			}
+
+			if (isset($choice['delta']['tool_calls']) && is_array($choice['delta']['tool_calls'])) {
+				$this->mergeToolCalls($choices[$index]['message'], $choice['delta']['tool_calls']);
+			} elseif (isset($choice['message']['tool_calls']) && is_array($choice['message']['tool_calls'])) {
+				$choices[$index]['message']['tool_calls'] = $choice['message']['tool_calls'];
 			}
 		}
 
@@ -266,28 +170,74 @@ class StreamingService {
 	 * @param string $buffer
 	 * @param bool $done
 	 * @param array<string, mixed>|null $usage
+	 * @param array<int, array<string, mixed>> $choices
 	 * @param bool $flush
 	 * @return string[]
 	 * @throws Exception
 	 */
-	private function parseSseChunk(string $chunk, string &$buffer, bool &$done, ?array &$usage, bool $flush = false): array {
+	private function parseSseChunk(string $chunk, string &$buffer, bool &$done, ?array &$usage, array &$choices, bool $flush = false): array {
 		$buffer .= str_replace(["\r\n", "\r"], "\n", $chunk);
 		$partials = [];
 
 		while (($delimiterPos = strpos($buffer, "\n\n")) !== false) {
 			$event = substr($buffer, 0, $delimiterPos);
 			$buffer = substr($buffer, $delimiterPos + 2);
-			$partials = [...$partials, ...$this->parseSseEvent($event, $done, $usage)];
+			$partials = [...$partials, ...$this->parseSseEvent($event, $done, $usage, $choices)];
 			if ($done) {
 				return $partials;
 			}
 		}
 
 		if ($flush && trim($buffer) !== '') {
-			$partials = [...$partials, ...$this->parseSseEvent($buffer, $done, $usage)];
+			$partials = [...$partials, ...$this->parseSseEvent($buffer, $done, $usage, $choices)];
 			$buffer = '';
 		}
 
 		return $partials;
+	}
+
+	/**
+	 * @param array<string, mixed> $message
+	 * @param array<int, array<string, mixed>> $toolCallsDelta
+	 */
+	private function mergeToolCalls(array &$message, array $toolCallsDelta): void {
+		$toolCalls = $message['tool_calls'] ?? [];
+		if (!is_array($toolCalls)) {
+			$toolCalls = [];
+		}
+
+		foreach ($toolCallsDelta as $toolCallDelta) {
+			if (!is_array($toolCallDelta)) {
+				continue;
+			}
+
+			$index = isset($toolCallDelta['index']) && is_int($toolCallDelta['index']) ? $toolCallDelta['index'] : count($toolCalls);
+			if (!isset($toolCalls[$index]) || !is_array($toolCalls[$index])) {
+				$toolCalls[$index] = [];
+			}
+
+			if (isset($toolCallDelta['id']) && is_string($toolCallDelta['id'])) {
+				$toolCalls[$index]['id'] = $toolCallDelta['id'];
+			}
+			if (isset($toolCallDelta['type']) && is_string($toolCallDelta['type'])) {
+				$toolCalls[$index]['type'] = $toolCallDelta['type'];
+			}
+			if (isset($toolCallDelta['function']) && is_array($toolCallDelta['function'])) {
+				$existingFunction = $toolCalls[$index]['function'] ?? [];
+				if (!is_array($existingFunction)) {
+					$existingFunction = [];
+				}
+				if (isset($toolCallDelta['function']['name']) && is_string($toolCallDelta['function']['name'])) {
+					$existingFunction['name'] = $toolCallDelta['function']['name'];
+				}
+				if (isset($toolCallDelta['function']['arguments']) && is_string($toolCallDelta['function']['arguments'])) {
+					$existingFunction['arguments'] = ($existingFunction['arguments'] ?? '') . $toolCallDelta['function']['arguments'];
+				}
+				$toolCalls[$index]['function'] = $existingFunction;
+			}
+		}
+
+		ksort($toolCalls);
+		$message['tool_calls'] = array_values($toolCalls);
 	}
 }

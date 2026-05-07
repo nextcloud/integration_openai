@@ -32,17 +32,26 @@ $appConfig->setValueString(Application::APP_ID, 'api_key', 'dummy-key', lazy: fa
 $service = Server::get(StreamingService::class);
 $start = microtime(true);
 
-$generator = $service->streamRequest(
-	null,
-	'chat/completions',
-	[
+$client = Server::get(\OCP\Http\Client\IClientService::class)->newClient();
+$response = $client->post($baseUrl . '/chat/completions', [
+	'body' => json_encode([
 		'model' => 'dummy-model',
 		'messages' => [['role' => 'user', 'content' => 'hello']],
 		'stream' => true,
+	]),
+	'headers' => [
+		'User-Agent' => Application::USER_AGENT,
+		'Content-Type' => 'application/json',
+		'Accept' => 'text/event-stream',
+		'Authorization' => 'Bearer dummy-key',
 	],
-	null,
-	false,
-);
+	'stream' => true,
+]);
+
+$generator = $service->parseStreamChatResponse([
+	'body' => $response->getBody(),
+	'content-type' => $response->getHeader('Content-Type'),
+]);
 
 $index = 0;
 foreach ($generator as $partial) {

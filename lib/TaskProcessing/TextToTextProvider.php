@@ -125,13 +125,13 @@ class TextToTextProvider implements ISynchronousProvider {
 				$stream = true;
 				if ($stream) {
 					$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-					$fullOutput = '';
+					// $fullOutput = '';
 					foreach ($chunks as $chunk) {
 						// TODO use the future "updateOutput" callback
-						$fullOutput .= $chunk;
+						// $fullOutput .= $chunk;
 						echo 'chunk: ' . $chunk . "\n";
 					}
-					$completion = [$fullOutput];
+					$completion = $chunks->getReturn()['messages'];
 				} else {
 					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 					$completion = $completion['messages'];

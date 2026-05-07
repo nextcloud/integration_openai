@@ -18,6 +18,7 @@ use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\StreamingService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
@@ -50,6 +51,7 @@ class OpenAiProviderTest extends TestCase {
 	private OpenAiAPIService $openAiApiService;
 	private OpenAiSettingsService $openAiSettingsService;
 	private ChunkService $chunkService;
+	private StreamingService $streamingService;
 	/**
 	 * @var MockObject|IClient
 	 */
@@ -71,6 +73,9 @@ class OpenAiProviderTest extends TestCase {
 		$this->openAiSettingsService = \OCP\Server::get(OpenAiSettingsService::class);
 
 		$this->chunkService = \OCP\Server::get(ChunkService::class);
+		$this->streamingService = new StreamingService(
+			$this->createMock(\OCP\IL10N::class),
+		);
 
 		$this->quotaUsageMapper = \OCP\Server::get(QuotaUsageMapper::class);
 
@@ -86,6 +91,7 @@ class OpenAiProviderTest extends TestCase {
 			\OCP\Server::get(ICacheFactory::class),
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
+			$this->streamingService,
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
@@ -169,6 +175,53 @@ class OpenAiProviderTest extends TestCase {
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
 		$this->assertEquals(21, $usage);
 		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testCreateStreamedChatCompletionReturnsStructuredChatResult(): void {
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Could not open temp stream');
+		}
+
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"This is \"}}]}\n\n");
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"a test response.\"},\"finish_reason\":\"stop\"}],\"usage\":{\"total_tokens\":21}}\n\n");
+		fwrite($stream, "data: [DONE]\n\n");
+		rewind($stream);
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [['role' => 'user', 'content' => 'This is a test prompt']],
+			'n' => 1,
+			'stream' => true,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+			'stream_options' => ['include_usage' => true],
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($stream);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->willReturnMap([
+			['Content-Type', 'text/event-stream'],
+		]);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$generator = $this->openAiApiService->createStreamedChatCompletion(self::TEST_USER1, Application::DEFAULT_MODEL_ID, 'This is a test prompt');
+		$chunks = iterator_to_array($generator, false);
+
+		$this->assertSame(['This is ', 'a test response.'], $chunks);
+		$this->assertSame([
+			'messages' => ['This is a test response.'],
+			'tool_calls' => [],
+			'audio_messages' => [],
+		], $generator->getReturn());
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
