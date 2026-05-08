@@ -94,6 +94,7 @@
     "You can create a free API key in your OpenAI account settings" : "Вы можете создать бесплатный ключ API в настройках вашего аккаунта OpenAI.",
     "Usage quota info" : "Информация о квоте использования",
     "Specifying your own API key will allow unlimited usage" : "Указание вашего собственного ключа API позволит использовать его неограниченно",
+    "Days" : "Дни",
     "Months" : "Месяц(ев)",
     "Who?" : "Кто?",
     "No recommendations. Start typing." : "Начните вводить имя...",
