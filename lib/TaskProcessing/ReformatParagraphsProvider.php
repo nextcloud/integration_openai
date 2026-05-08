@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
+use InvalidArgumentException;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
@@ -57,8 +58,14 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 			}
 
 			$insertAt = $pos + $delta;
-			$result = substr($result, 0, $insertAt) . "\n\n" . substr($result, $insertAt);
-			$delta += 2;
+			// Makes sure to replace newlines and whitespace that already exists at the split
+			$replaceFrom = $insertAt;
+			while ($replaceFrom > 0 && preg_match('/\s/u', $result[$replaceFrom - 1]) === 1) {
+				$replaceFrom--;
+			}
+			$result = substr($result, 0, $replaceFrom) . "\n\n" . substr($result, $insertAt);
+			$delta += 2 - ($insertAt - $replaceFrom);
+
 			$searchOffset = $pos + strlen($anchor);
 		}
 		return $result;
@@ -120,9 +127,7 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi()
-			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', lazy: true);
+		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
 			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
@@ -145,7 +150,7 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new InvalidArgumentException('Invalid prompt');
 		}
 		$prompt = $input['input'];
 
@@ -157,7 +162,7 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		} else {
-			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
+			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		}
 		$chunks = $this->chunkService->chunkSplitPrompt($prompt, false);
 		$result = '';
@@ -170,7 +175,7 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 				. 'Thematic breaks only: Do not create a new paragraph for rhythm, style, or sentence flow. '
 				. 'A break is allowed only when the subject matter changes significantly. '
 				. 'Output format: For each identified paragraph, return only the first 8 to 12 words verbatim from the input. '
-				. 'Structure: Return exactly one anchor per line. Do not include bullets, numbering, summaries, quotes, or any additional text. '
+				. 'Structure: Return exactly one anchor per line. Do not include bullets, html tags, numbering, summaries, quotes, or any additional text. '
 				. 'Single topic: If the text covers only one topic, return exactly one line.';
 			try {
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
@@ -184,7 +189,7 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
 			if (count($completion) > 0) {
-				// The llm only needs to generate the first sentence of each paragraph, and we get the rest of the output from the orginal input.
+				// The llm only needs to generate the first 8 to 12 words of each paragraph, and we get the rest of the output from the original input.
 				$raw = (string)array_pop($completion);
 				$anchors = $this->parseAnchorsFromModelOutput($raw);
 				$result .= $this->insertParagraphBreaksByAnchors($chunk, $anchors);
