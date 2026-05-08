@@ -26,10 +26,10 @@ use RuntimeException;
 class AudioToTextProvider implements ISynchronousProvider {
 
 	public function __construct(
-		protected OpenAiAPIService $openAiAPIService,
-		protected LoggerInterface $logger,
-		protected IAppConfig $appConfig,
-		protected IL10N $l,
+		private OpenAiAPIService $openAiAPIService,
+		private LoggerInterface $logger,
+		private IAppConfig $appConfig,
+		private IL10N $l,
 	) {
 	}
 

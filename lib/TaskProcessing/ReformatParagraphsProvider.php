@@ -21,7 +21,6 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use RuntimeException;
-use InvalidArgumentException;
 
 class ReformatParagraphsProvider implements ISynchronousProvider {
 	private const TASK_TYPE_ID = 'core:text2text:reformatparagraphs';

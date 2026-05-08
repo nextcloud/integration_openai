@@ -11,43 +11,81 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCP\IAppConfig;
-use OCP\IL10N;
 use OCP\TaskProcessing\IManager;
+use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\Task;
+use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
-// Built on top of the AudioToTextProvider to add paragraph reformatting.
-class AudioToTextEnhancedProvider extends AudioToTextProvider {
-	private const REFORMAT_PARAGRAPHS_TASK_TYPE_ID = 'core:text2text:reformatparagraphs';
-
-	private IManager $taskProcessingManager;
+class AudioToTextEnhancedProvider implements ISynchronousProvider {
 
 	public function __construct(
-		OpenAiAPIService $openAiAPIService,
-		LoggerInterface $logger,
-		IAppConfig $appConfig,
-		IL10N $l,
-		IManager $taskProcessingManager,
+		private AudioToTextProvider $audioToTextProvider,
+		private OpenAiAPIService $openAiAPIService,
+		private IManager $taskProcessingManager,
+		private LoggerInterface $logger,
 	) {
-		parent::__construct($openAiAPIService, $logger, $appConfig, $l);
-		$this->taskProcessingManager = $taskProcessingManager;
 	}
 
 	public function getId(): string {
-		return parent::getId() . '-enhanced';
+		return $this->audioToTextProvider->getId() . '-enhanced';
 	}
 
 	public function getName(): string {
-		return parent::getName() . ' ' . $this->l->t('(with paragraph reformatting)');
+		return $this->audioToTextProvider->getName() . ' (with paragraph reformatting)';
+	}
+
+	public function getTaskTypeId(): string {
+		return AudioToText::ID;
+	}
+
+	public function getExpectedRuntime(): int {
+		return $this->audioToTextProvider->getExpectedRuntime();
+	}
+
+	public function getInputShapeEnumValues(): array {
+		return $this->audioToTextProvider->getInputShapeEnumValues();
+	}
+
+	public function getInputShapeDefaults(): array {
+		return $this->audioToTextProvider->getInputShapeDefaults();
+	}
+
+	public function getOptionalInputShape(): array {
+		return $this->audioToTextProvider->getOptionalInputShape();
+	}
+
+	public function getOptionalInputShapeEnumValues(): array {
+		return $this->audioToTextProvider->getOptionalInputShapeEnumValues();
+	}
+
+	public function getOptionalInputShapeDefaults(): array {
+		return $this->audioToTextProvider->getOptionalInputShapeDefaults();
+	}
+
+	public function getOutputShapeEnumValues(): array {
+		return $this->audioToTextProvider->getOutputShapeEnumValues();
+	}
+
+	public function getOptionalOutputShape(): array {
+		return $this->audioToTextProvider->getOptionalOutputShape();
+	}
+
+	public function getOptionalOutputShapeEnumValues(): array {
+		return $this->audioToTextProvider->getOptionalOutputShapeEnumValues();
 	}
 
 	public function process(?string $userId, array $input, callable $reportProgress): array {
-		$transcription = parent::process($userId, $input, $reportProgress)['output'];
+		$transcription = $this->audioToTextProvider->process($userId, $input, $reportProgress)['output'];
+
+		// Skip reformatting if the transcription is empty
+		if (trim($transcription) === '') {
+			return ['output' => $transcription];
+		}
 
 		$reformatTask = new Task(
-			self::REFORMAT_PARAGRAPHS_TASK_TYPE_ID,
+			\OCP\TaskProcessing\TaskTypes\TextToTextReformatParagraphs::ID,
 			['input' => $transcription],
 			Application::APP_ID,
 			$userId,
