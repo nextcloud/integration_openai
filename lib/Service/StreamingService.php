@@ -18,6 +18,12 @@ class StreamingService {
 	}
 
 	/**
+	 * Parse a streamed chat response and yield assistant content fragments as they arrive.
+	 *
+	 * The generator return value contains the reconstructed response payload, including
+	 * usage and rebuilt choices for SSE responses, or the original decoded JSON body
+	 * when the upstream responded with non-streamed JSON.
+	 *
 	 * @param array{body?: mixed, content-type?: mixed} $response
 	 * @return \Generator<string, mixed, mixed, array{usage?: array<string, mixed>, choices?: array<int, array<string, mixed>>}>
 	 * @throws Exception
@@ -85,6 +91,9 @@ class StreamingService {
 	}
 
 	/**
+	 * Parse one SSE event payload, update the accumulated choice state, and return any
+	 * assistant text fragments that should be yielded to the caller.
+	 *
 	 * @param string $event
 	 * @param bool $done
 	 * @param array<string, mixed>|null $usage
@@ -166,6 +175,12 @@ class StreamingService {
 	}
 
 	/**
+	 * Append a raw chunk to the SSE buffer and parse all complete events currently
+	 * available in that buffer.
+	 *
+	 * When `$flush` is true, the remaining buffer is parsed as a final event even if it
+	 * is not terminated by the usual blank-line SSE delimiter.
+	 *
 	 * @param string $chunk
 	 * @param string $buffer
 	 * @param bool $done
@@ -197,6 +212,9 @@ class StreamingService {
 	}
 
 	/**
+	 * Merge fragmented `tool_calls` deltas from multiple SSE events into the accumulated
+	 * message structure for a single choice.
+	 *
 	 * @param array<string, mixed> $message
 	 * @param array<int, array<string, mixed>> $toolCallsDelta
 	 */
