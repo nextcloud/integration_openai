@@ -17,6 +17,7 @@ OC.L10N.register(
     "API key" : "API key",
     "Start date" : "Датум на започнување",
     "Default language" : "Стандарден јазик",
+    "Days" : "Дена",
     "Months" : "Месеци",
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
     "No result." : "Нема резултати.",
