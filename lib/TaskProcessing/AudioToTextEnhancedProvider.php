@@ -41,7 +41,7 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->audioToTextProvider->getExpectedRuntime();
+		return $this->audioToTextProvider->getExpectedRuntime() + $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -65,15 +65,15 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 	}
 
 	public function getOutputShapeEnumValues(): array {
-		return $this->audioToTextProvider->getOutputShapeEnumValues();
+		return [];
 	}
 
 	public function getOptionalOutputShape(): array {
-		return $this->audioToTextProvider->getOptionalOutputShape();
+		return [];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
-		return $this->audioToTextProvider->getOptionalOutputShapeEnumValues();
+		return [];
 	}
 
 	public function process(?string $userId, array $input, callable $reportProgress): array {
