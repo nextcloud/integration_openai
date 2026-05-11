@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IL10N;
 use OCP\TaskProcessing\IManager;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
@@ -25,6 +26,7 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 		private IManager $taskProcessingManager,
 		private LoggerInterface $logger,
 		private IL10N $l10n,
+		private OpenAiAPIService $openAiAPIService,
 	) {
 	}
 
@@ -41,7 +43,7 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->textToImageProvider->getExpectedRuntime();
+		return $this->textToImageProvider->getExpectedRuntime() + $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -65,15 +67,15 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 	}
 
 	public function getOutputShapeEnumValues(): array {
-		return $this->textToImageProvider->getOutputShapeEnumValues();
+		return [];
 	}
 
 	public function getOptionalOutputShape(): array {
-		return $this->textToImageProvider->getOptionalOutputShape();
+		return [];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
-		return $this->textToImageProvider->getOptionalOutputShapeEnumValues();
+		return [];
 	}
 
 	public function process(?string $userId, array $input, callable $reportProgress, bool $includeWatermark = true): array {
