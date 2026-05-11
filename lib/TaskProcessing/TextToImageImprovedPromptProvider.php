@@ -45,6 +45,7 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 	}
 
 	public function getExpectedRuntime(): int {
+		// The text to image provider may not be openai and this assumes it is
 		return $this->textToImageProvider->getExpectedRuntime() + $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
