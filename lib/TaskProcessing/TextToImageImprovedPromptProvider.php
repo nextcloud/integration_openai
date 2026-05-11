@@ -12,8 +12,10 @@ namespace OCA\OpenAi\TaskProcessing;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IL10N;
+use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\IManager;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
+use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\Task;
 use OCP\TaskProcessing\TaskTypes\TextToImage;
 use OCP\TaskProcessing\TaskTypes\TextToText;
@@ -71,7 +73,13 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 	}
 
 	public function getOptionalOutputShape(): array {
-		return [];
+		return [
+			'enhanced_prompt' => new ShapeDescriptor(
+				$this->l10n->t('Improved prompt'),
+				$this->l10n->t('The prompt after LLM enhancement, as sent to the image model.'),
+				EShapeType::Text
+			),
+		];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
@@ -113,6 +121,8 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 
 		$newInput = $input;
 		$newInput['input'] = $improvedPrompt;
-		return $this->textToImageProvider->process($userId, $newInput, $reportProgress, $includeWatermark);
+		$output = $this->textToImageProvider->process($userId, $newInput, $reportProgress, $includeWatermark);
+		$output['enhanced_prompt'] = $improvedPrompt;
+		return $output;
 	}
 }
