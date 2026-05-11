@@ -41,6 +41,7 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
+		// The audio to text provider may not be openai and this assumes it is
 		return $this->audioToTextProvider->getExpectedRuntime() + $this->openAiAPIService->getExpTextProcessingTime();
 	}
 
