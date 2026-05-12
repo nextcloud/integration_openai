@@ -170,15 +170,19 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 		$progress = 0.0;
 
 		foreach ($chunks as $chunk) {
-			$systemPrompt = 'You will receive a continuous block of text without line breaks. Your task is to identify points in the text where the subject or topic changes (e.g., a shift to a new person, place, concept, or thematic focus) and insert a line break at that specific transition. ' .
-				'Do NOT break lines based on sentence length or grammar unless the subject actually changes. ' .
-				'Once you have identified these segments, do NOT output the full text. Instead, for each new line created by a subject change, output ONLY the first 3-5 words of that line. These serve as anchors for programmatic retrieval. ' .
-				'Format your output as a plain list of these anchor words, one per line. Do not include numbers, bullet points, or any additional commentary. ' .
-				'Example input: "The market for electric vehicles is expanding rapidly. In contrast, traditional motorcycle sales are declining globally. Aside from transportation, the price of copper remains volatile." ' .
-				'Example output:\n' .
-				'The market for electric vehicles\n' .
-				'In contrast, traditional motorcycle\n' .
-				'Aside from transportation, the price\n';
+			$systemPrompt = <<<TEXT
+You will receive a continuous block of text without line breaks. Your task is to identify points in the text where the subject or topic changes (e.g., a shift to a new person, place, concept, or thematic focus) and insert a line break at that specific transition.
+Do NOT break lines based on sentence length or grammar unless the subject actually changes.
+Once you have identified these segments, do NOT output the full text. Instead, for each new line created by a subject change, output ONLY the first 3-5 words of that line. These serve as anchors for programmatic retrieval.
+Format your output as a plain list of these anchor words, one per line. Do not include numbers, bullet points, or any additional commentary.
+
+Example input: "The market for electric vehicles is expanding rapidly. In contrast, traditional motorcycle sales are declining globally. Aside from transportation, the price of copper remains volatile."
+
+Example output:
+The market for electric vehicles
+In contrast, traditional motorcycle
+Aside from transportation, the price
+TEXT;
 			try {
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $chunk, $systemPrompt, null, 1, $maxTokens);
