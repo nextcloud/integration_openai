@@ -19,6 +19,7 @@ use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\ReformulateProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
+use OCA\OpenAi\TaskProcessing\TextToImageImprovedPromptProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
@@ -144,6 +145,7 @@ class Application extends App implements IBootstrap {
 		$context->registerTaskProcessingProvider(TextToSpeechProvider::class);
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
 			$context->registerTaskProcessingProvider(TextToImageProvider::class);
+			$context->registerTaskProcessingProvider(TextToImageImprovedPromptProvider::class);
 		}
 
 		// only register audio chat stuff if we're using OpenAI or stt+llm+tts are enabled
