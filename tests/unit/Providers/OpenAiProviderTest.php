@@ -23,6 +23,7 @@ use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
 use OCA\OpenAi\TaskProcessing\ProofreadProvider;
+use OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
@@ -32,6 +33,7 @@ use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
+use OCP\TaskProcessing\TaskTypes\TextToTextReformatParagraphs;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Test\TestCase;
@@ -687,6 +689,88 @@ class OpenAiProviderTest extends TestCase {
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_IMAGE);
 		$this->assertEquals(1, $usage);
 		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testReformatParagraphsProvider(): void {
+		if (!class_exists(TextToTextReformatParagraphs::class)) {
+			$this->markTestSkipped('TextToTextReformatParagraphs task type is not available in this Nextcloud version.');
+		}
+
+		$provider = new ReformatParagraphsProvider(
+			$this->openAiApiService,
+			\OCP\Server::get(IAppConfig::class),
+			$this->openAiSettingsService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->chunkService,
+			self::TEST_USER1,
+		);
+
+		$inputText = 'Alpha part. Beta part.';
+		$n = 1;
+
+		$response = '{
+            "id": "chatcmpl-123",
+            "object": "chat.completion",
+            "created": 1677652288,
+            "model": "gpt-4.1-mini",
+            "system_fingerprint": "fp_44709d6fcb",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Alpha part.\nBeta part."
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 9,
+              "completion_tokens": 12,
+              "total_tokens": 21
+            }
+        }';
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$systemPrompt = <<<TEXT
+You will receive a continuous block of text without line breaks. Your task is to identify points in the text where the subject or topic changes (e.g., a shift to a new person, place, concept, or thematic focus) and insert a line break at that specific transition.
+Do NOT break lines based on sentence length or grammar unless the subject actually changes.
+Once you have identified these segments, do NOT output the full text. Instead, for each new line created by a subject change, output ONLY the first 3-5 words of that line. These serve as anchors for programmatic retrieval.
+Format your output as a plain list of these anchor words, one per line. Do not include numbers, bullet points, or any additional commentary.
+
+Example input: "The market for electric vehicles is expanding rapidly. In contrast, traditional motorcycle sales are declining globally. Aside from transportation, the price of copper remains volatile."
+
+Example output:
+The market for electric vehicles
+In contrast, traditional motorcycle
+Aside from transportation, the price
+TEXT;
+
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				['role' => 'system', 'content' => $systemPrompt],
+				['role' => 'user', 'content' => $inputText],
+			],
+			'n' => $n,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $provider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
+		$this->assertEquals("Alpha part.\n\nBeta part.", $result['output']);
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
