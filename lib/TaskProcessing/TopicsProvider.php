@@ -14,7 +14,6 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
@@ -27,7 +26,6 @@ class TopicsProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private IAppConfig $appConfig,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private ChunkService $chunkService,
@@ -82,9 +80,7 @@ class TopicsProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi()
-			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', lazy: true);
+		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
 			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
@@ -119,7 +115,7 @@ class TopicsProvider implements ISynchronousProvider {
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		} else {
-			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
+			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		}
 		$prompts = $this->chunkService->chunkSplitPrompt($prompt);
 		$newNumChunks = count($prompts);

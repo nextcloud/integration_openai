@@ -15,7 +15,6 @@ use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\TranslateService;
-use OCP\IAppConfig;
 use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -54,7 +53,6 @@ class TranslateProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private IAppConfig $appConfig,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private ICacheFactory $cacheFactory,
@@ -120,9 +118,7 @@ class TranslateProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi()
-			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', lazy: true);
+		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
 			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
@@ -153,7 +149,7 @@ class TranslateProvider implements ISynchronousProvider {
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		} else {
-			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
+			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {

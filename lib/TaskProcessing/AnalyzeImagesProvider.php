@@ -13,7 +13,6 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
@@ -28,7 +27,6 @@ class AnalyzeImagesProvider implements ISynchronousProvider {
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private LoggerInterface $logger,
-		private IAppConfig $appConfig,
 		private ?string $userId,
 	) {
 	}
@@ -83,9 +81,7 @@ class AnalyzeImagesProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi()
-			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', lazy: true);
+		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
 			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
@@ -167,7 +163,7 @@ class AnalyzeImagesProvider implements ISynchronousProvider {
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		} else {
-			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_COMPLETION_MODEL_ID, lazy: true) ?: Application::DEFAULT_COMPLETION_MODEL_ID;
+			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		}
 
 		$maxTokens = null;
