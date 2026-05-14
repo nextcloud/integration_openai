@@ -38,6 +38,7 @@ OC.L10N.register(
     "API key" : "API-sleutel",
     "Start date" : "Startdatum",
     "Default language" : "Standaardtaal",
+    "Days" : "Dagen",
     "Months" : "Maanden",
     "Who?" : "Wie?",
     "No recommendations. Start typing." : "Geen aanbevelingen. Begin te typen.",
