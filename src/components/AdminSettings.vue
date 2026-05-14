@@ -822,7 +822,7 @@ export default {
 
 			const defaultImageModelId = this.state.default_image_model_id
 			const imageModelToSelect = this.imageModels.find(m => m.id === defaultImageModelId)
-					|| this.imageModels.find(m => m.id === 'dall-e-2')
+					|| this.imageModels.find(m => m.id.match(/image/i))
 					|| this.imageModels[1]
 					|| this.imageModels[0]
 
