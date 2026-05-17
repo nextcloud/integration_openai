@@ -78,7 +78,7 @@ OC.L10N.register(
     "The rewritten text in the desired tone, written by the assistant:" : "O texto reescrito no tom desejado, escrito pelo assistente:",
     "%s (LLM-improved prompt)" : "%s (Prompt otimizado por LLM)",
     "Improved prompt" : "Prompt otimizado",
-    "The prompt after LLM enhancement, as sent to the image model." : "O prompt após o aprimoramento por LLM, conforme enviada ao modelo de imagem.",
+    "The prompt after LLM enhancement, as sent to the image model." : "O prompt após o aprimoramento por LLM, conforme enviado ao modelo de imagem.",
     "Size" : "Tamanho",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Opcional. O tamanho das imagens geradas. Deve estar no formato 256x256. O padrão é %s",
     "The model used to generate the images" : "O modelo usado para gerar as imagens",
