@@ -7,8 +7,8 @@
 
 namespace OCA\OpenAi\Notification;
 
-use InvalidArgumentException;
 use OCA\OpenAi\AppInfo\Application;
+use OCP\Activity\Exceptions\UnknownActivityException;
 use OCP\IURLGenerator;
 use OCP\L10N\IFactory;
 use OCP\Notification\IAction;
@@ -35,11 +35,11 @@ class Notifier implements INotifier {
 	public function prepare(INotification $notification, string $languageCode): INotification {
 		if ($notification->getApp() !== Application::APP_ID) {
 			// Not my app => throw
-			throw new InvalidArgumentException();
+			throw new UnknownActivityException();
 		}
 		if ($notification->getSubject() !== 'quota_exceeded') {
 			// Not a valid subject => throw
-			throw new InvalidArgumentException();
+			throw new UnknownActivityException();
 		}
 
 		$l = $this->factory->get(Application::APP_ID, $languageCode);
