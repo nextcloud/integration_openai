@@ -15,12 +15,12 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\ISynchronousProgressiveProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToText;
 use RuntimeException;
 
-class TextToTextProvider implements ISynchronousProvider {
+class TextToTextProvider implements ISynchronousProgressiveProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -95,7 +95,7 @@ class TextToTextProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
 		/*
 		foreach (range(1, 20) as $i) {
 			$reportProgress($i / 100 * 5);
@@ -122,7 +122,7 @@ class TextToTextProvider implements ISynchronousProvider {
 
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$stream = true;
+				$stream = false;
 				if ($stream) {
 					$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 					// $fullOutput = '';
@@ -133,6 +133,13 @@ class TextToTextProvider implements ISynchronousProvider {
 					}
 					$completion = $chunks->getReturn()['messages'];
 				} else {
+					$tmp = 'initial';
+					foreach (range(1, 100) as $i) {
+						$tmp .= '-' . $i;
+						$reportOutput(['output' => $tmp]);
+						error_log('temp output: ' . json_encode($tmp));
+						usleep(100 * 1000);
+					}
 					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 					$completion = $completion['messages'];
 				}

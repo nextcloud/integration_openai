@@ -15,12 +15,12 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\ISynchronousProgressiveProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextChat;
 use RuntimeException;
 
-class TextToTextChatProvider implements ISynchronousProvider {
+class TextToTextChatProvider implements ISynchronousProgressiveProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -88,7 +88,7 @@ class TextToTextChatProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
@@ -115,6 +115,14 @@ class TextToTextChatProvider implements ISynchronousProvider {
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
+		}
+
+		$tmp = 'initial';
+		foreach (range(1, 50) as $i) {
+			$tmp .= '-' . $i;
+			$reportOutput(['output' => $tmp]);
+			error_log('temp output: ' . json_encode($tmp));
+			usleep(100 * 1000);
 		}
 
 		try {
