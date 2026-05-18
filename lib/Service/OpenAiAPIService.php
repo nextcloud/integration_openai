@@ -93,7 +93,7 @@ class OpenAiAPIService {
 	public function getServiceName(?string $serviceType = null): string {
 		if ($this->isUsingOpenAi($serviceType)) {
 			if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
-				return $this->l10n->t('OpenAI\'s DALL-E 2');
+				return $this->l10n->t('OpenAI\'s Image Generation');
 			}
 			if ($serviceType === Application::SERVICE_TYPE_TTS) {
 				$this->l10n->t('OpenAI\'s Text to Speech');
