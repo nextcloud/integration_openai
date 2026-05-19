@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Sesten yazıya dönüştürme kotası aşıldı",
     "Speech generation quota exceeded" : "Konuşma oluşturma kotası aşıldı",
     "View quota" : "Kotayı görüntüle",
-    "OpenAI's DALL-E 2" : "OpenAI DALL-E 2",
     "OpenAI's Text to Speech" : "OpenAI yazıdan konuşmaya",
     "Invalid models response received" : "Alınan model yanıtı geçersiz",
     "Default" : "Varsayılan",
@@ -76,6 +75,9 @@ OC.L10N.register(
     "Desired tone" : "İstenilen ton",
     "In which tone should your text be rewritten?" : "Yazı hangi tonda yeniden yazılmalı?",
     "The rewritten text in the desired tone, written by the assistant:" : "Yardımcı tarafından istenilen tonda yeniden yazılan yazı:",
+    "%s (LLM-improved prompt)" : "%s (LLM iyileştirilmiş istem)",
+    "Improved prompt" : "İyileştirilmiş istem",
+    "The prompt after LLM enhancement, as sent to the image model." : "Görsel modeline gönderilen LLM geliştirmesinden sonraki istem.",
     "Size" : "Boyut",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "İsteğe bağlı. Oluşturulan görsellerin boyutu. 256x256 boyutunda olmalıdır. Varsayılan değer: %s",
     "The model used to generate the images" : "Görselleri oluşturmakta kullanılacak model",
@@ -219,6 +221,7 @@ OC.L10N.register(
     "Service url overridden for {task} to {url}" : "{task} için hizmet adresi {url} olarak değiştirildi",
     "Service URL override" : "Hizmet adresi değişikliği",
     "With the current configuration, the target URL used to get the models for {aiTask} is:" : "Geçerli yapılandırmada {aiTask} için modellerin alınmasında kullanılacak hedef adres:",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Kullanımdan kaldırılan \"{deprecatedParam}\" yerine \"{newParam}\" parametresini kullanın"
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Kullanımdan kaldırılan \"{deprecatedParam}\" yerine \"{newParam}\" parametresini kullanın",
+    "OpenAI's DALL-E 2" : "OpenAI DALL-E 2"
 },
 "nplurals=2; plural=(n > 1);");

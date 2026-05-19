@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Bol prekročený limit prepisu zvuku",
     "Speech generation quota exceeded" : "Prekročená kvóta generovania reči",
     "View quota" : "Zobraziť kvótu",
-    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "OpenAI's Text to Speech" : "Text na reč od OpenAI",
     "Invalid models response received" : "Prijatá neplatná odpoveď modelu",
     "Default" : "Predvolené",
@@ -219,6 +218,7 @@ OC.L10N.register(
     "Service url overridden for {task} to {url}" : "Služobné URL bola prepísané pre {task} na {url}",
     "Service URL override" : "Prepisovanie URL služby",
     "With the current configuration, the target URL used to get the models for {aiTask} is:" : "S aktuálnou konfiguráciou je cieľová URL adresa používaná na získanie modelov {aiTask} pre:",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Použite parameter \"{newParam}\" namiesto zastaraného \"{deprecatedParam}\""
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Použite parameter \"{newParam}\" namiesto zastaraného \"{deprecatedParam}\"",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2"
 },
 "nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);");

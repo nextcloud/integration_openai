@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Sáraíodh an cuóta trascríobh fuaime",
     "Speech generation quota exceeded" : "Chuóta giniúna cainte sáraithe",
     "View quota" : "Cuóta amhairc",
-    "OpenAI's DALL-E 2" : "DALL-E 2 de chuid OpenAI",
     "OpenAI's Text to Speech" : "Téacs go Caint OpenAI",
     "Invalid models response received" : "Fuarthas freagra samhlacha neamhbhailí",
     "Default" : "Réamhshocrú",
@@ -222,6 +221,7 @@ OC.L10N.register(
     "Service url overridden for {task} to {url}" : "URL seirbhíse sáraithe do {task} go {url}",
     "Service URL override" : "Sárú URL na seirbhíse",
     "With the current configuration, the target URL used to get the models for {aiTask} is:" : "Leis an chumraíocht reatha, is é seo an URL sprice a úsáidtear chun na samhlacha do {aiTask} a fháil:",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Úsáid paraiméadar \"{newParam}\" in ionad an pharaiméadar \"{deprecatedParam}\""
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Úsáid paraiméadar \"{newParam}\" in ionad an pharaiméadar \"{deprecatedParam}\"",
+    "OpenAI's DALL-E 2" : "DALL-E 2 de chuid OpenAI"
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

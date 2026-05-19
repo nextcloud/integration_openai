@@ -4,7 +4,6 @@ OC.L10N.register(
     "Text generation quota exceeded" : " حصة توليد النصوص تمّ تجاوزها",
     "Image generation quota exceeded" : "حصة توليد الصور تمّ تجاوزها",
     "Audio transcription quota exceeded" : "حصة الترقين الصوتي تمّ تجاوزها",
-    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Invalid models response received" : "تم استلام استجابة نماذج غير صالحة",
     "Default" : "التلقائي",
     "Text generation" : "توليد النص",
@@ -124,6 +123,7 @@ OC.L10N.register(
     "Category" : "التصنيف",
     "Save" : "حفظ",
     "Delete" : "حذف",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "إستعمِل \"{newParam}\" بارامتراً عِوَضاً عن المُلغَى \"{deprecatedParam}\""
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "إستعمِل \"{newParam}\" بارامتراً عِوَضاً عن المُلغَى \"{deprecatedParam}\"",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2"
 },
 "nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;");

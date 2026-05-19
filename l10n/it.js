@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Superata la quota di trascrizione audio",
     "Speech generation quota exceeded" : "Superata la quota di generazione vocale",
     "View quota" : "Visualizza quota",
-    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "OpenAI's Text to Speech" : "Testo in voce di OpenAI",
     "Invalid models response received" : "Ricevuta risposta di modelli non validi",
     "Default" : "Predefinito",
@@ -207,6 +206,7 @@ OC.L10N.register(
     "Use shared quota" : "Utilizza quota condivisa",
     "Save" : "Salva",
     "Delete" : "Elimina",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilizza \"{newParam}\" parametro invece del deprecato \"{deprecatedParam}\""
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilizza \"{newParam}\" parametro invece del deprecato \"{deprecatedParam}\"",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

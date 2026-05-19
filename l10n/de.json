@@ -6,7 +6,6 @@
     "Audio transcription quota exceeded" : "Das Kontingent für Audiotranskription überschritten",
     "Speech generation quota exceeded" : "Kontingent für Spracherzeugung überschritten",
     "View quota" : "Kontingent anzeigen",
-    "OpenAI's DALL-E 2" : "DALL-E 2 von OpenAI",
     "OpenAI's Text to Speech" : "Text zu Sprache von OpenAI",
     "Invalid models response received" : "Ungültige Modellantwort erhalten",
     "Default" : "Standard",
@@ -220,6 +219,7 @@
     "Service url overridden for {task} to {url}" : "Dienst-URL umgeschrieben von {task} nach {url}",
     "Service URL override" : "Überschreiben der Dienst-URL",
     "With the current configuration, the target URL used to get the models for {aiTask} is:" : "Mit den aktuellen Einstellungen lautet die Ziel-URL, die zum Abrufen der Modelle für {aiTask} verwendet wird:",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden"
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "\"{newParam}\"-Parameter anstatt des veralteten \"{deprecatedParam}\" verwenden",
+    "OpenAI's DALL-E 2" : "DALL-E 2 von OpenAI"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Heli üleskirjutamise kvoot on ületatud",
     "Speech generation quota exceeded" : "Kõnesünteesi kvoot on ületatud",
     "View quota" : "Vaata kvooti",
-    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "OpenAI's Text to Speech" : "OpenAI kõnesüntees",
     "Invalid models response received" : "Vigane vastus mudelilt",
     "Default" : "Vaikimisi",
@@ -181,6 +180,7 @@ OC.L10N.register(
     "Use shared quota" : "Kasuta jagatud kvooti",
     "Save" : "Salvesta",
     "Delete" : "Kustuta",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Aegunud parameetri „{deprecatedParam}“ asemel kasuta pigem „{newParam}“ parameetrit"
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Aegunud parameetri „{deprecatedParam}“ asemel kasuta pigem „{newParam}“ parameetrit",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2"
 },
 "nplurals=2; plural=(n != 1);");

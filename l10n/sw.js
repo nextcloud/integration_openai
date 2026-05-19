@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Kiwango cha unukuzi wa sauti kimepitwa",
     "Speech generation quota exceeded" : "Kikomo cha kizazi cha hotuba kimezidi",
     "View quota" : "View quota",
-    "OpenAI's DALL-E 2" : "DALL-E 2 ya OpenAI",
     "OpenAI's Text to Speech" : "Maandishi ya OpenAI kwa Hotuba",
     "Invalid models response received" : "Jibu la miundo isiyosahihi limepokelewa",
     "Default" : "Chaguo msingi",
@@ -205,6 +204,7 @@ OC.L10N.register(
     "Use shared quota" : "Tumia sehemu iliyoshirikiwa",
     "Save" : "Hifadhi",
     "Delete" : "Futa",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Tumia kigezo cha \"{newParam}\" badala ya \"{deprecatedParam}\" iliyoacha kutumika."
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Tumia kigezo cha \"{newParam}\" badala ya \"{deprecatedParam}\" iliyoacha kutumika.",
+    "OpenAI's DALL-E 2" : "DALL-E 2 ya OpenAI"
 },
 "nplurals=2; plural=(n != 1);");
