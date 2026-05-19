@@ -6,7 +6,6 @@
     "Audio transcription quota exceeded" : "已超過音訊轉錄額度",
     "Speech generation quota exceeded" : "已超過語音產生額度",
     "View quota" : "檢視額度",
-    "OpenAI's DALL-E 2" : "OpenAI 的DALL-E 2",
     "OpenAI's Text to Speech" : "OpenAI 的文字轉語音",
     "Invalid models response received" : "收到無效的模型回應",
     "Default" : "預設",
@@ -220,6 +219,7 @@
     "Service url overridden for {task} to {url}" : "{task} 的服務 URL 已覆寫為 {url}",
     "Service URL override" : "服務 URL 覆寫",
     "With the current configuration, the target URL used to get the models for {aiTask} is:" : "按目前組態，用來取得 {aiTask} 模型的目標 URL 為：",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "使用「{newParam}」參數而非棄用的「{deprecatedParam}」"
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "使用「{newParam}」參數而非棄用的「{deprecatedParam}」",
+    "OpenAI's DALL-E 2" : "OpenAI 的DALL-E 2"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

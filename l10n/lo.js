@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "ໂຄວຕ້າການຖອດສຽງເກີນກຳນົດ",
     "Speech generation quota exceeded" : "ໂຄວຕ້າການສ້າງສຽງເວົ້າເກີນກຳນົດ",
     "View quota" : "ເບິ່ງໂຄວຕ້າ",
-    "OpenAI's DALL-E 2" : "DALL-E 2 ຂອງ OpenAI",
     "OpenAI's Text to Speech" : "ຂໍ້ຄວາມເປັນສຽງເວົ້າຂອງ OpenAI",
     "Invalid models response received" : "ໄດ້ຮັບການຕອບກັບຂອງໂມເດວທີ່ບໍ່ຖືກຕ້ອງ",
     "Default" : "ຄ່າເລີ່ມຕົ້ນ",
@@ -204,6 +203,7 @@ OC.L10N.register(
     "Use shared quota" : "ໃຊ້ໂຄວຕ້າຮ່ວມກັນ",
     "Save" : "ບັນທຶກ",
     "Delete" : "ລຶບ",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "ໃຊ້ພາຣາມິເຕີ \"{newParam}\" ແທນ \"{deprecatedParam}\" ທີ່ຖືກຍົກເລີກແລ້ວ"
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "ໃຊ້ພາຣາມິເຕີ \"{newParam}\" ແທນ \"{deprecatedParam}\" ທີ່ຖືກຍົກເລີກແລ້ວ",
+    "OpenAI's DALL-E 2" : "DALL-E 2 ຂອງ OpenAI"
 },
 "nplurals=1; plural=0;");

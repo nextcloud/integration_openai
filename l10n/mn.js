@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Аудио хөрвүүлэлтийн квот хэтэрсэн",
     "Speech generation quota exceeded" : "Яриа үүсгэх квот хэтэрсэн",
     "View quota" : "Квот харах",
-    "OpenAI's DALL-E 2" : "OpenAI-н DALL-E 2",
     "OpenAI's Text to Speech" : "OpenAI-н Текстээс яриа",
     "Invalid models response received" : "Загваруудын буруу хариулт хүлээн авлаа",
     "Default" : "Өгөгдмөл",
@@ -218,6 +217,7 @@ OC.L10N.register(
     "Service url overridden for {task} to {url}" : "{task}-н үйлчилгээний URL-г {url} руу дарсан",
     "Service URL override" : "Үйлчилгээний URL дарах",
     "With the current configuration, the target URL used to get the models for {aiTask} is:" : "Одоогийн тохиргоогоор {aiTask}-ын загваруудыг авахад ашиглах зорилтот URL нь:",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Хуучирсан \"{deprecatedParam}\" параметрийн оронд \"{newParam}\" параметрийг ашиглана уу"
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Хуучирсан \"{deprecatedParam}\" параметрийн оронд \"{newParam}\" параметрийг ашиглана уу",
+    "OpenAI's DALL-E 2" : "OpenAI-н DALL-E 2"
 },
 "nplurals=2; plural=(n != 1);");

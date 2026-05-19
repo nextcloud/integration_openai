@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Υπέρβαση του ορίου μεταγραφής ήχου",
     "Speech generation quota exceeded" : "Υπέρβαση του ορίου δημιουργίας ομιλίας",
     "View quota" : "Προβολή ποσόστωσης",
-    "OpenAI's DALL-E 2" : "Το DALL-E 2 της OpenAI",
     "OpenAI's Text to Speech" : "Μετατροπή Κειμένου σε Ομιλία της OpenAI",
     "Invalid models response received" : "Λήφθηκε μη έγκυρη απόκριση μοντέλων",
     "Default" : "Προεπιλογή",
@@ -203,6 +202,7 @@ OC.L10N.register(
     "Use shared quota" : "Χρήση κοινής ποσόστωσης",
     "Save" : "Αποθήκευση",
     "Delete" : "Διαγραφή",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Χρησιμοποιήστε την παράμετρο \"{newParam}\" αντί για την καταργημένη \"{deprecatedParam}\""
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Χρησιμοποιήστε την παράμετρο \"{newParam}\" αντί για την καταργημένη \"{deprecatedParam}\"",
+    "OpenAI's DALL-E 2" : "Το DALL-E 2 της OpenAI"
 },
 "nplurals=2; plural=(n != 1);");

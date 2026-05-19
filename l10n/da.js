@@ -4,7 +4,6 @@ OC.L10N.register(
     "Text generation quota exceeded" : "Kvote for tekstgenerering overskredet",
     "Image generation quota exceeded" : "Kvote for billedgenerering overskredet",
     "Audio transcription quota exceeded" : "Lydtransskriptionskvote overskredet",
-    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "Default" : "Standard",
     "Text generation" : "Tekstgenerering",
     "Image generation" : "Billedgenerering",
@@ -133,6 +132,7 @@ OC.L10N.register(
     "Category" : "Kategori",
     "Save" : "Gem",
     "Delete" : "Slet",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Anvend parameteren \"{newParam}\" i stedet for den forældede \"{deprecatedParam}\""
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Anvend parameteren \"{newParam}\" i stedet for den forældede \"{deprecatedParam}\"",
+    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2"
 },
 "nplurals=2; plural=(n != 1);");

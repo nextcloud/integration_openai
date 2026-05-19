@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Se excedió la cuota de transcripción de audio",
     "Speech generation quota exceeded" : "La cuota de generación de voz se ha excedido",
     "View quota" : "Ver cuota",
-    "OpenAI's DALL-E 2" : "DALL-E 2 de OpenAI ",
     "OpenAI's Text to Speech" : "Texto a voz de OpenAI",
     "Invalid models response received" : "Se recibió una respuesta inválida de los modelos",
     "Default" : "Por defecto",
@@ -219,6 +218,7 @@ OC.L10N.register(
     "Service url overridden for {task} to {url}" : "URL de servicio sobreescrita para{task}por {url}",
     "Service URL override" : "Sobreescribir URL de servicio",
     "With the current configuration, the target URL used to get the models for {aiTask} is:" : "Con la siguiente configuración, la URL para obtener los modelos para {aiTask} es:",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilice el parámetro \"{newParam}\" en vez del parámetro deprecado \"{deprecatedParam}\""
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Utilice el parámetro \"{newParam}\" en vez del parámetro deprecado \"{deprecatedParam}\"",
+    "OpenAI's DALL-E 2" : "DALL-E 2 de OpenAI "
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

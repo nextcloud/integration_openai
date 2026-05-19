@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "ئاۋاز خاتىرىلەش نورمىسى ئېشىپ كەتتى",
     "Speech generation quota exceeded" : "نۇتۇق ھاسىل قىلىش مىقدارى ئېشىپ كەتتى",
     "View quota" : "كۋوتانى كۆرۈش",
-    "OpenAI's DALL-E 2" : "OpenAI نىڭ DALL-E 2",
     "OpenAI's Text to Speech" : "OpenAI نىڭ تېكىستنى سۆزگە ئايلاندۇرۇش ئىقتىدارى",
     "Invalid models response received" : "مودېللارنىڭ جاۋابى خاتا تاپشۇرۇلدى",
     "Default" : "سۈكۈتتىكى",
@@ -207,6 +206,7 @@ OC.L10N.register(
     "Use shared quota" : "ئورتاق كۋوتانى ئىشلىتىڭ",
     "Save" : "ساقلاش",
     "Delete" : "ئۆچۈر",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "ئىشلىتىشتىن توختىتىلغان \"{deprecatedParam}\" پارامېتىرىنىڭ ئورنىغا \"{newParam}\" پارامېتىرىنى ئىشلىتىڭ"
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "ئىشلىتىشتىن توختىتىلغان \"{deprecatedParam}\" پارامېتىرىنىڭ ئورنىغا \"{newParam}\" پارامېتىرىنى ئىشلىتىڭ",
+    "OpenAI's DALL-E 2" : "OpenAI نىڭ DALL-E 2"
 },
 "nplurals=2; plural=(n != 1);");

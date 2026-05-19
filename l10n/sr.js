@@ -8,7 +8,6 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Прекорачена је квота за транскрипт звука",
     "Speech generation quota exceeded" : "Прекорачена је квота за генерисање говора",
     "View quota" : "Прикажи квоту",
-    "OpenAI's DALL-E 2" : "DALL-E 2 компаније OpenAI",
     "OpenAI's Text to Speech" : "Текст-у-говор компаније OpenAI",
     "Invalid models response received" : "Примљен је неисправан одговор модела",
     "Default" : "Подразумевано",
@@ -203,6 +202,7 @@ OC.L10N.register(
     "Use shared quota" : "Користи дељену квоту",
     "Save" : "Сачувај",
     "Delete" : "Обриши",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Уместо застарелог „{deprecatedParam}”, употребите параметар „{newParam}”"
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Уместо застарелог „{deprecatedParam}”, употребите параметар „{newParam}”",
+    "OpenAI's DALL-E 2" : "DALL-E 2 компаније OpenAI"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

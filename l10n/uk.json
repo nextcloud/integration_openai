@@ -6,7 +6,6 @@
     "Audio transcription quota exceeded" : "Перевищено квоту аудіо-транскрипції",
     "Speech generation quota exceeded" : "Перевищено квоту генерації мовлення",
     "View quota" : "Переглянути квоту",
-    "OpenAI's DALL-E 2" : "DALL-E 2 від OpenAI",
     "OpenAI's Text to Speech" : "Перетворення тексту в мовлення OpenAI",
     "Invalid models response received" : "Отримано відповідь про невірні моделі",
     "Default" : "Типово",
@@ -199,6 +198,7 @@
     "Use shared quota" : "Використовуйте спільну квоту",
     "Save" : "Зберегти",
     "Delete" : "Видалити",
-    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Використовуйте параметр \"{newParam}\" замість застарілого \"{deprecatedParam}\""
+    "Use \"{newParam}\" parameter instead of the deprecated \"{deprecatedParam}\"" : "Використовуйте параметр \"{newParam}\" замість застарілого \"{deprecatedParam}\"",
+    "OpenAI's DALL-E 2" : "DALL-E 2 від OpenAI"
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);"
 }
