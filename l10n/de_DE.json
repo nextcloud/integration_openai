@@ -6,6 +6,7 @@
     "Audio transcription quota exceeded" : "Das Kontingent für Audiotranskription überschritten",
     "Speech generation quota exceeded" : "Kontingent für Spracherzeugung überschritten",
     "View quota" : "Kontingent anzeigen",
+    "OpenAI's Image Generation" : "OpenAI's Bildgenerierung",
     "OpenAI's Text to Speech" : "Text zu Sprache von OpenAI",
     "Invalid models response received" : "Ungültige Modellantwort erhalten",
     "Default" : "Standard",
