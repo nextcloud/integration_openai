@@ -15,12 +15,12 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProgressiveProvider;
+use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools;
 use RuntimeException;
 
-class TextToTextChatWithToolsProvider implements ISynchronousProgressiveProvider {
+class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -83,7 +83,7 @@ class TextToTextChatWithToolsProvider implements ISynchronousProgressiveProvider
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
+	public function process(?string $userId, array $input, callable $reportProgress): array {
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
@@ -124,14 +124,6 @@ class TextToTextChatWithToolsProvider implements ISynchronousProgressiveProvider
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
-		}
-
-		$tmp = 'initial';
-		foreach (range(1, 10) as $i) {
-			$tmp .= '-' . $i;
-			$reportOutput(['output' => $tmp, 'tool_calls' => []]);
-			error_log('temp output: ' . json_encode($tmp));
-			sleep(1);
 		}
 
 		try {

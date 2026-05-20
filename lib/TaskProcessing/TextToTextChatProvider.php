@@ -117,17 +117,25 @@ class TextToTextChatProvider implements ISynchronousProgressiveProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$tmp = 'initial';
-		foreach (range(1, 50) as $i) {
-			$tmp .= '-' . $i;
-			$reportOutput(['output' => $tmp]);
-			error_log('temp output: ' . json_encode($tmp));
-			usleep(100 * 1000);
-		}
-
 		try {
-			$completion = $this->openAiAPIService->createChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
-			$completion = $completion['messages'];
+			$stream = true;
+			if ($stream) {
+				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+				$time = microtime(true);
+				$fullOutput = '';
+				foreach ($chunks as $chunk) {
+					$fullOutput .= $chunk;
+					// we don't report more often than every 100ms
+					if (microtime(true) - $time >= 0.1) {
+						$reportOutput(['output' => $fullOutput]);
+						$time = microtime(true);
+					}
+				}
+				$completion = $chunks->getReturn()['messages'];
+			} else {
+				$completion = $this->openAiAPIService->createChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+				$completion = $completion['messages'];
+			}
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}

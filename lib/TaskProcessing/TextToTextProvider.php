@@ -122,24 +122,21 @@ class TextToTextProvider implements ISynchronousProgressiveProvider {
 
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$stream = false;
+				$stream = true;
 				if ($stream) {
 					$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-					// $fullOutput = '';
+					$time = microtime(true);
+					$fullOutput = '';
 					foreach ($chunks as $chunk) {
-						// TODO use the future "updateOutput" callback
-						// $fullOutput .= $chunk;
-						echo 'chunk: ' . $chunk . "\n";
+						$fullOutput .= $chunk;
+						// we don't report more often than every 100ms
+						if (microtime(true) - $time >= 0.1) {
+							$reportOutput(['output' => $fullOutput]);
+							$time = microtime(true);
+						}
 					}
 					$completion = $chunks->getReturn()['messages'];
 				} else {
-					$tmp = 'initial';
-					foreach (range(1, 100) as $i) {
-						$tmp .= '-' . $i;
-						$reportOutput(['output' => $tmp]);
-						error_log('temp output: ' . json_encode($tmp));
-						usleep(100 * 1000);
-					}
 					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 					$completion = $completion['messages'];
 				}
