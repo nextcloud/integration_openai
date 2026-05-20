@@ -24,8 +24,8 @@ class StreamingService {
 	 * usage and rebuilt choices for SSE responses, or the original decoded JSON body
 	 * when the upstream responded with non-streamed JSON.
 	 *
-	 * @param array{body?: mixed, content-type?: mixed} $response
-	 * @return \Generator<string, mixed, mixed, array{usage?: array<string, mixed>, choices?: array<int, array<string, mixed>>}>
+	 * @param array{body?: mixed, content-type?: mixed, error?: string} $response
+	 * @return \Generator<mixed, mixed, mixed, array<string, mixed>>
 	 * @throws Exception
 	 */
 	public function parseStreamChatResponse(array $response): \Generator {

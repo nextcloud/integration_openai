@@ -15,12 +15,13 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousProgressiveProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToText;
 use RuntimeException;
 
-class TextToTextProvider implements ISynchronousProgressiveProvider {
+class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,

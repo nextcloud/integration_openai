@@ -622,7 +622,7 @@ class OpenAiAPIService {
 	 * @param array|null $tools
 	 * @param string|null $userAudioPromptBase64
 	 * @param string|null $userAudioPromptFormat
-	 * @return array{messages: array<string>, tool_calls: array<string>, audio_messages: list<array<string, mixed>>}
+	 * @return array{messages?: array<string>, tool_calls?: array<string>, audio_messages?: list<array<string, mixed>>, usage?: array<string, mixed>}
 	 * @throws Exception
 	 */
 	public function requestChatCompletion(
