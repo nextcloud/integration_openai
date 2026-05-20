@@ -8,6 +8,7 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "已超過音訊轉錄額度",
     "Speech generation quota exceeded" : "已超過語音產生額度",
     "View quota" : "檢視配額",
+    "OpenAI's Image Generation" : "OpenAI 圖像生成",
     "OpenAI's Text to Speech" : "OpenAI 的文字轉語音",
     "Invalid models response received" : "收到無效的模型回應",
     "Default" : "默認",

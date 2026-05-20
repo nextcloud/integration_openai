@@ -8,6 +8,7 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Cota de transcrição de áudio excedida",
     "Speech generation quota exceeded" : "Cota de geração de fala excedida",
     "View quota" : "Exibir cota",
+    "OpenAI's Image Generation" : "Geração de imagens do OpenAI",
     "OpenAI's Text to Speech" : "Texto para Fala do OpenAI",
     "Invalid models response received" : "Inválida a resposta de modelos recebida",
     "Default" : "Padrão",

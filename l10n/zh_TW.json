@@ -6,6 +6,7 @@
     "Audio transcription quota exceeded" : "已超過音訊轉錄額度",
     "Speech generation quota exceeded" : "已超過語音產生額度",
     "View quota" : "檢視額度",
+    "OpenAI's Image Generation" : "OpenAI 的影像產生",
     "OpenAI's Text to Speech" : "OpenAI 的文字轉語音",
     "Invalid models response received" : "收到無效的模型回應",
     "Default" : "預設",
