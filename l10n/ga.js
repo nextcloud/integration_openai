@@ -8,6 +8,7 @@ OC.L10N.register(
     "Audio transcription quota exceeded" : "Sáraíodh an cuóta trascríobh fuaime",
     "Speech generation quota exceeded" : "Chuóta giniúna cainte sáraithe",
     "View quota" : "Cuóta amhairc",
+    "OpenAI's Image Generation" : "Giniúint Íomhánna OpenAI",
     "OpenAI's Text to Speech" : "Téacs go Caint OpenAI",
     "Invalid models response received" : "Fuarthas freagra samhlacha neamhbhailí",
     "Default" : "Réamhshocrú",

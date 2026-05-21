@@ -27,6 +27,7 @@ OC.L10N.register(
     "Speed" : "Greitis",
     "Language" : "Kalba",
     "Change Tone" : "Pakeisti toną",
+    "Ask a question about your data." : "Užduokite klausimą apie savo duomenis.",
     "Input text" : "Įvesties tekstas",
     "Write a text that you want the assistant to rewrite in another tone." : "Parašykite tekstą, kurį norite, kad asistentas perrašytų kitokiu tonu.",
     "Desired tone" : "Pageidaujamas tonas",
