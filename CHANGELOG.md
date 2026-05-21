@@ -8,6 +8,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.5.0] - 2026-05-21
+
+### Added
+
+- Better image generation @lukasdotcom [#365](https://github.com/nextcloud/integration_openai/pull/365)
+- Create enhanced AudioToTextEnhancedProvider that also reformats text from transcription and ReformatParagraphs provider @lukasdotcom [#363](https://github.com/nextcloud/integration_openai/pull/363)
+- Add TextToTextReformatParagraphs task processing handler @lukasdotcom [#362](https://github.com/nextcloud/integration_openai/pull/362)
+
+### Changed
+
+- Switch from dall-e-2 to gpt-image-1-mini @lukasdotcom [#370](https://github.com/nextcloud/integration_openai/pull/370)
+- Restrict models API route to admins and use instance API key @lukasdotcom [#371](https://github.com/nextcloud/integration_openai/pull/371)
+- Use settings service for default model instead of duplicated appConfig code @lukasdotcom [#367](https://github.com/nextcloud/integration_openai/pull/367)
+- Update dependencies @lukasdotcom [#369](https://github.com/nextcloud/integration_openai/pull/369)
+
+### Fixed
+
+- Fix hardcoded max tokens @n-iv [#364](https://github.com/nextcloud/integration_openai/pull/364)
+- Throw UnknownActivityException on Notifier @lukasdotcom [#372](https://github.com/nextcloud/integration_openai/pull/372)
+
 ## [4.4.0] - 2026-05-04
 
 ### Added
