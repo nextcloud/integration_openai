@@ -35,7 +35,6 @@ use OCP\IAppConfig;
 use OCP\ICacheFactory;
 use OCP\TaskProcessing\TaskTypes\TextToTextReformatParagraphs;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Log\LoggerInterface;
 use Test\TestCase;
 use Test\Util\User\Dummy;
 
@@ -115,11 +114,9 @@ class OpenAiProviderTest extends TestCase {
 	public function testFreePromptProvider(): void {
 		$freePromptProvider = new TextToTextProvider(
 			$this->openAiApiService,
-			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
-			\OCP\Server::get(LoggerInterface::class),
 		);
 
 		$prompt = 'This is a test prompt';
@@ -178,7 +175,6 @@ class OpenAiProviderTest extends TestCase {
 	public function testEmojiProvider(): void {
 		$emojiProvider = new EmojiProvider(
 			$this->openAiApiService,
-			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
@@ -243,7 +239,6 @@ class OpenAiProviderTest extends TestCase {
 	public function testHeadlineProvider(): void {
 		$headlineProvider = new HeadlineProvider(
 			$this->openAiApiService,
-			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			self::TEST_USER1,
@@ -307,7 +302,6 @@ class OpenAiProviderTest extends TestCase {
 	public function testChangeToneProvider(): void {
 		$changeToneProvider = new ChangeToneProvider(
 			$this->openAiApiService,
-			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
@@ -374,7 +368,6 @@ class OpenAiProviderTest extends TestCase {
 	public function testSummaryProvider(): void {
 		$summaryProvider = new SummaryProvider(
 			$this->openAiApiService,
-			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
@@ -443,7 +436,6 @@ class OpenAiProviderTest extends TestCase {
 	public function testProofreadProvider(): void {
 		$proofreadProvider = new ProofreadProvider(
 			$this->openAiApiService,
-			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
@@ -511,7 +503,6 @@ class OpenAiProviderTest extends TestCase {
 	public function testTranslationProvider(): void {
 		$translationProvider = new TranslateProvider(
 			$this->openAiApiService,
-			\OCP\Server::get(IAppConfig::class),
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\OCP\ICacheFactory::class),

@@ -12,6 +12,7 @@ namespace OCA\OpenAi\TaskProcessing;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
 use OCP\IAppConfig;
 use OCP\IL10N;
@@ -39,6 +40,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private IAppConfig $appConfig,
+		private OpenAiSettingsService $openAiSettingsService,
 		private ?string $userId,
 	) {
 	}
@@ -125,7 +127,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
 		$adminLlmModel = $isUsingOpenAi
 			? 'gpt-4o-audio-preview'
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', lazy: true);
+			: $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		$defaults = [
 			'voice' => $adminVoice,
 			'llm_model' => $adminLlmModel,
@@ -194,7 +196,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
 			$llmModel = $isUsingOpenAi
 				? 'gpt-4o-audio-preview'
-				: ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID);
+				: $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		}
 
 
