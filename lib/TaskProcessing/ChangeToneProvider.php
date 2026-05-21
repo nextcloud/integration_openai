@@ -42,10 +42,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChangeTone')) {
-			return TextToTextChangeTone::ID;
-		}
-		return ChangeToneTaskType::ID;
+		return TextToTextChangeTone::ID;
 	}
 
 	public function getExpectedRuntime(): int {

@@ -14,7 +14,6 @@ use OCA\OpenAi\TaskProcessing\AudioToAudioChatProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextEnhancedProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
-use OCA\OpenAi\TaskProcessing\ChangeToneTaskType;
 use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
@@ -126,28 +125,15 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(ContextWriteProvider::class);
 			$context->registerTaskProcessingProvider(ReformulateProvider::class);
 			$context->registerTaskProcessingProvider(EmojiProvider::class);
-			if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChangeTone')) {
-				$context->registerTaskProcessingTaskType(ChangeToneTaskType::class);
-			}
 			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
-			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextChatWithTools')) {
-				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
-			}
-			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextProofread')) {
-				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
-			}
+			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
+			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider::class);
 			}
 			if ($isUsingOpenAI || $this->appConfig->getValueString(Application::APP_ID, 'analyze_image_provider_enabled') === '1') {
-				if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImages')) {
-					$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\AnalyzeImagesTaskType::class);
-				}
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImagesProvider::class);
 			}
-		}
-		if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech')) {
-			$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\TextToSpeechTaskType::class);
 		}
 		$context->registerTaskProcessingProvider(TextToSpeechProvider::class);
 		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
