@@ -130,11 +130,14 @@ class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 					$fullOutput = '';
 					foreach ($chunks as $chunk) {
 						$fullOutput .= $chunk;
-						// we don't report more often than every 100ms
-						if (microtime(true) - $time >= 0.1) {
+						// we don't report more often than every 250ms
+						if (microtime(true) - $time >= 0.25) {
 							$reportOutput(['output' => $fullOutput]);
 							$time = microtime(true);
 						}
+					}
+					if ($fullOutput !== '') {
+						$reportOutput(['output' => $fullOutput]);
 					}
 					$completion = $chunks->getReturn()['messages'];
 				} else {

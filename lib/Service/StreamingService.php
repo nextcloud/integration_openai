@@ -47,7 +47,7 @@ class StreamingService {
 			$choices = [];
 
 			while (!feof($body)) {
-				$chunk = fread($body, 8192);
+				$chunk = fread($body, 256);
 				if ($chunk === false) {
 					throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
 				}

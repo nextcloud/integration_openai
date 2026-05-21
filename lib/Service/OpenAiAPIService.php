@@ -1176,7 +1176,9 @@ class OpenAiAPIService {
 
 			if ($stream) {
 				$options['headers']['Accept'] = 'text/event-stream';
+				// $options['headers']['Accept-Encoding'] = 'identity';
 				$options['stream'] = true;
+				// $options['decode'] = false;
 			}
 
 			if (count($params) > 0) {
