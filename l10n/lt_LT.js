@@ -54,6 +54,7 @@ OC.L10N.register(
     "More information about OpenAI models" : "Daugiau informacijos apie „OpenAI“ modelius",
     "More information about LocalAI models" : "Daugiau informacijos apie „LocalAI“ modelius",
     "Start date" : "Pradžios data",
+    "End date" : "Pabaigos data",
     "OpenAI options saved" : "„OpenAI“ parinktys įrašytos",
     "Failed to save OpenAI options" : "Nepavyko įrašyti „OpenAI“ parinkčių",
     "Default language" : "Numatytoji kalba",
