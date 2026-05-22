@@ -8,6 +8,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.5.1] - 2026-05-22
+
+### Fixed
+
+- Throw UnknownNotificationException on Notifier @lukasdotcom [#376](https://github.com/nextcloud/integration_openai/pull/376)
+
 ## [4.5.0] - 2026-05-21
 
 ### Added
