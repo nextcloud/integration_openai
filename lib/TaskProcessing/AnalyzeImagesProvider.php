@@ -40,10 +40,7 @@ class AnalyzeImagesProvider implements ISynchronousProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImages')) {
-			return \OCP\TaskProcessing\TaskTypes\AnalyzeImages::ID;
-		}
-		return AnalyzeImagesTaskType::ID;
+		return \OCP\TaskProcessing\TaskTypes\AnalyzeImages::ID;
 	}
 
 	public function getExpectedRuntime(): int {
