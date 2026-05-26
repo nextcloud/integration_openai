@@ -15,12 +15,13 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\IProvider;
+use OCP\TaskProcessing\ISynchronousProgressiveProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools;
 use RuntimeException;
 
-class TextToTextChatWithToolsProvider implements ISynchronousProvider {
+class TextToTextChatWithToolsProvider implements IProvider, ISynchronousProgressiveProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -83,7 +84,7 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
@@ -126,10 +127,31 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$stream = true;
 		try {
-			$completion = $this->openAiAPIService->createChatCompletion(
-				$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
-			);
+			if ($stream) {
+				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
+					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
+				);
+				$time = microtime(true);
+				$fullOutput = '';
+				foreach ($chunks as $chunk) {
+					$fullOutput .= $chunk;
+					// we don't report more often than every 250ms
+					if (microtime(true) - $time >= 0.25) {
+						$reportOutput(['output' => $fullOutput]);
+						$time = microtime(true);
+					}
+				}
+				if ($fullOutput !== '') {
+					$reportOutput(['output' => $fullOutput]);
+				}
+				$completion = $chunks->getReturn()['messages'];
+			} else {
+				$completion = $this->openAiAPIService->createChatCompletion(
+					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
+				);
+			}
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}

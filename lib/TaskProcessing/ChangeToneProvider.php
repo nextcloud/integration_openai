@@ -16,13 +16,14 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\IProvider;
+use OCP\TaskProcessing\ISynchronousProgressiveProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToTextChangeTone;
 use RuntimeException;
 
-class ChangeToneProvider implements ISynchronousProvider {
+class ChangeToneProvider implements IProvider, ISynchronousProgressiveProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -112,7 +113,7 @@ class ChangeToneProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
@@ -133,6 +134,8 @@ class ChangeToneProvider implements ISynchronousProvider {
 		}
 
 		$chunks = $this->chunkService->chunkSplitPrompt($textInput, true, $maxTokens);
+		$streamedResult = '';
+		$stream = true;
 		$result = '';
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
@@ -140,8 +143,25 @@ class ChangeToneProvider implements ISynchronousProvider {
 			$prompt = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 			try {
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-					$completion = $completion['messages'];
+					if ($stream) {
+						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$time = microtime(true);
+						foreach ($chunks as $chunk) {
+							$streamedResult .= $chunk;
+							// we don't report more often than every 250ms
+							if (microtime(true) - $time >= 0.25) {
+								$reportOutput(['output' => $streamedResult]);
+								$time = microtime(true);
+							}
+						}
+						if ($streamedResult !== '') {
+							$reportOutput(['output' => $streamedResult]);
+						}
+						$completion = $chunks->getReturn()['messages'];
+					} else {
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$completion = $completion['messages'];
+					}
 				} else {
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 				}

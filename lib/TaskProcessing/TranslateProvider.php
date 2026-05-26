@@ -20,13 +20,14 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\IProvider;
+use OCP\TaskProcessing\ISynchronousProgressiveProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToTextTranslate;
 use Psr\Log\LoggerInterface;
 
-class TranslateProvider implements ISynchronousProvider {
+class TranslateProvider implements IProvider, ISynchronousProgressiveProvider {
 
 	public const SYSTEM_PROMPT = 'You are a translations expert that ONLY outputs a valid JSON with the translated text in the following format: { "translation": "<translated text>" } .';
 	public const JSON_RESPONSE_FORMAT = [
@@ -137,7 +138,7 @@ class TranslateProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
 		/*
 		foreach (range(1, 20) as $i) {
 			$reportProgress($i / 100 * 5);
@@ -166,6 +167,7 @@ class TranslateProvider implements ISynchronousProvider {
 		}
 
 		$chunks = $this->chunkService->chunkSplitPrompt($inputText, true, $maxTokens);
+		$stream = true;
 		$result = '';
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
@@ -191,6 +193,9 @@ class TranslateProvider implements ISynchronousProvider {
 					$this->logger->debug('Using cached translation', ['cached' => $cached, 'cacheKey' => $cacheKey]);
 					$result .= $cached;
 					$reportProgress($progress);
+					if ($stream) {
+						$reportOutput(['output' => $result]);
+					}
 					continue;
 				}
 				$prompt = $promptStart . PHP_EOL . PHP_EOL . $chunk;
@@ -224,6 +229,9 @@ class TranslateProvider implements ISynchronousProvider {
 					continue;
 				}
 				$result .= $decodedCompletion['translation'];
+				if ($stream) {
+					$reportOutput(['output' => $result]);
+				}
 				$cache->set($cacheKey, $decodedCompletion['translation']);
 				continue;
 			}
