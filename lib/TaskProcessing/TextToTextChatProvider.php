@@ -56,6 +56,11 @@ class TextToTextChatProvider implements IProvider, ISynchronousProgressiveProvid
 
 	public function getOptionalInputShape(): array {
 		return [
+			'stream' => new ShapeDescriptor(
+				$this->l->t('Stream the output'),
+				$this->l->t('0 to not stream, anything other value to stream.'),
+				EShapeType::Number,
+			),
 			'max_tokens' => new ShapeDescriptor(
 				$this->l->t('Maximum output words'),
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
@@ -74,7 +79,9 @@ class TextToTextChatProvider implements IProvider, ISynchronousProgressiveProvid
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		return [];
+		return [
+			'stream' => 1,
+		];
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -118,8 +125,12 @@ class TextToTextChatProvider implements IProvider, ISynchronousProgressiveProvid
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$stream = true;
+		if (isset($input['stream']) && is_int($input['stream'])) {
+			$stream = $input['stream'] !== 0;
+		}
+
 		try {
-			$stream = true;
 			if ($stream) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
 				$time = microtime(true);

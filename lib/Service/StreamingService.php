@@ -81,12 +81,6 @@ class StreamingService {
 			throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		foreach ($body['choices'] ?? [] as $choice) {
-			if (isset($choice['message']['content']) && is_string($choice['message']['content']) && $choice['message']['content'] !== '') {
-				yield $choice['message']['content'];
-			}
-		}
-
 		return $body;
 	}
 
@@ -163,6 +157,15 @@ class StreamingService {
 			} elseif (isset($choice['message']['audio']) && is_array($choice['message']['audio'])) {
 				$choices[$index]['message']['audio'] = $choice['message']['audio'];
 			}
+
+			// TODO decide if we stream the tool_calls
+
+			// TODO decide if we use the reasoning_content
+			/*
+			if (isset($choice['delta']['reasoning_content']) && is_string($choice['delta']['reasoning_content'])) {
+				echo 'REASONING_CONTENT: ' . json_encode($choice['delta']['reasoning_content']) . "\n";
+			}
+			*/
 
 			if (isset($choice['delta']['tool_calls']) && is_array($choice['delta']['tool_calls'])) {
 				$this->mergeToolCalls($choices[$index]['message'], $choice['delta']['tool_calls']);

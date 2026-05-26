@@ -57,15 +57,20 @@ class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 
 	public function getOptionalInputShape(): array {
 		return [
+			'stream' => new ShapeDescriptor(
+				$this->l->t('Stream the output'),
+				$this->l->t('0 to not stream, anything other value to stream.'),
+				EShapeType::Number,
+			),
 			'max_tokens' => new ShapeDescriptor(
 				$this->l->t('Maximum output words'),
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
-				EShapeType::Number
+				EShapeType::Number,
 			),
 			'model' => new ShapeDescriptor(
 				$this->l->t('Model'),
 				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
+				EShapeType::Enum,
 			),
 		];
 	}
@@ -79,6 +84,7 @@ class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 	public function getOptionalInputShapeDefaults(): array {
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
+			'stream' => 1,
 			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
 		];
@@ -115,6 +121,11 @@ class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$stream = true;
+		if (isset($input['stream']) && is_int($input['stream'])) {
+			$stream = $input['stream'] !== 0;
+		}
+
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
 		} else {
@@ -123,7 +134,6 @@ class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$stream = true;
 				if ($stream) {
 					$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 					$time = microtime(true);
