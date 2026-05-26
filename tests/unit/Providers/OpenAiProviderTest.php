@@ -213,9 +213,71 @@ class OpenAiProviderTest extends TestCase {
 		$generator = $this->openAiApiService->createStreamedChatCompletion(self::TEST_USER1, Application::DEFAULT_MODEL_ID, 'This is a test prompt');
 		$chunks = iterator_to_array($generator, false);
 
-		$this->assertSame(['This is ', 'a test response.'], $chunks);
+		$this->assertSame([
+			['kind' => 'content', 'text' => 'This is ', 'index' => 0],
+			['kind' => 'content', 'text' => 'a test response.', 'index' => 0],
+		], $chunks);
 		$this->assertSame([
 			'messages' => ['This is a test response.'],
+			'reasoning_messages' => [],
+			'tool_calls' => [],
+			'audio_messages' => [],
+		], $generator->getReturn());
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testCreateStreamedChatCompletionCanYieldStructuredReasoningChunks(): void {
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Could not open temp stream');
+		}
+
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":\"Thinking... \"}}]}\n\n");
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Answer \"}}]}\n\n");
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":\"done.\",\"content\":\"ready\"},\"finish_reason\":\"stop\"}],\"usage\":{\"total_tokens\":21}}\n\n");
+		fwrite($stream, "data: [DONE]\n\n");
+		rewind($stream);
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [['role' => 'user', 'content' => 'This is a test prompt']],
+			'n' => 1,
+			'stream' => true,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+			'stream_options' => ['include_usage' => true],
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($stream);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->willReturnMap([
+			['Content-Type', 'text/event-stream'],
+		]);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$generator = $this->openAiApiService->createStreamedChatCompletion(
+			self::TEST_USER1,
+			Application::DEFAULT_MODEL_ID,
+			'This is a test prompt',
+		);
+		$chunks = iterator_to_array($generator, false);
+
+		$this->assertSame([
+			['kind' => 'reasoning_content', 'text' => 'Thinking... ', 'index' => 0],
+			['kind' => 'content', 'text' => 'Answer ', 'index' => 0],
+			['kind' => 'content', 'text' => 'ready', 'index' => 0],
+			['kind' => 'reasoning_content', 'text' => 'done.', 'index' => 0],
+		], $chunks);
+		$this->assertSame([
+			'messages' => ['Answer ready'],
+			'reasoning_messages' => ['Thinking... done.'],
 			'tool_calls' => [],
 			'audio_messages' => [],
 		], $generator->getReturn());

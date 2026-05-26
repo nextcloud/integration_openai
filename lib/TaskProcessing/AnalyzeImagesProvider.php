@@ -15,12 +15,14 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\IProvider;
+use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class AnalyzeImagesProvider implements ISynchronousProvider {
+class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -100,7 +102,11 @@ class AnalyzeImagesProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
+	): array {
+		$reportOutput = $options->getReportOutput();
+		$preferStreaming = $options->getPreferStreaming();
 
 		if (!$this->openAiAPIService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
 			throw new RuntimeException('Must support chat completion endpoint');
@@ -173,8 +179,29 @@ class AnalyzeImagesProvider implements ISynchronousProvider {
 
 		try {
 			$systemPrompt = 'Take the user\'s question and answer it based on the provided images. Ensure that the answer matches the language of the user\'s question.';
-			$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens);
-			$completion = $completion['messages'];
+			if ($preferStreaming) {
+				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens);
+				$time = microtime(true);
+				$fullOutput = '';
+				foreach ($chunks as $chunk) {
+					if (($chunk['kind'] ?? null) !== 'content') {
+						continue;
+					}
+					$fullOutput .= $chunk['text'];
+					// we don't report more often than every 250ms
+					if (microtime(true) - $time >= 0.25) {
+						$reportOutput(['output' => $fullOutput]);
+						$time = microtime(true);
+					}
+				}
+				if ($fullOutput !== '') {
+					$reportOutput(['output' => $fullOutput]);
+				}
+				$completion = $chunks->getReturn()['messages'];
+			} else {
+				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens);
+				$completion = $completion['messages'];
+			}
 
 			if (count($completion) > 0) {
 				return ['output' => array_pop($completion)];

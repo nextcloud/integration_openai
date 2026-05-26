@@ -16,12 +16,13 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\IProvider;
-use OCP\TaskProcessing\ISynchronousProgressiveProvider;
+use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextChat;
 use RuntimeException;
 
-class TextToTextChatProvider implements IProvider, ISynchronousProgressiveProvider {
+class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -89,7 +90,11 @@ class TextToTextChatProvider implements IProvider, ISynchronousProgressiveProvid
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
+	): array {
+		$reportOutput = $options->getReportOutput();
+		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
@@ -119,13 +124,15 @@ class TextToTextChatProvider implements IProvider, ISynchronousProgressiveProvid
 		}
 
 		try {
-			$stream = true;
-			if ($stream) {
+			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
 				$time = microtime(true);
 				$fullOutput = '';
 				foreach ($chunks as $chunk) {
-					$fullOutput .= $chunk;
+					if (($chunk['kind'] ?? null) !== 'content') {
+						continue;
+					}
+					$fullOutput .= $chunk['text'];
 					// we don't report more often than every 250ms
 					if (microtime(true) - $time >= 0.25) {
 						$reportOutput(['output' => $fullOutput]);

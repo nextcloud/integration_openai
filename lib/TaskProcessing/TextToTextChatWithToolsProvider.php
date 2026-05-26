@@ -15,12 +15,14 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\IProvider;
+use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools;
 use RuntimeException;
 
-class TextToTextChatWithToolsProvider implements ISynchronousProvider {
+class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -83,7 +85,11 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
+	): array {
+		$reportOutput = $options->getReportOutput();
+		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
@@ -127,9 +133,32 @@ class TextToTextChatWithToolsProvider implements ISynchronousProvider {
 		}
 
 		try {
-			$completion = $this->openAiAPIService->createChatCompletion(
-				$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
-			);
+			if ($preferStreaming) {
+				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
+					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
+				);
+				$time = microtime(true);
+				$fullOutput = '';
+				foreach ($chunks as $chunk) {
+					if (($chunk['kind'] ?? null) !== 'content') {
+						continue;
+					}
+					$fullOutput .= $chunk['text'];
+					// we don't report more often than every 250ms
+					if (microtime(true) - $time >= 0.25) {
+						$reportOutput(['output' => $fullOutput]);
+						$time = microtime(true);
+					}
+				}
+				if ($fullOutput !== '') {
+					$reportOutput(['output' => $fullOutput]);
+				}
+				$completion = $chunks->getReturn()['messages'];
+			} else {
+				$completion = $this->openAiAPIService->createChatCompletion(
+					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
+				);
+			}
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}

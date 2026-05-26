@@ -27,7 +27,8 @@
 	<stubs>
 		<file name="tests/stubs/ocp_task_processing_i_provider.php" />
 		<file name="tests/stubs/ocp_task_processing_isynchronous_provider.php" />
-		<file name="tests/stubs/ocp_task_processing_isynchronous_progressive_provider.php" />
+		<file name="tests/stubs/ocp_task_processing_synchronous_provider_options.php" />
+		<file name="tests/stubs/ocp_task_processing_isynchronous_options_provider.php" />
 	</stubs>
 	<issueHandlers>
 		<LessSpecificReturnStatement errorLevel="error"/>

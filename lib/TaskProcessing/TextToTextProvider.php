@@ -16,12 +16,13 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\IProvider;
-use OCP\TaskProcessing\ISynchronousProgressiveProvider;
+use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToText;
 use RuntimeException;
 
-class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
+class TextToTextProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -60,12 +61,12 @@ class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 			'max_tokens' => new ShapeDescriptor(
 				$this->l->t('Maximum output words'),
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
-				EShapeType::Number
+				EShapeType::Number,
 			),
 			'model' => new ShapeDescriptor(
 				$this->l->t('Model'),
 				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
+				EShapeType::Enum,
 			),
 		];
 	}
@@ -96,7 +97,11 @@ class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
+	): array {
+		$reportOutput = $options?->getReportOutput();
+		$preferStreaming = $options?->getPreferStreaming();
 		/*
 		foreach (range(1, 20) as $i) {
 			$reportProgress($i / 100 * 5);
@@ -123,13 +128,15 @@ class TextToTextProvider implements IProvider, ISynchronousProgressiveProvider {
 
 		try {
 			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$stream = true;
-				if ($stream) {
+				if ($preferStreaming) {
 					$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 					$time = microtime(true);
 					$fullOutput = '';
 					foreach ($chunks as $chunk) {
-						$fullOutput .= $chunk;
+						if (($chunk['kind'] ?? null) !== 'content') {
+							continue;
+						}
+						$fullOutput .= $chunk['text'];
 						// we don't report more often than every 250ms
 						if (microtime(true) - $time >= 0.25) {
 							$reportOutput(['output' => $fullOutput]);
