@@ -137,7 +137,10 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousProgress
 				$time = microtime(true);
 				$fullOutput = '';
 				foreach ($chunks as $chunk) {
-					$fullOutput .= $chunk;
+					if (($chunk['kind'] ?? null) !== 'content') {
+						continue;
+					}
+					$fullOutput .= $chunk['text'];
 					// we don't report more often than every 250ms
 					if (microtime(true) - $time >= 0.25) {
 						$reportOutput(['output' => $fullOutput]);

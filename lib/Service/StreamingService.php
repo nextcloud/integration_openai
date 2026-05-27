@@ -25,7 +25,7 @@ class StreamingService {
 	 * when the upstream responded with non-streamed JSON.
 	 *
 	 * @param array{body?: mixed, content-type?: mixed, error?: string} $response
-	 * @return \Generator<mixed, mixed, mixed, array<string, mixed>>
+	 * @return \Generator<int, array{kind: string, text: string, index: int}, mixed, array<string, mixed>>
 	 * @throws Exception
 	 */
 	public function parseStreamChatResponse(array $response): \Generator {
@@ -92,7 +92,7 @@ class StreamingService {
 	 * @param bool $done
 	 * @param array<string, mixed>|null $usage
 	 * @param array<int, array<string, mixed>> $choices
-	 * @return string[]
+	 * @return list<array{kind: string, text: string, index: int}>
 	 * @throws Exception
 	 */
 	private function parseSseEvent(string $event, bool &$done, ?array &$usage, array &$choices): array {
@@ -142,10 +142,26 @@ class StreamingService {
 
 			if (isset($choice['delta']['content']) && is_string($choice['delta']['content']) && $choice['delta']['content'] !== '') {
 				$choices[$index]['message']['content'] = ($choices[$index]['message']['content'] ?? '') . $choice['delta']['content'];
-				$partials[] = $choice['delta']['content'];
+				$partials[] = ['kind' => 'content', 'text' => $choice['delta']['content'], 'index' => $index];
 			} elseif (isset($choice['message']['content']) && is_string($choice['message']['content']) && $choice['message']['content'] !== '') {
 				$choices[$index]['message']['content'] = $choice['message']['content'];
-				$partials[] = $choice['message']['content'];
+				$partials[] = ['kind' => 'content', 'text' => $choice['message']['content'], 'index' => $index];
+			}
+
+			if (isset($choice['delta']['reasoning_content']) && is_string($choice['delta']['reasoning_content']) && $choice['delta']['reasoning_content'] !== '') {
+				$choices[$index]['message']['reasoning_content'] = ($choices[$index]['message']['reasoning_content'] ?? '') . $choice['delta']['reasoning_content'];
+				$partials[] = [
+					'kind' => 'reasoning_content',
+					'text' => $choice['delta']['reasoning_content'],
+					'index' => $index,
+				];
+			} elseif (isset($choice['message']['reasoning_content']) && is_string($choice['message']['reasoning_content']) && $choice['message']['reasoning_content'] !== '') {
+				$choices[$index]['message']['reasoning_content'] = $choice['message']['reasoning_content'];
+				$partials[] = [
+					'kind' => 'reasoning_content',
+					'text' => $choice['message']['reasoning_content'],
+					'index' => $index,
+				];
 			}
 
 			if (isset($choice['delta']['audio']) && is_array($choice['delta']['audio'])) {
@@ -159,13 +175,6 @@ class StreamingService {
 			}
 
 			// TODO decide if we stream the tool_calls
-
-			// TODO decide if we use the reasoning_content
-			/*
-			if (isset($choice['delta']['reasoning_content']) && is_string($choice['delta']['reasoning_content'])) {
-				echo 'REASONING_CONTENT: ' . json_encode($choice['delta']['reasoning_content']) . "\n";
-			}
-			*/
 
 			if (isset($choice['delta']['tool_calls']) && is_array($choice['delta']['tool_calls'])) {
 				$this->mergeToolCalls($choices[$index]['message'], $choice['delta']['tool_calls']);
@@ -190,7 +199,7 @@ class StreamingService {
 	 * @param array<string, mixed>|null $usage
 	 * @param array<int, array<string, mixed>> $choices
 	 * @param bool $flush
-	 * @return string[]
+	 * @return list<array{kind: string, text: string, index: int}>
 	 * @throws Exception
 	 */
 	private function parseSseChunk(string $chunk, string &$buffer, bool &$done, ?array &$usage, array &$choices, bool $flush = false): array {

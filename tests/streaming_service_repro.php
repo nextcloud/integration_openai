@@ -56,7 +56,7 @@ $generator = $service->parseStreamChatResponse([
 $index = 0;
 foreach ($generator as $partial) {
 	$index++;
-	printf("partial=%d at=%.6f data=%s\n", $index, microtime(true) - $start, $partial);
+	printf("partial=%d at=%.6f data=%s\n", $index, microtime(true) - $start, json_encode($partial));
 	flush();
 }
 

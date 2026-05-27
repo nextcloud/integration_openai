@@ -1354,7 +1354,7 @@ class OpenAiAPIService {
 
 	/**
 	 * @param array<string, mixed> $response
-	 * @return array{messages: array<string>, tool_calls: array<string>, audio_messages: list<array<string, mixed>>}
+	 * @return array{messages: array<string>, reasoning_messages: array<string>, tool_calls: array<string>, audio_messages: list<array<string, mixed>>}
 	 * @throws Exception
 	 */
 	private function normalizeChatCompletionResponse(array $response): array {
@@ -1365,6 +1365,7 @@ class OpenAiAPIService {
 
 		$completions = [
 			'messages' => [],
+			'reasoning_messages' => [],
 			'tool_calls' => [],
 			'audio_messages' => [],
 		];
@@ -1401,6 +1402,9 @@ class OpenAiAPIService {
 
 			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
 				$completions['messages'][] = $choice['message']['content'];
+			}
+			if (isset($choice['message']['reasoning_content']) && is_string($choice['message']['reasoning_content'])) {
+				$completions['reasoning_messages'][] = $choice['message']['reasoning_content'];
 			}
 			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
 				$completions['audio_messages'][] = $choice['message'];
