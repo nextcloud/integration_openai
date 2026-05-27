@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace OCP\TaskProcessing;
 
 /**
- * @since 34.0.0
+ * @since 35.0.0
  */
 interface ISynchronousProgressiveProvider extends ISynchronousProvider {
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array;
+	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null, bool $preferStreaming = true): array;
 }

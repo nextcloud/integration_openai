@@ -113,7 +113,9 @@ class ChangeToneProvider implements IProvider, ISynchronousProgressiveProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null, bool $preferStreaming = true,
+	): array {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
@@ -135,7 +137,6 @@ class ChangeToneProvider implements IProvider, ISynchronousProgressiveProvider {
 
 		$chunks = $this->chunkService->chunkSplitPrompt($textInput, true, $maxTokens);
 		$streamedResult = '';
-		$stream = true;
 		$result = '';
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
@@ -143,7 +144,7 @@ class ChangeToneProvider implements IProvider, ISynchronousProgressiveProvider {
 			$prompt = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 			try {
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					if ($stream) {
+					if ($preferStreaming) {
 						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 						$time = microtime(true);
 						foreach ($chunks as $chunk) {

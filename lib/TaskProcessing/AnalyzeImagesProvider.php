@@ -101,13 +101,13 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousProgressiveProvide
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null, bool $preferStreaming = true,
+	): array {
 
 		if (!$this->openAiAPIService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
 			throw new RuntimeException('Must support chat completion endpoint');
 		}
-
-		$stream = true;
 
 		$history = [];
 
@@ -176,7 +176,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousProgressiveProvide
 
 		try {
 			$systemPrompt = 'Take the user\'s question and answer it based on the provided images. Ensure that the answer matches the language of the user\'s question.';
-			if ($stream) {
+			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens);
 				$time = microtime(true);
 				$fullOutput = '';

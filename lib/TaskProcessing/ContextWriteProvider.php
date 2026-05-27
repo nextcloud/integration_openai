@@ -59,11 +59,6 @@ class ContextWriteProvider implements IProvider, ISynchronousProgressiveProvider
 
 	public function getOptionalInputShape(): array {
 		return [
-			'stream' => new ShapeDescriptor(
-				$this->l->t('Stream the output'),
-				$this->l->t('0 to not stream, anything other value to stream.'),
-				EShapeType::Number,
-			),
 			'max_tokens' => new ShapeDescriptor(
 				$this->l->t('Maximum output words'),
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
@@ -86,7 +81,6 @@ class ContextWriteProvider implements IProvider, ISynchronousProgressiveProvider
 	public function getOptionalInputShapeDefaults(): array {
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
-			'stream' => 1,
 			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
 		];
@@ -104,7 +98,9 @@ class ContextWriteProvider implements IProvider, ISynchronousProgressiveProvider
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null, bool $preferStreaming = true,
+	): array {
 		$startTime = time();
 
 		if (
@@ -120,11 +116,6 @@ class ContextWriteProvider implements IProvider, ISynchronousProgressiveProvider
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
-		}
-
-		$stream = true;
-		if (isset($input['stream']) && is_int($input['stream'])) {
-			$stream = $input['stream'] !== 0;
 		}
 
 		if (isset($input['model']) && is_string($input['model'])) {
@@ -150,7 +141,7 @@ class ContextWriteProvider implements IProvider, ISynchronousProgressiveProvider
 				. ' Detect the language used in the *SOURCE_MATERIAL*. Make sure to use the same language in your response. Do not mention the language explicitly.';
 			try {
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					if ($stream) {
+					if ($preferStreaming) {
 						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 						$time = microtime(true);
 						foreach ($chunks as $chunk) {

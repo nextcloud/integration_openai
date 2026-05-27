@@ -84,7 +84,9 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousProgress
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null, bool $preferStreaming = true,
+	): array {
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
@@ -127,9 +129,8 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousProgress
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$stream = true;
 		try {
-			if ($stream) {
+			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
 					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
 				);

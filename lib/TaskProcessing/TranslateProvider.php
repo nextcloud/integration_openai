@@ -138,7 +138,9 @@ class TranslateProvider implements IProvider, ISynchronousProgressiveProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null, bool $preferStreaming = true,
+	): array {
 		/*
 		foreach (range(1, 20) as $i) {
 			$reportProgress($i / 100 * 5);
@@ -167,7 +169,6 @@ class TranslateProvider implements IProvider, ISynchronousProgressiveProvider {
 		}
 
 		$chunks = $this->chunkService->chunkSplitPrompt($inputText, true, $maxTokens);
-		$stream = true;
 		$result = '';
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
@@ -193,7 +194,7 @@ class TranslateProvider implements IProvider, ISynchronousProgressiveProvider {
 					$this->logger->debug('Using cached translation', ['cached' => $cached, 'cacheKey' => $cacheKey]);
 					$result .= $cached;
 					$reportProgress($progress);
-					if ($stream) {
+					if ($preferStreaming) {
 						$reportOutput(['output' => $result]);
 					}
 					continue;
@@ -229,7 +230,7 @@ class TranslateProvider implements IProvider, ISynchronousProgressiveProvider {
 					continue;
 				}
 				$result .= $decodedCompletion['translation'];
-				if ($stream) {
+				if ($preferStreaming) {
 					$reportOutput(['output' => $result]);
 				}
 				$cache->set($cacheKey, $decodedCompletion['translation']);
