@@ -16,12 +16,13 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\IProvider;
-use OCP\TaskProcessing\ISynchronousProgressiveProvider;
+use OCP\TaskProcessing\ISynchronousOptionsProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools;
 use RuntimeException;
 
-class TextToTextChatWithToolsProvider implements IProvider, ISynchronousProgressiveProvider {
+class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -85,8 +86,10 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousProgress
 	}
 
 	public function process(
-		?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null, bool $preferStreaming = true,
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
 	): array {
+		$reportOutput = $options->getReportOutput();
+		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 

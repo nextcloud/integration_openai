@@ -17,13 +17,14 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\IProvider;
-use OCP\TaskProcessing\ISynchronousProgressiveProvider;
+use OCP\TaskProcessing\ISynchronousOptionsProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextChangeTone;
 use RuntimeException;
 
-class ChangeToneProvider implements IProvider, ISynchronousProgressiveProvider {
+class ChangeToneProvider implements IProvider, ISynchronousOptionsProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -114,8 +115,10 @@ class ChangeToneProvider implements IProvider, ISynchronousProgressiveProvider {
 	}
 
 	public function process(
-		?string $userId, array $input, callable $reportProgress, ?callable $reportOutput = null, bool $preferStreaming = true,
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
 	): array {
+		$reportOutput = $options->getReportOutput();
+		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
