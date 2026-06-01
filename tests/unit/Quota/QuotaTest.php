@@ -18,6 +18,7 @@ use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\StreamingService;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\ICache;
@@ -84,6 +85,9 @@ class QuotaTest extends TestCase {
 			$this->cacheFactory,
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
+			new StreamingService(
+				$this->createMock(IL10N::class),
+			),
 			$this->notificationManager,
 			\OCP\Server::get(QuotaRuleService::class),
 			\OCP\Server::get(IClientService::class),

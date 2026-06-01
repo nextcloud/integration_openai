@@ -12,7 +12,6 @@ namespace OCA\OpenAi\Db;
 use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 use OCP\DB\Types;
-use ReturnTypeWillChange;
 
 /**
  * @method string getUserId()
@@ -46,8 +45,7 @@ class QuotaUsage extends Entity implements JsonSerializable {
 		$this->addType('pool', Types::INTEGER);
 	}
 
-	#[ReturnTypeWillChange]
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'id' => $this->getId(),
 			'user_id' => $this->getUserId(),
