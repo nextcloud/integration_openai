@@ -34,6 +34,7 @@ use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextReformatParagraphs;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
@@ -157,6 +158,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -168,7 +170,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
+		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -190,7 +192,7 @@ class OpenAiProviderTest extends TestCase {
 		rewind($stream);
 
 		$url = self::OPENAI_API_BASE . 'chat/completions';
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true];
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true, 'version' => '1.1', 'curl' => [\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1]];
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => 'This is a test prompt']],
@@ -242,7 +244,7 @@ class OpenAiProviderTest extends TestCase {
 		rewind($stream);
 
 		$url = self::OPENAI_API_BASE . 'chat/completions';
-		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true];
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true, 'version' => '1.1', 'curl' => [\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1]];
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => 'This is a test prompt']],
@@ -329,6 +331,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -393,6 +396,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -458,6 +462,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -469,7 +474,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone' => $toneInput ], fn () => null);
+		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone' => $toneInput ], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -527,6 +532,7 @@ class OpenAiProviderTest extends TestCase {
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -594,6 +600,7 @@ class OpenAiProviderTest extends TestCase {
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -666,6 +673,7 @@ class OpenAiProviderTest extends TestCase {
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 			...$translationProvider::JSON_RESPONSE_FORMAT,
@@ -686,7 +694,7 @@ class OpenAiProviderTest extends TestCase {
 			}),
 		)->willReturn($iResponse);
 
-		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => null);
+		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals(['output' => $aiContent['translation']], $result);
 
 		// Check that token usage is logged properly
@@ -861,6 +869,7 @@ TEXT;
 				['role' => 'user', 'content' => $inputText],
 			],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);

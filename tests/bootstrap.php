@@ -18,4 +18,11 @@ if (!defined('PHPUNIT_RUN')) {
 require_once __DIR__ . '/../../../lib/base.php';
 require_once __DIR__ . '/../../../tests/autoload.php';
 
+if (!interface_exists(\OCP\TaskProcessing\ISynchronousOptionsAwareProvider::class)) {
+	require_once __DIR__ . '/stubs/ocp_task_processing_i_provider.php';
+	require_once __DIR__ . '/stubs/ocp_task_processing_isynchronous_provider.php';
+	require_once __DIR__ . '/stubs/ocp_task_processing_synchronous_provider_options.php';
+	require_once __DIR__ . '/stubs/ocp_task_processing_isynchronous_options_provider.php';
+}
+
 Server::get(IAppManager::class)->loadApp('integration_openai');

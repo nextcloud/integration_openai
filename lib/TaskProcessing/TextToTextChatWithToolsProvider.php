@@ -88,7 +88,7 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 	public function process(
 		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
 	): array {
-		$reportOutput = $options->getReportOutput();
+		$reportOutput = $options->getReportIntermediateOutput();
 		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
@@ -153,7 +153,7 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 				if ($fullOutput !== '') {
 					$reportOutput(['output' => $fullOutput]);
 				}
-				$completion = $chunks->getReturn()['messages'];
+				$completion = $chunks->getReturn();
 			} else {
 				$completion = $this->openAiAPIService->createChatCompletion(
 					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools

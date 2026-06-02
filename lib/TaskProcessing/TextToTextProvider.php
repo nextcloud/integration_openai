@@ -100,8 +100,8 @@ class TextToTextProvider implements IProvider, ISynchronousOptionsAwareProvider 
 	public function process(
 		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
 	): array {
-		$reportOutput = $options?->getReportOutput();
-		$preferStreaming = $options?->getPreferStreaming();
+		$reportOutput = $options->getReportIntermediateOutput();
+		$preferStreaming = $options->getPreferStreaming();
 		/*
 		foreach (range(1, 20) as $i) {
 			$reportProgress($i / 100 * 5);

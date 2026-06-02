@@ -11,6 +11,7 @@ use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Utils;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCP\AppFramework\Db\DoesNotExistException;
@@ -53,7 +54,9 @@ class OpenAiAPIService {
 		IClientService $clientService,
 		private bool $isCLI,
 	) {
-		$this->client = $clientService->newClient();
+		// chooseHandler returns a wrapper that chooses the StreamHandler if the request 'stream' option is set
+		/** @psalm-suppress TooManyArguments */
+		$this->client = $clientService->newClient(Utils::chooseHandler());
 	}
 
 	/**
@@ -1176,9 +1179,12 @@ class OpenAiAPIService {
 
 			if ($stream) {
 				$options['headers']['Accept'] = 'text/event-stream';
-				// $options['headers']['Accept-Encoding'] = 'identity';
 				$options['stream'] = true;
-				// $options['decode'] = false;
+				// Guzzle's StreamHandler only supports HTTP/1.x, so streamed
+				// responses must not force the default HTTP/2 transport settings.
+				$options['version'] = '1.1';
+				$options['curl'] = [];
+				$options['curl'][\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_1;
 			}
 
 			if (count($params) > 0) {

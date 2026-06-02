@@ -102,7 +102,7 @@ class ReformulateProvider implements IProvider, ISynchronousOptionsAwareProvider
 	public function process(
 		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
 	): array {
-		$reportOutput = $options->getReportOutput();
+		$reportOutput = $options->getReportIntermediateOutput();
 		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
 

@@ -10,14 +10,18 @@ namespace OCP\TaskProcessing;
  * @since 35.0.0
  */
 class SynchronousProviderOptions {
+	private \Closure $reportIntermediateOutput;
 
 	public function __construct(
 		private readonly bool $includeWatermarks = false,
-		private readonly bool $preferStreaming = true,
-		private callable $reportOutput = static function (float $progress): bool {
-			return true;
-		},
+		private readonly bool $preferStreaming = false,
+		?callable $reportOutput = null,
 	) {
+		$this->reportIntermediateOutput = $reportOutput !== null
+			? \Closure::fromCallable($reportOutput)
+			: static function (array $output): bool {
+				return true;
+			};
 	}
 
 	public function getIncludeWatermarks(): bool {
@@ -28,7 +32,7 @@ class SynchronousProviderOptions {
 		return $this->preferStreaming;
 	}
 
-	public function getReportOutput(): callable {
-		return $this->reportOutput;
+	public function getReportIntermediateOutput(): callable {
+		return $this->reportIntermediateOutput;
 	}
 }
