@@ -34,6 +34,7 @@ OC.L10N.register(
     "The maximum number of words/tokens that can be generated in the completion." : "Maksimalt antall ord/tokens som kan genereres i fullføringen.",
     "Input text" : "Inndatatekst",
     "Size" : "Størrelse",
+    "Cannot generate less than 1 image" : "Kan ikke generere mindre enn 1 bilde",
     "Prompt" : "Spør",
     "OpenAI and LocalAI integration" : "OpenAI og LocalAI integrasjon",
     "Integration of OpenAI and LocalAI services" : "Integrasjon av OpenAI og LocalAI tjenester",
