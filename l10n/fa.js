@@ -23,6 +23,7 @@ OC.L10N.register(
     "In which tone should your text be rewritten?" : "متن شما با چه لحنی بازنویسی شود؟",
     "The rewritten text in the desired tone, written by the assistant:" : "متن بازنویسی شده با لحن مورد نظر، نوشته شده توسط دستیار:",
     "Size" : "اندازه",
+    "Cannot generate less than 1 image" : "باید دست‌کم ۱ تصویر تولید شود.",
     "Generate speech" : "تولید گفتار",
     "Generate speech from a transcript" : "تولید گفتار از یک رونوشت",
     "Prompt" : "درخواست",
