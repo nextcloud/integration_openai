@@ -2,6 +2,7 @@ OC.L10N.register(
     "integration_openai",
     {
     "Default" : "پیش‌فرض",
+    "Text generation" : "تولید متن",
     "Image generation" : "Image generation",
     "Unknown" : "ناشناخته",
     "seconds" : "ثانیه ها",
