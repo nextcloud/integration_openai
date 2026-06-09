@@ -1,4 +1,5 @@
 { "translations": {
+    "OpenAI Integration" : "OpenAI integracija",
     "Default" : "Numatytasis",
     "Text generation" : "Teksto generavimas",
     "Image generation" : "Paveikslėlio generavimas",

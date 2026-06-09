@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "OpenAI Integration" : "OpenAI integracija",
     "Default" : "Numatytasis",
     "Text generation" : "Teksto generavimas",
     "Image generation" : "Paveikslėlio generavimas",
