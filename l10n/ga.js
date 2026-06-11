@@ -46,7 +46,7 @@ OC.L10N.register(
     "What to ask about the image." : "Cad atá le fiafraí faoin íomhá.",
     "Generated response" : "Freagra ginte",
     "The answer to the question" : "An freagra ar an gceist",
-    "Completion model" : "Completion model",
+    "Completion model" : "Múnla críochnaithe",
     "The model used to generate the completion" : "An tsamhail a úsáidtear chun an críochnú a ghiniúint",
     "Output voice" : "Guth aschuir",
     "The voice used to generate speech" : "An guth a úsáidtear chun urlabhra a ghiniúint",
