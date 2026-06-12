@@ -18,6 +18,7 @@ use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\StreamingService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
@@ -33,6 +34,7 @@ use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextReformatParagraphs;
 use PHPUnit\Framework\MockObject\MockObject;
 use Test\TestCase;
@@ -50,6 +52,7 @@ class OpenAiProviderTest extends TestCase {
 	private OpenAiAPIService $openAiApiService;
 	private OpenAiSettingsService $openAiSettingsService;
 	private ChunkService $chunkService;
+	private StreamingService $streamingService;
 	/**
 	 * @var MockObject|IClient
 	 */
@@ -71,6 +74,9 @@ class OpenAiProviderTest extends TestCase {
 		$this->openAiSettingsService = \OCP\Server::get(OpenAiSettingsService::class);
 
 		$this->chunkService = \OCP\Server::get(ChunkService::class);
+		$this->streamingService = new StreamingService(
+			$this->createMock(\OCP\IL10N::class),
+		);
 
 		$this->quotaUsageMapper = \OCP\Server::get(QuotaUsageMapper::class);
 
@@ -86,6 +92,7 @@ class OpenAiProviderTest extends TestCase {
 			\OCP\Server::get(ICacheFactory::class),
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
+			$this->streamingService,
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
@@ -151,6 +158,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $prompt]],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -162,13 +170,122 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
+		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
 		$this->assertEquals(21, $usage);
 		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testCreateStreamedChatCompletionReturnsStructuredChatResult(): void {
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Could not open temp stream');
+		}
+
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"This is \"}}]}\n\n");
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"a test response.\"},\"finish_reason\":\"stop\"}],\"usage\":{\"total_tokens\":21}}\n\n");
+		fwrite($stream, "data: [DONE]\n\n");
+		rewind($stream);
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true, 'version' => '1.1', 'curl' => [\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1]];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [['role' => 'user', 'content' => 'This is a test prompt']],
+			'n' => 1,
+			'stream' => true,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+			'stream_options' => ['include_usage' => true],
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($stream);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->willReturnMap([
+			['Content-Type', 'text/event-stream'],
+		]);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$generator = $this->openAiApiService->createStreamedChatCompletion(self::TEST_USER1, Application::DEFAULT_MODEL_ID, 'This is a test prompt');
+		$chunks = iterator_to_array($generator, false);
+
+		$this->assertSame([
+			['kind' => 'content', 'text' => 'This is ', 'index' => 0],
+			['kind' => 'content', 'text' => 'a test response.', 'index' => 0],
+		], $chunks);
+		$this->assertSame([
+			'messages' => ['This is a test response.'],
+			'reasoning_messages' => [],
+			'tool_calls' => [],
+			'audio_messages' => [],
+		], $generator->getReturn());
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testCreateStreamedChatCompletionCanYieldStructuredReasoningChunks(): void {
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Could not open temp stream');
+		}
+
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":\"Thinking... \"}}]}\n\n");
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Answer \"}}]}\n\n");
+		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":\"done.\",\"content\":\"ready\"},\"finish_reason\":\"stop\"}],\"usage\":{\"total_tokens\":21}}\n\n");
+		fwrite($stream, "data: [DONE]\n\n");
+		rewind($stream);
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true, 'version' => '1.1', 'curl' => [\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1]];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [['role' => 'user', 'content' => 'This is a test prompt']],
+			'n' => 1,
+			'stream' => true,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+			'stream_options' => ['include_usage' => true],
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($stream);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->willReturnMap([
+			['Content-Type', 'text/event-stream'],
+		]);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$generator = $this->openAiApiService->createStreamedChatCompletion(
+			self::TEST_USER1,
+			Application::DEFAULT_MODEL_ID,
+			'This is a test prompt',
+		);
+		$chunks = iterator_to_array($generator, false);
+
+		$this->assertSame([
+			['kind' => 'reasoning_content', 'text' => 'Thinking... ', 'index' => 0],
+			['kind' => 'content', 'text' => 'Answer ', 'index' => 0],
+			['kind' => 'content', 'text' => 'ready', 'index' => 0],
+			['kind' => 'reasoning_content', 'text' => 'done.', 'index' => 0],
+		], $chunks);
+		$this->assertSame([
+			'messages' => ['Answer ready'],
+			'reasoning_messages' => ['Thinking... done.'],
+			'tool_calls' => [],
+			'audio_messages' => [],
+		], $generator->getReturn());
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
@@ -214,6 +331,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -278,6 +396,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -343,6 +462,7 @@ class OpenAiProviderTest extends TestCase {
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [['role' => 'user', 'content' => $message]],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -354,7 +474,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone' => $toneInput ], fn () => null);
+		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone' => $toneInput ], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -412,6 +532,7 @@ class OpenAiProviderTest extends TestCase {
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -479,6 +600,7 @@ class OpenAiProviderTest extends TestCase {
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);
@@ -551,6 +673,7 @@ class OpenAiProviderTest extends TestCase {
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 			...$translationProvider::JSON_RESPONSE_FORMAT,
@@ -571,7 +694,7 @@ class OpenAiProviderTest extends TestCase {
 			}),
 		)->willReturn($iResponse);
 
-		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => null);
+		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals(['output' => $aiContent['translation']], $result);
 
 		// Check that token usage is logged properly
@@ -746,6 +869,7 @@ TEXT;
 				['role' => 'user', 'content' => $inputText],
 			],
 			'n' => $n,
+			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
 		]);

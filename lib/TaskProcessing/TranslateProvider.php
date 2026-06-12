@@ -20,13 +20,15 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\IProvider;
+use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextTranslate;
 use Psr\Log\LoggerInterface;
 
-class TranslateProvider implements ISynchronousProvider {
+class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 	public const SYSTEM_PROMPT = 'You are a translations expert that ONLY outputs a valid JSON with the translated text in the following format: { "translation": "<translated text>" } .';
 	public const JSON_RESPONSE_FORMAT = [
@@ -137,7 +139,11 @@ class TranslateProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
+	): array {
+		$reportOutput = $options->getReportIntermediateOutput();
+		$preferStreaming = $options->getPreferStreaming();
 		/*
 		foreach (range(1, 20) as $i) {
 			$reportProgress($i / 100 * 5);
@@ -191,6 +197,9 @@ class TranslateProvider implements ISynchronousProvider {
 					$this->logger->debug('Using cached translation', ['cached' => $cached, 'cacheKey' => $cacheKey]);
 					$result .= $cached;
 					$reportProgress($progress);
+					if ($preferStreaming) {
+						$reportOutput(['output' => $result]);
+					}
 					continue;
 				}
 				$prompt = $promptStart . PHP_EOL . PHP_EOL . $chunk;
@@ -224,6 +233,9 @@ class TranslateProvider implements ISynchronousProvider {
 					continue;
 				}
 				$result .= $decodedCompletion['translation'];
+				if ($preferStreaming) {
+					$reportOutput(['output' => $result]);
+				}
 				$cache->set($cacheKey, $decodedCompletion['translation']);
 				continue;
 			}

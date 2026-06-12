@@ -16,12 +16,14 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\IProvider;
+use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextReformulation;
 use RuntimeException;
 
-class ReformulateProvider implements ISynchronousProvider {
+class ReformulateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -97,7 +99,11 @@ class ReformulateProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
+	): array {
+		$reportOutput = $options->getReportIntermediateOutput();
+		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
@@ -119,13 +125,34 @@ class ReformulateProvider implements ISynchronousProvider {
 		$result = '';
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
+		$fullOutput = '';
 
 		foreach ($chunks as $chunk) {
 			$prompt = 'Reformulate the following text. Use the same language as the original text.  Output only the reformulation. Here is the text:' . "\n\n" . $chunk . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 			try {
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-					$completion = $completion['messages'];
+					if ($preferStreaming) {
+						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$time = microtime(true);
+						foreach ($chunks as $chunk) {
+							if (($chunk['kind'] ?? null) !== 'content') {
+								continue;
+							}
+							$fullOutput .= $chunk['text'];
+							// we don't report more often than every 250ms
+							if (microtime(true) - $time >= 0.25) {
+								$reportOutput(['output' => $fullOutput]);
+								$time = microtime(true);
+							}
+						}
+						if ($fullOutput !== '') {
+							$reportOutput(['output' => $fullOutput]);
+						}
+						$completion = $chunks->getReturn()['messages'];
+					} else {
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$completion = $completion['messages'];
+					}
 				} else {
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 				}
