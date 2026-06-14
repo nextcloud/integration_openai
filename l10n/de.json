@@ -31,6 +31,7 @@
     "Name" : "Name",
     "Usage" : "Verwendung",
     "Quota pool for rule %d" : "Kontingent-Pool für die Regel %d",
+    "Malformed API response" : "Fehlerhafte API-Antwort",
     "Detect language" : "Sprache erkennen",
     "Maximum output words" : "Maximal ausgegebene Wörter",
     "The maximum number of words/tokens that can be generated in the output." : "Die maximale Anzahl von Wörtern/Tokens, die in der Ausgabe erstellt werden können.",
