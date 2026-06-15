@@ -69,7 +69,6 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		return [];
 	}
 
-
 	public function getOptionalInputShape(): array {
 		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
 		$ois = [
@@ -198,7 +197,6 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				? 'gpt-4o-audio-preview'
 				: $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		}
-
 
 		if (isset($input['voice']) && is_string($input['voice'])) {
 			$outputVoice = $input['voice'];

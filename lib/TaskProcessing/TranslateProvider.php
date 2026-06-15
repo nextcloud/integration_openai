@@ -155,7 +155,6 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 				throw new ProcessingException("Empty translation result from {$fromLanguage} to {$toLanguage}");
 			}
 			return ['output' => trim($translation)];
-
 		} catch (Exception $e) {
 			throw new ProcessingException(
 				"Failed to translate from {$fromLanguage} to {$toLanguage}: {$e->getMessage()}",

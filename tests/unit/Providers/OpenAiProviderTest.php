@@ -364,7 +364,6 @@ class OpenAiProviderTest extends TestCase {
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
-
 	public function testHeadlineProvider(): void {
 		$headlineProvider = new HeadlineProvider(
 			$this->openAiApiService,
@@ -494,7 +493,6 @@ class OpenAiProviderTest extends TestCase {
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
-
 
 	public function testSummaryProvider(): void {
 		$summaryProvider = new SummaryProvider(

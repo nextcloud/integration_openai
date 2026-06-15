@@ -31,7 +31,6 @@ use OCA\OpenAi\TaskProcessing\TopicsProvider;
 use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
-
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\IAppConfig;
@@ -77,7 +76,6 @@ class Application extends App implements IBootstrap {
 		self::QUOTA_TYPE_IMAGE => 0, // 0 = unlimited
 		self::QUOTA_TYPE_TRANSCRIPTION => 0, // 0 = unlimited
 		self::QUOTA_TYPE_SPEECH => 0, // 0 = unlimited
-
 	];
 
 	public const MODELS_CACHE_KEY = 'models';

@@ -12,7 +12,6 @@ use OCP\IURLGenerator;
 use OCP\L10N\IFactory;
 use OCP\Notification\IAction;
 use OCP\Notification\INotification;
-
 use OCP\Notification\INotifier;
 use OCP\Notification\UnknownNotificationException;
 

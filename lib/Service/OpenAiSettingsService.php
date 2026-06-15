@@ -81,7 +81,6 @@ class OpenAiSettingsService {
 		'stt_language' => 'string',
 	];
 
-
 	public function __construct(
 		private IConfig $config,
 		private IAppConfig $appConfig,
@@ -633,7 +632,6 @@ class OpenAiSettingsService {
 			'use_basic_auth' => $this->getUseBasicAuth(),
 			'is_custom_service' => $isCustomService,
 			'stt_language' => $this->getUserSTTLanguage($userId)
-
 		];
 	}
 

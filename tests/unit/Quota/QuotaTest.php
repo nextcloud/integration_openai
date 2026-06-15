@@ -77,7 +77,6 @@ class QuotaTest extends TestCase {
 
 		$this->quotaRuleService = \OCP\Server::get(QuotaRuleService::class);
 
-
 		$this->openAiApiService = new OpenAiAPIService(
 			\OCP\Server::get(LoggerInterface::class),
 			$this->createMock(IL10N::class),

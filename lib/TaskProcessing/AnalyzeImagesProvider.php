@@ -60,7 +60,6 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 		return [];
 	}
 
-
 	public function getOptionalInputShape(): array {
 		return [
 			'max_tokens' => new ShapeDescriptor(
@@ -159,7 +158,6 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 				],
 			]);
 		}
-
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new RuntimeException('Invalid prompt');

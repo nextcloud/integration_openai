@@ -77,7 +77,6 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		];
 	}
 
-
 	public function getOptionalInputShape(): array {
 		return [];
 	}
