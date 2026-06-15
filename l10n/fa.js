@@ -33,6 +33,7 @@ OC.L10N.register(
     "Name" : "نام",
     "Usage" : "مصرف",
     "Quota pool for rule %d" : "استخر سهمیه برای قاعدهٔ %d",
+    "Malformed API response" : "پاسخ نامعتبر API",
     "Detect language" : "تشخیص زبان",
     "Maximum output words" : "بیشینهٔ واژگان خروجی",
     "The maximum number of words/tokens that can be generated in the output." : "بیشترین تعداد واژگان/توکن‌هایی که می‌تواند در خروجی تولید شود.",

@@ -56,6 +56,7 @@ OC.L10N.register(
     "More information about LocalAI models" : "Daugiau informacijos apie „LocalAI“ modelius",
     "Start date" : "Pradžios data",
     "End date" : "Pabaigos data",
+    "Speech-to-text provider (to transcribe Talk recordings for example)" : "Kalbos į tekstą teikėjas (pavyzdžiui, pokalbių įrašų transkribavimui)",
     "OpenAI options saved" : "„OpenAI“ parinktys įrašytos",
     "Failed to save OpenAI options" : "Nepavyko įrašyti „OpenAI“ parinkčių",
     "Default language" : "Numatytoji kalba",
