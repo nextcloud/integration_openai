@@ -171,6 +171,16 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				$e,
 			);
 		}
+		if ($includeWatermark) {
+			if ($userId !== null) {
+				$user = $this->userManager->getExistingUser($userId);
+				$lang = $this->l10nFactory->getUserLanguage($user);
+				$l = $this->l10nFactory->get(Application::APP_ID, $lang);
+				$transcription .= "\n\n" . $l->t('This was generated using Artificial Intelligence.');
+			} else {
+				$transcription .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
+			}
+		}
 
 		$reportProgress(0.3);
 
@@ -214,16 +224,6 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 
 		// TTS
 		$ttsPrompt = $translatedText;
-		if ($includeWatermark) {
-			if ($userId !== null) {
-				$user = $this->userManager->getExistingUser($userId);
-				$lang = $this->l10nFactory->getUserLanguage($user);
-				$l = $this->l10nFactory->get(Application::APP_ID, $lang);
-				$ttsPrompt .= "\n\n" . $l->t('This was generated using Artificial Intelligence.');
-			} else {
-				$ttsPrompt .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
-			}
-		}
 		if (isset($input['model']) && is_string($input['model'])) {
 			$ttsModel = $input['tts_model'];
 		} else {
@@ -256,7 +256,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				$this->logger->warning('Text to speech generation failed: no speech returned');
 				throw new ProcessingException('Text to speech generation failed: no speech returned');
 			}
-			$translatedAudio = $includeWatermark ? $this->watermarkingService->markAudio($apiResponse['body']) : $apiResponse['body'];
+			$translatedAudio = $apiResponse['body'];
 		} catch (\Exception $e) {
 			$this->logger->warning('Text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new ProcessingException(
