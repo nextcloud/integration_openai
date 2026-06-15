@@ -10,6 +10,7 @@ namespace OCA\OpenAi\Service;
 use DateTime;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Utils;
 use OCA\OpenAi\AppInfo\Application;
@@ -28,6 +29,7 @@ use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
 use OCP\Notification\IManager as INotificationManager;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -1125,7 +1127,7 @@ class OpenAiAPIService {
 	 * @param string|null $serviceType
 	 * @param int $retryCount number of retries that have been attempted so far
 	 * @return array decoded request result or error
-	 * @throws Exception
+	 * @throws Exception|UserFacingProcessingException
 	 */
 	public function request(
 		?string $userId, string $endPoint, array $params = [], string $method = 'GET',
@@ -1291,17 +1293,34 @@ class OpenAiAPIService {
 					$this->logger->warning('API request error : ' . $e->getMessage(), ['response_body' => $responseBody, 'exception' => $e]);
 				}
 			}
-			throw new Exception(
-				$this->l10n->t('API request error: ') . (
-					$e->getResponse()->getStatusCode() === 401
+			$errorMessage = (
+				$e->getResponse()->getStatusCode() === 401
 					? $this->l10n->t('Invalid API Key/Basic Auth: ')
 					: ''
-				) . (
-					isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])
+			) . (
+				isset($parsedResponseBody['error']) && isset($parsedResponseBody['error']['message'])
 					? $parsedResponseBody['error']['message']
 					: $e->getMessage()
-				),
+			);
+			if ($e->getResponse()->getStatusCode() >= 500) {
+				throw new UserFacingProcessingException(
+					$this->l10n->t('API request error: ') . $errorMessage,
+					intval($e->getCode()),
+					userFacingMessage: $this->l10n->t('%s API error: AI backend is currently not available. Contact your system administrator.', [$this->getServiceName()]),
+				);
+			}
+			throw new Exception(
+				$this->l10n->t('API request error: ') . $errorMessage,
 				intval($e->getCode()),
+			);
+		} catch (ConnectException $e) {
+			if ($logErrors) {
+				$this->logger->warning('API connection error: ' . $e->getMessage(), ['exception' => $e]);
+			}
+			throw new UserFacingProcessingException(
+				$this->l10n->t('API connection error: ') . $e->getMessage(),
+				intval($e->getCode()),
+				userFacingMessage: $this->l10n->t('%s API error: AI backend is currently not reachable. Contact your system administrator.', [$this->getServiceName()]),
 			);
 		}
 	}
