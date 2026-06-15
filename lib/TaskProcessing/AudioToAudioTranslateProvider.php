@@ -20,9 +20,11 @@ use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
+use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
+use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use Psr\Log\LoggerInterface;
@@ -94,7 +96,13 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 	}
 
 	public function getOptionalOutputShape(): array {
-		return [];
+		return [
+			'text_input' => new ShapeDescriptor(
+				$this->l->t('Audio transcription'),
+				$this->l->t('The transcribed audio input'),
+				EShapeType::Text,
+			),
+		];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
@@ -135,6 +143,12 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 
 		$reportProgress(0.3);
 
+		if ($preferStreaming) {
+			$reportOutput([
+				'text_input' => $transcription,
+			]);
+		}
+
 		// translate
 		$completionModel = $this->openAiAPIService->isUsingOpenAi()
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
@@ -147,9 +161,12 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				$completionModel, $maxTokens, $userId,
 			);
 
-			$reportOutput([
-				'translated_text' => $translatedText,
-			]);
+			if ($preferStreaming) {
+				$reportOutput([
+					'text_input' => $transcription,
+					'translated_text' => $translatedText,
+				]);
+			}
 
 			if (empty($translatedText)) {
 				throw new ProcessingException("Empty translation result from {$input['origin_language']} to {$input['target_language']}");
