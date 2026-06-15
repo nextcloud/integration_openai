@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ccd91568a2cb120d5788be1bfe2af07",
+    "content-hash": "db059d652920a0c6cd9c7afda5199a69",
     "packages": [
         {
             "name": "bamarni/composer-bin-plugin",
@@ -200,16 +200,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nextcloud-deps/ocp.git",
-                "reference": "20e8343005856c8b1a5fc2b12ceae86f57c533f7"
+                "reference": "40842eb82f4972ef0fe465e9c03832275bb85533"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/20e8343005856c8b1a5fc2b12ceae86f57c533f7",
-                "reference": "20e8343005856c8b1a5fc2b12ceae86f57c533f7",
+                "url": "https://api.github.com/repos/nextcloud-deps/ocp/zipball/40842eb82f4972ef0fe465e9c03832275bb85533",
+                "reference": "40842eb82f4972ef0fe465e9c03832275bb85533",
                 "shasum": ""
             },
             "require": {
-                "php": "~8.1 || ~8.2 || ~8.3 || ~8.4 || ~8.5",
+                "php": "~8.3 || ~8.4 || ~8.5",
                 "psr/clock": "^1.0",
                 "psr/container": "^2.0.2",
                 "psr/event-dispatcher": "^1.0",
@@ -220,7 +220,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "34.0.0-dev"
+                    "dev-master": "35.0.0-dev"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -242,7 +242,7 @@
                 "issues": "https://github.com/nextcloud-deps/ocp/issues",
                 "source": "https://github.com/nextcloud-deps/ocp/tree/master"
             },
-            "time": "2026-05-14T02:06:02+00:00"
+            "time": "2026-06-13T09:58:31+00:00"
         },
         {
             "name": "psr/clock",
@@ -563,7 +563,7 @@
     },
     "platform-dev": {},
     "platform-overrides": {
-        "php": "8.2"
+        "php": "8.3"
     },
     "plugin-api-version": "2.9.0"
 }
