@@ -14,7 +14,6 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\TranslateService;
-use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -25,7 +24,6 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextTranslate;
-use Psr\Log\LoggerInterface;
 
 class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -33,8 +31,6 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 		private OpenAiAPIService $openAiAPIService,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
-		private ICacheFactory $cacheFactory,
-		private LoggerInterface $logger,
 		private TranslateService $translateService,
 		private ?string $userId,
 	) {
