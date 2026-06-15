@@ -105,12 +105,13 @@ class Application extends App implements IBootstrap {
 
 		$translationProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
 		$sttProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
+		$ttsProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
 
 		// Task processing
 		if ($translationProviderEnabled) {
 			$context->registerTaskProcessingProvider(TranslateProvider::class);
 		}
-		if ($translationProviderEnabled && $sttProviderEnabled) {
+		if ($translationProviderEnabled && $sttProviderEnabled && $ttsProviderEnabled) {
 			$context->registerTaskProcessingTaskType(AudioToAudioTranslateTaskType::class);
 			$context->registerTaskProcessingProvider(AudioToAudioTranslateProvider::class);
 		}

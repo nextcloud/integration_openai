@@ -30,7 +30,7 @@ class TranslateService {
 							'description' => 'The translated text',
 						],
 					],
-					'required' => [ 'translation' ],
+					'required' => ['translation'],
 					'additionalProperties' => false,
 				],
 			],
@@ -86,11 +86,11 @@ class TranslateService {
 			$promptStart = 'Translate the following text to ' . $toLanguage . ': ';
 		}
 
+		$cache = $this->cacheFactory->createDistributed('integration_openai');
 		foreach ($chunks as $chunk) {
 			$progress += $increase;
 			$cacheKey = $sourceLanguageCode . '/' . $targetLanguageCode . '/' . md5($chunk);
 
-			$cache = $this->cacheFactory->createDistributed('integration_openai');
 			if ($cached = $cache->get($cacheKey)) {
 				$this->logger->debug('Using cached translation', ['cached' => $cached, 'cacheKey' => $cacheKey]);
 				$translation .= $cached;
@@ -98,7 +98,7 @@ class TranslateService {
 					$reportProgress($progress);
 				}
 				if ($preferStreaming && $reportOutput !== null) {
-					$reportOutput(['output' => $translation]);
+					$reportOutput($translation);
 				}
 				continue;
 			}
@@ -136,10 +136,9 @@ class TranslateService {
 			}
 			$translation .= $decodedCompletion['translation'];
 			if ($preferStreaming && $reportOutput !== null) {
-				$reportOutput(['output' => $translation]);
+				$reportOutput($translation);
 			}
 			$cache->set($cacheKey, $decodedCompletion['translation']);
-			continue;
 		}
 		return $translation;
 	}

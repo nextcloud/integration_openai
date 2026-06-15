@@ -62,8 +62,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 	}
 
 	public function getInputShapeEnumValues(): array {
-		$coreL = $this->l10nFactory->getLanguages();
-		$languages = array_merge($coreL['commonLanguages'], $coreL['otherLanguages']);
+		$languages = TranslateService::getStaticLanguages();
 		$languageEnumValues = array_map(static function (array $language) {
 			return new ShapeEnumValue($language['name'], $language['code']);
 		}, $languages);
@@ -171,14 +170,18 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				$e,
 			);
 		}
+		if (empty(trim($transcription))) {
+			throw new ProcessingException("Empty transcription result from {$input['origin_language']} to {$input['target_language']}");
+		}
+		$watermarkSuffix = '';
 		if ($includeWatermark) {
 			if ($userId !== null) {
 				$user = $this->userManager->getExistingUser($userId);
 				$lang = $this->l10nFactory->getUserLanguage($user);
 				$l = $this->l10nFactory->get(Application::APP_ID, $lang);
-				$transcription .= "\n\n" . $l->t('This was generated using Artificial Intelligence.');
+				$watermarkSuffix = "\n\n" . $l->t('This was generated using Artificial Intelligence.');
 			} else {
-				$transcription .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
+				$watermarkSuffix = "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
 			}
 		}
 
@@ -186,7 +189,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 
 		if ($preferStreaming) {
 			$reportOutput([
-				'text_input' => $transcription,
+				'text_input' => $transcription . $watermarkSuffix,
 			]);
 		}
 
@@ -197,15 +200,22 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		$maxTokens = $this->openAiSettingsService->getMaxTokens();
 
 		try {
+			$reportTranslationOutput = function (string $translationOutput) use ($reportOutput, $transcription, $watermarkSuffix) {
+				$reportOutput([
+					'text_input' => $transcription . $watermarkSuffix,
+					'text_output' => $translationOutput,
+				]);
+			};
 			$translatedText = $this->translateService->translate(
 				$transcription, $input['origin_language'], $input['target_language'],
-				$completionModel, $maxTokens, $userId,
+				$completionModel, $maxTokens, $userId, null,
+				$preferStreaming, $reportTranslationOutput,
 			);
 
 			if ($preferStreaming) {
 				$reportOutput([
-					'text_input' => $transcription,
-					'translated_text' => $translatedText,
+					'text_input' => $transcription . $watermarkSuffix,
+					'text_output' => $translatedText . $watermarkSuffix,
 				]);
 			}
 
@@ -223,8 +233,8 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		$reportProgress(0.6);
 
 		// TTS
-		$ttsPrompt = $translatedText;
-		if (isset($input['model']) && is_string($input['model'])) {
+		$ttsPrompt = $translatedText . $watermarkSuffix;
+		if (isset($input['tts_model']) && is_string($input['tts_model'])) {
 			$ttsModel = $input['tts_model'];
 		} else {
 			$ttsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
@@ -256,8 +266,8 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				$this->logger->warning('Text to speech generation failed: no speech returned');
 				throw new ProcessingException('Text to speech generation failed: no speech returned');
 			}
-			$translatedAudio = $apiResponse['body'];
-		} catch (\Exception $e) {
+			$translatedAudio = $includeWatermark ? $this->watermarkingService->markAudio($apiResponse['body']) : $apiResponse['body'];
+		} catch (Exception $e) {
 			$this->logger->warning('Text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new ProcessingException(
 				'Text to speech generation failed with: ' . $e->getMessage(),
@@ -270,9 +280,9 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 
 		// Translation
 		return [
-			'text_input' => $transcription,
+			'text_input' => $transcription . $watermarkSuffix,
 			'audio_output' => $translatedAudio,
-			'text_output' => $translatedText,
+			'text_output' => $translatedText . $watermarkSuffix,
 		];
 	}
 }

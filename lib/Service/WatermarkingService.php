@@ -123,7 +123,7 @@ class WatermarkingService {
 
 			return $newAudio;
 		} catch (\Throwable $e) {
-			$this->logger->warning('Could not add AI watermark to AI generated image', ['exception' => $e]);
+			$this->logger->warning('Could not add AI watermark to AI generated audio', ['exception' => $e]);
 			return $audio;
 		}
 	}

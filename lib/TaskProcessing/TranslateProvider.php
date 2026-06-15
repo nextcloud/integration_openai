@@ -142,10 +142,15 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 		$toLanguage = $coreLanguages[$input['target_language']] ?? $input['target_language'];
 
 		try {
+			$reportTranslationOutput = function (string $translationOutput) use ($reportOutput) {
+				$reportOutput([
+					'output' => $translationOutput,
+				]);
+			};
 			$translation = $this->translateService->translate(
 				$inputText, $input['origin_language'] ?? '', $input['target_language'] ?? '',
 				$model, $maxTokens, $userId, $reportProgress,
-				$preferStreaming, $reportOutput,
+				$preferStreaming, $reportTranslationOutput,
 			);
 
 			$endTime = time();
