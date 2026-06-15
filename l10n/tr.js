@@ -33,6 +33,7 @@ OC.L10N.register(
     "Name" : "Ad",
     "Usage" : "Kullanım",
     "Quota pool for rule %d" : "%d kuralının kota havuzu",
+    "Malformed API response" : "API yanıtı bozuk",
     "Detect language" : "Dili algıla",
     "Maximum output words" : "En fazla çıktı sözcüğü sayısı",
     "The maximum number of words/tokens that can be generated in the output." : "Çıktıda oluşturulabilecek en fazla sözcük/kod sayısı.",
