@@ -41,6 +41,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		private IL10N $l,
 		private IAppConfig $appConfig,
 		private IUserManager $userManager,
+		private ?string $userId,
 	) {
 	}
 
@@ -80,15 +81,45 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 	}
 
 	public function getOptionalInputShape(): array {
-		return [];
+		return [
+			'tts_voice' => new ShapeDescriptor(
+				$this->l->t('Voice'),
+				$this->l->t('The voice to use'),
+				EShapeType::Enum
+			),
+			'tts_model' => new ShapeDescriptor(
+				$this->l->t('Model'),
+				$this->l->t('The model used to generate the speech'),
+				EShapeType::Enum
+			),
+			'tts_speed' => new ShapeDescriptor(
+				$this->l->t('Speed'),
+				$this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)
+					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
+					: $this->l->t('Speech speed modifier'),
+				EShapeType::Number
+			),
+		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [];
+		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
+		return [
+			'tts_voice' => array_map(function ($v) {
+				return new ShapeEnumValue($v, $v);
+			}, $voices),
+			'tts_model' => $this->openAiAPIService->getModelEnumValues($this->userId, Application::SERVICE_TYPE_TTS),
+		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		return [];
+		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
+		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
+		return [
+			'tts_voice' => $adminVoice,
+			'tts_model' => $adminModel,
+			'tts_speed' => 1,
+		];
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -193,9 +224,29 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				$ttsPrompt .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
 			}
 		}
-		$ttsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
-		$voice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE, lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
+		if (isset($input['model']) && is_string($input['model'])) {
+			$ttsModel = $input['tts_model'];
+		} else {
+			$ttsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
+		}
+		if (isset($input['tts_voice']) && is_string($input['tts_voice'])) {
+			$voice = $input['tts_voice'];
+		} else {
+			$voice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE, lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
+		}
+
 		$speed = 1;
+		if (isset($input['tts_speed']) && is_numeric($input['tts_speed'])) {
+			$speed = $input['tts_speed'];
+			if ($this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)) {
+				if ($speed > 4) {
+					$speed = 4;
+				} elseif ($speed < 0.25) {
+					$speed = 0.25;
+				}
+			}
+		}
+
 		try {
 			$apiResponse = $this->openAiAPIService->requestSpeechCreation(
 				$userId, $ttsPrompt, $ttsModel, $voice, $speed,
@@ -219,6 +270,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 
 		// Translation
 		return [
+			'text_input' => $transcription,
 			'audio_output' => $translatedAudio,
 			'text_output' => $translatedText,
 		];
