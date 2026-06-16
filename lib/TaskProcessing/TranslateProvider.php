@@ -248,6 +248,8 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 			}
 			return ['output' => trim($result)];
 
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			throw new ProcessingException(
 				"Failed to translate from {$fromLanguage} to {$toLanguage}: {$e->getMessage()}",

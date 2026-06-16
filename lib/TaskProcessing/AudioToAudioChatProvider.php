@@ -20,6 +20,7 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\AudioToAudioChat;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -261,6 +262,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 					throw new RuntimeException($serviceName . ' text to speech generation failed: no speech returned');
 				}
 				$output = $apiResponse['body'];
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
 			} catch (\Exception $e) {
 				$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 				throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
@@ -282,6 +285,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		try {
 			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
 			$result['input_transcript'] = $inputTranscription;
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			$this->logger->warning($serviceName . ' audio input transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException($serviceName . ' audio input transcription failed with: ' . $e->getMessage());
@@ -297,6 +302,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		// speech to text
 		try {
 			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			$this->logger->warning($serviceName . ' transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException($serviceName . ' transcription failed with: ' . $e->getMessage());
@@ -306,6 +313,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		try {
 			$completion = $this->openAiAPIService->createChatCompletion($userId, $llmModel, $inputTranscription, $systemPrompt, $history, 1, 1000);
 			$completion = $completion['messages'];
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			throw new RuntimeException($serviceName . ' chat completion request failed: ' . $e->getMessage());
 		}
@@ -327,6 +336,8 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				'output_transcript' => $llmResult,
 				'input_transcript' => $inputTranscription,
 			];
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (\Exception $e) {
 			$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());

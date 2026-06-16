@@ -20,6 +20,7 @@ use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\AudioToText;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -105,6 +106,8 @@ class AudioToTextProvider implements ISynchronousProvider {
 		try {
 			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model, $language);
 			return ['output' => $transcription];
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());

@@ -19,6 +19,7 @@ use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -208,6 +209,8 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 			}
 
 			throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (\Exception $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s image question generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new RuntimeException('OpenAI/LocalAI\'s image question generation failed with: ' . $e->getMessage());

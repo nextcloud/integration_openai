@@ -21,6 +21,7 @@ use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\SynchronousProviderOptions;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\TextToTextChangeTone;
 use RuntimeException;
 
@@ -172,6 +173,8 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 				} else {
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 				}
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}

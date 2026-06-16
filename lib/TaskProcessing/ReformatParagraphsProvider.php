@@ -19,6 +19,7 @@ use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ShapeDescriptor;
 use RuntimeException;
 
@@ -191,6 +192,8 @@ TEXT;
 					$instruction = $systemPrompt . ' Here is the text:' . "\n\n" . $chunk;
 					$completion = $this->openAiAPIService->createCompletion($userId, $instruction, 1, $model, $maxTokens);
 				}
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}

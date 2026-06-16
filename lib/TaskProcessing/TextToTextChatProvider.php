@@ -19,6 +19,7 @@ use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\TextToTextChat;
 use RuntimeException;
 
@@ -147,6 +148,8 @@ class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvi
 				$completion = $this->openAiAPIService->createChatCompletion($userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
 				$completion = $completion['messages'];
 			}
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}

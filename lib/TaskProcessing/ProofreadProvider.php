@@ -18,6 +18,7 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\TextToTextProofread;
 use RuntimeException;
 
@@ -131,6 +132,8 @@ class ProofreadProvider implements ISynchronousProvider {
 					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $textInput;
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 				}
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
@@ -153,6 +156,8 @@ class ProofreadProvider implements ISynchronousProvider {
 					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $result;
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 				}
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}

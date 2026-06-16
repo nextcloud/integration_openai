@@ -18,6 +18,7 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
 use RuntimeException;
 
@@ -149,6 +150,8 @@ class SummaryProvider implements ISynchronousProvider {
 						$reportProgress($progress);
 					}
 				}
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
 			} catch (Exception $e) {
 				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}

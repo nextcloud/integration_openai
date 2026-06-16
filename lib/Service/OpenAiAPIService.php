@@ -1302,6 +1302,13 @@ class OpenAiAPIService {
 					? $parsedResponseBody['error']['message']
 					: $e->getMessage()
 			);
+			if ($e->getResponse()->getStatusCode() >= 401) {
+				throw new UserFacingProcessingException(
+					$this->l10n->t('API request error: ') . $errorMessage,
+					intval($e->getCode()),
+					userFacingMessage: $this->l10n->t('%s API error: Invalid API key or invalid Basic Authentication. Contact your system administrator.', [$this->getServiceName()]),
+				);
+			}
 			if ($e->getResponse()->getStatusCode() >= 500) {
 				throw new UserFacingProcessingException(
 					$this->l10n->t('API request error: ') . $errorMessage,
