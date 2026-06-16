@@ -18,9 +18,9 @@ use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 
@@ -119,7 +119,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 	public function process(?string $userId, array $input, callable $reportProgress, bool $includeWatermark = true): array {
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new ProcessingException('Invalid prompt');
 		}
 		// For OpenAI the text input limit is 4096 characters (https://platform.openai.com/docs/api-reference/audio/createSpeech#audio-createspeech-input)
 		$prompt = $input['input'];
@@ -158,16 +158,16 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 
 			if (!isset($apiResponse['body'])) {
 				$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
-				throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
+				throw new ProcessingException('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');
 			}
 			$audio = $includeWatermark ? $this->watermarkingService->markAudio($apiResponse['body']) : $apiResponse['body'];
 
 			return ['speech' => $audio];
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage());
+			throw new ProcessingException('OpenAI/LocalAI\'s text to speech generation failed with: ' . $e->getMessage());
 		}
 	}
 }

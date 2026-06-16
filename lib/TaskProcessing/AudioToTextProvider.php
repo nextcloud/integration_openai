@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Files\File;
@@ -20,9 +19,9 @@ use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\AudioToText;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class AudioToTextProvider implements ISynchronousProvider {
 
@@ -93,12 +92,12 @@ class AudioToTextProvider implements ISynchronousProvider {
 
 	public function process(?string $userId, array $input, callable $reportProgress): array {
 		if (!isset($input['input']) || !$input['input'] instanceof File || !$input['input']->isReadable()) {
-			throw new RuntimeException('Invalid input file');
+			throw new ProcessingException('Invalid input file');
 		}
 		$inputFile = $input['input'];
 		$language = $input['language'] ?? 'default';
 		if (!is_string($language)) {
-			throw new RuntimeException('Invalid language');
+			throw new ProcessingException('Invalid language');
 		}
 
 		$model = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
@@ -108,9 +107,9 @@ class AudioToTextProvider implements ISynchronousProvider {
 			return ['output' => $transcription];
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
-		} catch (Exception $e) {
+		} catch (\Throwable $e) {
 			$this->logger->warning('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
+			throw new ProcessingException('OpenAI\'s Whisper transcription failed with: ' . $e->getMessage());
 		}
 	}
 }

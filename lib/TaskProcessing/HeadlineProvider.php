@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -17,9 +16,9 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\TextToTextHeadline;
-use RuntimeException;
 
 class HeadlineProvider implements ISynchronousProvider {
 
@@ -100,7 +99,7 @@ class HeadlineProvider implements ISynchronousProvider {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new ProcessingException('Invalid prompt');
 		}
 		$prompt = $input['input'];
 		$prompt = 'Give me the headline of the following text in its original language. Do not output the language. Output only the headline without any quotes or additional punctuation.' . "\n\n" . $prompt;
@@ -125,8 +124,8 @@ class HeadlineProvider implements ISynchronousProvider {
 			}
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+		} catch (\Throwable $e) {
+			throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
@@ -134,6 +133,6 @@ class HeadlineProvider implements ISynchronousProvider {
 			return ['output' => array_pop($completion)];
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		throw new ProcessingException('No result in OpenAI/LocalAI response.');
 	}
 }

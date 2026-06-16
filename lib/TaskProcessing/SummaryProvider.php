@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
@@ -18,9 +17,9 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
-use RuntimeException;
 
 class SummaryProvider implements ISynchronousProvider {
 
@@ -102,7 +101,7 @@ class SummaryProvider implements ISynchronousProvider {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new ProcessingException('Invalid prompt');
 		}
 		$prompt = $input['input'];
 
@@ -152,14 +151,14 @@ class SummaryProvider implements ISynchronousProvider {
 				}
 			} catch (UserFacingProcessingException $e) {
 				throw $e;
-			} catch (Exception $e) {
-				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			} catch (\Throwable $e) {
+				throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
 
 			// Each prompt chunk should return a non-empty array of completions, this will return false if at least one array is empty
 			$allPromptsHaveCompletions = array_reduce($completions, fn (bool $prev, array $next): bool => $prev && count($next), true);
 			if (!$allPromptsHaveCompletions) {
-				throw new RuntimeException('No result in OpenAI/LocalAI response.');
+				throw new ProcessingException('No result in OpenAI/LocalAI response.');
 			}
 
 			// Take only one completion for each chunk and combine them into a single summary (which may be used as the next prompt)

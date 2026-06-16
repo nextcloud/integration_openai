@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -19,9 +18,9 @@ use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\TextToTextChat;
-use RuntimeException;
 
 class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -100,12 +99,12 @@ class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvi
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid input');
+			throw new ProcessingException('Invalid input');
 		}
 		$userPrompt = $input['input'];
 
 		if (!isset($input['system_prompt']) || !is_string($input['system_prompt'])) {
-			throw new RuntimeException('Invalid system_prompt');
+			throw new ProcessingException('Invalid system_prompt');
 		}
 		$systemPrompt = $input['system_prompt'];
 
@@ -115,7 +114,7 @@ class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvi
 		}
 
 		if (!isset($input['history']) || !is_array($input['history'])) {
-			throw new RuntimeException('Invalid history');
+			throw new ProcessingException('Invalid history');
 		}
 		$history = $input['history'];
 
@@ -150,8 +149,8 @@ class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvi
 			}
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+		} catch (\Throwable $e) {
+			throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
@@ -159,6 +158,6 @@ class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvi
 			return ['output' => array_pop($completion)];
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		throw new ProcessingException('No result in OpenAI/LocalAI response.');
 	}
 }

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
@@ -21,9 +20,9 @@ use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\SynchronousProviderOptions;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\TextToTextChangeTone;
-use RuntimeException;
 
 class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -123,7 +122,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid input text');
+			throw new ProcessingException('Invalid input text');
 		}
 		$textInput = $input['input'];
 		$toneInput = $input['tone'];
@@ -175,8 +174,8 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 				}
 			} catch (UserFacingProcessingException $e) {
 				throw $e;
-			} catch (Exception $e) {
-				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			} catch (\Throwable $e) {
+				throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
 			$progress += $increase;
 			$reportProgress($progress);
@@ -185,7 +184,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 				continue;
 			}
 
-			throw new RuntimeException('No result in OpenAI/LocalAI response.');
+			throw new ProcessingException('No result in OpenAI/LocalAI response.');
 		}
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
@@ -20,9 +19,9 @@ use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\TaskTypes\ContextWrite;
-use RuntimeException;
 
 class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -111,7 +110,7 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 			!isset($input['style_input']) || !is_string($input['style_input'])
 				|| !isset($input['source_input']) || !is_string($input['source_input'])
 		) {
-			throw new RuntimeException('Invalid inputs');
+			throw new ProcessingException('Invalid inputs');
 		}
 
 		$writingStyle = $input['style_input'];
@@ -172,8 +171,8 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 				}
 			} catch (UserFacingProcessingException $e) {
 				throw $e;
-			} catch (Exception $e) {
-				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			} catch (\Throwable $e) {
+				throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
 			if (count($completion) > 0) {
 				$result .= array_pop($completion);
@@ -182,7 +181,7 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 				continue;
 			}
 
-			throw new RuntimeException('No result in OpenAI/LocalAI response.');
+			throw new ProcessingException('No result in OpenAI/LocalAI response.');
 		}
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
