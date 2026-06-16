@@ -15,12 +15,13 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -108,32 +109,32 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 		$preferStreaming = $options->getPreferStreaming();
 
 		if (!$this->openAiAPIService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
-			throw new RuntimeException('Must support chat completion endpoint');
+			throw new ProcessingException('Must support chat completion endpoint');
 		}
 
 		$history = [];
 
 		if (!isset($input['images']) || !is_array($input['images'])) {
-			throw new RuntimeException('Invalid file list');
+			throw new ProcessingException('Invalid file list');
 		}
 		// Maximum file count for openai is 500. Seems reasonable enough to enforce for all apis though (https://platform.openai.com/docs/guides/images-vision?api-mode=responses&format=url#image-input-requirements)
 		if (count($input['images']) > 500) {
-			throw new RuntimeException('Too many files given. Max is 500');
+			throw new ProcessingException('Too many files given. Max is 500');
 		}
 		$fileSize = 0;
 		foreach ($input['images'] as $image) {
 			if (!$image instanceof File || !$image->isReadable()) {
-				throw new RuntimeException('Invalid input file');
+				throw new ProcessingException('Invalid input file');
 			}
 			$fileSize += intval($image->getSize());
 			// Maximum file size for openai is 50MB. Seems reasonable enough to enforce for all apis though. (https://platform.openai.com/docs/guides/images-vision?api-mode=responses&format=url#image-input-requirements)
 			if ($fileSize > 50 * 1000 * 1000) {
-				throw new RuntimeException('Filesize of input files too large. Max is 50MB');
+				throw new ProcessingException('Filesize of input files too large. Max is 50MB');
 			}
 			$inputFile = base64_encode(stream_get_contents($image->fopen('rb')));
 			$fileType = $image->getMimeType();
 			if (!str_starts_with($fileType, 'image/')) {
-				throw new RuntimeException('Invalid input file type ' . $fileType);
+				throw new ProcessingException('Invalid input file type ' . $fileType);
 			}
 			if ($this->openAiAPIService->isUsingOpenAi()) {
 				$validFileTypes = [
@@ -143,7 +144,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 					'image/webp',
 				];
 				if (!in_array($fileType, $validFileTypes)) {
-					throw new RuntimeException('Invalid input file type for OpenAI ' . $fileType);
+					throw new ProcessingException('Invalid input file type for OpenAI ' . $fileType);
 				}
 			}
 			$history[] = json_encode([
@@ -160,7 +161,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 		}
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new ProcessingException('Invalid prompt');
 		}
 		$prompt = $input['input'];
 
@@ -205,10 +206,12 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 				return ['output' => array_pop($completion)];
 			}
 
-			throw new RuntimeException('No result in OpenAI/LocalAI response.');
-		} catch (\Exception $e) {
+			throw new ProcessingException('No result in OpenAI/LocalAI response.');
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s image question generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException('OpenAI/LocalAI\'s image question generation failed with: ' . $e->getMessage());
+			throw new ProcessingException('OpenAI/LocalAI\'s image question generation failed with: ' . $e->getMessage());
 		}
 	}
 }

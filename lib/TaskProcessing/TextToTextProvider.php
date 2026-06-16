@@ -9,18 +9,18 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToText;
-use RuntimeException;
 
 class TextToTextProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -111,7 +111,7 @@ class TextToTextProvider implements IProvider, ISynchronousOptionsAwareProvider 
 		*/
 		$startTime = time();
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new ProcessingException('Invalid prompt');
 		}
 		$prompt = $input['input'];
 
@@ -154,8 +154,10 @@ class TextToTextProvider implements IProvider, ISynchronousOptionsAwareProvider 
 			} else {
 				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 			}
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
+			throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
@@ -163,6 +165,6 @@ class TextToTextProvider implements IProvider, ISynchronousOptionsAwareProvider 
 			return ['output' => array_pop($completion)];
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		throw new ProcessingException('No result in OpenAI/LocalAI response.');
 	}
 }

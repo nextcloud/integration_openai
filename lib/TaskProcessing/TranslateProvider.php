@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -160,7 +159,9 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 				throw new ProcessingException("Empty translation result from {$fromLanguage} to {$toLanguage}");
 			}
 			return ['output' => trim($translation)];
-		} catch (Exception $e) {
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
 			throw new ProcessingException(
 				"Failed to translate from {$fromLanguage} to {$toLanguage}: {$e->getMessage()}",
 				$e->getCode(),

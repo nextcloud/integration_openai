@@ -179,7 +179,9 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
 			/** @var array<string, list<numeric|string>|numeric|string> $output */
 			return $output;
-		} catch (\Exception $e) {
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed with: ' . $e->getMessage());
 		}

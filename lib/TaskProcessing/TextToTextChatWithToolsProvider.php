@@ -9,18 +9,18 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools;
-use RuntimeException;
 
 class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -94,7 +94,7 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid input');
+			throw new ProcessingException('Invalid input');
 		}
 		$userPrompt = $input['input'];
 		if ($userPrompt === '') {
@@ -102,12 +102,12 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		}
 
 		if (!isset($input['system_prompt']) || !is_string($input['system_prompt'])) {
-			throw new RuntimeException('Invalid system_prompt');
+			throw new ProcessingException('Invalid system_prompt');
 		}
 		$systemPrompt = $input['system_prompt'];
 
 		if (!isset($input['tool_message']) || !is_string($input['tool_message'])) {
-			throw new RuntimeException('Invalid tool_message');
+			throw new ProcessingException('Invalid tool_message');
 		}
 		$toolMessage = $input['tool_message'];
 		if ($toolMessage === '') {
@@ -115,15 +115,15 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		}
 
 		if (!isset($input['tools']) || !is_string($input['tools'])) {
-			throw new RuntimeException('Invalid tools');
+			throw new ProcessingException('Invalid tools');
 		}
 		$tools = json_decode($input['tools']);
 		if (!is_array($tools) || !\array_is_list($tools)) {
-			throw new RuntimeException('Invalid JSON tools');
+			throw new ProcessingException('Invalid JSON tools');
 		}
 
 		if (!isset($input['history']) || !is_array($input['history']) || !\array_is_list($input['history'])) {
-			throw new RuntimeException('Invalid history');
+			throw new ProcessingException('Invalid history');
 		}
 		$history = $input['history'];
 
@@ -159,8 +159,10 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
 				);
 			}
-		} catch (Exception $e) {
-			throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
+			throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($completion['messages']) > 0 || count($completion['tool_calls']) > 0) {
 			$endTime = time();
@@ -171,6 +173,6 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 			];
 		}
 
-		throw new RuntimeException('No result in OpenAI/LocalAI response.');
+		throw new ProcessingException('No result in OpenAI/LocalAI response.');
 	}
 }

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -17,12 +16,13 @@ use OCP\Files\File;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\AudioToAudioChat;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class AudioToAudioChatProvider implements ISynchronousProvider {
 
@@ -164,12 +164,12 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 	public function process(?string $userId, array $input, callable $reportProgress): array {
 		if (!isset($input['input']) || !$input['input'] instanceof File || !$input['input']->isReadable()) {
-			throw new RuntimeException('Invalid input audio file in the "input" field. A readable file is expected.');
+			throw new ProcessingException('Invalid input audio file in the "input" field. A readable file is expected.');
 		}
 		$inputFile = $input['input'];
 
 		if (!isset($input['system_prompt']) || !is_string($input['system_prompt'])) {
-			throw new RuntimeException('Invalid system_prompt');
+			throw new ProcessingException('Invalid system_prompt');
 		}
 		$systemPrompt = $input['system_prompt'];
 
@@ -179,7 +179,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		}
 
 		if (!isset($input['history']) || !is_array($input['history'])) {
-			throw new RuntimeException('Invalid chat history, array expected');
+			throw new ProcessingException('Invalid chat history, array expected');
 		}
 		$history = $input['history'];
 
@@ -256,12 +256,14 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $textResponse, $ttsModel, $outputVoice, $speed);
 				if (!isset($apiResponse['body'])) {
 					$this->logger->warning($serviceName . ' text to speech generation failed: no speech returned');
-					throw new RuntimeException($serviceName . ' text to speech generation failed: no speech returned');
+					throw new ProcessingException($serviceName . ' text to speech generation failed: no speech returned');
 				}
 				$output = $apiResponse['body'];
-			} catch (\Exception $e) {
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
+			} catch (\Throwable $e) {
 				$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-				throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
+				throw new ProcessingException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
 			}
 		} else {
 			$output = base64_decode($message['audio']['data']);
@@ -280,9 +282,11 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		try {
 			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
 			$result['input_transcript'] = $inputTranscription;
-		} catch (Exception $e) {
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
 			$this->logger->warning($serviceName . ' audio input transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException($serviceName . ' audio input transcription failed with: ' . $e->getMessage());
+			throw new ProcessingException($serviceName . ' audio input transcription failed with: ' . $e->getMessage());
 		}
 
 		return $result;
@@ -295,20 +299,24 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		// speech to text
 		try {
 			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
-		} catch (Exception $e) {
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
 			$this->logger->warning($serviceName . ' transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException($serviceName . ' transcription failed with: ' . $e->getMessage());
+			throw new ProcessingException($serviceName . ' transcription failed with: ' . $e->getMessage());
 		}
 
 		// free prompt
 		try {
 			$completion = $this->openAiAPIService->createChatCompletion($userId, $llmModel, $inputTranscription, $systemPrompt, $history, 1, 1000);
 			$completion = $completion['messages'];
-		} catch (Exception $e) {
-			throw new RuntimeException($serviceName . ' chat completion request failed: ' . $e->getMessage());
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
+			throw new ProcessingException($serviceName . ' chat completion request failed: ' . $e->getMessage());
 		}
 		if (count($completion) === 0) {
-			throw new RuntimeException('No completion in ' . $serviceName . ' response.');
+			throw new ProcessingException('No completion in ' . $serviceName . ' response.');
 		}
 		$llmResult = array_pop($completion);
 
@@ -318,16 +326,18 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 			if (!isset($apiResponse['body'])) {
 				$this->logger->warning($serviceName . ' text to speech generation failed: no speech returned');
-				throw new RuntimeException($serviceName . ' text to speech generation failed: no speech returned');
+				throw new ProcessingException($serviceName . ' text to speech generation failed: no speech returned');
 			}
 			return [
 				'output' => $apiResponse['body'],
 				'output_transcript' => $llmResult,
 				'input_transcript' => $inputTranscription,
 			];
-		} catch (\Exception $e) {
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
 			$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new RuntimeException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
+			throw new ProcessingException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
 		}
 	}
 }

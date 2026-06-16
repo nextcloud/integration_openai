@@ -9,17 +9,17 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextProofread;
-use RuntimeException;
 
 class ProofreadProvider implements ISynchronousProvider {
 
@@ -101,7 +101,7 @@ class ProofreadProvider implements ISynchronousProvider {
 		$startTime = time();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
-			throw new RuntimeException('Invalid prompt');
+			throw new ProcessingException('Invalid prompt');
 		}
 		$textInput = $input['input'];
 		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list.';
@@ -131,8 +131,10 @@ class ProofreadProvider implements ISynchronousProvider {
 					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $textInput;
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 				}
-			} catch (Exception $e) {
-				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
+			} catch (\Throwable $e) {
+				throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
 			if (count($completion) > 0) {
 				$result .= array_pop($completion);
@@ -141,7 +143,7 @@ class ProofreadProvider implements ISynchronousProvider {
 				continue;
 			}
 
-			throw new RuntimeException('No result in OpenAI/LocalAI response.');
+			throw new ProcessingException('No result in OpenAI/LocalAI response.');
 		}
 		if (count($chunks) > 1) {
 			$systemPrompt = 'Repeat the proofread feedback list. Ensure that no information is lost, but also not duplicated. ';
@@ -153,8 +155,10 @@ class ProofreadProvider implements ISynchronousProvider {
 					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $result;
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
 				}
-			} catch (Exception $e) {
-				throw new RuntimeException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+			} catch (UserFacingProcessingException $e) {
+				throw $e;
+			} catch (\Throwable $e) {
+				throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
 			if (count($completion) > 0) {
 				$result = array_pop($completion);
