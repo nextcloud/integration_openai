@@ -225,7 +225,6 @@ class ServiceOverrideTest extends TestCase {
 
 		$file = $this->createMock(\OCP\Files\File::class);
 
-
 		$inputSpeech = file_get_contents(__DIR__ . '/../../res/speech.mp3');
 
 		if (!$inputSpeech) {

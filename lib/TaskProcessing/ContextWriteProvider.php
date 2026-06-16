@@ -186,6 +186,5 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 		return ['output' => $result];
-
 	}
 }

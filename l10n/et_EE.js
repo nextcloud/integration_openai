@@ -122,7 +122,7 @@ OC.L10N.register(
     "Max input tokens per request" : "Päringu sisendsõnede ülempiir",
     "Max output tokens per request" : "Päringu väldundsõnede ülempiir",
     "Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks." : "Ühe tekstiloome käsuviiba jaoks loodav maksimaalne väljund tookenite arv. See kehtib ka kõnetuvastuse puhul.",
-    "image generation" : "pPildiloome",
+    "image generation" : "pildiloome",
     "Default image generation model to use" : "Vaikimisi kasutatav pildiloome mudel",
     "No models to list" : "Mudeleid ei leidu",
     "Default image size" : "Pildi vaikimisi suurus",

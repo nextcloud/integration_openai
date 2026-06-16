@@ -12,6 +12,7 @@ declare(strict_types=1);
  * implement a task processing provider
  * @since 35.0.0
  */
+
 namespace OCP\TaskProcessing;
 
 interface ISynchronousOptionsAwareProvider extends IProvider, ISynchronousProvider {

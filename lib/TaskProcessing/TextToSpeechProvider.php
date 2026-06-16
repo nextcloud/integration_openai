@@ -61,7 +61,6 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		return [];
 	}
 
-
 	public function getOptionalInputShape(): array {
 		return [
 			'voice' => new ShapeDescriptor(
@@ -133,7 +132,6 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		} else {
 			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
 		}
-
 
 		if (isset($input['voice']) && is_string($input['voice'])) {
 			$voice = $input['voice'];

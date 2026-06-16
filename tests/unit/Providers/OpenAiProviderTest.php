@@ -19,7 +19,9 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\StreamingService;
+use OCA\OpenAi\Service\TranslateService;
 use OCA\OpenAi\Service\WatermarkingService;
+use OCA\OpenAi\TaskProcessing\AudioToAudioTranslateProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
@@ -53,6 +55,7 @@ class OpenAiProviderTest extends TestCase {
 	private OpenAiSettingsService $openAiSettingsService;
 	private ChunkService $chunkService;
 	private StreamingService $streamingService;
+	private TranslateService $translateService;
 	/**
 	 * @var MockObject|IClient
 	 */
@@ -97,6 +100,15 @@ class OpenAiProviderTest extends TestCase {
 			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
 			true,
+		);
+
+		$this->translateService = \OCP\Server::get(TranslateService::class);
+		$this->translateService = new TranslateService(
+			$this->openAiSettingsService,
+			\OCP\Server::get(\Psr\Log\LoggerInterface::class),
+			$this->openAiApiService,
+			$this->chunkService,
+			\OCP\Server::get(ICacheFactory::class),
 		);
 
 		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
@@ -353,7 +365,6 @@ class OpenAiProviderTest extends TestCase {
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
-
 	public function testHeadlineProvider(): void {
 		$headlineProvider = new HeadlineProvider(
 			$this->openAiApiService,
@@ -483,7 +494,6 @@ class OpenAiProviderTest extends TestCase {
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
-
 
 	public function testSummaryProvider(): void {
 		$summaryProvider = new SummaryProvider(
@@ -627,9 +637,7 @@ class OpenAiProviderTest extends TestCase {
 			$this->openAiApiService,
 			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
-			$this->createMock(\OCP\ICacheFactory::class),
-			$this->createMock(\Psr\Log\LoggerInterface::class),
-			$this->chunkService,
+			$this->translateService,
 			self::TEST_USER1,
 		);
 
@@ -669,14 +677,14 @@ class OpenAiProviderTest extends TestCase {
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
-				['role' => 'system', 'content' => $translationProvider::SYSTEM_PROMPT],
+				['role' => 'system', 'content' => TranslateService::SYSTEM_PROMPT],
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
 			'stream' => false,
 			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
 			'user' => self::TEST_USER1,
-			...$translationProvider::JSON_RESPONSE_FORMAT,
+			...TranslateService::JSON_RESPONSE_FORMAT,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -701,6 +709,119 @@ class OpenAiProviderTest extends TestCase {
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
 		$this->assertEquals(21, $usage);
 		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testAudioToAudioTranslateProvider(): void {
+		$l10n = $this->createMock(\OCP\IL10N::class);
+		$l10n->method('t')->willReturnCallback(fn ($text) => $text);
+
+		$l10nFactory = $this->createMock(\OCP\L10N\IFactory::class);
+		$l10nFactory->method('getUserLanguage')->willReturn('en');
+		$l10nFactory->method('get')->willReturn($l10n);
+
+		$userManager = \OCP\Server::get(\OCP\IUserManager::class);
+
+		$audioToAudioTranslateProvider = new AudioToAudioTranslateProvider(
+			$this->openAiApiService,
+			$this->translateService,
+			$this->openAiSettingsService,
+			\OCP\Server::get(WatermarkingService::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			$l10nFactory,
+			$l10n,
+			\OCP\Server::get(IAppConfig::class),
+			$userManager,
+			self::TEST_USER1,
+		);
+
+		$inputSpeech = file_get_contents(__DIR__ . '/../../res/speech.mp3');
+		if (!$inputSpeech) {
+			throw new \RuntimeException('Could not read test resource `speech.mp3`');
+		}
+
+		$file = $this->createMock(\OCP\Files\File::class);
+		$file->method('isReadable')->willReturn(true);
+		$file->method('getContent')->willReturn($inputSpeech);
+
+		$transcribedText = 'Hello world';
+		$translatedText = 'Bonjour le monde';
+		$fromLang = 'en';
+		$toLang = 'fr';
+
+		$sttResponse = json_encode(['text' => $transcribedText]);
+		$translationAiContent = ['translation' => $translatedText];
+		$translationResponse = '{
+			"id": "chatcmpl-123",
+			"object": "chat.completion",
+			"created": 1677652288,
+			"model": "gpt-4.1-mini",
+			"choices": [{
+				"index": 0,
+				"message": {
+					"role": "assistant",
+					"content": ' . json_encode(json_encode($translationAiContent)) . '
+				},
+				"finish_reason": "stop"
+			}],
+			"usage": {
+				"prompt_tokens": 9,
+				"completion_tokens": 12,
+				"total_tokens": 21
+			}
+		}';
+		$ttsResponse = $inputSpeech;
+
+		$sttUrl = self::OPENAI_API_BASE . 'audio/transcriptions';
+		$translationUrl = self::OPENAI_API_BASE . 'chat/completions';
+		$ttsUrl = self::OPENAI_API_BASE . 'audio/speech';
+
+		$sttMockResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$sttMockResponse->method('getBody')->willReturn($sttResponse);
+		$sttMockResponse->method('getStatusCode')->willReturn(200);
+		$sttMockResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$translationMockResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$translationMockResponse->method('getBody')->willReturn($translationResponse);
+		$translationMockResponse->method('getStatusCode')->willReturn(200);
+		$translationMockResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$ttsMockResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$ttsMockResponse->method('getBody')->willReturn($ttsResponse);
+		$ttsMockResponse->method('getStatusCode')->willReturn(200);
+		$ttsMockResponse->method('getHeader')->with('Content-Type')->willReturn('audio/mpeg');
+
+		$this->iClient->expects($this->exactly(3))
+			->method('post')
+			->willReturnCallback(function ($url, $options) use ($sttUrl, $translationUrl, $ttsUrl, $sttMockResponse, $translationMockResponse, $ttsMockResponse) {
+				if ($url === $sttUrl) {
+					return $sttMockResponse;
+				} elseif ($url === $translationUrl) {
+					return $translationMockResponse;
+				} elseif ($url === $ttsUrl) {
+					return $ttsMockResponse;
+				}
+				throw new \RuntimeException('Unexpected URL: ' . $url);
+			});
+
+		$result = $audioToAudioTranslateProvider->process(
+			self::TEST_USER1,
+			[
+				'input' => $file,
+				'origin_language' => $fromLang,
+				'target_language' => $toLang,
+			],
+			fn () => null,
+			new SynchronousProviderOptions(includeWatermarks: false, preferStreaming: false),
+		);
+
+		$this->assertArrayHasKey('text_input', $result);
+		$this->assertArrayHasKey('text_output', $result);
+		$this->assertArrayHasKey('audio_output', $result);
+		$this->assertEquals($transcribedText, $result['text_input']);
+		$this->assertEquals($translatedText, $result['text_output']);
+		$this->assertEquals($ttsResponse, $result['audio_output']);
+
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 

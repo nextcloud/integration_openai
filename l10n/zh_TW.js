@@ -33,6 +33,7 @@ OC.L10N.register(
     "Name" : "名稱",
     "Usage" : "使用量",
     "Quota pool for rule %d" : "規則 %d 的配額池",
+    "Malformed API response" : "API 回應格式錯誤",
     "Detect language" : "偵測語言",
     "Maximum output words" : "最大輸出字數",
     "The maximum number of words/tokens that can be generated in the output." : "輸出中可以產生的最大文字/詞元數。",

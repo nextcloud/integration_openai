@@ -169,6 +169,5 @@ class ProofreadProvider implements ISynchronousProvider {
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 		return ['output' => $result];
-
 	}
 }
