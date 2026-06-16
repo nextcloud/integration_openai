@@ -15,10 +15,10 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
-use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToTextProofread;
 
 class ProofreadProvider implements ISynchronousProvider {

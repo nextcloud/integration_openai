@@ -15,12 +15,12 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
-use OCP\TaskProcessing\Exception\ProcessingException;
-use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use Psr\Log\LoggerInterface;
 
 class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvider {

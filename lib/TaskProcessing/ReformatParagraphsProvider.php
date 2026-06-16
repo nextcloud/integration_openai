@@ -16,9 +16,9 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 
 class ReformatParagraphsProvider implements ISynchronousProvider {
