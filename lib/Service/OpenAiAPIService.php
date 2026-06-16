@@ -1302,7 +1302,7 @@ class OpenAiAPIService {
 					? $parsedResponseBody['error']['message']
 					: $e->getMessage()
 			);
-			if ($e->getResponse()->getStatusCode() >= 401) {
+			if ($e->getResponse()->getStatusCode() >= 401 && $e->getResponse()->getStatusCode() < 500) {
 				throw new UserFacingProcessingException(
 					$this->l10n->t('API request error: ') . $errorMessage,
 					intval($e->getCode()),
