@@ -11,6 +11,8 @@ use OCA\OpenAi\Capabilities;
 use OCA\OpenAi\Notification\Notifier;
 use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
 use OCA\OpenAi\TaskProcessing\AudioToAudioChatProvider;
+use OCA\OpenAi\TaskProcessing\AudioToAudioTranslateProvider;
+use OCA\OpenAi\TaskProcessing\AudioToAudioTranslateTaskType;
 use OCA\OpenAi\TaskProcessing\AudioToTextEnhancedProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
@@ -29,7 +31,6 @@ use OCA\OpenAi\TaskProcessing\TopicsProvider;
 use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
-
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\IAppConfig;
@@ -75,7 +76,6 @@ class Application extends App implements IBootstrap {
 		self::QUOTA_TYPE_IMAGE => 0, // 0 = unlimited
 		self::QUOTA_TYPE_TRANSCRIPTION => 0, // 0 = unlimited
 		self::QUOTA_TYPE_SPEECH => 0, // 0 = unlimited
-
 	];
 
 	public const MODELS_CACHE_KEY = 'models';
@@ -103,11 +103,19 @@ class Application extends App implements IBootstrap {
 			$context->registerTranslationProvider(OldTranslationProvider::class);
 		}
 
+		$translationProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
+		$sttProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
+		$ttsProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
+
 		// Task processing
-		if ($this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
+		if ($translationProviderEnabled) {
 			$context->registerTaskProcessingProvider(TranslateProvider::class);
 		}
-		if ($this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1') {
+		if ($translationProviderEnabled && $sttProviderEnabled && $ttsProviderEnabled) {
+			$context->registerTaskProcessingTaskType(AudioToAudioTranslateTaskType::class);
+			$context->registerTaskProcessingProvider(AudioToAudioTranslateProvider::class);
+		}
+		if ($sttProviderEnabled) {
 			$context->registerTaskProcessingProvider(AudioToTextProvider::class);
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
 				$context->registerTaskProcessingProvider(AudioToTextEnhancedProvider::class);

@@ -64,7 +64,6 @@ class QuotaRuleMapper extends QBMapper {
 						$qb->expr()->eq('u.entity_type', $qb->createNamedParameter(EntityType::GROUP->value, IQueryBuilder::PARAM_INT)),
 						$qb->expr()->in('u.entity_id', $qb->createNamedParameter($groups, IQueryBuilder::PARAM_STR_ARRAY))
 					),
-
 				)
 			)->orderBy('r.priority', 'ASC')
 			->setMaxResults(1);

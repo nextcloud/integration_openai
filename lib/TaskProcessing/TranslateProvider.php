@@ -11,11 +11,9 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\TranslateService;
-use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -26,40 +24,14 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextTranslate;
-use Psr\Log\LoggerInterface;
 
 class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
-
-	public const SYSTEM_PROMPT = 'You are a translations expert that ONLY outputs a valid JSON with the translated text in the following format: { "translation": "<translated text>" } .';
-	public const JSON_RESPONSE_FORMAT = [
-		'response_format' => [
-			'type' => 'json_schema',
-			'json_schema' => [
-				'name' => 'TranslationResponse',
-				'description' => 'A JSON object containing the translated text',
-				'strict' => true,
-				'schema' => [
-					'type' => 'object',
-					'properties' => [
-						'translation' => [
-							'type' => 'string',
-							'description' => 'The translated text',
-						],
-					],
-					'required' => [ 'translation' ],
-					'additionalProperties' => false,
-				],
-			],
-		],
-	];
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
-		private ICacheFactory $cacheFactory,
-		private LoggerInterface $logger,
-		private ChunkService $chunkService,
+		private TranslateService $translateService,
 		private ?string $userId,
 	) {
 	}
@@ -144,13 +116,7 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 	): array {
 		$reportOutput = $options->getReportIntermediateOutput();
 		$preferStreaming = $options->getPreferStreaming();
-		/*
-		foreach (range(1, 20) as $i) {
-			$reportProgress($i / 100 * 5);
-			error_log('aa ' . ($i / 100 * 5));
-			sleep(1);
-		}
-		*/
+
 		$startTime = time();
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
@@ -171,83 +137,29 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$chunks = $this->chunkService->chunkSplitPrompt($inputText, true, $maxTokens);
-		$result = '';
-		$increase = 1.0 / (float)count($chunks);
-		$progress = 0.0;
+		$coreLanguages = TranslateService::getCoreLanguagesByCode();
+		$fromLanguage = $input['origin_language'];
+		$toLanguage = $coreLanguages[$input['target_language']] ?? $input['target_language'];
+
 		try {
-			$coreLanguages = TranslateService::getCoreLanguagesByCode();
-
-			$fromLanguage = $input['origin_language'];
-			$toLanguage = $coreLanguages[$input['target_language']] ?? $input['target_language'];
-
-			if ($input['origin_language'] !== 'detect_language') {
-				$fromLanguage = $coreLanguages[$input['origin_language']] ?? $input['origin_language'];
-				$promptStart = 'Translate the following text from ' . $fromLanguage . ' to ' . $toLanguage . ': ';
-			} else {
-				$promptStart = 'Translate the following text to ' . $toLanguage . ': ';
-			}
-
-			foreach ($chunks as $chunk) {
-				$progress += $increase;
-				$cacheKey = ($input['origin_language'] ?? '') . '/' . $input['target_language'] . '/' . md5($chunk);
-
-				$cache = $this->cacheFactory->createDistributed('integration_openai');
-				if ($cached = $cache->get($cacheKey)) {
-					$this->logger->debug('Using cached translation', ['cached' => $cached, 'cacheKey' => $cacheKey]);
-					$result .= $cached;
-					$reportProgress($progress);
-					if ($preferStreaming) {
-						$reportOutput(['output' => $result]);
-					}
-					continue;
-				}
-				$prompt = $promptStart . PHP_EOL . PHP_EOL . $chunk;
-
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$completionsObj = $this->openAiAPIService->createChatCompletion(
-						$userId, $model, $prompt, self::SYSTEM_PROMPT, null, 1, $maxTokens, self::JSON_RESPONSE_FORMAT
-					);
-					$completions = $completionsObj['messages'];
-				} else {
-					$completions = $this->openAiAPIService->createCompletion(
-						$userId, $prompt . PHP_EOL . self::SYSTEM_PROMPT . PHP_EOL . PHP_EOL, 1, $model, $maxTokens
-					);
-				}
-
-				$reportProgress($progress);
-
-				if (count($completions) === 0) {
-					$this->logger->error('Empty translation response received for chunk');
-					continue;
-				}
-
-				$completion = array_pop($completions);
-				$decodedCompletion = json_decode($completion, true);
-				if (
-					!isset($decodedCompletion['translation'])
-					|| !is_string($decodedCompletion['translation'])
-					|| empty($decodedCompletion['translation'])
-				) {
-					$this->logger->error('Invalid translation response received for chunk', ['response' => $completion]);
-					continue;
-				}
-				$result .= $decodedCompletion['translation'];
-				if ($preferStreaming) {
-					$reportOutput(['output' => $result]);
-				}
-				$cache->set($cacheKey, $decodedCompletion['translation']);
-				continue;
-			}
+			$reportTranslationOutput = function (string $translationOutput) use ($reportOutput) {
+				$reportOutput([
+					'output' => $translationOutput,
+				]);
+			};
+			$translation = $this->translateService->translate(
+				$inputText, $input['origin_language'] ?? '', $input['target_language'] ?? '',
+				$model, $maxTokens, $userId, $reportProgress,
+				$preferStreaming, $reportTranslationOutput,
+			);
 
 			$endTime = time();
 			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 
-			if (empty(trim($result))) {
+			if (empty(trim($translation))) {
 				throw new ProcessingException("Empty translation result from {$fromLanguage} to {$toLanguage}");
 			}
-			return ['output' => trim($result)];
-
+			return ['output' => trim($translation)];
 		} catch (Exception $e) {
 			throw new ProcessingException(
 				"Failed to translate from {$fromLanguage} to {$toLanguage}: {$e->getMessage()}",
