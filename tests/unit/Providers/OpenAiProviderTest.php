@@ -21,6 +21,7 @@ use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\StreamingService;
 use OCA\OpenAi\Service\TranslateService;
 use OCA\OpenAi\Service\WatermarkingService;
+use OCA\OpenAi\TaskProcessing\AudioToAudioTranslateProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
@@ -708,6 +709,119 @@ class OpenAiProviderTest extends TestCase {
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
 		$this->assertEquals(21, $usage);
 		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testAudioToAudioTranslateProvider(): void {
+		$l10n = $this->createMock(\OCP\IL10N::class);
+		$l10n->method('t')->willReturnCallback(fn ($text) => $text);
+
+		$l10nFactory = $this->createMock(\OCP\L10N\IFactory::class);
+		$l10nFactory->method('getUserLanguage')->willReturn('en');
+		$l10nFactory->method('get')->willReturn($l10n);
+
+		$userManager = \OCP\Server::get(\OCP\IUserManager::class);
+
+		$audioToAudioTranslateProvider = new AudioToAudioTranslateProvider(
+			$this->openAiApiService,
+			$this->translateService,
+			$this->openAiSettingsService,
+			\OCP\Server::get(WatermarkingService::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			$l10nFactory,
+			$l10n,
+			\OCP\Server::get(IAppConfig::class),
+			$userManager,
+			self::TEST_USER1,
+		);
+
+		$inputSpeech = file_get_contents(__DIR__ . '/../../res/speech.mp3');
+		if (!$inputSpeech) {
+			throw new \RuntimeException('Could not read test resource `speech.mp3`');
+		}
+
+		$file = $this->createMock(\OCP\Files\File::class);
+		$file->method('isReadable')->willReturn(true);
+		$file->method('getContent')->willReturn($inputSpeech);
+
+		$transcribedText = 'Hello world';
+		$translatedText = 'Bonjour le monde';
+		$fromLang = 'en';
+		$toLang = 'fr';
+
+		$sttResponse = json_encode(['text' => $transcribedText]);
+		$translationAiContent = ['translation' => $translatedText];
+		$translationResponse = '{
+			"id": "chatcmpl-123",
+			"object": "chat.completion",
+			"created": 1677652288,
+			"model": "gpt-4.1-mini",
+			"choices": [{
+				"index": 0,
+				"message": {
+					"role": "assistant",
+					"content": ' . json_encode(json_encode($translationAiContent)) . '
+				},
+				"finish_reason": "stop"
+			}],
+			"usage": {
+				"prompt_tokens": 9,
+				"completion_tokens": 12,
+				"total_tokens": 21
+			}
+		}';
+		$ttsResponse = $inputSpeech;
+
+		$sttUrl = self::OPENAI_API_BASE . 'audio/transcriptions';
+		$translationUrl = self::OPENAI_API_BASE . 'chat/completions';
+		$ttsUrl = self::OPENAI_API_BASE . 'audio/speech';
+
+		$sttMockResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$sttMockResponse->method('getBody')->willReturn($sttResponse);
+		$sttMockResponse->method('getStatusCode')->willReturn(200);
+		$sttMockResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$translationMockResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$translationMockResponse->method('getBody')->willReturn($translationResponse);
+		$translationMockResponse->method('getStatusCode')->willReturn(200);
+		$translationMockResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$ttsMockResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$ttsMockResponse->method('getBody')->willReturn($ttsResponse);
+		$ttsMockResponse->method('getStatusCode')->willReturn(200);
+		$ttsMockResponse->method('getHeader')->with('Content-Type')->willReturn('audio/mpeg');
+
+		$this->iClient->expects($this->exactly(3))
+			->method('post')
+			->willReturnCallback(function ($url, $options) use ($sttUrl, $translationUrl, $ttsUrl, $sttMockResponse, $translationMockResponse, $ttsMockResponse) {
+				if ($url === $sttUrl) {
+					return $sttMockResponse;
+				} elseif ($url === $translationUrl) {
+					return $translationMockResponse;
+				} elseif ($url === $ttsUrl) {
+					return $ttsMockResponse;
+				}
+				throw new \RuntimeException('Unexpected URL: ' . $url);
+			});
+
+		$result = $audioToAudioTranslateProvider->process(
+			self::TEST_USER1,
+			[
+				'input' => $file,
+				'origin_language' => $fromLang,
+				'target_language' => $toLang,
+			],
+			fn () => null,
+			new SynchronousProviderOptions(includeWatermarks: false, preferStreaming: false),
+		);
+
+		$this->assertArrayHasKey('text_input', $result);
+		$this->assertArrayHasKey('text_output', $result);
+		$this->assertArrayHasKey('audio_output', $result);
+		$this->assertEquals($transcribedText, $result['text_input']);
+		$this->assertEquals($translatedText, $result['text_output']);
+		$this->assertEquals($ttsResponse, $result['audio_output']);
+
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
