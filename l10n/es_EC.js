@@ -12,6 +12,8 @@ OC.L10N.register(
     "Images" : "Imágenes",
     "Question" : "Pregunta",
     "Memories" : "Memorias",
+    "Target language" : "Lenguaje de destino",
+    "Audio output" : "Salida de audio",
     "Language" : "Idioma",
     "Size" : "Tamaño",
     "Prompt" : "Promoción",
