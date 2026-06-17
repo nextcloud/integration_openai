@@ -16,6 +16,8 @@ OC.L10N.register(
     "The answer to the question" : "Vastaus kysymykseen",
     "Memories" : "Muistot",
     "Speed" : "Nopeus",
+    "Target language" : "Kohdekieli",
+    "Audio output" : "Äänen ulostulo",
     "Language" : "Kieli",
     "Prompt" : "Kehote",
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",

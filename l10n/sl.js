@@ -21,6 +21,8 @@ OC.L10N.register(
     "Question" : "Vprašanje",
     "Memories" : "Spomini",
     "Speed" : "Hitrost",
+    "Target language" : "Ciljni jezik",
+    "Audio output" : "Odvod zvoka",
     "Language" : "Jezik",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",
     "Size" : "Velikost",

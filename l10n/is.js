@@ -10,6 +10,8 @@ OC.L10N.register(
     "Detect language" : "Greina tungumál",
     "Images" : "Myndir",
     "Speed" : "Hraði",
+    "Origin language" : "Upprunalegt tungumál",
+    "Target language" : "Marktungumál:",
     "Language" : "Tungumál",
     "Input text" : "Inntakstexti",
     "Size" : "Stærð",
