@@ -865,6 +865,7 @@ class OpenAiAPIService {
 	 * @param bool $translate
 	 * @param string $model
 	 * @param string $language
+	 * @param string $responseFormat
 	 * @return string
 	 * @throws Exception
 	 */
@@ -874,9 +875,10 @@ class OpenAiAPIService {
 		bool $translate = false,
 		string $model = Application::DEFAULT_MODEL_ID,
 		string $language = 'default',
+		string $responseFormat = 'verbose_json',
 	): string {
 		try {
-			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model, $language);
+			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model, $language, $responseFormat);
 		} catch (NotPermittedException|LockedException|GenericFileException $e) {
 			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -891,6 +893,7 @@ class OpenAiAPIService {
 	 * @param bool $translate
 	 * @param string $model
 	 * @param string $language
+	 * @param string $responseFormat
 	 * @return string
 	 * @throws Exception
 	 */
@@ -900,6 +903,7 @@ class OpenAiAPIService {
 		bool $translate = true,
 		string $model = Application::DEFAULT_MODEL_ID,
 		string $language = 'default',
+		string $responseFormat = 'verbose_json', // Verbose needed for extraction of audio duration
 	): string {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -912,8 +916,7 @@ class OpenAiAPIService {
 		$params = [
 			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_TRANSCRIPTION_MODEL_ID : $model,
 			'file' => $audioFileContent,
-			'response_format' => 'verbose_json',
-			// Verbose needed for extraction of audio duration
+			'response_format' => $responseFormat,
 		];
 		// Gets the user's preferred language if it's not the default one
 		if ($language === 'default') {
@@ -926,6 +929,34 @@ class OpenAiAPIService {
 		$contentType = 'multipart/form-data';
 
 		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType, serviceType: Application::SERVICE_TYPE_STT);
+
+		if (in_array($responseFormat, Application::DEFAULT_SUBTITLE_FORMATS)) {
+			if (!isset($response['body'])) {
+				$this->logger->warning('Audio subtitling error: ' . json_encode($response));
+				throw new Exception($this->l10n->t('Unknown audio subtitling error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			}
+
+			// Extract audio duration from response and store it as quota usage:
+			$matches = [];
+			$isMatch = preg_match_all('/(\d\d):(\d\d):(\d\d)[\.,](\d\d\d)/', $response['body'], $matches, PREG_SET_ORDER);
+
+			if ($isMatch !== false && $isMatch > 0) {
+				$lastTimestamp = end($matches);
+				$hours = intval($lastTimestamp[1]);
+				$minutes = intval($lastTimestamp[2]);
+				$seconds = intval($lastTimestamp[3]);
+				$millisecondAdjustment = intval(round(floatval($lastTimestamp[4]) / 1000.0));
+				$audioDuration = ($hours * 3600) + ($minutes * 60) + $seconds + $millisecondAdjustment;
+
+				try {
+					$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+				} catch (DBException $e) {
+					$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+				}
+			}
+
+			return $response['body'];
+		}
 
 		if (!isset($response['text'])) {
 			$this->logger->warning('Audio transcription error: ' . json_encode($response));
