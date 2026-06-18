@@ -22,6 +22,7 @@ use OCP\IUserManager;
 use OCP\L10N\IFactory;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
@@ -162,6 +163,8 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		$sttModel = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
 		try {
 			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel, $input['origin_language']);
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			$this->logger->warning('Transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new ProcessingException(
@@ -222,6 +225,8 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 			if (empty($translatedText)) {
 				throw new ProcessingException("Empty translation result from {$input['origin_language']} to {$input['target_language']}");
 			}
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			throw new ProcessingException(
 				"Failed to translate from {$input['origin_language']} to {$input['target_language']}: {$e->getMessage()}",
@@ -267,6 +272,8 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				throw new ProcessingException('Text to speech generation failed: no speech returned');
 			}
 			$translatedAudio = $includeWatermark ? $this->watermarkingService->markAudio($apiResponse['body']) : $apiResponse['body'];
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
 		} catch (Exception $e) {
 			$this->logger->warning('Text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new ProcessingException(
