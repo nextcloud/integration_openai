@@ -64,6 +64,7 @@ OC.L10N.register(
     "The voice to use" : "La voz a utilizar",
     "This was generated using Artificial Intelligence." : "Generado usando inteligencia artificial.",
     "Origin language" : "Lenguaje origen",
+    "Target language" : "Lenguaje de destino",
     "Audio output" : "Salida de audio",
     "Language" : "Lenguaje",
     "The language of the audio file" : "El idioma del fichero de audio",

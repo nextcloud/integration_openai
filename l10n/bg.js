@@ -13,6 +13,8 @@ OC.L10N.register(
     "Question" : "Въпрос",
     "Memories" : "Спомени",
     "Speed" : "Скорост",
+    "Target language" : "Целеви език",
+    "Audio output" : "Аудио изход",
     "Language" : "Език",
     "Prompt" : "Подкана",
     "OpenAI admin options saved" : "Опциите за администратор на OpenAI са записани",
