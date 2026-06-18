@@ -62,6 +62,7 @@ OC.L10N.register(
     "Voice" : "Φωνή",
     "The voice to use" : "Η φωνή που θα χρησιμοποιηθεί",
     "Origin language" : "Γλώσσα προέλευσης",
+    "Target language" : "Γλώσσα στόχος",
     "Audio output" : "Έξοδος ήχου",
     "Language" : "Γλώσσα",
     "Friendlier" : "Φιλικότερο",

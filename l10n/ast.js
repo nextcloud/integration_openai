@@ -13,6 +13,8 @@ OC.L10N.register(
     "Question" : "Entruga",
     "Memories" : "Recuerdos",
     "Voice" : "Voz",
+    "Target language" : "Llingua de destín",
+    "Audio output" : "Salida d'audiu",
     "Language" : "Llingua",
     "Size" : "Tamañu",
     "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
