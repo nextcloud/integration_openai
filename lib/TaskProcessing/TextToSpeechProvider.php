@@ -43,10 +43,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getTaskTypeId(): string {
-		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToSpeech')) {
-			return \OCP\TaskProcessing\TaskTypes\TextToSpeech::ID;
-		}
-		return TextToSpeechTaskType::ID;
+		return \OCP\TaskProcessing\TaskTypes\TextToSpeech::ID;
 	}
 
 	public function getExpectedRuntime(): int {
