@@ -148,6 +148,10 @@ class Application extends App implements IBootstrap {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider::class);
 			}
 			if ($isUsingOpenAI || $this->appConfig->getValueString(Application::APP_ID, 'analyze_image_provider_enabled') === '1') {
+				if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\ImageToTextOpticalCharacterRecognition')) {
+					$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\ImageToTextOcrTaskType::class);
+				}
+				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ImageToTextOcrProvider::class);
 				if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\AnalyzeImages')) {
 					$context->registerTaskProcessingTaskType(\OCA\OpenAi\TaskProcessing\AnalyzeImagesTaskType::class);
 				}
