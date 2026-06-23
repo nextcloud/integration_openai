@@ -34,6 +34,7 @@ class AudioToAudioTranslateTaskType implements ITaskType {
 	 * @inheritDoc
 	 */
 	public function getDescription(): string {
+		// TRANSLATORS This translates an input file into an output
 		return $this->l->t('Translate the input voice');
 	}
 
@@ -51,6 +52,7 @@ class AudioToAudioTranslateTaskType implements ITaskType {
 		return [
 			'input' => new ShapeDescriptor(
 				$this->l->t('Input audio'),
+				// TRANSLATORS This is a file input
 				$this->l->t('The audio to translate'),
 				EShapeType::Audio,
 			),
