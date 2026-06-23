@@ -78,7 +78,13 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 	}
 
 	public function getOptionalOutputShape(): array {
-		return [];
+		return [
+			'reasoning' => new ShapeDescriptor(
+				$this->l->t('Reasoning content'),
+				$this->l->t('The model reasoning behind the output'),
+				EShapeType::Text,
+			),
+		];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
@@ -138,24 +144,35 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
 				);
 				$time = microtime(true);
-				$fullOutput = '';
+				$streamedOutput = '';
+				$streamedReasoning = '';
 				foreach ($chunks as $chunk) {
-					if (($chunk['kind'] ?? null) !== 'content') {
+					if (!in_array($chunk['kind'] ?? null, ['content', 'reasoning_content'], true)) {
 						continue;
 					}
-					$fullOutput .= $chunk['text'];
+					if ($chunk['kind'] === 'reasoning_content') {
+						$streamedReasoning .= $chunk['text'];
+					} elseif ($chunk['kind'] === 'content') {
+						$streamedOutput .= $chunk['text'];
+					}
 					// we don't report more often than every 250ms
 					if (microtime(true) - $time >= 0.25) {
-						$reportOutput(['output' => $fullOutput]);
+						$reportOutput([
+							'output' => $streamedOutput,
+							'reasoning' => $streamedReasoning,
+						]);
 						$time = microtime(true);
 					}
 				}
-				if ($fullOutput !== '') {
-					$reportOutput(['output' => $fullOutput]);
+				if ($streamedOutput !== '' || $streamedReasoning !== '') {
+					$reportOutput([
+						'output' => $streamedOutput,
+						'reasoning' => $streamedReasoning,
+					]);
 				}
-				$completion = $chunks->getReturn();
+				$returnValue = $chunks->getReturn();
 			} else {
-				$completion = $this->openAiAPIService->createChatCompletion(
+				$returnValue = $this->openAiAPIService->createChatCompletion(
 					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
 				);
 			}
@@ -164,12 +181,13 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		} catch (\Throwable $e) {
 			throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
-		if (count($completion['messages']) > 0 || count($completion['tool_calls']) > 0) {
+		if (count($returnValue['messages']) > 0 || count($returnValue['tool_calls']) > 0) {
 			$endTime = time();
 			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 			return [
-				'output' => array_pop($completion['messages']) ?? '',
-				'tool_calls' => array_pop($completion['tool_calls']) ?? '',
+				'output' => array_pop($returnValue['messages']) ?? '',
+				'reasoning' => count($returnValue['reasoning_messages']) > 0 ? array_pop($returnValue['reasoning_messages']) : '',
+				'tool_calls' => array_pop($returnValue['tool_calls']) ?? '',
 			];
 		}
 

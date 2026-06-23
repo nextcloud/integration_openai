@@ -92,7 +92,13 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 	}
 
 	public function getOptionalOutputShape(): array {
-		return [];
+		return [
+			'reasoning' => new ShapeDescriptor(
+				$this->l->t('Reasoning content'),
+				$this->l->t('The model reasoning behind the output'),
+				EShapeType::Text,
+			),
+		];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
@@ -128,10 +134,13 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 		}
 
 		$chunks = $this->chunkService->chunkSplitPrompt($sourceMaterial, true, $maxTokens);
-		$result = '';
+		$fullOutput = '';
+		$fullReasoning = '';
+
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
-		$fullOutput = '';
+		$streamedOutput = '';
+		$streamedReasoning = '';
 
 		foreach ($chunks as $sourceMaterial) {
 			$prompt = 'You\'re a professional copywriter tasked with copying an instructed or demonstrated *WRITING STYLE*'
@@ -148,34 +157,51 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 						$time = microtime(true);
 						foreach ($chunks as $chunk) {
-							if (($chunk['kind'] ?? null) !== 'content') {
+							if (!in_array($chunk['kind'] ?? null, ['content', 'reasoning_content'], true)) {
 								continue;
 							}
-							$fullOutput .= $chunk['text'];
+							if ($chunk['kind'] === 'reasoning_content') {
+								$streamedReasoning .= $chunk['text'];
+							} elseif ($chunk['kind'] === 'content') {
+								$streamedOutput .= $chunk['text'];
+							}
 							// we don't report more often than every 250ms
 							if (microtime(true) - $time >= 0.25) {
-								$reportOutput(['output' => $fullOutput]);
+								$reportOutput([
+									'output' => $streamedOutput,
+									'reasoning' => $streamedReasoning,
+								]);
 								$time = microtime(true);
 							}
 						}
-						if ($fullOutput !== '') {
-							$reportOutput(['output' => $fullOutput]);
+						if ($streamedOutput !== '' || $streamedReasoning !== '') {
+							$reportOutput([
+								'output' => $streamedOutput,
+								'reasoning' => $streamedReasoning,
+							]);
 						}
-						$completion = $chunks->getReturn()['messages'];
+						$returnValue = $chunks->getReturn();
+						$completion = $returnValue['messages'];
+						$reasoning = $returnValue['reasoning_messages'];
 					} else {
-						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-						$completion = $completion['messages'];
+						$returnValue = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$completion = $returnValue['messages'];
+						$reasoning = $returnValue['reasoning_messages'];
 					}
 				} else {
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+					$reasoning = [];
 				}
 			} catch (UserFacingProcessingException $e) {
 				throw $e;
 			} catch (\Throwable $e) {
 				throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
+			if (count($reasoning) > 0) {
+				$fullReasoning .= array_pop($reasoning);
+			}
 			if (count($completion) > 0) {
-				$result .= array_pop($completion);
+				$fullOutput .= array_pop($completion);
 				$progress += $increase;
 				$reportProgress($progress);
 				continue;
@@ -185,6 +211,9 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 		}
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-		return ['output' => $result];
+		return [
+			'output' => $fullOutput,
+			'reasoning' => $fullReasoning,
+		];
 	}
 }
