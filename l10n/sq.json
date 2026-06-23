@@ -3,7 +3,6 @@
     "Unknown" : "I panjohur",
     "seconds" : "sekonda",
     "Name" : "Emër",
-    "Images" : "Imazhe ",
     "Language" : "Gjuha",
     "Size" : "Madhësi",
     "Request timeout (seconds)" : "Kohë skadimi kërkese (sekonda)",
@@ -13,6 +12,7 @@
     "Start date" : "Datë nisjeje",
     "Category" : "Kategori",
     "Save" : "Ruaje",
-    "Delete" : "Fshi"
+    "Delete" : "Fshi",
+    "Images" : "Imazhe "
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -5,8 +5,6 @@ OC.L10N.register(
     "Unknown" : "Arussin",
     "seconds" : "tisinin",
     "Name" : "Isem",
-    "Images" : "Tugniwin",
-    "Question" : "Asteqsi",
     "Speed" : "Arured",
     "Voice" : "Taγuct",
     "Audio output" : "Anekcum n umeslaw",
@@ -20,6 +18,8 @@ OC.L10N.register(
     "Who?" : "Anwa?",
     "Category" : "Taggayt",
     "Save" : "Sekles",
-    "Delete" : "Kkes"
+    "Delete" : "Kkes",
+    "Images" : "Tugniwin",
+    "Question" : "Asteqsi"
 },
 "nplurals=2; plural=(n != 1);");
