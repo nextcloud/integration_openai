@@ -4,7 +4,6 @@ OC.L10N.register(
     "Unknown" : "Nekonata",
     "seconds" : "sekundoj",
     "Name" : "Nomo",
-    "Images" : "Bildoj",
     "Speed" : "Rapideco",
     "Language" : "Lingvo",
     "Size" : "Grando",
@@ -18,6 +17,7 @@ OC.L10N.register(
     "No result." : "Nenia rezulto.",
     "Category" : "Kategorio",
     "Save" : "Konservi",
-    "Delete" : "Forigi"
+    "Delete" : "Forigi",
+    "Images" : "Bildoj"
 },
 "nplurals=2; plural=(n != 1);");

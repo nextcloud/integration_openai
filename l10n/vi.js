@@ -7,7 +7,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Phương thức HTTP không hợp lệ",
     "Bad credentials" : "Thông tin đăng nhập không hợp lệ.",
     "Name" : "Tên",
-    "Images" : "Hình ảnh",
     "Language" : "Ngôn ngữ",
     "Size" : "Kích cỡ",
     "Authentication" : "Xác thực",
@@ -19,6 +18,7 @@ OC.L10N.register(
     "No result." : "Không có kết quả",
     "Category" : "Hạng mục",
     "Save" : "Lưu",
-    "Delete" : "Xóa"
+    "Delete" : "Xóa",
+    "Images" : "Hình ảnh"
 },
 "nplurals=1; plural=0;");

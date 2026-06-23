@@ -7,12 +7,8 @@ OC.L10N.register(
     "Bad HTTP method" : "Yomon HTTP usuli",
     "Bad credentials" : "Akkaunt ma'lumotlari xato",
     "Name" : "Nomi",
-    "Images" : "Tasvirlar",
-    "Generated response" : "Yaratilgan javob",
     "Language" : "Language",
-    "Ask a question about your data." : "Ma'lumotlaringiz haqida savol bering.",
     "Size" : "Size",
-    "Prompt" : "Tezkor",
     "Authentication" : "Autentifikatsiya",
     "API key" : "API kaliti",
     "Days" : "Kunlar",
@@ -21,6 +17,10 @@ OC.L10N.register(
     "No result." : "Natija yo'q.",
     "Category" : "Kategoriya",
     "Save" : "Saqlash",
-    "Delete" : "O'chirish"
+    "Delete" : "O'chirish",
+    "Images" : "Tasvirlar",
+    "Generated response" : "Yaratilgan javob",
+    "Ask a question about your data." : "Ma'lumotlaringiz haqida savol bering.",
+    "Prompt" : "Tezkor"
 },
 "nplurals=1; plural=0;");

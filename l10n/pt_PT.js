@@ -7,7 +7,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Método HTTP incorreto",
     "Bad credentials" : "Credenciais inválidas",
     "Name" : "Nome",
-    "Images" : "Imagens",
     "Memories" : "Memories",
     "Speed" : "velocidade",
     "Language" : "Idioma",
@@ -21,6 +20,7 @@ OC.L10N.register(
     "No result." : "Sem resultados",
     "Category" : "Categoria",
     "Save" : "Guardar",
-    "Delete" : "Eliminar"
+    "Delete" : "Eliminar",
+    "Images" : "Imagens"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

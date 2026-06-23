@@ -3,8 +3,6 @@
     "seconds" : "segondas",
     "Bad credentials" : "Marrits identificants",
     "Name" : "Nom",
-    "Images" : "Imatges",
-    "Question" : "Question",
     "Language" : "Lenga",
     "Authentication" : "Autentificacion",
     "Default language" : "Lenga per defaut",
@@ -12,6 +10,8 @@
     "No result." : "Cap de resultat.",
     "Category" : "Categoria",
     "Save" : "Enregistrar",
-    "Delete" : "Suprimir"
+    "Delete" : "Suprimir",
+    "Images" : "Imatges",
+    "Question" : "Question"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"
 }

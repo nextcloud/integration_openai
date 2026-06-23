@@ -4,8 +4,6 @@
     "seconds" : "секунди",
     "Bad credentials" : "Неточни акредитиви",
     "Name" : "Име",
-    "Images" : "Слики",
-    "Question" : "Прашање",
     "Memories" : "Memories",
     "Speed" : "Брзина",
     "Language" : "Јазик",
@@ -20,6 +18,8 @@
     "No recommendations. Start typing." : "Нема препораки. Започнете со пишување.",
     "No result." : "Нема резултати.",
     "Save" : "Сними",
-    "Delete" : "Избриши"
+    "Delete" : "Избриши",
+    "Images" : "Слики",
+    "Question" : "Прашање"
 },"pluralForm" :"nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;"
 }

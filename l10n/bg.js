@@ -9,14 +9,11 @@ OC.L10N.register(
     "Bad credentials" : "Лоши идентификационни данни",
     "Name" : "Име",
     "Detect language" : "Разпознаване на език",
-    "Images" : "Изображения",
-    "Question" : "Въпрос",
     "Memories" : "Спомени",
     "Speed" : "Скорост",
     "Target language" : "Целеви език",
     "Audio output" : "Аудио изход",
     "Language" : "Език",
-    "Prompt" : "Подкана",
     "OpenAI admin options saved" : "Опциите за администратор на OpenAI са записани",
     "Failed to save OpenAI admin options" : "Неуспешно записване на опциите за администратор на OpenAI",
     "Request timeout (seconds)" : "Време за изчакване на заявката (секунди)",
@@ -36,6 +33,9 @@ OC.L10N.register(
     "No result." : "Няма резултат.",
     "Category" : "Категория",
     "Save" : "Запиши",
-    "Delete" : "Изтриване"
+    "Delete" : "Изтриване",
+    "Images" : "Изображения",
+    "Question" : "Въпрос",
+    "Prompt" : "Подкана"
 },
 "nplurals=2; plural=(n != 1);");

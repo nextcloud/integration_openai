@@ -2,7 +2,6 @@
     "Default" : "საწყისი პარამეტრები",
     "Unknown" : "უცნობია",
     "Name" : "სახელი",
-    "Images" : "სურათები",
     "Language" : "ენა",
     "Size" : "ზომა",
     "Request timeout (seconds)" : "მოთხოვნის დროის ამოწურვა (წამები)",
@@ -12,6 +11,7 @@
     "Start date" : "დაწყების თარიღი",
     "Category" : "კატეგორია",
     "Save" : "შენახვა",
-    "Delete" : "წაშლა"
+    "Delete" : "წაშლა",
+    "Images" : "სურათები"
 },"pluralForm" :"nplurals=2; plural=(n!=1);"
 }

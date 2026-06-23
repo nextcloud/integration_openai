@@ -6,7 +6,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Nederīgs HTTP pieprasījuma veids",
     "Bad credentials" : "Nederīgi pieteikšanās dati",
     "Name" : "Nosaukums",
-    "Images" : "Attēli",
     "Speed" : "Ātrums",
     "Language" : "Valoda",
     "Size" : "Izmērs",
@@ -21,6 +20,7 @@ OC.L10N.register(
     "No result." : "Nav iznākuma.",
     "Category" : "Kategorija",
     "Save" : "Saglabāt",
-    "Delete" : "Izdzēst"
+    "Delete" : "Izdzēst",
+    "Images" : "Attēli"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

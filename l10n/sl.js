@@ -17,8 +17,6 @@ OC.L10N.register(
     "Usage" : "Uporaba",
     "Detect language" : "Zaznava jezika",
     "Maximum output words" : "Največje število besed odvoda",
-    "Images" : "Slike",
-    "Question" : "Vprašanje",
     "Memories" : "Spomini",
     "Speed" : "Hitrost",
     "Target language" : "Ciljni jezik",
@@ -46,6 +44,8 @@ OC.L10N.register(
     "No result." : "Ni zadetkov",
     "Category" : "Kategorija",
     "Save" : "Shrani",
-    "Delete" : "Izbriši"
+    "Delete" : "Izbriši",
+    "Images" : "Slike",
+    "Question" : "Vprašanje"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");

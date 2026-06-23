@@ -2,7 +2,6 @@
     "Unknown" : "Nekonata",
     "seconds" : "sekundoj",
     "Name" : "Nomo",
-    "Images" : "Bildoj",
     "Speed" : "Rapideco",
     "Language" : "Lingvo",
     "Size" : "Grando",
@@ -16,6 +15,7 @@
     "No result." : "Nenia rezulto.",
     "Category" : "Kategorio",
     "Save" : "Konservi",
-    "Delete" : "Forigi"
+    "Delete" : "Forigi",
+    "Images" : "Bildoj"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

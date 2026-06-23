@@ -7,14 +7,11 @@ OC.L10N.register(
     "seconds" : "segundos",
     "Name" : "Nombre",
     "Detect language" : "Detectar idioma",
-    "Images" : "Imágenes",
     "Memories" : "Recuerdos",
     "Origin language" : "Idioma de origen",
     "Target language" : "Idioma destino",
     "Language" : "Idioma",
-    "Input text" : "Ingresar texto",
     "Size" : "Tamaño",
-    "Prompt" : "Prompt",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
@@ -27,6 +24,9 @@ OC.L10N.register(
     "No result." : "Sin resultado.",
     "Category" : "Categoría",
     "Save" : "Guardar",
-    "Delete" : "Eliminar"
+    "Delete" : "Eliminar",
+    "Images" : "Imágenes",
+    "Input text" : "Ingresar texto",
+    "Prompt" : "Prompt"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

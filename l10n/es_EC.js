@@ -9,14 +9,11 @@ OC.L10N.register(
     "Name" : "Nombre",
     "Detect language" : "Detectar idioma",
     "Model" : "Modelo",
-    "Images" : "Imágenes",
-    "Question" : "Pregunta",
     "Memories" : "Memorias",
     "Target language" : "Lenguaje de destino",
     "Audio output" : "Salida de audio",
     "Language" : "Idioma",
     "Size" : "Tamaño",
-    "Prompt" : "Promoción",
     "OpenAI and LocalAI integration" : "Integración de OpenAI y LocalAI",
     "Integration of OpenAI and LocalAI services" : "Integración de los servicios de OpenAI y LocalAI",
     "OpenAI admin options saved" : "Opciones de administrador de OpenAI guardadas",
@@ -43,6 +40,9 @@ OC.L10N.register(
     "No result." : "Sin resultados.",
     "Category" : "Categoría",
     "Save" : "Guardar",
-    "Delete" : "Borrar"
+    "Delete" : "Borrar",
+    "Images" : "Imágenes",
+    "Question" : "Pregunta",
+    "Prompt" : "Promoción"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

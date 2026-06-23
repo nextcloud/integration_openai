@@ -5,7 +5,6 @@ OC.L10N.register(
     "Unknown" : "I panjohur",
     "seconds" : "sekonda",
     "Name" : "Emër",
-    "Images" : "Imazhe ",
     "Language" : "Gjuha",
     "Size" : "Madhësi",
     "Request timeout (seconds)" : "Kohë skadimi kërkese (sekonda)",
@@ -15,6 +14,7 @@ OC.L10N.register(
     "Start date" : "Datë nisjeje",
     "Category" : "Kategori",
     "Save" : "Ruaje",
-    "Delete" : "Fshi"
+    "Delete" : "Fshi",
+    "Images" : "Imazhe "
 },
 "nplurals=2; plural=(n != 1);");

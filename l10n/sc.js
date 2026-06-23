@@ -8,7 +8,6 @@ OC.L10N.register(
     "Bad HTTP method" : "Mètodu HTTP no bàlidu",
     "Bad credentials" : "Credentziales non bàlidas",
     "Name" : "Nùmene",
-    "Images" : "Immàgines",
     "Speed" : "Lestresa",
     "Language" : "Limba",
     "Size" : "Mannària",
@@ -24,6 +23,7 @@ OC.L10N.register(
     "No result." : "Perunu resultadu.",
     "Category" : "Categorias",
     "Save" : "Sarva",
-    "Delete" : "Cantzella"
+    "Delete" : "Cantzella",
+    "Images" : "Immàgines"
 },
 "nplurals=2; plural=(n != 1);");

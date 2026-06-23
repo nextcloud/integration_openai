@@ -25,8 +25,6 @@ OC.L10N.register(
     "Detect language" : "Oppdag språk",
     "Maximum output words" : "Maksimalt antall utdataord",
     "Model" : "Modell",
-    "Images" : "Bilder",
-    "Question" : "Spørsmål",
     "The model used to generate the completion" : "Modellen som brukes til å generere fullføringen",
     "Memories" : "Minner",
     "Speed" : "Hastighet",
@@ -35,10 +33,8 @@ OC.L10N.register(
     "Audio output" : "Lydutgang",
     "Language" : "Språk",
     "The maximum number of words/tokens that can be generated in the completion." : "Maksimalt antall ord/tokens som kan genereres i fullføringen.",
-    "Input text" : "Inndatatekst",
     "Size" : "Størrelse",
     "Cannot generate less than 1 image" : "Kan ikke generere mindre enn 1 bilde",
-    "Prompt" : "Spør",
     "OpenAI and LocalAI integration" : "OpenAI og LocalAI integrasjon",
     "Integration of OpenAI and LocalAI services" : "Integrasjon av OpenAI og LocalAI tjenester",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "JSON-objekt. Se API-dokumentasjonen for å få listen over alle tilgjengelige parametere. For eksempel: {example}",
@@ -95,6 +91,10 @@ OC.L10N.register(
     "No result." : "Ingen resultat.",
     "Category" : "Kategori",
     "Save" : "Lagre",
-    "Delete" : "Slett"
+    "Delete" : "Slett",
+    "Images" : "Bilder",
+    "Question" : "Spørsmål",
+    "Input text" : "Inndatatekst",
+    "Prompt" : "Spør"
 },
 "nplurals=2; plural=(n != 1);");

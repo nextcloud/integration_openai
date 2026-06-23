@@ -6,8 +6,6 @@ OC.L10N.register(
     "Unknown" : "Unknown",
     "seconds" : "seconds",
     "Name" : "სახელი",
-    "Images" : "Images",
-    "Question" : "Question",
     "Language" : "Language",
     "Size" : "Size",
     "Cannot generate less than 1 image" : "1-ზე ნაკლები გამოსახულების გენერაცია შეუძლებელია",
@@ -19,6 +17,8 @@ OC.L10N.register(
     "No recommendations. Start typing." : "No recommendations. Start typing.",
     "Category" : "Category",
     "Save" : "დამახსოვრება",
-    "Delete" : "წაშლა"
+    "Delete" : "წაშლა",
+    "Images" : "Images",
+    "Question" : "Question"
 },
 "nplurals=2; plural=(n!=1);");
