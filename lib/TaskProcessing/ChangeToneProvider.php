@@ -104,7 +104,13 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 	}
 
 	public function getOptionalOutputShape(): array {
-		return [];
+		return [
+			'reasoning' => new ShapeDescriptor(
+				$this->l->t('Reasoning content'),
+				$this->l->t('The model reasoning behind the output'),
+				EShapeType::Text,
+			),
+		];
 	}
 
 	public function getOptionalOutputShapeEnumValues(): array {
@@ -136,8 +142,10 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 		}
 
 		$chunks = $this->chunkService->chunkSplitPrompt($textInput, true, $maxTokens);
-		$streamedResult = '';
-		$result = '';
+		$streamedOutput = '';
+		$streamedReasoning = '';
+		$fullOutput = '';
+		$fullReasoning = '';
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
 		foreach ($chunks as $textInput) {
@@ -148,26 +156,40 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 						$time = microtime(true);
 						foreach ($chunks as $chunk) {
-							if (($chunk['kind'] ?? null) !== 'content') {
+							if (!in_array($chunk['kind'] ?? null, ['content', 'reasoning_content'], true)) {
 								continue;
 							}
-							$streamedResult .= $chunk['text'];
+							if ($chunk['kind'] === 'reasoning_content') {
+								$streamedReasoning .= $chunk['text'];
+							} elseif ($chunk['kind'] === 'content') {
+								$streamedOutput .= $chunk['text'];
+							}
 							// we don't report more often than every 250ms
 							if (microtime(true) - $time >= 0.25) {
-								$reportOutput(['output' => $streamedResult]);
+								$reportOutput([
+									'output' => $streamedOutput,
+									'reasoning' => $streamedReasoning,
+								]);
 								$time = microtime(true);
 							}
 						}
-						if ($streamedResult !== '') {
-							$reportOutput(['output' => $streamedResult]);
+						if ($streamedOutput !== '' || $streamedReasoning !== '') {
+							$reportOutput([
+								'output' => $streamedOutput,
+								'reasoning' => $streamedReasoning,
+							]);
 						}
-						$completion = $chunks->getReturn()['messages'];
+						$returnValue = $chunks->getReturn();
+						$completion = $returnValue['messages'];
+						$reasoning = $returnValue['reasoning_messages'];
 					} else {
-						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
-						$completion = $completion['messages'];
+						$returnValue = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$completion = $returnValue['messages'];
+						$reasoning = $returnValue['reasoning_messages'];
 					}
 				} else {
 					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+					$reasoning = [];
 				}
 			} catch (UserFacingProcessingException $e) {
 				throw $e;
@@ -176,8 +198,11 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 			}
 			$progress += $increase;
 			$reportProgress($progress);
+			if (count($reasoning) > 0) {
+				$fullReasoning .= array_pop($reasoning);
+			}
 			if (count($completion) > 0) {
-				$result .= array_pop($completion);
+				$fullOutput .= array_pop($completion);
 				continue;
 			}
 
@@ -185,6 +210,9 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 		}
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-		return ['output' => $result];
+		return [
+			'output' => $fullOutput,
+			'reasoning' => $fullReasoning,
+		];
 	}
 }
