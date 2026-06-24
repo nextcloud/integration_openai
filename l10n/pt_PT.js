@@ -11,6 +11,7 @@ OC.L10N.register(
     "Speed" : "velocidade",
     "Language" : "Idioma",
     "Size" : "Altura",
+    "Cannot generate less than 1 image" : "Não é possível gerar menos de 1 imagem",
     "Request timeout (seconds)" : "Pedido expira (segundos)",
     "Authentication" : "Autenticação",
     "Authentication method" : "Método de Autenticação",
