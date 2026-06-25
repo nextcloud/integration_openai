@@ -142,9 +142,12 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 		try {
 			$reportTranslationOutput = function (string $translationOutput) use ($reportOutput) {
-				$reportOutput([
+				$running = $reportOutput([
 					'output' => $translationOutput,
 				]);
+				if (!$running) {
+					throw new ProcessingException('OpenAI/LocalAI task cancelled');
+				}
 			};
 			$translation = $this->translateService->translate(
 				$inputText, $input['origin_language'] ?? '', $input['target_language'] ?? '',

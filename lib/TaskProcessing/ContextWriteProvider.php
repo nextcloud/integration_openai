@@ -167,18 +167,24 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 							}
 							// we don't report more often than every 250ms
 							if (microtime(true) - $time >= 0.25) {
-								$reportOutput([
+								$running = $reportOutput([
 									'output' => $streamedOutput,
 									'reasoning' => $streamedReasoning,
 								]);
+								if (!$running) {
+									throw new ProcessingException('OpenAI/LocalAI task cancelled');
+								}
 								$time = microtime(true);
 							}
 						}
 						if ($streamedOutput !== '' || $streamedReasoning !== '') {
-							$reportOutput([
+							$running = $reportOutput([
 								'output' => $streamedOutput,
 								'reasoning' => $streamedReasoning,
 							]);
+							if (!$running) {
+								throw new ProcessingException('OpenAI/LocalAI task cancelled');
+							}
 						}
 						$returnValue = $chunks->getReturn();
 						$completion = $returnValue['messages'];

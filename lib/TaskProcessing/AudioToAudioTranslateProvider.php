@@ -191,9 +191,12 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		$reportProgress(0.3);
 
 		if ($preferStreaming) {
-			$reportOutput([
+			$running = $reportOutput([
 				'text_input' => $transcription . $watermarkSuffix,
 			]);
+			if (!$running) {
+				throw new ProcessingException('OpenAI/LocalAI task cancelled');
+			}
 		}
 
 		// translate
@@ -204,10 +207,13 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 
 		try {
 			$reportTranslationOutput = function (string $translationOutput) use ($reportOutput, $transcription, $watermarkSuffix) {
-				$reportOutput([
+				$running = $reportOutput([
 					'text_input' => $transcription . $watermarkSuffix,
 					'text_output' => $translationOutput,
 				]);
+				if (!$running) {
+					throw new ProcessingException('OpenAI/LocalAI task cancelled');
+				}
 			};
 			$translatedText = $this->translateService->translate(
 				$transcription, $input['origin_language'], $input['target_language'],
@@ -216,10 +222,13 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 			);
 
 			if ($preferStreaming) {
-				$reportOutput([
+				$running = $reportOutput([
 					'text_input' => $transcription . $watermarkSuffix,
 					'text_output' => $translatedText . $watermarkSuffix,
 				]);
+				if (!$running) {
+					throw new ProcessingException('OpenAI/LocalAI task cancelled');
+				}
 			}
 
 			if (empty($translatedText)) {
