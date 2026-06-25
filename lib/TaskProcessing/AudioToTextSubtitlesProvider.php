@@ -114,12 +114,22 @@ class AudioToTextSubtitlesProvider implements ISynchronousProvider {
 		$fileSize = intval($input['input']->getSize());
 		// Maximum file size for OpenAI is 25MB. (https://developers.openai.com/api/docs/guides/speech-to-text)
 		if ($fileSize > 25 * 1000 * 1000) {
-			throw new ProcessingException('Filesize of input too large. Max is 25MB');
+			throw new UserFacingProcessingException(
+				'Filesize of input is too large. Max is 25MB',
+				0,
+				null,
+				$this->l->t('The input file size is too large. A maximum of 25MB is allowed.'),
+			);
 		}
 
 		$fileType = $input['input']->getMimeType();
 		if (!str_starts_with($fileType, 'audio/')) {
-			throw new ProcessingException('Invalid input file type ' . $fileType);
+			throw new UserFacingProcessingException(
+				'Invalid input file type ' . $fileType,
+				0,
+				null,
+				$this->l->t('The input file type is invalid. Only audio files are allowed.'),
+			);
 		}
 		if ($this->openAiAPIService->isUsingOpenAi()) {
 			$validFileTypes = [
