@@ -203,7 +203,10 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 				throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 			}
 			$progress += $increase;
-			$reportProgress($progress);
+			$running = $reportProgress($progress);
+			if (!$running) {
+				throw new ProcessingException('OpenAI/LocalAI task cancelled');
+			}
 			if (count($reasoning) > 0) {
 				$fullReasoning .= array_pop($reasoning);
 			}

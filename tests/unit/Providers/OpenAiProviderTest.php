@@ -182,7 +182,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
+		$result = $freePromptProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => true, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -355,7 +355,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $emojiProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
+		$result = $emojiProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => true);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -419,7 +419,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $headlineProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
+		$result = $headlineProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => true);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -485,7 +485,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone' => $toneInput ], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
+		$result = $changeToneProvider->process(self::TEST_USER1, ['input' => $textInput, 'tone' => $toneInput ], fn () => true, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -554,7 +554,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $summaryProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
+		$result = $summaryProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => true);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -622,7 +622,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $proofreadProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => null);
+		$result = $proofreadProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => true);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly
@@ -702,7 +702,7 @@ class OpenAiProviderTest extends TestCase {
 			}),
 		)->willReturn($iResponse);
 
-		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => null, new SynchronousProviderOptions(preferStreaming: false));
+		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => true, new SynchronousProviderOptions(preferStreaming: false));
 		$this->assertEquals(['output' => $aiContent['translation']], $result);
 
 		// Check that token usage is logged properly
@@ -811,7 +811,7 @@ class OpenAiProviderTest extends TestCase {
 				'origin_language' => $fromLang,
 				'target_language' => $toLang,
 			],
-			fn () => null,
+			fn () => true,
 			new SynchronousProviderOptions(includeWatermarks: false, preferStreaming: false),
 		);
 
@@ -862,7 +862,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $TTSProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
+		$result = $TTSProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => true);
 		$this->assertArrayHasKey('speech', $result);
 
 		// Check that token usage is logged properly (should be 21 characters)
@@ -916,7 +916,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText, 'numberOfImages' => 1], fn () => null);
+		$result = $TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText, 'numberOfImages' => 1], fn () => true);
 		$this->assertArrayHasKey('images', $result);
 		$this->assertArrayHasKey(0, $result['images']);
 
@@ -1002,7 +1002,7 @@ TEXT;
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$result = $provider->process(self::TEST_USER1, ['input' => $inputText], fn () => null);
+		$result = $provider->process(self::TEST_USER1, ['input' => $inputText], fn () => true);
 		$this->assertEquals("Alpha part.\n\nBeta part.", $result['output']);
 
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);

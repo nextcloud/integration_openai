@@ -209,7 +209,10 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 			if (count($completion) > 0) {
 				$fullOutput .= array_pop($completion);
 				$progress += $increase;
-				$reportProgress($progress);
+				$running = $reportProgress($progress);
+				if (!$running) {
+					throw new ProcessingException('OpenAI/LocalAI task cancelled');
+				}
 				continue;
 			}
 

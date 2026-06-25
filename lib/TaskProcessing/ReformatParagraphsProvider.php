@@ -201,7 +201,10 @@ TEXT;
 				$anchors = $this->parseAnchorsFromModelOutput($raw);
 				$result .= $this->insertParagraphBreaksByAnchors($chunk, $anchors);
 				$progress += $increase;
-				$reportProgress($progress);
+				$running = $reportProgress($progress);
+				if (!$running) {
+					throw new ProcessingException('OpenAI/LocalAI task cancelled');
+				}
 				continue;
 			}
 
