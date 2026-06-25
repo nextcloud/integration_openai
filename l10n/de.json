@@ -41,6 +41,8 @@
     "The maximum number of words/tokens that can be generated in the output." : "Die maximale Anzahl von Wörtern/Tokens, die in der Ausgabe erstellt werden können.",
     "Model" : "Modell",
     "The model used to generate the output" : "Das Modell zur Erzeugung der Ausgabe",
+    "Reasoning content" : "Inhalt der logischen Begründung",
+    "The model reasoning behind the output" : "Die modellbasierte Begründung für das Ergebnis",
     "Too many files given. A maximum of 500 files is allowed." : "Es wurden zu viele Dateien angegeben. Es sind maximal 500 Dateien zulässig.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "Die Gesamtgröße der Eingabedateien ist zu groß. Es sind maximal 50 MB zulässig.",
     "Invalid input file type \"%1$s\". Only image files are supported." : "Ungültiger Dateityp \"%1$s\". Es werden nur Bilddateien unterstützt.",
