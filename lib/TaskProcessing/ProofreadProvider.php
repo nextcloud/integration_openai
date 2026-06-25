@@ -139,7 +139,10 @@ class ProofreadProvider implements ISynchronousProvider {
 			if (count($completion) > 0) {
 				$result .= array_pop($completion);
 				$progress += $increase;
-				$reportProgress($progress);
+				$running = $reportProgress($progress);
+				if (!$running) {
+					throw new ProcessingException('OpenAI/LocalAI task cancelled');
+				}
 				continue;
 			}
 

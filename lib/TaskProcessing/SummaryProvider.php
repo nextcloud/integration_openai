@@ -122,7 +122,10 @@ class SummaryProvider implements ISynchronousProvider {
 			// Ensure that progress never finishes no matter how many times this loop runs
 			$increase = (1.0 - $progress) / 2.0 / (float)$newNumChunks;
 			$oldNumChunks = $newNumChunks;
-			$reportProgress($progress);
+			$running = $reportProgress($progress);
+			if (!$running) {
+				throw new ProcessingException('OpenAI/LocalAI task cancelled');
+			}
 
 			try {
 				$completions = [];
@@ -134,7 +137,10 @@ class SummaryProvider implements ISynchronousProvider {
 						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
 						$completions[] = $completion['messages'];
 						$progress += $increase;
-						$reportProgress($progress);
+						$running = $reportProgress($progress);
+						if (!$running) {
+							throw new ProcessingException('OpenAI/LocalAI task cancelled');
+						}
 					}
 				} else {
 					$wrapSummaryPrompt = function (string $p): string {
@@ -146,7 +152,10 @@ class SummaryProvider implements ISynchronousProvider {
 					foreach (array_map($wrapSummaryPrompt, $prompts) as $p) {
 						$completions[] = $this->openAiAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
 						$progress += $increase;
-						$reportProgress($progress);
+						$running = $reportProgress($progress);
+						if (!$running) {
+							throw new ProcessingException('OpenAI/LocalAI task cancelled');
+						}
 					}
 				}
 			} catch (UserFacingProcessingException $e) {
