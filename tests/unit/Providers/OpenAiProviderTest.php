@@ -602,7 +602,7 @@ class OpenAiProviderTest extends TestCase {
 		$url = self::OPENAI_API_BASE . 'chat/completions';
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
-		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list.';
+		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and list how to correct them. Output only the list.';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
