@@ -52,21 +52,26 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 	}
 
 	public function getInputShapeEnumValues(): array {
-		$toneInputEnumValue = new ShapeEnumValue($this->l->t('Detect language'), 'detect_language');
 		return [
 			'tone' => [
-				new ShapeEnumValue($this->l->t('Friendlier'), 'friendler'),
+				new ShapeEnumValue($this->l->t('Less wordy'), 'less wordy'),
+				new ShapeEnumValue($this->l->t('Simpler'), 'simpler'),
+				new ShapeEnumValue($this->l->t('More convincing'), 'more convincing'),
+				new ShapeEnumValue($this->l->t('Less buzzwords'), 'less buzzwords'),
+				new ShapeEnumValue($this->l->t('Friendlier'), 'friendlier'),
 				new ShapeEnumValue($this->l->t('More formal'), 'more formal'),
-				new ShapeEnumValue($this->l->t('Funnier'), 'funnier'),
-				new ShapeEnumValue($this->l->t('More casual'), 'more casual'),
 				new ShapeEnumValue($this->l->t('More urgent'), 'more urgent'),
+				new ShapeEnumValue($this->l->t('Funnier'), 'funnier'),
+				new ShapeEnumValue($this->l->t('More passionate'), 'more passionate'),
+				new ShapeEnumValue($this->l->t('Less emotional'), 'less emotional'),
+				new ShapeEnumValue($this->l->t('More casual'), 'more casual'),
 			],
 		];
 	}
 
 	public function getInputShapeDefaults(): array {
 		return [
-			'tone' => 'friendler',
+			'tone' => 'less wordy',
 		];
 	}
 
