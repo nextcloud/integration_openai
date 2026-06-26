@@ -19,6 +19,7 @@ use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToTextProofread;
 
 class ProofreadProvider implements ISynchronousProvider {
@@ -58,6 +59,11 @@ class ProofreadProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShape(): array {
 		return [
+			'strictness' => new ShapeDescriptor(
+				$this->l->t('Strictness'),
+				$this->l->t('How thoroughly to check spelling and grammar.'),
+				EShapeType::Enum
+			),
 			'max_tokens' => new ShapeDescriptor(
 				$this->l->t('Maximum output words'),
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
@@ -73,6 +79,11 @@ class ProofreadProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeEnumValues(): array {
 		return [
+			'strictness' => [
+				new ShapeEnumValue($this->l->t('Minimal'), 'minimal'),
+				new ShapeEnumValue($this->l->t('Standard'), 'standard'),
+				new ShapeEnumValue($this->l->t('Strict'), 'strict'),
+			],
 			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
 		];
 	}
@@ -80,6 +91,7 @@ class ProofreadProvider implements ISynchronousProvider {
 	public function getOptionalInputShapeDefaults(): array {
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
+			'strictness' => 'standard',
 			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
 		];
@@ -104,7 +116,11 @@ class ProofreadProvider implements ISynchronousProvider {
 			throw new ProcessingException('Invalid prompt');
 		}
 		$textInput = $input['input'];
-		$systemPrompt = 'Proofread the following text. List all spelling and grammar mistakes and how to correct them. Output only the list.';
+		$strictness = 'standard';
+		if (isset($input['strictness']) && is_string($input['strictness'])) {
+			$strictness = $input['strictness'];
+		}
+		$systemPrompt = $this->getSystemPrompt($strictness);
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -172,5 +188,15 @@ class ProofreadProvider implements ISynchronousProvider {
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
 		return ['output' => $result];
+	}
+
+	private function getSystemPrompt(string $strictness): string {
+		$instruction = match ($strictness) {
+			'minimal' => 'List only grammatical and spelling errors that clearly affect meaning or readability, and list how to correct them.',
+			'strict' => 'List every conceivable issue, including minor grammar rules, and list how to correct them. Also flag redundancy, and phrasing that could be clearer.',
+			default => 'List all spelling and grammar mistakes and list how to correct them.',
+		};
+
+		return 'Proofread the following text. ' . $instruction . ' Output only the list.';
 	}
 }
