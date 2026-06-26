@@ -9,6 +9,7 @@ OC.L10N.register(
     "Name" : "Nome",
     "Memories" : "Memories",
     "Speed" : "velocidade",
+    "Origin language" : "Idioma original",
     "Language" : "Idioma",
     "Size" : "Altura",
     "Cannot generate less than 1 image" : "Não é possível gerar menos de 1 imagem",
@@ -17,11 +18,17 @@ OC.L10N.register(
     "Authentication method" : "Método de Autenticação",
     "API key" : "Chave API",
     "Start date" : "Data de início",
+    "Default language" : "Idioma padrão",
     "No recommendations. Start typing." : "Nenhuma recomendação. Comece a escrever ",
     "No result." : "Sem resultados",
     "Category" : "Categoria",
     "Save" : "Guardar",
     "Delete" : "Eliminar",
-    "Images" : "Imagens"
+    "Images" : "Imagens",
+    "Images to ask a question about" : "Imagens sobre as quais fazer uma pergunta",
+    "Change Tone" : "Mudar o Tom",
+    "The rewritten text in the desired tone, written by the assistant:" : "O texto reescrito no tom desejado, escrito pelo assistente:",
+    "Generate speech" : "Gerar fala",
+    "Prompt" : "Prompt"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
