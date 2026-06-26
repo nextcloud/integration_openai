@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -22,9 +22,8 @@ use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\SynchronousProviderOptions;
-use OCP\TaskProcessing\TaskTypes\TextToTextChangeTone;
 
-class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider {
+class TextToTextRephraseProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -36,7 +35,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-changetone';
+		return Application::APP_ID . '-rephrase';
 	}
 
 	public function getName(): string {
@@ -44,7 +43,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 	}
 
 	public function getTaskTypeId(): string {
-		return TextToTextChangeTone::ID;
+		return TextToTextRephraseTaskType::ID;
 	}
 
 	public function getExpectedRuntime(): int {
@@ -53,19 +52,24 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 
 	public function getInputShapeEnumValues(): array {
 		return [
-			'tone' => [
-				new ShapeEnumValue($this->l->t('Friendlier'), 'friendler'),
+			'style' => [
+				new ShapeEnumValue($this->l->t('Less wordy'), 'less wordy'),
+				new ShapeEnumValue($this->l->t('Simpler'), 'simpler'),
+				new ShapeEnumValue($this->l->t('More convincing'), 'more convincing'),
+				new ShapeEnumValue($this->l->t('Less buzzwords'), 'less buzzwords'),
+				new ShapeEnumValue($this->l->t('Friendlier'), 'friendlier'),
 				new ShapeEnumValue($this->l->t('More formal'), 'more formal'),
-				new ShapeEnumValue($this->l->t('Funnier'), 'funnier'),
-				new ShapeEnumValue($this->l->t('More casual'), 'more casual'),
 				new ShapeEnumValue($this->l->t('More urgent'), 'more urgent'),
+				new ShapeEnumValue($this->l->t('Funnier'), 'funnier'),
+				new ShapeEnumValue($this->l->t('More passionate'), 'more passionate'),
+				new ShapeEnumValue($this->l->t('Less emotional'), 'less emotional'),
 			],
 		];
 	}
 
 	public function getInputShapeDefaults(): array {
 		return [
-			'tone' => 'friendler',
+			'style' => 'less wordy',
 		];
 	}
 
@@ -127,7 +131,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 			throw new ProcessingException('Invalid input text');
 		}
 		$textInput = $input['input'];
-		$toneInput = $input['tone'];
+		$styleInput = $input['style'];
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -148,7 +152,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
 		foreach ($chunks as $textInput) {
-			$prompt = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
+			$prompt = "Reformulate the following text to be $styleInput in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 			try {
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 					if ($preferStreaming) {
