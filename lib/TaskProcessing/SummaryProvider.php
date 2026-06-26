@@ -19,6 +19,7 @@ use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
 
 class SummaryProvider implements ISynchronousProvider {
@@ -58,6 +59,16 @@ class SummaryProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShape(): array {
 		return [
+			'format' => new ShapeDescriptor(
+				$this->l->t('Format'),
+				$this->l->t('The format of the summary'),
+				EShapeType::Enum
+			),
+			'complexity' => new ShapeDescriptor(
+				$this->l->t('Complexity'),
+				$this->l->t('The complexity of the summary'),
+				EShapeType::Enum
+			),
 			'max_tokens' => new ShapeDescriptor(
 				$this->l->t('Maximum output words'),
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
@@ -74,6 +85,17 @@ class SummaryProvider implements ISynchronousProvider {
 	public function getOptionalInputShapeEnumValues(): array {
 		return [
 			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
+			'format' => [
+				new ShapeEnumValue($this->l->t('Auto'), 'auto'),
+				new ShapeEnumValue($this->l->t('Sentence'), 'sentence'),
+				new ShapeEnumValue($this->l->t('Paragraph'), 'paragraph'),
+				new ShapeEnumValue($this->l->t('Bullet Points'), 'bullet_points')
+			],
+			'complexity' => [
+				new ShapeEnumValue($this->l->t('Simple'), 'simple'),
+				new ShapeEnumValue($this->l->t('Medium'), 'medium'),
+				new ShapeEnumValue($this->l->t('Complex'), 'complex')
+			],
 		];
 	}
 
@@ -82,6 +104,8 @@ class SummaryProvider implements ISynchronousProvider {
 		return [
 			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
+			'format' => 'auto',
+			'complexity' => 'medium',
 		];
 	}
 
@@ -129,9 +153,21 @@ class SummaryProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
+				$summarySystemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
+					. 'You should only return the summary without any additional information. ';
+				if (isset($input['format']) && $input['format'] === 'paragraph') {
+					$summarySystemPrompt .= 'Return the summary as a paragraph. ';
+				} elseif (isset($input['format']) && $input['format'] === 'bullet_points') {
+					$summarySystemPrompt .= 'Return the summary as a list of bullet points. ';
+				} elseif (isset($input['format']) && $input['format'] === 'sentence') {
+					$summarySystemPrompt .= 'Return the summary as a single sentence. Do not include more than one sentence. ';
+				}
+				if (isset($input['complexity']) && $input['complexity'] === 'complex') {
+					$summarySystemPrompt .= 'Use complex language and vocabulary appropriate for an expert in the subject. ';
+				} elseif (isset($input['complexity']) && $input['complexity'] === 'simple') {
+					$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
+				}
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$summarySystemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
-						. 'You should only return the summary without any additional information.';
 
 					foreach ($prompts as $p) {
 						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
@@ -143,11 +179,8 @@ class SummaryProvider implements ISynchronousProvider {
 						}
 					}
 				} else {
-					$wrapSummaryPrompt = function (string $p): string {
-						return 'You are a helpful assistant that summarizes text in the same language as the text. '
-							. 'You should only return the summary without any additional information. '
-							. 'Here is the text to summarize:\n\n' . $p . '\n';
-					};
+					$wrapSummaryPrompt = static fn (string $p) => $summarySystemPrompt
+						. 'Here is the text to summarize:\n\n' . $p . '\n';
 
 					foreach (array_map($wrapSummaryPrompt, $prompts) as $p) {
 						$completions[] = $this->openAiAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
