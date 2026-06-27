@@ -17,16 +17,21 @@
     "API key" : "Chave API",
     "Start date" : "Data de início",
     "Default language" : "Idioma padrão",
+    "Days" : "Dias",
     "No recommendations. Start typing." : "Nenhuma recomendação. Comece a escrever ",
     "No result." : "Sem resultados",
     "Category" : "Categoria",
     "Save" : "Guardar",
     "Delete" : "Eliminar",
+    "Analyze images" : "Analisar imagens",
     "Images" : "Imagens",
     "Images to ask a question about" : "Imagens sobre as quais fazer uma pergunta",
+    "The answer to the question" : "A resposta à pergunta",
     "Change Tone" : "Mudar o Tom",
+    "In which tone should your text be rewritten?" : "Em qual tom seu texto deve ser reescrito?",
     "The rewritten text in the desired tone, written by the assistant:" : "O texto reescrito no tom desejado, escrito pelo assistente:",
     "Generate speech" : "Gerar fala",
-    "Prompt" : "Prompt"
+    "Prompt" : "Prompt",
+    "Write transcript that you want the assistant to generate speech from" : "Escreva a transcrição a partir da qual você deseja que o assistente gere a fala"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

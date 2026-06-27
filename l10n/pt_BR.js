@@ -43,6 +43,8 @@ OC.L10N.register(
     "The maximum number of words/tokens that can be generated in the output." : "O número máximo de palavras/tokens que podem ser gerados na saída.",
     "Model" : "Modelo",
     "The model used to generate the output" : "O modelo usado para gerar o resultado",
+    "Reasoning content" : "Conteúdo de raciocínio",
+    "The model reasoning behind the output" : "O raciocínio do modelo por trás do resultado",
     "Too many files given. A maximum of 500 files is allowed." : "Foram fornecidos arquivos demais. É permitido um máximo de 500 arquivos.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "O tamanho total dos arquivos de entrada é muito grande. O limite máximo permitido é de 50 MB.",
     "Invalid input file type \"%1$s\". Only image files are supported." : "Tipo de arquivo de entrada “%1$s” inválido. Somente arquivos de imagem são aceitos.",
