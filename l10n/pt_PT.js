@@ -33,6 +33,7 @@ OC.L10N.register(
     "In which tone should your text be rewritten?" : "Em qual tom seu texto deve ser reescrito?",
     "The rewritten text in the desired tone, written by the assistant:" : "O texto reescrito no tom desejado, escrito pelo assistente:",
     "Generate speech" : "Gerar fala",
+    "Generate speech from a transcript" : "Gerar fala a partir de uma transcrição",
     "Prompt" : "Prompt",
     "Write transcript that you want the assistant to generate speech from" : "Escreva a transcrição a partir da qual você deseja que o assistente gere a fala"
 },
