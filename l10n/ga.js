@@ -43,6 +43,8 @@ OC.L10N.register(
     "The maximum number of words/tokens that can be generated in the output." : "An líon uasta focal/comharthaí is féidir a ghiniúint san aschur.",
     "Model" : "Mionsamhail",
     "The model used to generate the output" : "An tsamhail a úsáideadh chun an t-aschur a ghiniúint",
+    "Reasoning content" : "Ábhar réasúnaíochta",
+    "The model reasoning behind the output" : "An réasúnaíocht mhúnla atá taobh thiar den aschur",
     "Too many files given. A maximum of 500 files is allowed." : "An iomarca comhad tugtha. Ceadaítear uasmhéid de 500 comhad.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "Tá méid iomlán na gcomhad ionchuir rómhór. Ceadaítear uasmhéid de 50MB.",
     "Invalid input file type \"%1$s\". Only image files are supported." : "Cineál comhaid ionchuir neamhbhailí \"%1$s\". Ní thacaítear ach le comhaid íomhá.",
