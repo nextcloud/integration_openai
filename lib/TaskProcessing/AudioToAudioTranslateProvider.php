@@ -28,6 +28,7 @@ use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\SynchronousProviderOptions;
+use OCP\TaskProcessing\TaskTypes\AudioToAudioTranslate;
 use Psr\Log\LoggerInterface;
 
 class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
@@ -55,7 +56,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 	}
 
 	public function getTaskTypeId(): string {
-		return AudioToAudioTranslateTaskType::ID;
+		return AudioToAudioTranslate::ID;
 	}
 
 	public function getExpectedRuntime(): int {
@@ -131,6 +132,11 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 			'text_input' => new ShapeDescriptor(
 				$this->l->t('Audio transcription'),
 				$this->l->t('The transcribed audio input'),
+				EShapeType::Text,
+			),
+			'text_output' => new ShapeDescriptor(
+				$this->l->t('Text output'),
+				$this->l->t('The text translation'),
 				EShapeType::Text,
 			),
 		];
