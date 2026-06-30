@@ -11,8 +11,6 @@ OC.L10N.register(
     "Detect language" : "Havaitse kieli",
     "Memories" : "Muistot",
     "Speed" : "Nopeus",
-    "Target language" : "Kohdekieli",
-    "Audio output" : "Äänen ulostulo",
     "Language" : "Kieli",
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "Authentication" : "Tunnistautuminen",

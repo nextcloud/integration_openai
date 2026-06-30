@@ -9,8 +9,6 @@ OC.L10N.register(
     "Name" : "Heiti",
     "Detect language" : "Greina tungumál",
     "Speed" : "Hraði",
-    "Origin language" : "Upprunalegt tungumál",
-    "Target language" : "Marktungumál:",
     "Language" : "Tungumál",
     "Size" : "Stærð",
     "Cannot generate less than 1 image" : "Get ekki útbúið minna en 1 mynd",

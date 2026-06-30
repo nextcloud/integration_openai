@@ -8,8 +8,6 @@ OC.L10N.register(
     "Name" : "Nombre",
     "Detect language" : "Detectar idioma",
     "Memories" : "Recuerdos",
-    "Origin language" : "Idioma de origen",
-    "Target language" : "Idioma destino",
     "Language" : "Idioma",
     "Size" : "Tamaño",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",

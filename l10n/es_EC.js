@@ -10,8 +10,6 @@ OC.L10N.register(
     "Detect language" : "Detectar idioma",
     "Model" : "Modelo",
     "Memories" : "Memorias",
-    "Target language" : "Lenguaje de destino",
-    "Audio output" : "Salida de audio",
     "Language" : "Idioma",
     "Size" : "Tamaño",
     "OpenAI and LocalAI integration" : "Integración de OpenAI y LocalAI",

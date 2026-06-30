@@ -11,8 +11,6 @@ OC.L10N.register(
     "Detect language" : "Разпознаване на език",
     "Memories" : "Спомени",
     "Speed" : "Скорост",
-    "Target language" : "Целеви език",
-    "Audio output" : "Аудио изход",
     "Language" : "Език",
     "OpenAI admin options saved" : "Опциите за администратор на OpenAI са записани",
     "Failed to save OpenAI admin options" : "Неуспешно записване на опциите за администратор на OpenAI",
