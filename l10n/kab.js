@@ -7,7 +7,6 @@ OC.L10N.register(
     "Name" : "Isem",
     "Speed" : "Arured",
     "Voice" : "Taγuct",
-    "Audio output" : "Anekcum n umeslaw",
     "Language" : "Tutlayt",
     "Size" : "Teɣzi",
     "Authentication" : "Asesteb",

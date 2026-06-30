@@ -9,8 +9,6 @@ OC.L10N.register(
     "Bad credentials" : "Pogrešne vjerodajnice",
     "Name" : "Naziv",
     "Speed" : "Brzina",
-    "Origin language" : "Izvorni jezik",
-    "Target language" : "Ciljani jezik",
     "Language" : "Jezik",
     "Cannot generate less than 1 image" : "Nije moguće generirati manje od 1 slike",
     "Request timeout (seconds)" : "Istek zahtjeva (u sekundama)",
