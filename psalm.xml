@@ -49,6 +49,7 @@
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\AudioToAudioChat" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\AudioToAudioTranslate" />
+				<referencedClass name="OCP\TaskProcessing\TaskTypes\TextToTextImprove" />
 			</errorLevel>
 		</UndefinedClass>
 		<UndefinedDocblockClass>
