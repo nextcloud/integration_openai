@@ -24,6 +24,7 @@ use OCA\OpenAi\TaskProcessing\TextToImageImprovedPromptProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
+use OCA\OpenAi\TaskProcessing\TextToTextImproveProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextProvider;
 use OCA\OpenAi\TaskProcessing\TopicsProvider;
 use OCA\OpenAi\TaskProcessing\TranslateProvider;
@@ -130,6 +131,7 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(TopicsProvider::class);
 			$context->registerTaskProcessingProvider(ContextWriteProvider::class);
 			$context->registerTaskProcessingProvider(ReformulateProvider::class);
+			$context->registerTaskProcessingProvider(TextToTextImproveProvider::class);
 			$context->registerTaskProcessingProvider(EmojiProvider::class);
 			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
 			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
