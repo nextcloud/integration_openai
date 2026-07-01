@@ -87,8 +87,8 @@ class SummaryProvider implements ISynchronousProvider {
 			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
 			'format' => [
 				new ShapeEnumValue($this->l->t('Auto'), 'auto'),
-				new ShapeEnumValue($this->l->t('Sentence'), 'sentence'),
-				new ShapeEnumValue($this->l->t('Paragraph'), 'paragraph'),
+				new ShapeEnumValue($this->l->t('One Sentence'), 'sentence'),
+				new ShapeEnumValue($this->l->t('One Paragraph'), 'paragraph'),
 				new ShapeEnumValue($this->l->t('Bullet Points'), 'bullet_points')
 			],
 			'complexity' => [
@@ -155,17 +155,21 @@ class SummaryProvider implements ISynchronousProvider {
 				$completions = [];
 				$summarySystemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
 					. 'You should only return the summary without any additional information. ';
-				if (isset($input['format']) && $input['format'] === 'paragraph') {
-					$summarySystemPrompt .= 'Return the summary as a paragraph. ';
-				} elseif (isset($input['format']) && $input['format'] === 'bullet_points') {
-					$summarySystemPrompt .= 'Return the summary as a list of bullet points. ';
-				} elseif (isset($input['format']) && $input['format'] === 'sentence') {
-					$summarySystemPrompt .= 'Return the summary as a single sentence. Do not include more than one sentence. ';
+				if (isset($input['format'])) {
+					if ($input['format'] === 'paragraph') {
+						$summarySystemPrompt .= 'Return the summary as a paragraph. ';
+					} elseif ($input['format'] === 'bullet_points') {
+						$summarySystemPrompt .= 'Return the summary as a list of bullet points. ';
+					} elseif ($input['format'] === 'sentence') {
+						$summarySystemPrompt .= 'Return the summary as a single sentence. Do not include more than one sentence. ';
+					}
 				}
-				if (isset($input['complexity']) && $input['complexity'] === 'complex') {
-					$summarySystemPrompt .= 'Use complex language and vocabulary appropriate for an expert in the subject. ';
-				} elseif (isset($input['complexity']) && $input['complexity'] === 'simple') {
-					$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
+				if (isset($input['complexity'])) {
+					if ($input['complexity'] === 'complex') {
+						$summarySystemPrompt .= 'Use complex language and vocabulary appropriate for an expert in the subject. ';
+					} elseif ($input['complexity'] === 'simple') {
+						$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
+					}
 				}
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 
