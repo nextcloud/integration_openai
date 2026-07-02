@@ -5,6 +5,8 @@ OC.L10N.register(
     "seconds" : "วินาที",
     "Name" : "ชื่อ",
     "Language" : "ภาษา",
+    "Simple" : "เรียบง่าย",
+    "Medium" : "ปานกลาง",
     "Size" : "ขนาด",
     "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
     "Authentication" : "การตรวจสอบสิทธิ์",

@@ -9,6 +9,8 @@ OC.L10N.register(
     "Name" : "שם",
     "Speed" : "מהירות",
     "Language" : "שפה",
+    "Auto" : "אוטומטי",
+    "Medium" : "בינוני",
     "Size" : "גודל",
     "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Authentication" : "אימות",

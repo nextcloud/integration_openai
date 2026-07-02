@@ -13,6 +13,8 @@ OC.L10N.register(
     "Detect language" : "Detecta la llengua",
     "Speed" : "Velocitat",
     "Language" : "Llengua",
+    "Minimal" : "Mínim",
+    "Auto" : "Automàtic",
     "Size" : "Tamany",
     "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
     "Authentication" : "Autenticació",

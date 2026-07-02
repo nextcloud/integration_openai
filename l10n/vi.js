@@ -8,6 +8,8 @@ OC.L10N.register(
     "Bad credentials" : "Thông tin đăng nhập không hợp lệ.",
     "Name" : "Tên",
     "Language" : "Ngôn ngữ",
+    "Auto" : "Tự động",
+    "Medium" : "Trung bình",
     "Size" : "Kích cỡ",
     "Authentication" : "Xác thực",
     "Authentication method" : "Phương thức xác thực",

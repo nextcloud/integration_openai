@@ -8,6 +8,8 @@ OC.L10N.register(
     "Bad credentials" : "Akkaunt ma'lumotlari xato",
     "Name" : "Nomi",
     "Language" : "Language",
+    "Format" : "Formatlash",
+    "Medium" : "O'rta",
     "Size" : "Size",
     "Authentication" : "Autentifikatsiya",
     "API key" : "API kaliti",

@@ -8,6 +8,8 @@ OC.L10N.register(
     "Speed" : "Arured",
     "Voice" : "Taγuct",
     "Language" : "Tutlayt",
+    "Format" : "Format",
+    "Auto" : "Awurman",
     "Size" : "Teɣzi",
     "Authentication" : "Asesteb",
     "Start date" : "Azemz n tazwara",

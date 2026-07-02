@@ -21,6 +21,8 @@ OC.L10N.register(
     "Speed" : "Hitrost",
     "Language" : "Jezik",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",
+    "Auto" : "Samodejno",
+    "Medium" : "Srednja",
     "Size" : "Velikost",
     "Cannot generate less than 1 image" : "Ne morem izdelati manj kot 1 sliko",
     "OpenAI and LocalAI integration" : "Združevalnik OpenAI in LocalAI",

@@ -10,6 +10,8 @@ OC.L10N.register(
     "Name" : "Nùmene",
     "Speed" : "Lestresa",
     "Language" : "Limba",
+    "Auto" : "Auto",
+    "Medium" : "Mesanu",
     "Size" : "Mannària",
     "Request timeout (seconds)" : "Tempus màssimu de sa rechesta (segundos)",
     "Authentication" : "Autenticatzione",

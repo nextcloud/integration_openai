@@ -9,6 +9,7 @@ OC.L10N.register(
     "Memories" : "Memories",
     "Speed" : "Брзина",
     "Language" : "Јазик",
+    "Auto" : "Автоматски",
     "Cannot generate less than 1 image" : "Неможе да се генерира помалку од една слика",
     "Authentication" : "Автентикација",
     "Authentication method" : "Начин на автентификација",

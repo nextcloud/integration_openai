@@ -9,6 +9,8 @@ OC.L10N.register(
     "Detect language" : "Detectar idioma",
     "Memories" : "Recuerdos",
     "Language" : "Idioma",
+    "Auto" : "Auto",
+    "Medium" : "Medio",
     "Size" : "Tamaño",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
