@@ -8,6 +8,8 @@ OC.L10N.register(
     "Bad credentials" : "Credențiale greșite",
     "Name" : "Nume",
     "Language" : "Limba",
+    "Auto" : "Auto",
+    "Medium" : "Mediu",
     "Authentication" : "Autentificare",
     "Authentication method" : "Modul de autentificare",
     "API key" : "Cheie API",

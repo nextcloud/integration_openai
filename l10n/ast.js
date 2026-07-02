@@ -12,6 +12,7 @@ OC.L10N.register(
     "Memories" : "Recuerdos",
     "Voice" : "Voz",
     "Language" : "Llingua",
+    "Minimal" : "Mínimu",
     "Size" : "Tamañu",
     "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
     "Authentication" : "Autenticación",

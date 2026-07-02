@@ -6,6 +6,7 @@ OC.L10N.register(
     "Name" : "Nomo",
     "Speed" : "Rapideco",
     "Language" : "Lingvo",
+    "Auto" : "Aŭtomate",
     "Size" : "Grando",
     "Request timeout (seconds)" : "Eltempiĝo (sekundoj)",
     "Authentication" : "Aŭtentigo",

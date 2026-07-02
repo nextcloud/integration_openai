@@ -7,6 +7,8 @@ OC.L10N.register(
     "seconds" : "seconds",
     "Name" : "სახელი",
     "Language" : "Language",
+    "Auto" : "Auto",
+    "Medium" : "Medium",
     "Size" : "Size",
     "Cannot generate less than 1 image" : "1-ზე ნაკლები გამოსახულების გენერაცია შეუძლებელია",
     "Request timeout (seconds)" : "Request timeout (seconds)",
