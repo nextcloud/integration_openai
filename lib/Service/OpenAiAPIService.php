@@ -936,6 +936,16 @@ class OpenAiAPIService {
 		if (isset($response['segments'])) {
 			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
 
+			if ($audioDuration < 0) {
+				$this->logger->warning('Audio duration is less than 0: ' . $audioDuration);
+				$audioDuration = 0;
+			}
+
+			if ($audioDuration > 2147483647) {
+				$this->logger->warning('Audio duration is greater than 2147483647 seconds: ' . $audioDuration);
+				$audioDuration = 2147483647;
+			}
+
 			try {
 				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
 			} catch (DBException $e) {
