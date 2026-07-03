@@ -90,7 +90,7 @@ class AudioToTextSubtitlesProvider implements ISynchronousProvider {
 	public function getOptionalInputShapeDefaults(): array {
 		return [
 			'language' => 'default',
-			'format' => 'srt',
+			'format' => Application::DEFAULT_SUBTITLE_FORMAT,
 		];
 	}
 

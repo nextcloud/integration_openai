@@ -53,7 +53,7 @@ class Application extends App implements IBootstrap {
 		'onyx', 'nova', 'sage', 'shimmer', 'verse'
 	];
 	public const DEFAULT_SUBTITLE_FORMAT = 'srt';
-	public const DEFAULT_SUBTITLE_FORMATS = [
+	public const SUPPORTED_SUBTITLE_FORMATS = [
 		'srt', 'vtt'
 	];
 	public const DEFAULT_DEFAULT_IMAGE_SIZE = '1024x1024';

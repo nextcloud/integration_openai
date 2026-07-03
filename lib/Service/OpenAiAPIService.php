@@ -930,7 +930,7 @@ class OpenAiAPIService {
 
 		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType, serviceType: Application::SERVICE_TYPE_STT);
 
-		if (in_array($responseFormat, Application::DEFAULT_SUBTITLE_FORMATS)) {
+		if (in_array($responseFormat, Application::SUPPORTED_SUBTITLE_FORMATS)) {
 			if (!isset($response['body'])) {
 				$this->logger->warning('Audio subtitling error: ' . json_encode($response));
 				throw new Exception($this->l10n->t('Unknown audio subtitling error'), Http::STATUS_INTERNAL_SERVER_ERROR);
