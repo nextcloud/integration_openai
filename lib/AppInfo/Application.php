@@ -14,6 +14,7 @@ use OCA\OpenAi\TaskProcessing\AudioToAudioChatProvider;
 use OCA\OpenAi\TaskProcessing\AudioToAudioTranslateProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextEnhancedProvider;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
+use OCA\OpenAi\TaskProcessing\AudioToTextSubtitlesProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
@@ -50,6 +51,10 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_SPEECH_VOICES = [
 		'alloy', 'ash', 'ballad', 'coral', 'echo', 'fable',
 		'onyx', 'nova', 'sage', 'shimmer', 'verse'
+	];
+	public const DEFAULT_SUBTITLE_FORMAT = 'srt';
+	public const SUPPORTED_SUBTITLE_FORMATS = [
+		'srt', 'vtt'
 	];
 	public const DEFAULT_DEFAULT_IMAGE_SIZE = '1024x1024';
 	public const MAX_GENERATION_IDLE_TIME = 60 * 60 * 24 * 10;
@@ -115,6 +120,9 @@ class Application extends App implements IBootstrap {
 		}
 		if ($sttProviderEnabled) {
 			$context->registerTaskProcessingProvider(AudioToTextProvider::class);
+			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AudioToTextSubtitles')) {
+				$context->registerTaskProcessingProvider(AudioToTextSubtitlesProvider::class);
+			}
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
 				$context->registerTaskProcessingProvider(AudioToTextEnhancedProvider::class);
 			}
