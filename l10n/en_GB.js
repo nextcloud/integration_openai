@@ -66,6 +66,7 @@ OC.L10N.register(
     "Minimal" : "Minimal",
     "Format" : "Format",
     "Auto" : "Auto",
+    "Medium" : "Medium",
     "Size" : "Size",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Optional. The size of the generated images. Must be in 256x256 format. Default is %s",
     "The model used to generate the images" : "The model used to generate the images",

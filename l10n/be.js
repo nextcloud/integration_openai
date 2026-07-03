@@ -14,6 +14,7 @@ OC.L10N.register(
     "Language" : "Мова",
     "The language of the audio file" : "Мова аўдыяфайла",
     "The maximum number of words/tokens that can be generated in the completion." : "Максімальная колькасць слоў/токенаў, якія можна згенерыраваць падчас завяршэння.",
+    "Format" : "Фармат",
     "Size" : "Памер",
     "Authentication" : "Аўтэнтыфікацыя",
     "API key" : "Ключ API",
