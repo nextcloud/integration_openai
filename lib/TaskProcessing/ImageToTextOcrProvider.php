@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
+use Imagick;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
@@ -30,7 +30,6 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private LoggerInterface $logger,
-		private IAppConfig $appConfig,
 		private ?string $userId,
 	) {
 	}
@@ -128,10 +127,12 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 
 		$fileSize = 0;
 		$outputs = [];
+		$fileCount = (float)count($input['input']);
 		$systemPrompt = 'Extract all visible text from the image. Return only the extracted text without additional commentary. Preserve the original language of the text.';
 		$userPrompt = 'Extract all text from this image.';
 
-		foreach ($input['input'] as $i => $file) {
+		$fileIndex = 0;
+		foreach ($input['input'] as $file) {
 			if (!$file instanceof File || !$file->isReadable()) {
 				throw new RuntimeException('Invalid input file');
 			}
@@ -141,52 +142,130 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 			}
 
 			$fileType = $file->getMimeType();
-			if (!str_starts_with($fileType, 'image/')) {
-				throw new UserFacingProcessingException('Only supports image file types' . $fileType, userFacingMessage: $this->l->t('Only supports image file types'));
-			}
-			if ($this->openAiAPIService->isUsingOpenAi()) {
-				$validFileTypes = [
-					'image/jpeg',
-					'image/png',
-					'image/gif',
-					'image/webp',
-				];
-				if (!in_array($fileType, $validFileTypes, true)) {
-					throw new RuntimeException('Invalid input file type for OpenAI ' . $fileType);
-				}
-			}
 
-			$inputFile = base64_encode(stream_get_contents($file->fopen('rb')));
-			$history = [
-				json_encode([
-					'role' => 'user',
-					'content' => [
-						[
-							'type' => 'image_url',
-							'image_url' => [
-								'url' => 'data:' . $fileType . ';base64,' . $inputFile,
+			if ($fileType === 'application/pdf') {
+				$outputForFile = '';
+				$imagickProbe = $this->getImagickProbe($file);
+				$pagesRead = 0;
+				foreach ($this->imagickPdfToJpegBase64($imagickProbe['image']) as $base64Image) {
+					$pagesRead++;
+					$history = [json_encode([
+						'role' => 'user',
+						'content' => [
+							[
+								'type' => 'image_url',
+								'image_url' => [
+									'url' => 'data:image/jpeg;base64,' . $base64Image,
+								],
 							],
 						],
-					],
-				]),
-			];
+					])];
+					try {
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+						$messages = $completion['messages'];
 
-			try {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
-				$messages = $completion['messages'];
+						if (count($messages) === 0) {
+							$this->logger->warning('No result in OpenAI/LocalAI response.');
+							$outputs[] = '';
+							continue;
+						}
 
-				if (count($messages) === 0) {
-					throw new RuntimeException('No result in OpenAI/LocalAI response.');
+						$outputForFile .= array_pop($messages) . "\n\n";
+						$reportProgress(((float)$fileIndex + (float)($pagesRead / $imagickProbe['count'])) / $fileCount);
+					} catch (\Exception $e) {
+						$this->logger->warning('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage(), ['exception' => $e]);
+						throw new RuntimeException('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage());
+					}
+				}
+				$outputs[] = $outputForFile;
+				$reportProgress(((float)$fileIndex + 1.0) / $fileCount);
+			} elseif (str_starts_with($fileType, 'image/')) {
+				if ($this->openAiAPIService->isUsingOpenAi()) {
+					$validFileTypes = [
+						'image/jpeg',
+						'image/png',
+						'image/gif',
+						'image/webp',
+					];
+					if (!in_array($fileType, $validFileTypes, true)) {
+						throw new RuntimeException('Invalid input file type for OpenAI ' . $fileType);
+					}
 				}
 
-				$outputs[] = array_pop($messages);
-				$reportProgress(($i + 1) / count($input['input']));
-			} catch (\Exception $e) {
-				$this->logger->warning('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage(), ['exception' => $e]);
-				throw new RuntimeException('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage());
+				$base64Image = base64_encode(stream_get_contents($file->fopen('rb')));
+				$history = [
+					json_encode([
+						'role' => 'user',
+						'content' => [
+							[
+								'type' => 'image_url',
+								'image_url' => [
+									'url' => 'data:' . $fileType . ';base64,' . $base64Image,
+								],
+							],
+						],
+					]),
+				];
+				try {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+					$messages = $completion['messages'];
+					$reportProgress(((float)$fileIndex + 1.0) / $fileCount);
+
+					if (count($messages) === 0) {
+						$this->logger->warning('No result in OpenAI/LocalAI response.');
+						$outputs[] = '';
+						continue;
+					}
+
+					$outputs[] = array_pop($messages);
+				} catch (\Exception $e) {
+					$this->logger->warning('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage(), ['exception' => $e]);
+					throw new RuntimeException('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage());
+				}
+			} else {
+				throw new UserFacingProcessingException('Only supports image and pdf file types' . $fileType, userFacingMessage: $this->l->t('Only supports image and pdf file types'));
 			}
+			$fileIndex++;
 		}
 
 		return ['output' => $outputs];
+	}
+
+	/**
+	 * @return array{count: int, image: Imagick}
+	 */
+	private function getImagickProbe(File $file): array {
+		if (!extension_loaded('imagick')) {
+			throw new RuntimeException('Imagick extension not available can not process PDF');
+		}
+		if (empty(Imagick::queryFormats('PDF'))) {
+			throw new RuntimeException('Imagick has no PDF support (Ghostscript missing or blocked by policy.xml)');
+		}
+
+		$pdfContent = $file->getContent();
+		$probe = new Imagick();
+		$probe->setResolution(200, 200);
+		$probe->readImageBlob($pdfContent);
+		return ['count' => $probe->getNumberImages(), 'image' => $probe];
+	}
+	/**
+	 * @return \Generator<int, string>
+	 */
+	private function imagickPdfToJpegBase64(Imagick $im, int $maxPages = 100): \Generator {
+		$pageCount = 0;
+		foreach ($im as $page) {
+			if ($pageCount >= $maxPages) {
+				break;
+			}
+			$page = $page->getImage();
+			$page->setImageBackgroundColor('white');
+			$page = $page->flattenImages();
+			$page->setImageFormat('jpeg');
+			$page->setImageCompressionQuality(85);
+			yield base64_encode($page->getImageBlob());
+			$page->clear();
+			$pageCount++;
+		}
+		$im->clear();
 	}
 }
