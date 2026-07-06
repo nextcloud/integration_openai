@@ -941,6 +941,7 @@ class OpenAiAPIService {
 				$audioDuration = 0;
 			}
 
+			// Audio durations higher than this can cause errors in the database: https://github.com/nextcloud/integration_openai/issues/394
 			if ($audioDuration > 2147483647) {
 				$this->logger->warning('Audio duration is greater than 2147483647 seconds: ' . $audioDuration);
 				$audioDuration = 2147483647;
