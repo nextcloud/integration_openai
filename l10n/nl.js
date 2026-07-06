@@ -14,6 +14,7 @@ OC.L10N.register(
     "Minimal" : "Minimaal",
     "Format" : "Formaat",
     "Auto" : "Automatisch",
+    "Simple" : "Eenvoudig",
     "Medium" : "Gemiddeld",
     "Size" : "Grootte",
     "Cannot generate less than 1 image" : "Kan niet minder dan 1 afbeelding genereren",
