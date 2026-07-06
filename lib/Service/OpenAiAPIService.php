@@ -967,6 +967,17 @@ class OpenAiAPIService {
 		if (isset($response['segments'])) {
 			$audioDuration = intval(round(floatval(array_pop($response['segments'])['end'])));
 
+			if ($audioDuration < 0) {
+				$this->logger->warning('Audio duration is less than 0: ' . $audioDuration);
+				$audioDuration = 0;
+			}
+
+			// Audio durations higher than this can cause errors in the database: https://github.com/nextcloud/integration_openai/issues/394
+			if ($audioDuration > 2147483647) {
+				$this->logger->warning('Audio duration is greater than 2147483647 seconds: ' . $audioDuration);
+				$audioDuration = 2147483647;
+			}
+
 			try {
 				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
 			} catch (DBException $e) {
