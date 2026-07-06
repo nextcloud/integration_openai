@@ -143,23 +143,29 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 
 			$fileType = $file->getMimeType();
 
+			// handle pdf files by converting to jpeg and then passing to the api
 			if ($fileType === 'application/pdf') {
 				$outputForFile = '';
 				$imagickProbe = $this->getImagickProbe($file);
 				$pagesRead = 0;
-				foreach ($this->imagickPdfToJpegBase64($imagickProbe['image']) as $base64Image) {
-					$pagesRead++;
-					$history = [json_encode([
-						'role' => 'user',
-						'content' => [
-							[
-								'type' => 'image_url',
-								'image_url' => [
-									'url' => 'data:image/jpeg;base64,' . $base64Image,
+				$history = [];
+				foreach ($this->imagickPdfToJpegBase64($imagickProbe['image'], 5) as $base64Image) {
+					$pagesRead += count($base64Image);
+					$history = [];
+					// Batches 5 in one request to speed up the process
+					foreach ($base64Image as $image) {
+						$history[] = json_encode([
+							'role' => 'user',
+							'content' => [
+								[
+									'type' => 'image_url',
+									'image_url' => [
+										'url' => 'data:image/jpeg;base64,' . $image,
+									],
 								],
 							],
-						],
-					])];
+						]);
+					}
 					try {
 						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
 						$messages = $completion['messages'];
@@ -249,10 +255,11 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 		return ['count' => $probe->getNumberImages(), 'image' => $probe];
 	}
 	/**
-	 * @return \Generator<int, string>
+	 * @return \Generator<int, array<int, string>>
 	 */
-	private function imagickPdfToJpegBase64(Imagick $im, int $maxPages = 100): \Generator {
+	private function imagickPdfToJpegBase64(Imagick $im, int $batchSize, int $maxPages = 500): \Generator {
 		$pageCount = 0;
+		$batch = [];
 		foreach ($im as $page) {
 			if ($pageCount >= $maxPages) {
 				break;
@@ -262,9 +269,17 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 			$page = $page->flattenImages();
 			$page->setImageFormat('jpeg');
 			$page->setImageCompressionQuality(85);
-			yield base64_encode($page->getImageBlob());
+			$batch[] = base64_encode($page->getImageBlob());
 			$page->clear();
 			$pageCount++;
+			// Read in batchs to avoid memory issues
+			if (count($batch) >= $batchSize) {
+				yield $batch;
+				$batch = [];
+			}
+		}
+		if (count($batch) > 0) {
+			yield $batch;
 		}
 		$im->clear();
 	}
