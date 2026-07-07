@@ -23,6 +23,7 @@ OC.L10N.register(
     "Authentication method" : "Authenticatiemethode",
     "API key" : "API-sleutel",
     "Start date" : "Startdatum",
+    "End date" : "Eind datum",
     "Default language" : "Standaardtaal",
     "Days" : "Dagen",
     "Months" : "Maanden",
