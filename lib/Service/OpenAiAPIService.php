@@ -51,6 +51,7 @@ class OpenAiAPIService {
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
 		private StreamingService $streamingService,
+		private OpenAiFileService $openAiFileService,
 		private INotificationManager $notificationManager,
 		private QuotaRuleService $quotaRuleService,
 		IClientService $clientService,
@@ -533,6 +534,7 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?string $userAudioPromptBase64 = null,
 		?string $userAudioPromptFormat = null,
+		?array $files = null,
 	): \Generator {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -551,6 +553,7 @@ class OpenAiAPIService {
 			$tools,
 			$userAudioPromptBase64,
 			$userAudioPromptFormat,
+			$files,
 			true,
 		);
 
@@ -593,11 +596,12 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?string $userAudioPromptBase64 = null,
 		?string $userAudioPromptFormat = null,
+		?array $files = null,
 	): array {
 		$response = $this->requestChatCompletion(
 			$userId, $model, $userPrompt, $systemPrompt, $history,
 			$n, $maxTokens, $extraParams, $toolMessage, $tools,
-			$userAudioPromptBase64, $userAudioPromptFormat,
+			$userAudioPromptBase64, $userAudioPromptFormat, $files,
 			false,
 		);
 
@@ -627,6 +631,7 @@ class OpenAiAPIService {
 	 * @param array|null $tools
 	 * @param string|null $userAudioPromptBase64
 	 * @param string|null $userAudioPromptFormat
+	 * @param array|null $files Array of File objects
 	 * @return array{messages?: array<string>, tool_calls?: array<string>, audio_messages?: list<array<string, mixed>>, usage?: array<string, mixed>}
 	 * @throws Exception
 	 */
@@ -643,6 +648,7 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?string $userAudioPromptBase64 = null,
 		?string $userAudioPromptFormat = null,
+		?array $files = null,
 		bool $stream = false,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
@@ -662,6 +668,7 @@ class OpenAiAPIService {
 			$tools,
 			$userAudioPromptBase64,
 			$userAudioPromptFormat,
+			$files,
 			$stream,
 		);
 
@@ -681,6 +688,7 @@ class OpenAiAPIService {
 	 * @param array|null $tools
 	 * @param string|null $userAudioPromptBase64
 	 * @param string|null $userAudioPromptFormat
+	 * @param array|null $files Array of File objects
 	 * @param bool $stream
 	 * @return array<string, mixed>
 	 */
@@ -697,6 +705,7 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?string $userAudioPromptBase64 = null,
 		?string $userAudioPromptFormat = null,
+		?array $files = null,
 		bool $stream = false,
 	): array {
 		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
@@ -739,6 +748,13 @@ class OpenAiAPIService {
 				}
 				$messages[] = $message;
 			}
+		}
+		// Attach all files when necessary
+		if ($files !== null) {
+			$messages[] = [
+				'role' => 'user',
+				'content' => $this->openAiFileService->buildFileContents($files),
+			];
 		}
 		if ($userAudioPromptBase64 !== null) {
 			// if there is audio, use the new message format (content is a list of objects)

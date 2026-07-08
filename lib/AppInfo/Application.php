@@ -143,6 +143,7 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(EmojiProvider::class);
 			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
 			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
+			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\MultimodalChatWithToolsProvider::class);
 			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider::class);

@@ -16,6 +16,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\StreamingService;
@@ -96,6 +97,10 @@ class OpenAiProviderTest extends TestCase {
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$this->streamingService,
+			new OpenAiFileService(
+				$this->createMock(\OCP\IL10N::class),
+				$this->openAiSettingsService,
+			),
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
