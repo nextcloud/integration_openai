@@ -64,6 +64,7 @@
     "Minimal" : "Mínimo",
     "Format" : "Formato",
     "Auto" : "Auto",
+    "Simple" : "Simple",
     "Medium" : "Mediano",
     "Size" : "Tamaño",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "Opcional. El tamaño de las imágenes generadas. Debe estar en formato 256x256. El valor por defecto es %s",
