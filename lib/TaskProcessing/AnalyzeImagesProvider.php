@@ -12,7 +12,6 @@ namespace OCA\OpenAi\TaskProcessing;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
-use OCP\Files\File;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -120,68 +119,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 		if (!isset($input['images']) || !is_array($input['images'])) {
 			throw new ProcessingException('Invalid file list');
 		}
-		// Maximum file count for openai is 500. Seems reasonable enough to enforce for all apis though (https://platform.openai.com/docs/guides/images-vision?api-mode=responses&format=url#image-input-requirements)
-		if (count($input['images']) > 500) {
-			throw new UserFacingProcessingException(
-				'Too many files given. Max is 500',
-				0,
-				null,
-				$this->l->t('Too many files given. A maximum of 500 files is allowed.'),
-			);
-		}
-		$fileSize = 0;
-		foreach ($input['images'] as $image) {
-			if (!$image instanceof File || !$image->isReadable()) {
-				throw new ProcessingException('Invalid input file');
-			}
-			$fileSize += intval($image->getSize());
-			// Maximum file size for openai is 50MB. Seems reasonable enough to enforce for all apis though. (https://platform.openai.com/docs/guides/images-vision?api-mode=responses&format=url#image-input-requirements)
-			if ($fileSize > 50 * 1000 * 1000) {
-				throw new UserFacingProcessingException(
-					'Filesize of input files too large. Max is 50MB',
-					0,
-					null,
-					$this->l->t('The total size of the input files is too large. A maximum of 50MB is allowed.'),
-				);
-			}
-			$inputFile = base64_encode(stream_get_contents($image->fopen('rb')));
-			$fileType = $image->getMimeType();
-			if (!str_starts_with($fileType, 'image/')) {
-				throw new UserFacingProcessingException(
-					'Invalid input file type ' . $fileType,
-					0,
-					null,
-					$this->l->t('Invalid input file type "%1$s". Only image files are supported.', [$fileType]),
-				);
-			}
-			if ($this->openAiAPIService->isUsingOpenAi()) {
-				$validFileTypes = [
-					'image/jpeg',
-					'image/png',
-					'image/gif',
-					'image/webp',
-				];
-				if (!in_array($fileType, $validFileTypes)) {
-					throw new UserFacingProcessingException(
-						'Invalid input file type for OpenAI ' . $fileType,
-						0,
-						null,
-						$this->l->t('Invalid input file type "%1$s". Only JPEG, PNG, GIF and WebP images are supported.', [$fileType]),
-					);
-				}
-			}
-			$history[] = json_encode([
-				'role' => 'user',
-				'content' => [
-					[
-						'type' => 'image_url',
-						'image_url' => [
-							'url' => 'data:' . $fileType . ';base64,' . $inputFile,
-						],
-					],
-				],
-			]);
-		}
+		$images = $input['images'];
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new ProcessingException('Invalid prompt');
@@ -202,7 +140,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 		try {
 			$systemPrompt = 'Take the user\'s question and answer it based on the provided images. Ensure that the answer matches the language of the user\'s question.';
 			if ($preferStreaming) {
-				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens);
+				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens, null, null, null, $images);
 				$time = microtime(true);
 				$streamedOutput = '';
 				$streamedReasoning = '';
@@ -240,7 +178,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 				$completion = $returnValue['messages'];
 				$reasoning = $returnValue['reasoning_messages'];
 			} else {
-				$returnValue = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens);
+				$returnValue = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, $systemPrompt, $history, 1, $maxTokens, null, null, null, $images);
 				$completion = $returnValue['messages'];
 				$reasoning = $returnValue['reasoning_messages'];
 			}

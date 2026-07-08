@@ -43,7 +43,10 @@ class OpenAiSettingsService {
 		't2i_provider_enabled' => 'boolean',
 		'stt_provider_enabled' => 'boolean',
 		'tts_provider_enabled' => 'boolean',
-		'analyze_image_provider_enabled' => 'boolean',
+		'multimodal_image_enabled' => 'boolean',
+		'multimodal_audio_enabled' => 'boolean',
+		'multimodal_video_enabled' => 'boolean',
+		'multimodal_document_enabled' => 'boolean',
 		'chat_endpoint_enabled' => 'boolean',
 		'basic_user' => 'string',
 		'basic_password' => 'string',
@@ -587,7 +590,10 @@ class OpenAiSettingsService {
 			't2i_provider_enabled' => $this->getT2iProviderEnabled(),
 			'stt_provider_enabled' => $this->getSttProviderEnabled(),
 			'tts_provider_enabled' => $this->getTtsProviderEnabled(),
-			'analyze_image_provider_enabled' => $this->getAnalyzeImageProviderEnabled(),
+			'multimodal_image_enabled' => $this->getMultimodalImageEnabled(),
+			'multimodal_audio_enabled' => $this->getMultimodalAudioEnabled(),
+			'multimodal_video_enabled' => $this->getMultimodalVideoEnabled(),
+			'multimodal_document_enabled' => $this->getMultimodalDocumentEnabled(),
 			'chat_endpoint_enabled' => $this->getChatEndpointEnabled(),
 			'basic_user' => $this->getAdminBasicUser(),
 			'basic_password' => $this->getAdminBasicPassword(),
@@ -699,14 +705,29 @@ class OpenAiSettingsService {
 	/**
 	 * @return bool
 	 */
-	public function getAnalyzeImageProviderEnabled(): bool {
-		$config = $this->appConfig->getValueString(Application::APP_ID, 'analyze_image_provider_enabled');
-		if ($config === '') {
-			$serviceUrl = $this->getServiceUrl();
-			$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-			return $isUsingOpenAI;
-		}
-		return $config === '1';
+	public function getMultimodalImageEnabled(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'multimodal_image_enabled', '1') === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getMultimodalAudioEnabled(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'multimodal_audio_enabled', '1') === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getMultimodalVideoEnabled(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'multimodal_video_enabled', '0') === '1';
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getMultimodalDocumentEnabled(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'multimodal_document_enabled', '1') === '1';
 	}
 
 	////////////////////////////////////////////
@@ -1268,11 +1289,20 @@ class OpenAiSettingsService {
 		if (isset($adminConfig['tts_provider_enabled'])) {
 			$this->setTtsProviderEnabled($adminConfig['tts_provider_enabled']);
 		}
-		if (isset($adminConfig['analyze_image_provider_enabled'])) {
-			$this->setAnalyzeImageProviderEnabled($adminConfig['analyze_image_provider_enabled']);
-		}
 		if (isset($adminConfig['default_tts_voice'])) {
 			$this->setAdminDefaultTtsVoice($adminConfig['default_tts_voice']);
+		}
+		if (isset($adminConfig['multimodal_image_enabled'])) {
+			$this->setMultimodalImageEnabled($adminConfig['multimodal_image_enabled']);
+		}
+		if (isset($adminConfig['multimodal_audio_enabled'])) {
+			$this->setMultimodalAudioEnabled($adminConfig['multimodal_audio_enabled']);
+		}
+		if (isset($adminConfig['multimodal_video_enabled'])) {
+			$this->setMultimodalVideoEnabled($adminConfig['multimodal_video_enabled']);
+		}
+		if (isset($adminConfig['multimodal_document_enabled'])) {
+			$this->setMultimodalDocumentEnabled($adminConfig['multimodal_document_enabled']);
 		}
 		if (isset($adminConfig['chat_endpoint_enabled'])) {
 			$this->setChatEndpointEnabled($adminConfig['chat_endpoint_enabled']);
@@ -1444,10 +1474,30 @@ class OpenAiSettingsService {
 
 	/**
 	 * @param bool $enabled
-	 * @return void
 	 */
-	public function setAnalyzeImageProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'analyze_image_provider_enabled', $enabled ? '1' : '0');
+	public function setMultimodalImageEnabled(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'multimodal_image_enabled', $enabled ? '1' : '0');
+	}
+
+	/**
+	 * @param bool $enabled
+	 */
+	public function setMultimodalAudioEnabled(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'multimodal_audio_enabled', $enabled ? '1' : '0');
+	}
+
+	/**
+	 * @param bool $enabled
+	 */
+	public function setMultimodalVideoEnabled(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'multimodal_video_enabled', $enabled ? '1' : '0');
+	}
+
+	/**
+	 * @param bool $enabled
+	 */
+	public function setMultimodalDocumentEnabled(bool $enabled): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'multimodal_document_enabled', $enabled ? '1' : '0');
 	}
 
 	/**

@@ -61,7 +61,7 @@ class OpenAiFileService {
 		'application/yaml',
 		'application/x-awk',
 		'application/x-subrip',
-		'application/csv',
+		'application/csv'
 	];
 
 	public function __construct(
@@ -76,6 +76,14 @@ class OpenAiFileService {
 	 */
 	public function buildFileContents(array $files): array {
 		$fileContents = [];
+		if (count($files) > 500) {
+			throw new UserFacingProcessingException(
+				'Too many files. Max is 500',
+				0,
+				null,
+				$this->l10n->t('The number of input files is too large. A maximum of 500 files is allowed.'),
+			);
+		}
 		foreach ($files as $file) {
 			if (!$file instanceof File || !$file->isReadable()) {
 				throw new ProcessingException('File is not readable');
@@ -93,8 +101,10 @@ class OpenAiFileService {
 			$fileType = $file->getMimeType();
 			if (str_starts_with($fileType, 'image/')) {
 				$fileContents[] = $this->buildImageContent($file);
+				// OpenAI only supports this for very specific models and support is not that common
 			} elseif (str_starts_with($fileType, 'audio/')) {
 				$fileContents[] = $this->buildAudioContent($file);
+				// OpenAI does not currently support video attachments
 			} elseif (str_starts_with($fileType, 'video/')) {
 				$fileContents[] = $this->buildVideoContent($file);
 			} elseif ($fileType === 'application/pdf') {
@@ -110,6 +120,14 @@ class OpenAiFileService {
 	 * @return array{type: string, image_url: array{url: string}}
 	 */
 	private function buildImageContent(File $file): array {
+		if (!$this->openAiSettingsService->getMultimodalImageEnabled()) {
+			throw new UserFacingProcessingException(
+				'Image attachments are disabled',
+				0,
+				null,
+				$this->l10n->t('Image attachments are unsupported.'),
+			);
+		}
 		$fileType = $file->getMimeType();
 		if ($this->isUsingOpenAi() && !in_array($fileType, self::VALID_IMAGE_MIME_TYPES, true)) {
 			throw new UserFacingProcessingException(
@@ -131,8 +149,16 @@ class OpenAiFileService {
 	 * @return array{type: string, input_audio: array{data: string, format: string}}
 	 */
 	private function buildAudioContent(File $file): array {
+		if (!$this->openAiSettingsService->getMultimodalAudioEnabled()) {
+			throw new UserFacingProcessingException(
+				'Audio attachments are disabled',
+				0,
+				null,
+				$this->l10n->t('Audio attachments are unsupported.'),
+			);
+		}
 		$fileType = $file->getMimeType();
-		
+
 		if (!array_key_exists($fileType, self::SUPPORTED_INPUT_AUDIO_FORMATS)) {
 			throw new UserFacingProcessingException(
 				'Invalid input file type for OpenAI ' . $fileType,
@@ -155,6 +181,14 @@ class OpenAiFileService {
 	 * @return array{type: string, video_url: array{url: string}}
 	 */
 	private function buildVideoContent(File $file): array {
+		if (!$this->openAiSettingsService->getMultimodalVideoEnabled()) {
+			throw new UserFacingProcessingException(
+				'Video attachments are disabled',
+				0,
+				null,
+				$this->l10n->t('Video attachments are unsupported.'),
+			);
+		}
 		$fileType = $file->getMimeType();
 		return [
 			'type' => 'video_url',
@@ -168,6 +202,14 @@ class OpenAiFileService {
 	 * @return array{type: string, file: array{filename: string, file_data: string}}
 	 */
 	private function buildDocumentContent(File $file): array {
+		if (!$this->openAiSettingsService->getMultimodalDocumentEnabled()) {
+			throw new UserFacingProcessingException(
+				'Document attachments are disabled',
+				0,
+				null,
+				$this->l10n->t('Document attachments are unsupported.'),
+			);
+		}
 		$fileType = $file->getMimeType();
 		return [
 			'type' => 'file',

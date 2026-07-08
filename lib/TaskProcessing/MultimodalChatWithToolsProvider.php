@@ -146,7 +146,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		try {
 			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
-					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, null, null, $inputAttachments
+					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments
 				);
 				$time = microtime(true);
 				$streamedOutput = '';
@@ -184,19 +184,17 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 				$returnValue = $chunks->getReturn();
 			} else {
 				$returnValue = $this->openAiAPIService->createChatCompletion(
-					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, null, null, $inputAttachments
+					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments
 				);
 			}
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
 		} catch (\Throwable $e) {
-			xdebug_break();
 			throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
 		if (count($returnValue['messages']) > 0 || count($returnValue['tool_calls']) > 0) {
 			$endTime = time();
 			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
-			var_dump($returnValue);
 			return [
 				'output' => array_pop($returnValue['messages']) ?? '',
 				'output_attachments' => [],

@@ -125,7 +125,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
 		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
 		$adminLlmModel = $isUsingOpenAi
-			? 'gpt-4o-audio-preview'
+			? 'gpt-audio'
 			: $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		$defaults = [
 			'voice' => $adminVoice,
@@ -234,9 +234,6 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		string $sttModel, string $llmModel, string $ttsModel, float $speed, string $serviceName,
 	): array {
 		$result = [];
-		$audioInputMimetype = mime_content_type($inputFile->fopen('rb'));
-		$audioInputFormat = self::SUPPORTED_INPUT_AUDIO_FORMATS[$audioInputMimetype] ?? 'wav';
-		$b64Audio = base64_encode($inputFile->getContent());
 		$extraParams = [
 			'modalities' => ['text', 'audio'],
 			'audio' => ['voice' => $outputVoice, 'format' => 'mp3'],
@@ -244,7 +241,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$systemPrompt .= ' Producing text responses will break the user interface. Important: You have multimodal voice capability, and you use voice exclusively to respond.';
 		$completion = $this->openAiAPIService->createChatCompletion(
 			$userId, $llmModel, null, $systemPrompt, $history, 1, 1000,
-			$extraParams, null, null, $b64Audio, $audioInputFormat
+			$extraParams, null, null, [$inputFile]
 		);
 		$message = array_pop($completion['audio_messages']);
 		// TODO find a way to force the model to answer with audio when there is only text in the history

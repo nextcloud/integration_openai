@@ -532,8 +532,6 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
-		?string $userAudioPromptBase64 = null,
-		?string $userAudioPromptFormat = null,
 		?array $files = null,
 	): \Generator {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
@@ -551,8 +549,6 @@ class OpenAiAPIService {
 			$extraParams,
 			$toolMessage,
 			$tools,
-			$userAudioPromptBase64,
-			$userAudioPromptFormat,
 			$files,
 			true,
 		);
@@ -594,14 +590,11 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
-		?string $userAudioPromptBase64 = null,
-		?string $userAudioPromptFormat = null,
 		?array $files = null,
 	): array {
 		$response = $this->requestChatCompletion(
 			$userId, $model, $userPrompt, $systemPrompt, $history,
-			$n, $maxTokens, $extraParams, $toolMessage, $tools,
-			$userAudioPromptBase64, $userAudioPromptFormat, $files,
+			$n, $maxTokens, $extraParams, $toolMessage, $tools, $files,
 			false,
 		);
 
@@ -629,8 +622,6 @@ class OpenAiAPIService {
 	 * @param array|null $extraParams
 	 * @param string|null $toolMessage JSON string with role, content, tool_call_id
 	 * @param array|null $tools
-	 * @param string|null $userAudioPromptBase64
-	 * @param string|null $userAudioPromptFormat
 	 * @param array|null $files Array of File objects
 	 * @return array{messages?: array<string>, tool_calls?: array<string>, audio_messages?: list<array<string, mixed>>, usage?: array<string, mixed>}
 	 * @throws Exception
@@ -646,8 +637,6 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
-		?string $userAudioPromptBase64 = null,
-		?string $userAudioPromptFormat = null,
 		?array $files = null,
 		bool $stream = false,
 	): array {
@@ -666,8 +655,6 @@ class OpenAiAPIService {
 			$extraParams,
 			$toolMessage,
 			$tools,
-			$userAudioPromptBase64,
-			$userAudioPromptFormat,
 			$files,
 			$stream,
 		);
@@ -686,8 +673,6 @@ class OpenAiAPIService {
 	 * @param array|null $extraParams
 	 * @param string|null $toolMessage
 	 * @param array|null $tools
-	 * @param string|null $userAudioPromptBase64
-	 * @param string|null $userAudioPromptFormat
 	 * @param array|null $files Array of File objects
 	 * @param bool $stream
 	 * @return array<string, mixed>
@@ -703,8 +688,6 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
-		?string $userAudioPromptBase64 = null,
-		?string $userAudioPromptFormat = null,
 		?array $files = null,
 		bool $stream = false,
 	): array {
@@ -751,34 +734,18 @@ class OpenAiAPIService {
 		}
 		// Attach all files when necessary
 		if ($files !== null) {
-			$messages[] = [
-				'role' => 'user',
-				'content' => $this->openAiFileService->buildFileContents($files),
-			];
-		}
-		if ($userAudioPromptBase64 !== null) {
-			// if there is audio, use the new message format (content is a list of objects)
-			$message = [
-				'role' => 'user',
-				'content' => [
-					[
-						'type' => 'input_audio',
-						'input_audio' => [
-							'data' => $userAudioPromptBase64,
-							'format' => $userAudioPromptFormat ?? 'wav',
-						],
-					],
-				],
-			];
+			$content = $this->openAiFileService->buildFileContents($files);
 			if ($userPrompt !== null) {
-				$message['content'][] = [
+				$content[] = [
 					'type' => 'text',
 					'text' => $userPrompt,
 				];
 			}
-			$messages[] = $message;
+			$messages[] = [
+				'role' => 'user',
+				'content' => $content,
+			];
 		} elseif ($userPrompt !== null) {
-			// if there is only text, use the old message format (content is a string)
 			$messages[] = [
 				'role' => 'user',
 				'content' => $userPrompt,
@@ -1582,7 +1549,6 @@ class OpenAiAPIService {
 		$config['stt_provider_enabled'] = $this->isSTTAvailable();
 		$config['tts_provider_enabled'] = $this->isTTSAvailable();
 		$this->openAiSettingsService->setAdminConfig($config);
-		$config['analyze_image_provider_enabled'] = $this->openAiSettingsService->getAnalyzeImageProviderEnabled();
 		return $config;
 	}
 }
