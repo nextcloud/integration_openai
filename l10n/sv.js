@@ -16,6 +16,7 @@ OC.L10N.register(
     "Format" : "Format",
     "Auto" : "Auto",
     "Medium" : "Medium",
+    "Size" : "Storlek",
     "Cannot generate less than 1 image" : "Kan inte generera mindre än 1 bild",
     "OpenAI and LocalAI integration" : "OpenAI och LocalAI integration",
     "Integration of OpenAI and LocalAI services" : "Integration av OpenAI och LocalAI-tjänster",
