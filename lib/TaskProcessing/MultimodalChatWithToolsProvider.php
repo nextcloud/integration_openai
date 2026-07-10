@@ -12,6 +12,8 @@ namespace OCA\OpenAi\TaskProcessing;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\WatermarkingService;
+use OCP\Http\Client\IClientService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -21,6 +23,7 @@ use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\MultimodalChatWithTools;
+use Psr\Log\LoggerInterface;
 
 class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -28,6 +31,9 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		private OpenAiAPIService $openAiAPIService,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
+		private LoggerInterface $logger,
+		private IClientService $clientService,
+		private WatermarkingService $watermarkingService,
 	) {
 	}
 
@@ -95,7 +101,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
 	): array {
 		$reportOutput = $options->getReportIntermediateOutput();
-		$preferStreaming = false; //$options->getPreferStreaming();
+		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
@@ -142,7 +148,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
 		}
-
+		xdebug_break();
 		try {
 			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
@@ -192,12 +198,27 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		} catch (\Throwable $e) {
 			throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
 		}
-		if (count($returnValue['messages']) > 0 || count($returnValue['tool_calls']) > 0) {
+		if (count($returnValue['messages']) > 0 || count($returnValue['tool_calls']) > 0 || count($returnValue['images']) > 0 || count($returnValue['audio_messages']) > 0) {
 			$endTime = time();
 			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			$attachments = [];
+
+			// Handle image output
+			foreach ($returnValue['images'] as $image) {
+				if ($image['type'] === 'image_url') {
+					$url = $image['image_url']['url'];
+					$base64Str = explode(',', $url)[1] ?? '';
+					$image = base64_decode($base64Str);
+					$image = $this->watermarkingService->markImage($image);
+					$attachments[] = $image;
+				} else {
+					$this->logger->warning('Encountered an unknown image type in multimodal chat: ' . $image['type']);
+				}
+			}
+
 			return [
 				'output' => array_pop($returnValue['messages']) ?? '',
-				'output_attachments' => [],
+				'output_attachments' => $attachments,
 				'reasoning' => count($returnValue['reasoning_messages']) > 0 ? array_pop($returnValue['reasoning_messages']) : '',
 				'tool_calls' => array_pop($returnValue['tool_calls']) ?? '',
 			];

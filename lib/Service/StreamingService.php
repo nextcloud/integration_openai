@@ -176,6 +176,9 @@ class StreamingService {
 				$choices[$index]['message']['audio'] = $choice['message']['audio'];
 			}
 
+			if (isset($choice['message']['images']) && is_array($choice['message']['images'])) {
+				$choices[$index]['message']['images'] = $choice['message']['images'];
+			}
 			// TODO decide if we stream the tool_calls
 
 			if (isset($choice['delta']['tool_calls']) && is_array($choice['delta']['tool_calls'])) {

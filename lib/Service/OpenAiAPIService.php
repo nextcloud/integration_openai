@@ -1425,7 +1425,9 @@ class OpenAiAPIService {
 			'reasoning_messages' => [],
 			'tool_calls' => [],
 			'audio_messages' => [],
+			'images' => [],
 		];
+
 
 		foreach ($response['choices'] as $choice) {
 			if (!is_array($choice)) {
@@ -1465,6 +1467,11 @@ class OpenAiAPIService {
 			}
 			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
 				$completions['audio_messages'][] = $choice['message'];
+			}
+			if (isset($choice['message']['images']) && is_array($choice['message']['images'])) {
+				foreach ($choice['message']['images'] as $image) {
+					$completions['images'][] = $image;
+				}
 			}
 		}
 
