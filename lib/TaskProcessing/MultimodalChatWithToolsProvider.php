@@ -148,7 +148,6 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
 		}
-		xdebug_break();
 		try {
 			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion(

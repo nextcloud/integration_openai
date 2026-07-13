@@ -729,12 +729,27 @@ class OpenAiAPIService {
 						return $formattedToolCall;
 					}, $message['tool_calls']);
 				}
+				// Handle file attachments in the history
+				if (isset($message['content']) && is_array($message['content'])) {
+					$content = [];
+					foreach ($message['content'] as $item) {
+						if ($item['type'] === 'file') {
+							$content[] = $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId);
+						} else {
+							$content[] = $item;
+						}
+					}
+					$message['content'] = $content;
+				}
 				$messages[] = $message;
 			}
 		}
 		// Attach all files when necessary
-		if ($files !== null) {
-			$content = $this->openAiFileService->buildFileContents($files);
+		if ($files !== null && count($files) > 0) {
+			if (count($files) > 500) {
+				throw new UserFacingProcessingException($this->l10n->t('Too many files. Max is 500'), Http::STATUS_BAD_REQUEST);
+			}
+			$content = array_map([$this->openAiFileService, 'buildFileContentFromFile'], $files);
 			if ($userPrompt !== null) {
 				$content[] = [
 					'type' => 'text',

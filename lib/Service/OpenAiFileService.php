@@ -11,6 +11,7 @@ namespace OCA\OpenAi\Service;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCP\Files\File;
+use OCP\Files\IRootFolder;
 use OCP\IL10N;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
@@ -67,54 +68,63 @@ class OpenAiFileService {
 	public function __construct(
 		private IL10N $l10n,
 		private OpenAiSettingsService $openAiSettingsService,
+		private IRootFolder $rootFolder,
 	) {
 	}
 
 	/**
-	 * @param array $files Array of File objects
-	 * @return list<array<string, mixed>>
+	 * Builds file content from a file ID within a given user folder.
+	 *
+	 * @param int $fileId The ID of the file to build content from.
+	 * @param string $userId The user ID.
+	 * @return array Content array suitable for OpenAI API or other handlers.
+	 * @throws ProcessingException
+	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContents(array $files): array {
-		$fileContents = [];
-		if (count($files) > 500) {
+	public function buildFileContentFromId(int $fileId, string $userId): array {
+		$userFolder = $this->rootFolder->getUserFolder($userId);
+		$file = $userFolder->getFirstNodeById($fileId);
+		return $this->buildFileContentFromFile($file);
+	}
+
+	/**
+	 * Builds file content from a File object.
+	 *
+	 * @param ?File $file The file to build content from.
+	 * @return array Content array suitable for OpenAI API or other handlers.
+	 * @throws ProcessingException
+	 * @throws UserFacingProcessingException
+	 */
+	public function buildFileContentFromFile(?File $file): array {
+		if (!$file instanceof File || !$file->isReadable()) {
+			throw new ProcessingException('File is not readable');
+		}
+		// Maximum file size for openai is 50MB.
+		if ($this->isUsingOpenAi() && $file->getSize() > self::MAX_FILE_SIZE_BYTES) {
 			throw new UserFacingProcessingException(
-				'Too many files. Max is 500',
+				'Filesize of input files too large. Max is 50MB',
 				0,
 				null,
-				$this->l10n->t('The number of input files is too large. A maximum of 500 files is allowed.'),
+				$this->l10n->t('The size of the input file is too large. A maximum of 50MB is allowed.'),
 			);
 		}
-		foreach ($files as $file) {
-			if (!$file instanceof File || !$file->isReadable()) {
-				throw new ProcessingException('File is not readable');
-			}
-			// Maximum file size for openai is 50MB.
-			if ($this->isUsingOpenAi() && $file->getSize() > self::MAX_FILE_SIZE_BYTES) {
-				throw new UserFacingProcessingException(
-					'Filesize of input files too large. Max is 50MB',
-					0,
-					null,
-					$this->l10n->t('The size of the input file is too large. A maximum of 50MB is allowed.'),
-				);
-			}
 
-			$fileType = $file->getMimeType();
-			if (str_starts_with($fileType, 'image/')) {
-				$fileContents[] = $this->buildImageContent($file);
-				// OpenAI only supports this for very specific models and support is not that common
-			} elseif (str_starts_with($fileType, 'audio/')) {
-				$fileContents[] = $this->buildAudioContent($file);
-				// OpenAI does not currently support video attachments
-			} elseif (str_starts_with($fileType, 'video/')) {
-				$fileContents[] = $this->buildVideoContent($file);
-			} elseif ($fileType === 'application/pdf') {
-				$fileContents[] = $this->buildDocumentContent($file);
-			} else {
-				$fileContents[] = $this->buildTextContent($file);
-			}
+		$fileType = $file->getMimeType();
+		if (str_starts_with($fileType, 'image/')) {
+			return $this->buildImageContent($file);
+			// OpenAI only supports this for very specific models and support is not that common
+		} elseif (str_starts_with($fileType, 'audio/')) {
+			return $this->buildAudioContent($file);
+			// OpenAI does not currently support video attachments
+		} elseif (str_starts_with($fileType, 'video/')) {
+			return $this->buildVideoContent($file);
+		} elseif ($fileType === 'application/pdf') {
+			return $this->buildDocumentContent($file);
+		} else {
+			return $this->buildTextContent($file);
 		}
-		return $fileContents;
 	}
+
 
 	/**
 	 * @return array{type: string, image_url: array{url: string}}
