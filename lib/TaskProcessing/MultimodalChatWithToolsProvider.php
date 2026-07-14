@@ -13,7 +13,6 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\WatermarkingService;
-use OCP\Http\Client\IClientService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -27,12 +26,13 @@ use Psr\Log\LoggerInterface;
 
 class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
+	private const MAX_INPUT_ATTACHMENTS = 10;
+
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private LoggerInterface $logger,
-		private IClientService $clientService,
 		private WatermarkingService $watermarkingService,
 	) {
 	}
@@ -143,6 +143,14 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 			throw new ProcessingException('Invalid input_attachments');
 		}
 		$inputAttachments = $input['input_attachments'];
+		if (count($inputAttachments) > self::MAX_INPUT_ATTACHMENTS) {
+			throw new UserFacingProcessingException(
+				'Too many files. Max is ' . self::MAX_INPUT_ATTACHMENTS,
+				0,
+				null,
+				$this->l->t('Too many files given. A maximum of %d files is allowed.', [self::MAX_INPUT_ATTACHMENTS]),
+			);
+		}
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -213,6 +221,14 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 				} else {
 					$this->logger->warning('Encountered an unknown image type in multimodal chat: ' . $image['type']);
 				}
+			}
+
+			// Handle audio output
+			foreach ($returnValue['audio_messages'] as $audioMessage) {
+				if (!isset($audioMessage['audio']['data']) || !is_string($audioMessage['audio']['data'])) {
+					continue;
+				}
+				$attachments[] = base64_decode($audioMessage['audio']['data']);
 			}
 
 			return [

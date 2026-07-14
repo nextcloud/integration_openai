@@ -91,6 +91,8 @@ class QuotaTest extends TestCase {
 			new OpenAiFileService(
 				$this->createMock(IL10N::class),
 				$this->openAiSettingsService,
+				$this->createMock(\OCP\Files\IRootFolder::class),
+				$this->createMock(LoggerInterface::class),
 			),
 			$this->notificationManager,
 			\OCP\Server::get(QuotaRuleService::class),

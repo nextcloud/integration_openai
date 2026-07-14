@@ -734,7 +734,7 @@ class OpenAiAPIService {
 					$content = [];
 					foreach ($message['content'] as $item) {
 						if ($item['type'] === 'file') {
-							$content[] = $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId);
+							$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId));
 						} else {
 							$content[] = $item;
 						}
@@ -749,7 +749,10 @@ class OpenAiAPIService {
 			if (count($files) > 500) {
 				throw new UserFacingProcessingException($this->l10n->t('Too many files. Max is 500'), Http::STATUS_BAD_REQUEST);
 			}
-			$content = array_map([$this->openAiFileService, 'buildFileContentFromFile'], $files);
+			$content = [];
+			foreach ($files as $file) {
+				$content = array_merge($content, $this->openAiFileService->buildFileContentFromFile($file));
+			}
 			if ($userPrompt !== null) {
 				$content[] = [
 					'type' => 'text',

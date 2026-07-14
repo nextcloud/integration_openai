@@ -9,12 +9,15 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Service;
 
+use Imagick;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
 use OCP\IL10N;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class OpenAiFileService {
 	private const MAX_FILE_SIZE_BYTES = 50_000_000;
@@ -69,6 +72,7 @@ class OpenAiFileService {
 		private IL10N $l10n,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IRootFolder $rootFolder,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -77,7 +81,7 @@ class OpenAiFileService {
 	 *
 	 * @param int $fileId The ID of the file to build content from.
 	 * @param string $userId The user ID.
-	 * @return array Content array suitable for OpenAI API or other handlers.
+	 * @return list<array<string, mixed>> Content parts suitable for OpenAI chat message content.
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
@@ -91,7 +95,7 @@ class OpenAiFileService {
 	 * Builds file content from a File object.
 	 *
 	 * @param ?File $file The file to build content from.
-	 * @return array Content array suitable for OpenAI API or other handlers.
+	 * @return list<array<string, mixed>> Content parts suitable for OpenAI chat message content.
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
@@ -127,7 +131,7 @@ class OpenAiFileService {
 
 
 	/**
-	 * @return array{type: string, image_url: array{url: string}}
+	 * @return list<array{type: string, image_url: array{url: string}}>
 	 */
 	private function buildImageContent(File $file): array {
 		if (!$this->openAiSettingsService->getMultimodalImageEnabled()) {
@@ -147,16 +151,16 @@ class OpenAiFileService {
 				$this->l10n->t('Invalid input file type "%1$s".', [$fileType]),
 			);
 		}
-		return [
+		return [[
 			'type' => 'image_url',
 			'image_url' => [
 				'url' => 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb'))),
 			],
-		];
+		]];
 	}
 
 	/**
-	 * @return array{type: string, input_audio: array{data: string, format: string}}
+	 * @return list<array{type: string, input_audio: array{data: string, format: string}}>
 	 */
 	private function buildAudioContent(File $file): array {
 		if (!$this->openAiSettingsService->getMultimodalAudioEnabled()) {
@@ -178,17 +182,17 @@ class OpenAiFileService {
 			);
 		}
 		$format = self::SUPPORTED_INPUT_AUDIO_FORMATS[$fileType];
-		return [
+		return [[
 			'type' => 'input_audio',
 			'input_audio' => [
 				'data' => base64_encode(stream_get_contents($file->fopen('rb'))),
 				'format' => $format,
 			],
-		];
+		]];
 	}
 
 	/**
-	 * @return array{type: string, video_url: array{url: string}}
+	 * @return list<array{type: string, video_url: array{url: string}}>
 	 */
 	private function buildVideoContent(File $file): array {
 		if (!$this->openAiSettingsService->getMultimodalVideoEnabled()) {
@@ -200,19 +204,23 @@ class OpenAiFileService {
 			);
 		}
 		$fileType = $file->getMimeType();
-		return [
+		return [[
 			'type' => 'video_url',
 			'video_url' => [
 				'url' => 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb'))),
 			],
-		];
+		]];
 	}
 
 	/**
-	 * @return array{type: string, file: array{filename: string, file_data: string}}
+	 * @return list<array{type: string, file: array{filename: string, file_data: string}}|array{type: string, image_url: array{url: string}}>
 	 */
 	private function buildDocumentContent(File $file): array {
 		if (!$this->openAiSettingsService->getMultimodalDocumentEnabled()) {
+			// Fallback to image if documents are not supported
+			if ($this->openAiSettingsService->getMultimodalImageEnabled()) {
+				return $this->buildImageFromFile($file);
+			}
 			throw new UserFacingProcessingException(
 				'Document attachments are disabled',
 				0,
@@ -221,17 +229,17 @@ class OpenAiFileService {
 			);
 		}
 		$fileType = $file->getMimeType();
-		return [
+		return [[
 			'type' => 'file',
 			'file' => [
 				'filename' => $file->getName(),
 				'file_data' => 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb'))),
 			],
-		];
+		]];
 	}
 
 	/**
-	 * @return array{type: string, text: string}
+	 * @return list<array{type: string, text: string}>
 	 */
 	private function buildTextContent(File $file): array {
 		$fileType = $file->getMimeType();
@@ -244,14 +252,80 @@ class OpenAiFileService {
 				$this->l10n->t('Invalid input file type: "%1$s".', [$fileType]),
 			);
 		}
-		return [
+		return [[
 			'type' => 'text',
 			'text' => 'Filename:' . $file->getName() . "\nContent:\n" . stream_get_contents($file->fopen('rb')),
-		];
+		]];
 	}
 
 	private function isUsingOpenAi(): bool {
 		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
 		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+	}
+
+	/**
+	 * @return list<array{type: string, image_url: array{url: string}}>
+	 */
+	private function buildImageFromFile(File $file): array {
+		if (!extension_loaded('imagick')) {
+			throw new RuntimeException('Imagick extension not available can not process PDF');
+		}
+		if (empty(Imagick::queryFormats('PDF'))) {
+			throw new RuntimeException('Imagick has no PDF support (Ghostscript missing or blocked by policy.xml)');
+		}
+		$this->logger->debug('Building image from PDF file: {file}', ['file' => $file->getPath()]);
+
+		$pdfContent = $file->getContent();
+
+		// pingImageBlob avoids rasterizing every page into the pixel cache
+		$probe = new Imagick();
+		try {
+			$probe->pingImageBlob($pdfContent);
+			$pageCount = $probe->getNumberImages();
+		} finally {
+			$probe->clear();
+			$probe->destroy();
+		}
+
+		// Limit pages to avoid overwhelming Imagick memory and the API
+		$pages = min(10, $pageCount);
+		$images = [];
+
+		$document = new Imagick();
+		try {
+			// Keep resolution low 72 is still readable just very pixelated
+			$document->setResolution(72, 72);
+			$document->readImageBlob($pdfContent);
+
+			for ($i = 0; $i < $pages; $i++) {
+				$document->setIteratorIndex($i);
+				$page = $document->getImage();
+				$flat = null;
+				try {
+					$page->setBackgroundColor('white');
+					$flat = $page->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
+					$flat->setImageFormat('jpeg');
+					$flat->setImageCompressionQuality(85);
+					$images[] = [
+						'type' => 'image_url',
+						'image_url' => [
+							'url' => 'data:image/jpeg;base64,' . base64_encode($flat->getImageBlob()),
+						],
+					];
+				} finally {
+					$page->clear();
+					$page->destroy();
+					if ($flat instanceof Imagick) {
+						$flat->clear();
+						$flat->destroy();
+					}
+				}
+			}
+		} finally {
+			$document->clear();
+			$document->destroy();
+		}
+
+		return $images;
 	}
 }
