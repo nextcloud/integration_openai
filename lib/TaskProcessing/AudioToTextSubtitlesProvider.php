@@ -123,12 +123,12 @@ class AudioToTextSubtitlesProvider implements ISynchronousProvider {
 		}
 
 		$fileType = $input['input']->getMimeType();
-		if (!str_starts_with($fileType, 'audio/')) {
+		if (!str_starts_with($fileType, 'audio/') && !str_starts_with($fileType, 'video/')) {
 			throw new UserFacingProcessingException(
 				'Invalid input file type ' . $fileType,
 				0,
 				null,
-				$this->l->t('The input file type is invalid. Only audio files are allowed.'),
+				$this->l->t('The input file type is invalid. Only audio or video files are allowed.'),
 			);
 		}
 		if ($this->openAiAPIService->isUsingOpenAi()) {
@@ -140,6 +140,9 @@ class AudioToTextSubtitlesProvider implements ISynchronousProvider {
 				'audio/m4a',
 				'audio/wav',
 				'audio/webm',
+				'video/mp4',
+				'video/mpeg',
+				'video/webm',
 			];
 			if (!in_array($fileType, $validFileTypes)) {
 				throw new ProcessingException('Invalid input file type for OpenAI ' . $fileType);
