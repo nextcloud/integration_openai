@@ -734,7 +734,7 @@ class OpenAiAPIService {
 					$content = [];
 					foreach ($message['content'] as $item) {
 						if ($item['type'] === 'file') {
-							$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId));
+							$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null));
 						} else {
 							$content[] = $item;
 						}
@@ -1445,7 +1445,6 @@ class OpenAiAPIService {
 			'audio_messages' => [],
 			'images' => [],
 		];
-
 
 		foreach ($response['choices'] as $choice) {
 			if (!is_array($choice)) {

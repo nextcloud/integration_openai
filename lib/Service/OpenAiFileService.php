@@ -16,6 +16,7 @@ use OCP\Files\IRootFolder;
 use OCP\IL10N;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\IManager as ITaskProcessingManager;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -73,6 +74,7 @@ class OpenAiFileService {
 		private OpenAiSettingsService $openAiSettingsService,
 		private IRootFolder $rootFolder,
 		private LoggerInterface $logger,
+		private ITaskProcessingManager $taskProcessingManager,
 	) {
 	}
 
@@ -81,13 +83,29 @@ class OpenAiFileService {
 	 *
 	 * @param int $fileId The ID of the file to build content from.
 	 * @param string $userId The user ID.
+	 * @param ?int $taskId The ID of the task
 	 * @return list<array<string, mixed>> Content parts suitable for OpenAI chat message content.
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContentFromId(int $fileId, string $userId): array {
-		$userFolder = $this->rootFolder->getUserFolder($userId);
-		$file = $userFolder->getFirstNodeById($fileId);
+	public function buildFileContentFromId(int $fileId, string $userId, ?int $taskId): array {
+		$file = null;
+		if ($taskId !== null) {
+			$task = $this->taskProcessingManager->getUserTask($taskId, $userId);
+			$files = $this->taskProcessingManager->extractFileIdsFromTask($task);
+
+			if (array_search($fileId, $files, true) === false) {
+				throw new ProcessingException('File does not exist');
+			}
+			$file = $this->rootFolder->getFirstNodeById($fileId);
+
+			if ($file === null) {
+				$file = $this->rootFolder->getFirstNodeByIdInPath($fileId, '/' . $this->rootFolder->getAppDataDirectoryName() . '/');
+			}
+		} else {
+			$userFolder = $this->rootFolder->getUserFolder($userId);
+			$file = $userFolder->getFirstNodeById($fileId);
+		}
 		return $this->buildFileContentFromFile($file);
 	}
 
@@ -114,26 +132,29 @@ class OpenAiFileService {
 		}
 
 		$fileType = $file->getMimeType();
+		// Backup incase the file does not have an extension
+		if ($fileType === 'application/octet-stream') {
+			$fileType = mime_content_type($file->fopen('rb'));
+		}
 		if (str_starts_with($fileType, 'image/')) {
-			return $this->buildImageContent($file);
+			return $this->buildImageContent($file, $fileType);
 			// OpenAI only supports this for very specific models and support is not that common
 		} elseif (str_starts_with($fileType, 'audio/')) {
-			return $this->buildAudioContent($file);
+			return $this->buildAudioContent($file, $fileType);
 			// OpenAI does not currently support video attachments
 		} elseif (str_starts_with($fileType, 'video/')) {
-			return $this->buildVideoContent($file);
+			return $this->buildVideoContent($file, $fileType);
 		} elseif ($fileType === 'application/pdf') {
-			return $this->buildDocumentContent($file);
+			return $this->buildDocumentContent($file, $fileType);
 		} else {
-			return $this->buildTextContent($file);
+			return $this->buildTextContent($file, $fileType);
 		}
 	}
-
 
 	/**
 	 * @return list<array{type: string, image_url: array{url: string}}>
 	 */
-	private function buildImageContent(File $file): array {
+	private function buildImageContent(File $file, string $fileType): array {
 		if (!$this->openAiSettingsService->getMultimodalImageEnabled()) {
 			throw new UserFacingProcessingException(
 				'Image attachments are disabled',
@@ -142,7 +163,6 @@ class OpenAiFileService {
 				$this->l10n->t('Image attachments are unsupported.'),
 			);
 		}
-		$fileType = $file->getMimeType();
 		if ($this->isUsingOpenAi() && !in_array($fileType, self::VALID_IMAGE_MIME_TYPES, true)) {
 			throw new UserFacingProcessingException(
 				'Invalid input file type for OpenAI ' . $fileType,
@@ -162,7 +182,7 @@ class OpenAiFileService {
 	/**
 	 * @return list<array{type: string, input_audio: array{data: string, format: string}}>
 	 */
-	private function buildAudioContent(File $file): array {
+	private function buildAudioContent(File $file, string $fileType): array {
 		if (!$this->openAiSettingsService->getMultimodalAudioEnabled()) {
 			throw new UserFacingProcessingException(
 				'Audio attachments are disabled',
@@ -171,7 +191,6 @@ class OpenAiFileService {
 				$this->l10n->t('Audio attachments are unsupported.'),
 			);
 		}
-		$fileType = $file->getMimeType();
 
 		if (!array_key_exists($fileType, self::SUPPORTED_INPUT_AUDIO_FORMATS)) {
 			throw new UserFacingProcessingException(
@@ -194,7 +213,7 @@ class OpenAiFileService {
 	/**
 	 * @return list<array{type: string, video_url: array{url: string}}>
 	 */
-	private function buildVideoContent(File $file): array {
+	private function buildVideoContent(File $file, string $fileType): array {
 		if (!$this->openAiSettingsService->getMultimodalVideoEnabled()) {
 			throw new UserFacingProcessingException(
 				'Video attachments are disabled',
@@ -203,7 +222,6 @@ class OpenAiFileService {
 				$this->l10n->t('Video attachments are unsupported.'),
 			);
 		}
-		$fileType = $file->getMimeType();
 		return [[
 			'type' => 'video_url',
 			'video_url' => [
@@ -215,7 +233,7 @@ class OpenAiFileService {
 	/**
 	 * @return list<array{type: string, file: array{filename: string, file_data: string}}|array{type: string, image_url: array{url: string}}>
 	 */
-	private function buildDocumentContent(File $file): array {
+	private function buildDocumentContent(File $file, string $fileType): array {
 		if (!$this->openAiSettingsService->getMultimodalDocumentEnabled()) {
 			// Fallback to image if documents are not supported
 			if ($this->openAiSettingsService->getMultimodalImageEnabled()) {
@@ -228,7 +246,6 @@ class OpenAiFileService {
 				$this->l10n->t('Document attachments are unsupported.'),
 			);
 		}
-		$fileType = $file->getMimeType();
 		return [[
 			'type' => 'file',
 			'file' => [
@@ -241,8 +258,7 @@ class OpenAiFileService {
 	/**
 	 * @return list<array{type: string, text: string}>
 	 */
-	private function buildTextContent(File $file): array {
-		$fileType = $file->getMimeType();
+	private function buildTextContent(File $file, string $fileType): array {
 		// Sanity check that this isn't a binary
 		if (!str_starts_with($fileType, 'text/') && !in_array($fileType, self::VALID_TEXT_MIME_TYPES, true)) {
 			throw new UserFacingProcessingException(
