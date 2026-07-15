@@ -9,7 +9,7 @@ OC.L10N.register(
     "Speech generation quota exceeded" : "Перевищено квоту генерації мовлення",
     "View quota" : "Переглянути квоту",
     "OpenAI's Text to Speech" : "Перетворення тексту в мовлення OpenAI",
-    "Invalid models response received" : "Отримано відповідь про невірні моделі",
+    "Invalid models response received" : "Отримано відповідь щодо недійсних моделей",
     "Default" : "Типово",
     "Text generation" : "Генерація тексту",
     "Image generation" : "Створення зображення",

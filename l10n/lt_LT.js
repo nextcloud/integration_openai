@@ -78,7 +78,6 @@ OC.L10N.register(
     "SubRip Text" : "„SubRip“ tekstas",
     "WebVTT" : "„WebVTT“",
     "The input file size is too large. A maximum of 25MB is allowed." : "Įvesties failo dydis per didelis. Leidžiamas ne didesnis kaip 25 MB dydis.",
-    "The input file type is invalid. Only audio files are allowed." : "Netinkamas įvesties failo tipas. Leidžiami tik garso failai.",
     "Less wordy" : "Mažiau žodžių",
     "Simpler" : "Paprastesnis",
     "More convincing" : "Įtikinamiau",
