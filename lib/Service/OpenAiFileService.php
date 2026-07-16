@@ -82,13 +82,13 @@ class OpenAiFileService {
 	 * Builds file content from a file ID within a given user folder.
 	 *
 	 * @param int $fileId The ID of the file to build content from.
-	 * @param string $userId The user ID.
+	 * @param ?string $userId The user ID.
 	 * @param ?int $taskId The ID of the task
 	 * @return list<array<string, mixed>> Content parts suitable for OpenAI chat message content.
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContentFromId(int $fileId, string $userId, ?int $taskId): array {
+	public function buildFileContentFromId(int $fileId, ?string $userId, ?int $taskId): array {
 		$file = null;
 		if ($taskId !== null) {
 			$task = $this->taskProcessingManager->getUserTask($taskId, $userId);
@@ -102,7 +102,8 @@ class OpenAiFileService {
 			if ($file === null) {
 				$file = $this->rootFolder->getFirstNodeByIdInPath($fileId, '/' . $this->rootFolder->getAppDataDirectoryName() . '/');
 			}
-		} else {
+			// If the userId is not specified they don't have a user folder
+		} elseif ($userId !== null) {
 			$userFolder = $this->rootFolder->getUserFolder($userId);
 			$file = $userFolder->getFirstNodeById($fileId);
 		}

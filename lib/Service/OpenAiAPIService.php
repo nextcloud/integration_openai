@@ -733,7 +733,23 @@ class OpenAiAPIService {
 				if (isset($message['content']) && is_array($message['content'])) {
 					$content = [];
 					foreach ($message['content'] as $item) {
+						if (!isset($item['type'])) {
+							throw new UserFacingProcessingException(
+								'Invalid message history content',
+								0,
+								null,
+								$this->l10n->t('Invalid message history content'),
+							);
+						}
 						if ($item['type'] === 'file') {
+							if (!isset($item['file_id'])) {
+								throw new UserFacingProcessingException(
+									'Invalid message history content',
+									0,
+									null,
+									$this->l10n->t('Invalid message history content'),
+								);
+							}
 							$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null));
 						} else {
 							$content[] = $item;

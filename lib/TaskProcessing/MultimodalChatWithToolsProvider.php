@@ -214,12 +214,12 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 			foreach ($returnValue['images'] as $image) {
 				if ($image['type'] === 'image_url') {
 					$url = $image['image_url']['url'];
-					$base64Str = explode(',', $url)[1] ?? '';
+					$base64Str = explode(',', $url)[1] ?? throw new ProcessingException('Invalid image URL in multimodal chat: ' . $url);
 					$image = base64_decode($base64Str);
 					$image = $this->watermarkingService->markImage($image);
 					$attachments[] = $image;
 				} else {
-					$this->logger->warning('Encountered an unknown image type in multimodal chat: ' . $image['type']);
+					throw new ProcessingException('Unknown image type in multimodal chat: ' . $image['type']);
 				}
 			}
 
