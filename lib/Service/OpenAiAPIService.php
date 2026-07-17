@@ -74,6 +74,15 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function isUsingOpenRouter(): bool {
+		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+		// Return true if the service URL references OpenRouter (e.g., openrouter.ai)
+		return str_starts_with(strtolower($serviceUrl), 'https://openrouter.ai');
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getServiceName(): string {
@@ -177,7 +186,8 @@ class OpenAiAPIService {
 
 		try {
 			$this->logger->debug('Actually getting OpenAI models with a network request');
-			$modelsResponse = $this->request($userId, 'models');
+			$params = $this->isUsingOpenRouter() ? ['output_modalities' => 'all'] : [];
+			$modelsResponse = $this->request($userId, 'models', $params);
 		} catch (Exception $e) {
 			$this->logger->warning('Error retrieving models (exc): ' . $e->getMessage());
 			throw $e;
