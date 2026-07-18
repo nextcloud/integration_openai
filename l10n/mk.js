@@ -6,6 +6,7 @@ OC.L10N.register(
     "seconds" : "секунди",
     "Bad credentials" : "Неточни акредитиви",
     "Name" : "Име",
+    "Detect language" : "Детектирај јазик",
     "Memories" : "Memories",
     "Speed" : "Брзина",
     "Language" : "Јазик",
