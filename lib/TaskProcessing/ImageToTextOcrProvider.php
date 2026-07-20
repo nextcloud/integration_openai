@@ -16,14 +16,17 @@ use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
-use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\IProvider;
+use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
+use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\ImageToTextOpticalCharacterRecognition;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
-class ImageToTextOcrProvider implements ISynchronousProvider {
+class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -99,7 +102,12 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 		return [];
 	}
 
-	public function process(?string $userId, array $input, callable $reportProgress): array {
+	public function process(
+		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
+	): array {
+		$reportOutput = $options->getReportIntermediateOutput();
+		$preferStreaming = $options->getPreferStreaming();
+
 		if (!$this->openAiAPIService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
 			throw new RuntimeException('Must support chat completion endpoint');
 		}
@@ -127,6 +135,7 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 
 		$fileSize = 0;
 		$outputs = [];
+		$streamedOutputs = [];
 		$fileCount = (float)count($input['input']);
 		$systemPrompt = 'Extract all visible text from the image. Return only the extracted text without additional commentary. Preserve the original language of the text.';
 		$userPrompt = 'Extract all text from this image.';
@@ -140,6 +149,7 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 			if ($fileSize > 50 * 1000 * 1000) {
 				throw new UserFacingProcessingException('Filesize of input files too large. Max is 50MB', userFacingMessage: $this->l->t('Filesize of input files too large. Max is 50MB'));
 			}
+			$streamedOutputs[] = '';
 
 			$fileType = $file->getMimeType();
 
@@ -167,8 +177,39 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 						]);
 					}
 					try {
-						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
-						$messages = $completion['messages'];
+						if ($preferStreaming) {
+							$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+							$time = microtime(true);
+							foreach ($chunks as $chunk) {
+								if (!in_array($chunk['kind'] ?? null, ['content'], true)) {
+									continue;
+								}
+								$streamedOutputs[$fileIndex] .= $chunk['text'];
+								// we don't report more often than every 250ms
+								if (microtime(true) - $time >= 0.25) {
+									$running = $reportOutput([
+										'output' => $streamedOutputs,
+									]);
+									if (!$running) {
+										throw new ProcessingException('OpenAI/LocalAI task cancelled');
+									}
+									$time = microtime(true);
+								}
+							}
+							if ($streamedOutputs[$fileIndex] !== '') {
+								$running = $reportOutput([
+									'output' => $streamedOutputs,
+								]);
+								if (!$running) {
+									throw new ProcessingException('OpenAI/LocalAI task cancelled');
+								}
+							}
+							$returnValue = $chunks->getReturn();
+							$messages = $returnValue['messages'];
+						} else {
+							$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+							$messages = $completion['messages'];
+						}
 
 						if (count($messages) === 0) {
 							$this->logger->warning('No result in OpenAI/LocalAI response.');
@@ -213,8 +254,39 @@ class ImageToTextOcrProvider implements ISynchronousProvider {
 					]),
 				];
 				try {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
-					$messages = $completion['messages'];
+					if ($preferStreaming) {
+						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+						$time = microtime(true);
+						foreach ($chunks as $chunk) {
+							if (!in_array($chunk['kind'] ?? null, ['content'], true)) {
+								continue;
+							}
+							$streamedOutputs[$fileIndex] .= $chunk['text'];
+							// we don't report more often than every 250ms
+							if (microtime(true) - $time >= 0.25) {
+								$running = $reportOutput([
+									'output' => $streamedOutputs,
+								]);
+								if (!$running) {
+									throw new ProcessingException('OpenAI/LocalAI task cancelled');
+								}
+								$time = microtime(true);
+							}
+						}
+						if ($streamedOutputs[$fileIndex] !== '') {
+							$running = $reportOutput([
+								'output' => $streamedOutputs,
+							]);
+							if (!$running) {
+								throw new ProcessingException('OpenAI/LocalAI task cancelled');
+							}
+						}
+						$returnValue = $chunks->getReturn();
+						$messages = $returnValue['messages'];
+					} else {
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+						$messages = $completion['messages'];
+					}
 					$reportProgress(((float)$fileIndex + 1.0) / $fileCount);
 
 					if (count($messages) === 0) {
