@@ -105,7 +105,10 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 	}
 
 	public function process(
-		?string $userId, array $input, callable $reportProgress, SynchronousProviderOptions $options = new SynchronousProviderOptions(),
+		?string $userId,
+		array $input,
+		callable $reportProgress,
+		SynchronousProviderOptions $options = new SynchronousProviderOptions(),
 	): array {
 		$reportOutput = $options->getReportIntermediateOutput();
 		$preferStreaming = $options->getPreferStreaming();
@@ -135,6 +138,21 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
+		}
+		$fileSizeTotal = array_reduce(
+			$images,
+			function ($carry, $file) {
+				return $carry + (method_exists($file, 'getSize') ? $file->getSize() : 0);
+			},
+			0
+		);
+		if ($fileSizeTotal > 50 * 1000 * 1000) {
+			throw new UserFacingProcessingException(
+				'Filesize of input files too large. Max is 50MB',
+				0,
+				null,
+				$this->l->t('The total size of the input files is too large. A maximum of 50MB is allowed.'),
+			);
 		}
 
 		try {

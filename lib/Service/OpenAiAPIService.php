@@ -750,7 +750,12 @@ class OpenAiAPIService {
 									$this->l10n->t('Invalid message history content'),
 								);
 							}
-							$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null));
+							// If the history contains a file that isn't supported anymore we should skip it so the chat isn't broken
+							try {
+								$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null));
+							} catch (ProcessingException|UserFacingProcessingException $e) {
+								$this->logger->warning('Could not build file content from id: ' . $item['file_id'] . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+							}
 						} else {
 							$content[] = $item;
 						}
