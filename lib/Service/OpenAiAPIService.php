@@ -29,6 +29,7 @@ use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
 use OCP\Notification\IManager as INotificationManager;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;

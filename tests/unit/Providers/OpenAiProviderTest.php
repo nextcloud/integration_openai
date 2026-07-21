@@ -102,7 +102,6 @@ class OpenAiProviderTest extends TestCase {
 				$this->createMock(\OCP\IL10N::class),
 				$this->openAiSettingsService,
 				$this->createMock(\OCP\Files\IRootFolder::class),
-				$this->createMock(\Psr\Log\LoggerInterface::class),
 				$this->createMock(\OCP\TaskProcessing\IManager::class),
 			),
 			$this->createMock(\OCP\Notification\IManager::class),

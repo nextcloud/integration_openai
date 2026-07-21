@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Service;
 
-use Imagick;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
@@ -17,8 +16,6 @@ use OCP\IL10N;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IManager as ITaskProcessingManager;
-use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class OpenAiFileService {
 	private const MAX_FILE_SIZE_BYTES = 50_000_000;
@@ -73,7 +70,6 @@ class OpenAiFileService {
 		private IL10N $l10n,
 		private OpenAiSettingsService $openAiSettingsService,
 		private IRootFolder $rootFolder,
-		private LoggerInterface $logger,
 		private ITaskProcessingManager $taskProcessingManager,
 	) {
 	}
@@ -232,14 +228,10 @@ class OpenAiFileService {
 	}
 
 	/**
-	 * @return list<array{type: string, file: array{filename: string, file_data: string}}|array{type: string, image_url: array{url: string}}>
+	 * @return list<array{type: string, file: array{filename: string, file_data: string}}>
 	 */
 	private function buildDocumentContent(File $file, string $fileType): array {
 		if (!$this->openAiSettingsService->getMultimodalDocumentEnabled()) {
-			// Fallback to image if documents are not supported
-			if ($this->openAiSettingsService->getMultimodalImageEnabled()) {
-				return $this->buildImageFromFile($file);
-			}
 			throw new UserFacingProcessingException(
 				'Document attachments are disabled',
 				0,
@@ -278,71 +270,5 @@ class OpenAiFileService {
 	private function isUsingOpenAi(): bool {
 		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
 		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-	}
-
-	/**
-	 * @return list<array{type: string, image_url: array{url: string}}>
-	 */
-	private function buildImageFromFile(File $file): array {
-		if (!extension_loaded('imagick')) {
-			throw new RuntimeException('Imagick extension not available can not process PDF');
-		}
-		if (empty(Imagick::queryFormats('PDF'))) {
-			throw new RuntimeException('Imagick has no PDF support (Ghostscript missing or blocked by policy.xml)');
-		}
-		$this->logger->debug('Building image from PDF file: {file}', ['file' => $file->getPath()]);
-
-		$pdfContent = $file->getContent();
-
-		// pingImageBlob avoids rasterizing every page into the pixel cache
-		$probe = new Imagick();
-		try {
-			$probe->pingImageBlob($pdfContent);
-			$pageCount = $probe->getNumberImages();
-		} finally {
-			$probe->clear();
-			$probe->destroy();
-		}
-
-		// Limit pages to avoid overwhelming Imagick memory and the API
-		$pages = min(10, $pageCount);
-		$images = [];
-
-		$document = new Imagick();
-		try {
-			// Keep resolution low 72 is still readable just very pixelated
-			$document->setResolution(72, 72);
-			$document->readImageBlob($pdfContent);
-
-			for ($i = 0; $i < $pages; $i++) {
-				$document->setIteratorIndex($i);
-				$page = $document->getImage();
-				$flat = null;
-				try {
-					$page->setBackgroundColor('white');
-					$flat = $page->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
-					$flat->setImageFormat('jpeg');
-					$flat->setImageCompressionQuality(85);
-					$images[] = [
-						'type' => 'image_url',
-						'image_url' => [
-							'url' => 'data:image/jpeg;base64,' . base64_encode($flat->getImageBlob()),
-						],
-					];
-				} finally {
-					$page->clear();
-					$page->destroy();
-					if ($flat instanceof Imagick) {
-						$flat->clear();
-						$flat->destroy();
-					}
-				}
-			}
-		} finally {
-			$document->clear();
-			$document->destroy();
-		}
-
-		return $images;
 	}
 }
