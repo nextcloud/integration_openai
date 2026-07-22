@@ -614,4 +614,89 @@ class OpenAiProviderTest extends TestCase {
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
+	/**
+	 * Mistral may return message.content as alternating text/reference chunks
+	 * instead of a plain string. See https://github.com/nextcloud/integration_openai/issues/408
+	 */
+	public function testCreateChatCompletionExtractsMistralTypedTextContent(): void {
+		$response = json_encode([
+			'id' => 'f984ba9c1b34430d8935ccc3263b218c',
+			'created' => 1784753166,
+			'model' => 'mistral-small-2603',
+			'usage' => [
+				'prompt_tokens' => 9,
+				'total_tokens' => 21,
+				'completion_tokens' => 12,
+				'prompt_tokens_details' => [
+					'cached_tokens' => 0,
+				],
+			],
+			'object' => 'chat.completion',
+			'choices' => [
+				[
+					'index' => 0,
+					'finish_reason' => 'stop',
+					'message' => [
+						'role' => 'assistant',
+						'tool_calls' => null,
+						'content' => [
+							[
+								'type' => 'text',
+								'text' => 'Amsterdam was founded around 1000 CE',
+							],
+							[
+								'type' => 'reference',
+								'reference_ids' => [1, 3],
+							],
+							[
+								'type' => 'text',
+								'text' => '. It has about 1.2 million residents',
+							],
+							[
+								'type' => 'reference',
+								'reference_ids' => [2],
+							],
+							[
+								'type' => 'text',
+								'text' => '. It is worth visiting.',
+							],
+						],
+					],
+				],
+			],
+		]);
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [['role' => 'user', 'content' => 'Tell me more about Amsterdam']],
+			'n' => 1,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $this->openAiApiService->createChatCompletion(
+			self::TEST_USER1,
+			Application::DEFAULT_MODEL_ID,
+			'Tell me more about Amsterdam',
+		);
+
+		$this->assertSame(
+			['Amsterdam was founded around 1000 CE. It has about 1.2 million residents. It is worth visiting.'],
+			$result['messages'],
+		);
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
 }
