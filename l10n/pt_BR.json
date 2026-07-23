@@ -76,7 +76,7 @@
     "SubRip Text" : "Texto SubRip",
     "WebVTT" : "WebVTT",
     "The input file size is too large. A maximum of 25MB is allowed." : "O tamanho do arquivo de entrada é muito grande. O tamanho máximo permitido é de 25 MB.",
-    "The input file type is invalid. Only audio files are allowed." : "O tipo do arquivo de entrada é inválido. Somente arquivos de áudio são permitidos.",
+    "The input file type is invalid. Only audio or video files are allowed." : "O tipo do arquivo de entrada é inválido. Somente arquivos de áudio ou vídeo são permitidos.",
     "Less wordy" : "Mais conciso",
     "Simpler" : "Mais simples",
     "More convincing" : "Mais convincente",

@@ -95,6 +95,26 @@ class OpenAiAPIService {
 
 	/**
 	 * @param ?string $serviceType
+	 * @return bool
+	 */
+	public function isUsingOpenRouter(?string $serviceType = null): bool {
+		$serviceUrl = '';
+		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
+			$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
+		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
+			$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
+		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
+			$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
+		}
+		if ($serviceUrl === '') {
+			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+		}
+		// Return true if the service URL references OpenRouter (e.g., openrouter.ai)
+		return str_starts_with(strtolower($serviceUrl), 'https://openrouter.ai');
+	}
+
+	/**
+	 * @param ?string $serviceType
 	 *
 	 * @return string
 	 */
@@ -223,7 +243,8 @@ class OpenAiAPIService {
 
 		try {
 			$this->logger->debug('Actually getting OpenAI models with a network request');
-			$modelsResponse = $this->request($userId, 'models', serviceType: $serviceType);
+			$params = $this->isUsingOpenRouter($serviceType) ? ['output_modalities' => 'all'] : [];
+			$modelsResponse = $this->request($userId, 'models', $params, serviceType: $serviceType);
 		} catch (Exception $e) {
 			$this->logger->warning('Error retrieving models (exc): ' . $e->getMessage());
 			throw $e;
@@ -1498,8 +1519,19 @@ class OpenAiAPIService {
 				}
 			}
 
-			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
-				$completions['messages'][] = $choice['message']['content'];
+			if (isset($choice['message']['content'])) {
+				if (is_string($choice['message']['content'])) {
+					$completions['messages'][] = $choice['message']['content'];
+				} elseif (is_array($choice['message']['content'])) {
+					$messageContent = [];
+					// Handles more complex mistral message content (TODO: missing reasoning for now look at https://github.com/nextcloud/integration_openai/pull/409#discussion_r3638108824)
+					foreach ($choice['message']['content'] as $content) {
+						if ($content['type'] === 'text' && is_string($content['text'])) {
+							$messageContent[] = $content['text'];
+						}
+					}
+					$completions['messages'][] = implode('', $messageContent);
+				}
 			}
 			if (isset($choice['message']['reasoning_content']) && is_string($choice['message']['reasoning_content'])) {
 				$completions['reasoning_messages'][] = $choice['message']['reasoning_content'];
