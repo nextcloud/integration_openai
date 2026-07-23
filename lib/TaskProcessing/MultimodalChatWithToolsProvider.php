@@ -212,6 +212,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 
 			// Handle image output
 			foreach ($returnValue['images'] as $image) {
+				// Currently only data URIs have been seen, but if a real URL is found we should support it
 				if ($image['type'] === 'image_url') {
 					$url = $image['image_url']['url'];
 					$base64Str = explode(',', $url)[1] ?? throw new ProcessingException('Invalid image URL in multimodal chat: ' . $url);
