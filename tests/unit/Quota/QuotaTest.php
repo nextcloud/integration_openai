@@ -16,6 +16,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\EntityType;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\StreamingService;
@@ -86,6 +87,12 @@ class QuotaTest extends TestCase {
 			$this->openAiSettingsService,
 			new StreamingService(
 				$this->createMock(IL10N::class),
+			),
+			new OpenAiFileService(
+				$this->createMock(IL10N::class),
+				$this->openAiSettingsService,
+				$this->createMock(\OCP\Files\IRootFolder::class),
+				$this->createMock(\OCP\TaskProcessing\IManager::class),
 			),
 			$this->notificationManager,
 			\OCP\Server::get(QuotaRuleService::class),

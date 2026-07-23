@@ -143,11 +143,12 @@ class Application extends App implements IBootstrap {
 			$context->registerTaskProcessingProvider(EmojiProvider::class);
 			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
 			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
+			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\MultimodalChatWithToolsProvider::class);
 			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
 			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider::class);
 			}
-			if ($isUsingOpenAI || $this->appConfig->getValueString(Application::APP_ID, 'analyze_image_provider_enabled') === '1') {
+			if ($this->appConfig->getValueString(Application::APP_ID, 'multimodal_image_enabled', '1') === '1') {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImagesProvider::class);
 			}
 		}

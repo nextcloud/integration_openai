@@ -16,6 +16,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\StreamingService;
@@ -25,6 +26,7 @@ use OCA\OpenAi\TaskProcessing\AudioToAudioTranslateProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
+use OCA\OpenAi\TaskProcessing\MultimodalChatWithToolsProvider;
 use OCA\OpenAi\TaskProcessing\ProofreadProvider;
 use OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider;
 use OCA\OpenAi\TaskProcessing\SummaryProvider;
@@ -96,6 +98,12 @@ class OpenAiProviderTest extends TestCase {
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$this->streamingService,
+			new OpenAiFileService(
+				$this->createMock(\OCP\IL10N::class),
+				$this->openAiSettingsService,
+				$this->createMock(\OCP\Files\IRootFolder::class),
+				$this->createMock(\OCP\TaskProcessing\IManager::class),
+			),
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
 			$clientService,
@@ -236,6 +244,7 @@ class OpenAiProviderTest extends TestCase {
 			'reasoning_messages' => [],
 			'tool_calls' => [],
 			'audio_messages' => [],
+			'images' => [],
 		], $generator->getReturn());
 
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
@@ -294,6 +303,7 @@ class OpenAiProviderTest extends TestCase {
 			'reasoning_messages' => ['Thinking... done.'],
 			'tool_calls' => [],
 			'audio_messages' => [],
+			'images' => [],
 		], $generator->getReturn());
 
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
@@ -1090,6 +1100,116 @@ TEXT;
 			['Amsterdam was founded around 1000 CE. It has about 1.2 million residents. It is worth visiting.'],
 			$result['messages'],
 		);
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testMultimodalChatWithToolsProvider(): void {
+		$provider = new MultimodalChatWithToolsProvider(
+			$this->openAiApiService,
+			$this->openAiSettingsService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(WatermarkingService::class),
+		);
+
+		$prompt = 'What is in this image?';
+		$systemPrompt = 'You are a helpful assistant.';
+		$toolsJson = '[{"type":"function","function":{"name":"get_weather","description":"Get the weather","parameters":{"type":"object","properties":{"location":{"type":"string"}},"required":["location"]}}}]';
+		$history = [
+			json_encode(['role' => 'user', 'content' => 'Hello']),
+			json_encode(['role' => 'assistant', 'content' => 'Hi there!']),
+		];
+		$imageContent = 'fake-jpeg-bytes';
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Could not open temp stream');
+		}
+		fwrite($stream, $imageContent);
+		rewind($stream);
+
+		$file = $this->createMock(\OCP\Files\File::class);
+		$file->method('isReadable')->willReturn(true);
+		$file->method('getSize')->willReturn(strlen($imageContent));
+		$file->method('getMimeType')->willReturn('image/jpeg');
+		$file->method('fopen')->with('rb')->willReturn($stream);
+
+		$response = '{
+			"id": "chatcmpl-123",
+			"object": "chat.completion",
+			"created": 1677652288,
+			"model": "gpt-4.1-mini",
+			"system_fingerprint": "fp_44709d6fcb",
+			"choices": [
+			  {
+				"index": 0,
+				"message": {
+				  "role": "assistant",
+				  "content": "This is a test response."
+				},
+				"finish_reason": "stop"
+			  }
+			],
+			"usage": {
+			  "prompt_tokens": 9,
+			  "completion_tokens": 12,
+			  "total_tokens": 21
+			}
+		}';
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				['role' => 'system', 'content' => $systemPrompt],
+				['role' => 'user', 'content' => 'Hello'],
+				['role' => 'assistant', 'content' => 'Hi there!'],
+				[
+					'role' => 'user',
+					'content' => [
+						[
+							'type' => 'image_url',
+							'image_url' => [
+								'url' => 'data:image/jpeg;base64,' . base64_encode($imageContent),
+							],
+						],
+						[
+							'type' => 'text',
+							'text' => $prompt,
+						],
+					],
+				],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'tools' => json_decode($toolsJson),
+			'user' => self::TEST_USER1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $provider->process(self::TEST_USER1, [
+			'input' => $prompt,
+			'system_prompt' => $systemPrompt,
+			'tool_message' => '',
+			'tools' => $toolsJson,
+			'history' => $history,
+			'input_attachments' => [$file],
+		], fn () => true, new SynchronousProviderOptions(preferStreaming: false));
+
+		$this->assertEquals('This is a test response.', $result['output']);
+		$this->assertEquals([], $result['output_attachments']);
+		$this->assertEquals('', $result['reasoning']);
+		$this->assertEquals('', $result['tool_calls']);
 
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
 		$this->assertEquals(21, $usage);

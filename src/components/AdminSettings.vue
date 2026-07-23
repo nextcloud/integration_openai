@@ -326,6 +326,34 @@
 						{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
 					</NcFormBoxSwitch>
 				</div>
+				<h3>
+					{{ t('integration_openai', 'Multimodal LLM Support') }}
+				</h3>
+				<NcNoteCard type="info">
+					{{ t('integration_openai', 'Multimodal LLM Support allows you to enable or disable the use of images, audio, video and document attachments in the LLM.') }}
+				</NcNoteCard>
+				<NcFormBox class="features-form-box">
+					<NcFormBoxSwitch
+						:model-value="state.multimodal_image_enabled"
+						@update:model-value="onCheckboxChanged($event, 'multimodal_image_enabled', false)">
+						{{ t('integration_openai', 'Image attachments') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.multimodal_audio_enabled"
+						@update:model-value="onCheckboxChanged($event, 'multimodal_audio_enabled', false)">
+						{{ t('integration_openai', 'Audio attachments') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.multimodal_video_enabled"
+						@update:model-value="onCheckboxChanged($event, 'multimodal_video_enabled', false)">
+						{{ t('integration_openai', 'Video attachments') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.multimodal_document_enabled"
+						@update:model-value="onCheckboxChanged($event, 'multimodal_document_enabled', false)">
+						{{ t('integration_openai', 'Document attachments') }}
+					</NcFormBoxSwitch>
+				</NcFormBox>
 			</div>
 			<div>
 				<h2>
@@ -632,11 +660,6 @@
 						:model-value="state.tts_provider_enabled"
 						@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
 						{{ t('integration_openai', 'Text-to-speech provider') }}
-					</NcFormBoxSwitch>
-					<NcFormBoxSwitch
-						:model-value="state.analyze_image_provider_enabled"
-						@update:model-value="onCheckboxChanged($event, 'analyze_image_provider_enabled', false)">
-						{{ t('integration_openai', 'Analyze image provider') }}
 					</NcFormBoxSwitch>
 				</NcFormBox>
 			</div>

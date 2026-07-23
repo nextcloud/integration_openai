@@ -29,6 +29,7 @@ use OCP\ICacheFactory;
 use OCP\IL10N;
 use OCP\Lock\LockedException;
 use OCP\Notification\IManager as INotificationManager;
+use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
@@ -51,6 +52,7 @@ class OpenAiAPIService {
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
 		private StreamingService $streamingService,
+		private OpenAiFileService $openAiFileService,
 		private INotificationManager $notificationManager,
 		private QuotaRuleService $quotaRuleService,
 		IClientService $clientService,
@@ -552,8 +554,7 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
-		?string $userAudioPromptBase64 = null,
-		?string $userAudioPromptFormat = null,
+		?array $files = null,
 	): \Generator {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -570,8 +571,7 @@ class OpenAiAPIService {
 			$extraParams,
 			$toolMessage,
 			$tools,
-			$userAudioPromptBase64,
-			$userAudioPromptFormat,
+			$files,
 			true,
 		);
 
@@ -612,13 +612,11 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
-		?string $userAudioPromptBase64 = null,
-		?string $userAudioPromptFormat = null,
+		?array $files = null,
 	): array {
 		$response = $this->requestChatCompletion(
 			$userId, $model, $userPrompt, $systemPrompt, $history,
-			$n, $maxTokens, $extraParams, $toolMessage, $tools,
-			$userAudioPromptBase64, $userAudioPromptFormat,
+			$n, $maxTokens, $extraParams, $toolMessage, $tools, $files,
 			false,
 		);
 
@@ -646,8 +644,7 @@ class OpenAiAPIService {
 	 * @param array|null $extraParams
 	 * @param string|null $toolMessage JSON string with role, content, tool_call_id
 	 * @param array|null $tools
-	 * @param string|null $userAudioPromptBase64
-	 * @param string|null $userAudioPromptFormat
+	 * @param array|null $files Array of File objects
 	 * @return array{messages?: array<string>, tool_calls?: array<string>, audio_messages?: list<array<string, mixed>>, usage?: array<string, mixed>}
 	 * @throws Exception
 	 */
@@ -662,8 +659,7 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
-		?string $userAudioPromptBase64 = null,
-		?string $userAudioPromptFormat = null,
+		?array $files = null,
 		bool $stream = false,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
@@ -681,8 +677,7 @@ class OpenAiAPIService {
 			$extraParams,
 			$toolMessage,
 			$tools,
-			$userAudioPromptBase64,
-			$userAudioPromptFormat,
+			$files,
 			$stream,
 		);
 
@@ -700,8 +695,7 @@ class OpenAiAPIService {
 	 * @param array|null $extraParams
 	 * @param string|null $toolMessage
 	 * @param array|null $tools
-	 * @param string|null $userAudioPromptBase64
-	 * @param string|null $userAudioPromptFormat
+	 * @param array|null $files Array of File objects
 	 * @param bool $stream
 	 * @return array<string, mixed>
 	 */
@@ -716,8 +710,7 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 		?string $toolMessage = null,
 		?array $tools = null,
-		?string $userAudioPromptBase64 = null,
-		?string $userAudioPromptFormat = null,
+		?array $files = null,
 		bool $stream = false,
 	): array {
 		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
@@ -758,32 +751,62 @@ class OpenAiAPIService {
 						return $formattedToolCall;
 					}, $message['tool_calls']);
 				}
+				// Handle file attachments in the history
+				if (isset($message['content']) && is_array($message['content'])) {
+					$content = [];
+					foreach ($message['content'] as $item) {
+						if (!isset($item['type'])) {
+							throw new UserFacingProcessingException(
+								'Invalid message history content',
+								0,
+								null,
+								$this->l10n->t('Invalid message history content'),
+							);
+						}
+						if ($item['type'] === 'file') {
+							if (!isset($item['file_id'])) {
+								throw new UserFacingProcessingException(
+									'Invalid message history content',
+									0,
+									null,
+									$this->l10n->t('Invalid message history content'),
+								);
+							}
+							// If the history contains a file that isn't supported anymore we should skip it so the chat isn't broken
+							try {
+								$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null));
+							} catch (ProcessingException|UserFacingProcessingException $e) {
+								$this->logger->warning('Could not build file content from id: ' . $item['file_id'] . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+							}
+						} else {
+							$content[] = $item;
+						}
+					}
+					$message['content'] = $content;
+				}
 				$messages[] = $message;
 			}
 		}
-		if ($userAudioPromptBase64 !== null) {
-			// if there is audio, use the new message format (content is a list of objects)
-			$message = [
-				'role' => 'user',
-				'content' => [
-					[
-						'type' => 'input_audio',
-						'input_audio' => [
-							'data' => $userAudioPromptBase64,
-							'format' => $userAudioPromptFormat ?? 'wav',
-						],
-					],
-				],
-			];
+		// Attach all files when necessary
+		if ($files !== null && count($files) > 0) {
+			if (count($files) > 500) {
+				throw new UserFacingProcessingException($this->l10n->t('Too many files. Max is 500'), Http::STATUS_BAD_REQUEST);
+			}
+			$content = [];
+			foreach ($files as $file) {
+				$content = array_merge($content, $this->openAiFileService->buildFileContentFromFile($file));
+			}
 			if ($userPrompt !== null) {
-				$message['content'][] = [
+				$content[] = [
 					'type' => 'text',
 					'text' => $userPrompt,
 				];
 			}
-			$messages[] = $message;
+			$messages[] = [
+				'role' => 'user',
+				'content' => $content,
+			];
 		} elseif ($userPrompt !== null) {
-			// if there is only text, use the old message format (content is a string)
 			$messages[] = [
 				'role' => 'user',
 				'content' => $userPrompt,
@@ -1463,6 +1486,7 @@ class OpenAiAPIService {
 			'reasoning_messages' => [],
 			'tool_calls' => [],
 			'audio_messages' => [],
+			'images' => [],
 		];
 
 		foreach ($response['choices'] as $choice) {
@@ -1514,6 +1538,11 @@ class OpenAiAPIService {
 			}
 			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
 				$completions['audio_messages'][] = $choice['message'];
+			}
+			if (isset($choice['message']['images']) && is_array($choice['message']['images'])) {
+				foreach ($choice['message']['images'] as $image) {
+					$completions['images'][] = $image;
+				}
 			}
 		}
 
@@ -1598,7 +1627,6 @@ class OpenAiAPIService {
 		$config['stt_provider_enabled'] = $this->isSTTAvailable();
 		$config['tts_provider_enabled'] = $this->isTTSAvailable();
 		$this->openAiSettingsService->setAdminConfig($config);
-		$config['analyze_image_provider_enabled'] = $this->openAiSettingsService->getAnalyzeImageProviderEnabled();
 		return $config;
 	}
 }

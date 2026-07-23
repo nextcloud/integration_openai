@@ -25,6 +25,7 @@
 		<directory name="vendor" />
 	</extraFiles>
 	<stubs>
+		<file name="tests/stubs/oc_hooks_emitter.php" />
 		<file name="tests/stubs/ocp_task_processing_i_provider.php" />
 		<file name="tests/stubs/ocp_task_processing_isynchronous_provider.php" />
 		<file name="tests/stubs/ocp_task_processing_synchronous_provider_options.php" />
@@ -47,6 +48,7 @@
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\TextToTextProofread" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\TextToTextReformatParagraphs" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools" />
+				<referencedClass name="OCP\TaskProcessing\TaskTypes\MultimodalChatWithTools" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\AudioToAudioChat" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\AudioToAudioTranslate" />
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\TextToTextImprove" />

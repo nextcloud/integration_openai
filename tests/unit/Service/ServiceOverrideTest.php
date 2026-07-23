@@ -16,6 +16,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\StreamingService;
@@ -89,6 +90,12 @@ class ServiceOverrideTest extends TestCase {
 			$this->openAiSettingsService,
 			new StreamingService(
 				$this->createMock(\OCP\IL10N::class),
+			),
+			new OpenAiFileService(
+				$this->createMock(\OCP\IL10N::class),
+				$this->openAiSettingsService,
+				$this->createMock(\OCP\Files\IRootFolder::class),
+				$this->createMock(\OCP\TaskProcessing\IManager::class),
 			),
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
