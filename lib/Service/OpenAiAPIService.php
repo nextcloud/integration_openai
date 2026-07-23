@@ -665,8 +665,19 @@ class OpenAiAPIService {
 			}
 
 			// always try to get a message
-			if (isset($choice['message']['content']) && is_string($choice['message']['content'])) {
-				$completions['messages'][] = $choice['message']['content'];
+			if (isset($choice['message']['content'])) {
+				if (is_string($choice['message']['content'])) {
+					$completions['messages'][] = $choice['message']['content'];
+				} elseif (is_array($choice['message']['content'])) {
+					$messageContent = [];
+					// Handles more complex mistral message content (TODO: missing reasoning for now look at https://github.com/nextcloud/integration_openai/pull/409#discussion_r3638108824)
+					foreach ($choice['message']['content'] as $content) {
+						if ($content['type'] === 'text' && is_string($content['text'])) {
+							$messageContent[] = $content['text'];
+						}
+					}
+					$completions['messages'][] = implode('', $messageContent);
+				}
 			}
 			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
 				$completions['audio_messages'][] = $choice['message'];
