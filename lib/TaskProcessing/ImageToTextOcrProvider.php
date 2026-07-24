@@ -9,11 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use Imagick;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
-use OCP\Files\File;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -24,7 +22,6 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\ImageToTextOpticalCharacterRecognition;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 
 class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvider {
 
@@ -109,18 +106,17 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 		$preferStreaming = $options->getPreferStreaming();
 
 		if (!$this->openAiAPIService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
-			throw new RuntimeException('Must support chat completion endpoint');
+			throw new ProcessingException('Must support chat completion endpoint');
 		}
 
 		if (!isset($input['input']) || !is_array($input['input'])) {
-			throw new RuntimeException('Invalid file list');
+			throw new ProcessingException('Invalid file list');
 		}
 		if (count($input['input']) === 0) {
-			throw new RuntimeException('Invalid file list');
+			throw new ProcessingException('Invalid file list');
 		}
-		if (count($input['input']) > 500) {
-			throw new RuntimeException('Too many files given. Max is 500');
-		}
+
+		$files = $input['input'];
 
 		if (isset($input['model']) && is_string($input['model'])) {
 			$model = $input['model'];
@@ -133,226 +129,88 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$fileSize = 0;
+		$fileSizeTotal = array_reduce(
+			$files,
+			function ($carry, $file) {
+				return $carry + (method_exists($file, 'getSize') ? $file->getSize() : 0);
+			},
+			0
+		);
+		if ($fileSizeTotal > 50 * 1000 * 1000) {
+			throw new UserFacingProcessingException(
+				'Filesize of input files too large. Max is 50MB',
+				0,
+				null,
+				$this->l->t('The total size of the input files is too large. A maximum of 50MB is allowed.'),
+			);
+		}
+
 		$outputs = [];
 		$streamedOutputs = [];
-		$fileCount = (float)count($input['input']);
-		$systemPrompt = 'Extract all visible text from the image. Return only the extracted text without additional commentary. Preserve the original language of the text.';
-		$userPrompt = 'Extract all text from this image.';
+		$fileCount = (float)count($files);
+		$systemPrompt = 'Extract all visible text from the file. Return only the extracted text without additional commentary. Preserve the original language of the text.';
+		$userPrompt = 'Extract all text from this file.';
 
 		$fileIndex = 0;
-		foreach ($input['input'] as $file) {
-			if (!$file instanceof File || !$file->isReadable()) {
-				throw new RuntimeException('Invalid input file');
-			}
-			$fileSize += intval($file->getSize());
-			if ($fileSize > 50 * 1000 * 1000) {
-				throw new UserFacingProcessingException('Filesize of input files too large. Max is 50MB', userFacingMessage: $this->l->t('Filesize of input files too large. Max is 50MB'));
-			}
+		foreach ($files as $file) {
 			$streamedOutputs[] = '';
-
-			$fileType = $file->getMimeType();
-
-			// handle pdf files by converting to jpeg and then passing to the api
-			if ($fileType === 'application/pdf') {
-				$outputForFile = '';
-				$imagickProbe = $this->getImagickProbe($file);
-				$pagesRead = 0;
-				$history = [];
-				foreach ($this->imagickPdfToJpegBase64($imagickProbe['image'], 5) as $base64Image) {
-					$pagesRead += count($base64Image);
-					$history = [];
-					// Batches 5 in one request to speed up the process
-					foreach ($base64Image as $image) {
-						$history[] = json_encode([
-							'role' => 'user',
-							'content' => [
-								[
-									'type' => 'image_url',
-									'image_url' => [
-										'url' => 'data:image/jpeg;base64,' . $image,
-									],
-								],
-							],
-						]);
-					}
-					try {
-						if ($preferStreaming) {
-							$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
-							$time = microtime(true);
-							foreach ($chunks as $chunk) {
-								if (!in_array($chunk['kind'] ?? null, ['content'], true)) {
-									continue;
-								}
-								$streamedOutputs[$fileIndex] .= $chunk['text'];
-								// we don't report more often than every 250ms
-								if (microtime(true) - $time >= 0.25) {
-									$running = $reportOutput([
-										'output' => $streamedOutputs,
-									]);
-									if (!$running) {
-										throw new ProcessingException('OpenAI/LocalAI task cancelled');
-									}
-									$time = microtime(true);
-								}
-							}
-							if ($streamedOutputs[$fileIndex] !== '') {
-								$running = $reportOutput([
-									'output' => $streamedOutputs,
-								]);
-								if (!$running) {
-									throw new ProcessingException('OpenAI/LocalAI task cancelled');
-								}
-							}
-							$returnValue = $chunks->getReturn();
-							$messages = $returnValue['messages'];
-						} else {
-							$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
-							$messages = $completion['messages'];
-						}
-
-						if (count($messages) === 0) {
-							$this->logger->warning('No result in OpenAI/LocalAI response.');
-							$outputs[] = '';
+			try {
+				if ($preferStreaming) {
+					$chunks = $this->openAiAPIService->createStreamedChatCompletion(
+						$userId, $model, $userPrompt, $systemPrompt, null, 1, $maxTokens, null, null, null, [$file],
+					);
+					$time = microtime(true);
+					foreach ($chunks as $chunk) {
+						if (!in_array($chunk['kind'] ?? null, ['content'], true)) {
 							continue;
 						}
-
-						$outputForFile .= array_pop($messages) . "\n\n";
-						$reportProgress(((float)$fileIndex + (float)($pagesRead / $imagickProbe['count'])) / $fileCount);
-					} catch (\Exception $e) {
-						$this->logger->warning('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage(), ['exception' => $e]);
-						throw new RuntimeException('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage());
-					}
-				}
-				$outputs[] = $outputForFile;
-				$reportProgress(((float)$fileIndex + 1.0) / $fileCount);
-			} elseif (str_starts_with($fileType, 'image/')) {
-				if ($this->openAiAPIService->isUsingOpenAi()) {
-					$validFileTypes = [
-						'image/jpeg',
-						'image/png',
-						'image/gif',
-						'image/webp',
-					];
-					if (!in_array($fileType, $validFileTypes, true)) {
-						throw new RuntimeException('Invalid input file type for OpenAI ' . $fileType);
-					}
-				}
-
-				$base64Image = base64_encode(stream_get_contents($file->fopen('rb')));
-				$history = [
-					json_encode([
-						'role' => 'user',
-						'content' => [
-							[
-								'type' => 'image_url',
-								'image_url' => [
-									'url' => 'data:' . $fileType . ';base64,' . $base64Image,
-								],
-							],
-						],
-					]),
-				];
-				try {
-					if ($preferStreaming) {
-						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
-						$time = microtime(true);
-						foreach ($chunks as $chunk) {
-							if (!in_array($chunk['kind'] ?? null, ['content'], true)) {
-								continue;
-							}
-							$streamedOutputs[$fileIndex] .= $chunk['text'];
-							// we don't report more often than every 250ms
-							if (microtime(true) - $time >= 0.25) {
-								$running = $reportOutput([
-									'output' => $streamedOutputs,
-								]);
-								if (!$running) {
-									throw new ProcessingException('OpenAI/LocalAI task cancelled');
-								}
-								$time = microtime(true);
-							}
-						}
-						if ($streamedOutputs[$fileIndex] !== '') {
+						$streamedOutputs[$fileIndex] .= $chunk['text'];
+						// we don't report more often than every 250ms
+						if (microtime(true) - $time >= 0.25) {
 							$running = $reportOutput([
 								'output' => $streamedOutputs,
 							]);
 							if (!$running) {
 								throw new ProcessingException('OpenAI/LocalAI task cancelled');
 							}
+							$time = microtime(true);
 						}
-						$returnValue = $chunks->getReturn();
-						$messages = $returnValue['messages'];
-					} else {
-						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
-						$messages = $completion['messages'];
 					}
-					$reportProgress(((float)$fileIndex + 1.0) / $fileCount);
-
-					if (count($messages) === 0) {
-						$this->logger->warning('No result in OpenAI/LocalAI response.');
-						$outputs[] = '';
-						continue;
+					if ($streamedOutputs[$fileIndex] !== '') {
+						$running = $reportOutput([
+							'output' => $streamedOutputs,
+						]);
+						if (!$running) {
+							throw new ProcessingException('OpenAI/LocalAI task cancelled');
+						}
 					}
-
-					$outputs[] = array_pop($messages);
-				} catch (\Exception $e) {
-					$this->logger->warning('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage(), ['exception' => $e]);
-					throw new RuntimeException('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage());
+					$returnValue = $chunks->getReturn();
+					$messages = $returnValue['messages'];
+				} else {
+					$completion = $this->openAiAPIService->createChatCompletion(
+						$userId, $model, $userPrompt, $systemPrompt, null, 1, $maxTokens, null, null, null, [$file],
+					);
+					$messages = $completion['messages'];
 				}
-			} else {
-				throw new UserFacingProcessingException('Only supports image and pdf file types' . $fileType, userFacingMessage: $this->l->t('Only supports image and pdf file types'));
+				$reportProgress(((float)$fileIndex + 1.0) / $fileCount);
+
+				if (count($messages) === 0) {
+					$this->logger->warning('No result in OpenAI/LocalAI response.');
+					$outputs[] = '';
+					$fileIndex++;
+					continue;
+				}
+
+				$outputs[] = array_pop($messages);
+			} catch (UserFacingProcessingException|ProcessingException $e) {
+				throw $e;
+			} catch (\Throwable $e) {
+				$this->logger->warning('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage(), ['exception' => $e]);
+				throw new ProcessingException('OpenAI/LocalAI\'s OCR failed with: ' . $e->getMessage());
 			}
 			$fileIndex++;
 		}
 
 		return ['output' => $outputs];
-	}
-
-	/**
-	 * @return array{count: int, image: Imagick}
-	 */
-	private function getImagickProbe(File $file): array {
-		if (!extension_loaded('imagick')) {
-			throw new RuntimeException('Imagick extension not available can not process PDF');
-		}
-		if (empty(Imagick::queryFormats('PDF'))) {
-			throw new RuntimeException('Imagick has no PDF support (Ghostscript missing or blocked by policy.xml)');
-		}
-
-		$pdfContent = $file->getContent();
-		$probe = new Imagick();
-		$probe->setResolution(200, 200);
-		$probe->readImageBlob($pdfContent);
-		return ['count' => $probe->getNumberImages(), 'image' => $probe];
-	}
-	/**
-	 * @return \Generator<int, array<int, string>>
-	 */
-	private function imagickPdfToJpegBase64(Imagick $im, int $batchSize, int $maxPages = 500): \Generator {
-		$pageCount = 0;
-		$batch = [];
-		foreach ($im as $page) {
-			if ($pageCount >= $maxPages) {
-				break;
-			}
-			$page = $page->getImage();
-			$page->setImageBackgroundColor('white');
-			$page = $page->flattenImages();
-			$page->setImageFormat('jpeg');
-			$page->setImageCompressionQuality(85);
-			$batch[] = base64_encode($page->getImageBlob());
-			$page->clear();
-			$pageCount++;
-			// Read in batchs to avoid memory issues
-			if (count($batch) >= $batchSize) {
-				yield $batch;
-				$batch = [];
-			}
-		}
-		if (count($batch) > 0) {
-			yield $batch;
-		}
-		$im->clear();
 	}
 }
