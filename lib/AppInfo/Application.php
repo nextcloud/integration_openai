@@ -149,6 +149,7 @@ class Application extends App implements IBootstrap {
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider::class);
 			}
 			if ($this->appConfig->getValueString(Application::APP_ID, 'multimodal_image_enabled', '1') === '1') {
+				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ImageToTextOcrProvider::class);
 				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImagesProvider::class);
 			}
 		}
