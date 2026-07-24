@@ -1166,6 +1166,7 @@ export default {
 		margin: 0 !important;
 	}
 }
+
 .notecard {
 	max-width: 900px;
 }
