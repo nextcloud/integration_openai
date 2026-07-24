@@ -44,10 +44,7 @@
     "The model used to generate the output" : "Modelis, naudojamas rezultatams generuoti",
     "Reasoning content" : "Argumentacijos turinys",
     "The model reasoning behind the output" : "Rezultato pagrindą sudaranti modelio argumentacija",
-    "Too many files given. A maximum of 500 files is allowed." : "Pateikta per daug failų. Leidžiama įkelti ne daugiau kaip 500 failų.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "Bendras įvesties failų dydis yra per didelis. Leidžiamas maksimalus dydis – 50 MB.",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "Netinkamas įvesties failo tipas „%1$s“. Palaikomi tik vaizdo failai.",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "Netinkamas įvesties failo tipas „%1$s“. Palaikomi tik JPEG, PNG, GIF ir WebP formato paveikslėliai.",
     "Completion model" : "Užbaigimo modelis",
     "The model used to generate the completion" : "Modelis, naudotas užbaigimui sugeneruoti",
     "Output voice" : "Išvesties balsas",
@@ -190,7 +187,6 @@
     "Image generation provider" : "Vaizdo generavimo teikėjas",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Kalbos į tekstą teikėjas (pavyzdžiui, pokalbių įrašų transkribavimui)",
     "Text-to-speech provider" : "Teksto pavertimo kalba tiekėjas",
-    "Analyze image provider" : "Analizuoti vaizdo teikėją",
     "This quota period is from {startDate} to {endDate}" : "Šis kvotos laikotarpis yra nuo {startDate} iki {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Kvota skaičiuojama per kintamą laikotarpį, apimantį paskutinę %n d.","Kvota skaičiuojama per kintamą laikotarpį, apimantį paskutines %n d.","Kvota skaičiuojama per kintamą laikotarpį, apimantį paskutines %n d.","Kvota skaičiuojama per kintamą laikotarpį, apimantį paskutines %n d."],
     "OpenAI options saved" : "„OpenAI“ parinktys įrašytos",
@@ -263,6 +259,7 @@
     "Prompt" : "Užduotis",
     "Write transcript that you want the assistant to generate speech from" : "Parašykite tekstą, pagal kurį asistentas turėtų sugeneruoti kalbą",
     "Output speech" : "Išvesties kalba",
-    "The generated speech" : "Sugeneruota kalba"
+    "The generated speech" : "Sugeneruota kalba",
+    "Analyze image provider" : "Analizuoti vaizdo teikėją"
 },"pluralForm" :"nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);"
 }

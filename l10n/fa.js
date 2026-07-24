@@ -162,7 +162,6 @@ OC.L10N.register(
     "Image generation provider" : "ارائه‌دهنده تولید تصویر",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "ارائه‌دهنده تبدیل گفتار به متن (برای مثال رونویسی ضبط‌های Talk)",
     "Text-to-speech provider" : "ارائه‌دهنده تبدیل متن به گفتار",
-    "Analyze image provider" : "ارائه‌دهنده تحلیل تصویر",
     "This quota period is from {startDate} to {endDate}" : "این دوره سهمیه از {startDate} تا {endDate} است",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Ø³Ù‡Ù…ÛŒÙ‡ Ø¯Ø± ÛŒÚ© Ø¯ÙˆØ±Ù‡ Ù…ØªØºÛŒØ± Ø´Ø§Ù…Ù„ %n Ø±ÙˆØ² Ú¯Ø°Ø´ØªÙ‡ Ù†Ú¯Ù‡Ø¯Ø§Ø±ÛŒ Ù…ÛŒâ€ŒØ´ÙˆØ¯","Ø³Ù‡Ù…ÛŒÙ‡ Ø¯Ø± ÛŒÚ© Ø¯ÙˆØ±Ù‡ Ù…ØªØºÛŒØ± Ø´Ø§Ù…Ù„ %n Ø±ÙˆØ² Ú¯Ø°Ø´ØªÙ‡ Ù†Ú¯Ù‡Ø¯Ø§Ø±ÛŒ Ù…ÛŒâ€ŒØ´ÙˆØ¯"],
     "OpenAI options saved" : "تنظیمات OpenAI ذخیره شد",
@@ -235,6 +234,7 @@ OC.L10N.register(
     "Prompt" : "پرامپت",
     "Write transcript that you want the assistant to generate speech from" : "متنی را بنویسید که می‌خواهید دستیار از آن گفتار تولید کند",
     "Output speech" : "خروجی گفتار",
-    "The generated speech" : "گفتار تولید شده"
+    "The generated speech" : "گفتار تولید شده",
+    "Analyze image provider" : "ارائه‌دهنده تحلیل تصویر"
 },
 "nplurals=2; plural=(n > 1);");

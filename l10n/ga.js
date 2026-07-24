@@ -46,10 +46,7 @@ OC.L10N.register(
     "The model used to generate the output" : "An tsamhail a úsáideadh chun an t-aschur a ghiniúint",
     "Reasoning content" : "Ábhar réasúnaíochta",
     "The model reasoning behind the output" : "An réasúnaíocht mhúnla atá taobh thiar den aschur",
-    "Too many files given. A maximum of 500 files is allowed." : "An iomarca comhad tugtha. Ceadaítear uasmhéid de 500 comhad.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "Tá méid iomlán na gcomhad ionchuir rómhór. Ceadaítear uasmhéid de 50MB.",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "Cineál comhaid ionchuir neamhbhailí \"%1$s\". Ní thacaítear ach le comhaid íomhá.",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "Cineál comhaid ionchuir neamhbhailí \"%1$s\". Ní thacaítear ach le híomhánna JPEG, PNG, GIF agus WebP.",
     "Completion model" : "Múnla críochnaithe",
     "The model used to generate the completion" : "An tsamhail a úsáidtear chun an críochnú a ghiniúint",
     "Output voice" : "Guth aschuir",
@@ -193,7 +190,6 @@ OC.L10N.register(
     "Image generation provider" : "Soláthraí giniúna íomhá",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Soláthraí cainte go téacs (chun taifeadtaí Talk a thrascríobh mar shampla)",
     "Text-to-speech provider" : "Soláthraí téacs-go-hurlabhra",
-    "Analyze image provider" : "Anailísigh soláthraí íomhá",
     "This quota period is from {startDate} to {endDate}" : "Tá an tréimhse cuóta seo ó {startDate} go {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Coinnítear an cuóta thar thréimhse snámhach den %n lá deireanach","Coinnítear an cuóta thar thréimhse snámhach de na %n lá seo caite","Coinnítear an cuóta thar thréimhse snámhach de na %n lá seo caite","Coinnítear an cuóta thar thréimhse snámhach de na %n lá seo caite","Coinnítear an cuóta thar thréimhse snámhach de na %n lá seo caite"],
     "OpenAI options saved" : "Roghanna OpenAI sábháilte",
@@ -266,6 +262,7 @@ OC.L10N.register(
     "Prompt" : "Leid",
     "Write transcript that you want the assistant to generate speech from" : "Scríobh an tras-scríbhinn ar mhaith leat go nginfeadh an cúntóir urlabhra uaidh",
     "Output speech" : "Aschur cainte",
-    "The generated speech" : "An chaint ghinte"
+    "The generated speech" : "An chaint ghinte",
+    "Analyze image provider" : "Anailísigh soláthraí íomhá"
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

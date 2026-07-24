@@ -46,10 +46,7 @@ OC.L10N.register(
     "The model used to generate the output" : "Das Modell zur Erzeugung der Ausgabe",
     "Reasoning content" : "Inhalt der logischen Begründung",
     "The model reasoning behind the output" : "Die modellbasierte Begründung für das Ergebnis",
-    "Too many files given. A maximum of 500 files is allowed." : "Es wurden zu viele Dateien angegeben. Es sind maximal 500 Dateien zulässig.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "Die Gesamtgröße der Eingabedateien ist zu groß. Es sind maximal 50 MB zulässig.",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "Ungültiger Dateityp \"%1$s\". Es werden nur Bilddateien unterstützt.",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "Ungültiger Dateityp \"%1$s\". Es werden nur Bilder vom Typ JPEG, PNG, GIF und WebP unterstützt.",
     "Completion model" : "Vervollständigungsmodell",
     "The model used to generate the completion" : "Das zur Generierung der Vervollständigung verwendete Modell",
     "Output voice" : "Ausgabestimme",
@@ -193,7 +190,6 @@ OC.L10N.register(
     "Image generation provider" : "Bilderstellungsanbieter",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Sprache-zu-Text-Anbieter (zum Beispiel zum Transkribieren von Talk-Gesprächsaufzeichnungen)",
     "Text-to-speech provider" : "Text-zu-Sprache-Anbieter",
-    "Analyze image provider" : "Bildanbieter analysieren",
     "This quota period is from {startDate} to {endDate}" : "Dieser Kontingentszeitraum läuft vom {startDate} bis zum {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Das Kontingent wird über einen variablen Zeitraum des letzten %n Tages gehalten","Das Kontingent wird über einen variablen Zeitraum der letzten %n Tage gehalten"],
     "OpenAI options saved" : "OpenAI-Einstellungen gespeichert",
@@ -266,6 +262,7 @@ OC.L10N.register(
     "Prompt" : "Prompt",
     "Write transcript that you want the assistant to generate speech from" : "Schreiben Sie ein Transkript, aus dem der Assistent Sprache erstellen soll",
     "Output speech" : "Sprachausgabe",
-    "The generated speech" : "Die erstellte Sprache"
+    "The generated speech" : "Die erstellte Sprache",
+    "Analyze image provider" : "Bildanbieter analysieren"
 },
 "nplurals=2; plural=(n != 1);");

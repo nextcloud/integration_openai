@@ -137,7 +137,6 @@
     "Image generation provider" : "ຜູ້ໃຫ້ບໍລິການສ້າງຮູບພາບ",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "ຜູ້ໃຫ້ບໍລິການສຽງເປັນຂໍ້ຄວາມ (ຕົວຢ່າງ, ເພື່ອຖອດສຽງການບັນທຶກໃນ Talk)",
     "Text-to-speech provider" : "ຜູ້ໃຫ້ບໍລິການຂໍ້ຄວາມເປັນສຽງເວົ້າ",
-    "Analyze image provider" : "ຜູ້ໃຫ້ບໍລິການວິເຄາະຮູບພາບ",
     "This quota period is from {startDate} to {endDate}" : "ໄລຍະເວລາໂຄວຕ້ານີ້ແມ່ນແຕ່ວັນທີ {startDate} ຫາ {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["ໂຄວຕ້າຈະຖືກຮັກສາໄວ້ໃນໄລຍະເວລາເຄື່ອນທີ່ຂອງ %n ມື້ທີ່ຜ່ານມາ"],
     "OpenAI options saved" : "ບັນທຶກຕົວເລືອກ OpenAI ແລ້ວ",
@@ -205,6 +204,7 @@
     "Prompt" : "ຄຳສັ່ງ",
     "Write transcript that you want the assistant to generate speech from" : "ຂຽນບົດຖອດຄວາມທີ່ທ່ານຕ້ອງການໃຫ້ຜູ້ຊ່ວຍສ້າງສຽງເວົ້າ",
     "Output speech" : "ສຽງເວົ້າຂອງຜົນລັບ",
-    "The generated speech" : "ສຽງເວົ້າທີ່ສ້າງຂຶ້ນ"
+    "The generated speech" : "ສຽງເວົ້າທີ່ສ້າງຂຶ້ນ",
+    "Analyze image provider" : "ຜູ້ໃຫ້ບໍລິການວິເຄາະຮູບພາບ"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

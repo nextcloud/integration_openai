@@ -155,7 +155,6 @@ OC.L10N.register(
     "Image generation provider" : "Görsel oluşturma hizmeti sağlayıcısı",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Konuşmadan yazıya dönüştürme hizmeti (örneğin Konuş kayıtlarını yazıya dönüştürmek için)",
     "Text-to-speech provider" : "Yazıdan konuşmaya dönüştürme hizmeti sağlayıcısı",
-    "Analyze image provider" : "Görsel inceleme hizmeti sağlayıcısı",
     "This quota period is from {startDate} to {endDate}" : "Bu kota dönemi {startDate} ile {endDate} arasında",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Kota son %n günlük dönem için tutulur","Kota son %n günlük dönem için tutulur"],
     "OpenAI options saved" : "OpenAI ayarları kaydedildi",
@@ -228,6 +227,7 @@ OC.L10N.register(
     "Prompt" : "İstem",
     "Write transcript that you want the assistant to generate speech from" : "Yardımcının konuşma oluşturmasını istediğiniz yazıya dönüştürme sonucunu yazın",
     "Output speech" : "Konuşma çıktısı",
-    "The generated speech" : "Oluşturulan konuşma"
+    "The generated speech" : "Oluşturulan konuşma",
+    "Analyze image provider" : "Görsel inceleme hizmeti sağlayıcısı"
 },
 "nplurals=2; plural=(n > 1);");

@@ -44,10 +44,7 @@
     "The model used to generate the output" : "The model used to generate the output",
     "Reasoning content" : "Reasoning content",
     "The model reasoning behind the output" : "The model reasoning behind the output",
-    "Too many files given. A maximum of 500 files is allowed." : "Too many files given. A maximum of 500 files is allowed.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "The total size of the input files is too large. A maximum of 50MB is allowed.",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "Invalid input file type \"%1$s\". Only image files are supported.",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported.",
     "Completion model" : "Completion model",
     "The model used to generate the completion" : "The model used to generate the completion",
     "Output voice" : "Output voice",
@@ -191,7 +188,6 @@
     "Image generation provider" : "Image generation provider",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Speech-to-text provider (to transcribe Talk recordings for example)",
     "Text-to-speech provider" : "Text-to-speech provider",
-    "Analyze image provider" : "Analyze image provider",
     "This quota period is from {startDate} to {endDate}" : "This quota period is from {startDate} to {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["The quota is kept over a floating period of the last %n day","The quota is kept over a floating period of the last %n days"],
     "OpenAI options saved" : "OpenAI options saved",
@@ -264,6 +260,7 @@
     "Prompt" : "Prompt",
     "Write transcript that you want the assistant to generate speech from" : "Write transcript that you want the assistant to generate speech from",
     "Output speech" : "Output speech",
-    "The generated speech" : "The generated speech"
+    "The generated speech" : "The generated speech",
+    "Analyze image provider" : "Analyze image provider"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

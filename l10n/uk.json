@@ -140,7 +140,6 @@
     "Image generation provider" : "Постачальник послуг з генерації зображень",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Постачальник послуг з перетворення мови в текст (наприклад, для транскрибування записів розмов)",
     "Text-to-speech provider" : "Постачальник послуг з перетворення тексту в мовлення",
-    "Analyze image provider" : "Аналізувати постачальника зображень",
     "This quota period is from {startDate} to {endDate}" : "Період дії квоти - з {startDate} до {endDate}",
     "OpenAI options saved" : "Параметри OpenAI збережено",
     "Failed to save OpenAI options" : "Не вдалося зберегти параметри OpenAI",
@@ -204,6 +203,7 @@
     "Prompt" : "Запрошення",
     "Write transcript that you want the assistant to generate speech from" : "Напишіть стенограму, з якої ви хочете, щоб асистент генерував мовлення",
     "Output speech" : "Вихідне мовлення",
-    "The generated speech" : "Згенероване мовлення"
+    "The generated speech" : "Згенероване мовлення",
+    "Analyze image provider" : "Аналізувати постачальника зображень"
 },"pluralForm" :"nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);"
 }

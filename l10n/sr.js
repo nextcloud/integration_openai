@@ -141,7 +141,6 @@ OC.L10N.register(
     "Image generation provider" : "Пружалац услуге генерисања слике",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Пружалац услуге претварања говора у текст (на пример, за транскрибовање Talk снимака)",
     "Text-to-speech provider" : "Пружалац услуге претварање текста у говор",
-    "Analyze image provider" : "Пружалац услуге анализирања слике",
     "This quota period is from {startDate} to {endDate}" : "Период ове квоте је од {startDate} до {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Квота важи за плутајући период од последњих %n дан","Квота важи за плутајући период од последња %n дана","Квота важи за плутајући период од последњих %n дана"],
     "OpenAI options saved" : "Сачуване су OpenAI опције",
@@ -208,6 +207,7 @@ OC.L10N.register(
     "Prompt" : "Захтев за унос",
     "Write transcript that you want the assistant to generate speech from" : "Напишите транскрипт из којег желите да асистент генерише говор",
     "Output speech" : "Излазни говор",
-    "The generated speech" : "Генерисани говор"
+    "The generated speech" : "Генерисани говор",
+    "Analyze image provider" : "Пружалац услуге анализирања слике"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

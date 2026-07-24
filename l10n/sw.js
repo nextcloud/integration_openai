@@ -142,7 +142,6 @@ OC.L10N.register(
     "Image generation provider" : "Mtoa huduma wa kutengeneza picha",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Mtoa huduma wa hotuba-kwa-maandishi (kunukuu rekodi za Talk kwa mfano)",
     "Text-to-speech provider" : "Mtoa huduma wa maandishi-kwa-hotuba",
-    "Analyze image provider" : "Changanua mtoaji picha",
     "This quota period is from {startDate} to {endDate}" : "Kipindi hiki cha mgao ni kuanzia {startDate} hadi {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["The quota is kept over a floating period of the last %n day","Kiwango hicho kinawekwa katika kipindi cha kuelea cha siku %n zilizopita"],
     "OpenAI options saved" : "Chaguo za OpenAI zimehifadhiwa",
@@ -210,6 +209,7 @@ OC.L10N.register(
     "Prompt" : "Haraka",
     "Write transcript that you want the assistant to generate speech from" : "Andika manukuu ambayo ungependa msaidizi atolee hotuba",
     "Output speech" : "Hotuba ya toleo",
-    "The generated speech" : "Hotuba iliyotengenezwa"
+    "The generated speech" : "Hotuba iliyotengenezwa",
+    "Analyze image provider" : "Changanua mtoaji picha"
 },
 "nplurals=2; plural=(n != 1);");
