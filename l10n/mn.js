@@ -147,7 +147,6 @@ OC.L10N.register(
     "Image generation provider" : "Зураг үүсгэх үйлчилгээ",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Яриа-текст хөрвүүлэгч (жишээ нь Talk бичлэгийг хөрвүүлэхэд)",
     "Text-to-speech provider" : "Текстээс яриа үйлчилгээ",
-    "Analyze image provider" : "Зураг шинжлэх үйлчилгээ",
     "This quota period is from {startDate} to {endDate}" : "Энэ квотын хугацаа {startDate}-аас {endDate} хүртэл",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Квот нь сүүлийн %n хоногийн хөвөгч хугацаанд хадгалагдана","Квот нь сүүлийн %n хоногийн хөвөгч хугацаанд хадгалагдана"],
     "OpenAI options saved" : "OpenAI тохиргоо хадгалагдлаа",
@@ -220,6 +219,7 @@ OC.L10N.register(
     "Prompt" : "Сануулга",
     "Write transcript that you want the assistant to generate speech from" : "Туслахаар яриа үүсгүүлэхийг хүсч буй хуулбар бичнэ үү",
     "Output speech" : "Гаралтын яриа",
-    "The generated speech" : "Үүсгэсэн яриа"
+    "The generated speech" : "Үүсгэсэн яриа",
+    "Analyze image provider" : "Зураг шинжлэх үйлчилгээ"
 },
 "nplurals=2; plural=(n != 1);");

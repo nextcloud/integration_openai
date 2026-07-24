@@ -143,7 +143,6 @@ OC.L10N.register(
     "Image generation provider" : "Provider di generazione di immagini",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provider di sintesi vocale (ad esempio per trascrivere registrazioni di conversazioni)",
     "Text-to-speech provider" : "Fornitore di servizi di sintesi vocale",
-    "Analyze image provider" : "Analizza il fornitore di immagini",
     "This quota period is from {startDate} to {endDate}" : "Questo periodo di quota è da {startDate} a {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["La quota viene mantenuta per un periodo variabile dell'ultimo %n giorno","La quota viene mantenuta per un periodo variabile degli ultimi %n giorni","The quota is kept over a floating period of the last %n days"],
     "OpenAI options saved" : "Opzioni OpenAI salvate",
@@ -211,6 +210,7 @@ OC.L10N.register(
     "Prompt" : "Prompt",
     "Write transcript that you want the assistant to generate speech from" : "Scrivi la trascrizione da cui vuoi che l'assistente generi il discorso",
     "Output speech" : "Discorso di output",
-    "The generated speech" : "Il discorso generato"
+    "The generated speech" : "Il discorso generato",
+    "Analyze image provider" : "Analizza il fornitore di immagini"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

@@ -144,7 +144,6 @@ OC.L10N.register(
     "Image generation provider" : "رەسىم ھاسىل قىلغۇچى",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "سۆزلەشتىن تېكىست تەمىنلىگۈچى (سۆز خاتىرىسىنى خاتىرىلەش ئۈچۈن)",
     "Text-to-speech provider" : "تېكىستنى ئاۋازغا ئايلاندۇرۇش مۇلازىمىتى بىلەن تەمىنلىگۈچى",
-    "Analyze image provider" : "رەسىم تەمىنلىگۈچىنى تەھلىل قىلىڭ",
     "This quota period is from {startDate} to {endDate}" : "بۇ كۋوتا مەزگىلى {startDate} دىن {endDate} گىچە",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["بۇ سىغىم ئەڭ ئاخىرقى %n كۈننىڭ ئۈزۈلمە مەزگىلىدە ساقلىنىدۇ","بۇ سىغىم ئەڭ ئاخىرقى %n كۈننىڭ ئۈزۈلمە مەزگىلىدە ساقلىنىدۇ"],
     "OpenAI options saved" : "OpenAI تاللانمىلىرى ساقلاندى",
@@ -212,6 +211,7 @@ OC.L10N.register(
     "Prompt" : "تېز",
     "Write transcript that you want the assistant to generate speech from" : "ياردەمچىنىڭ سۆز ھاسىل قىلىشىنى ئۈمىد قىلىدىغان تېكىست يېزىڭ",
     "Output speech" : "چىقارغان ئاۋاز",
-    "The generated speech" : "ھاسىل قىلغان ئاۋاز"
+    "The generated speech" : "ھاسىل قىلغان ئاۋاز",
+    "Analyze image provider" : "رەسىم تەمىنلىگۈچىنى تەھلىل قىلىڭ"
 },
 "nplurals=2; plural=(n != 1);");

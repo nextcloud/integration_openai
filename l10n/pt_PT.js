@@ -43,10 +43,7 @@ OC.L10N.register(
     "The model used to generate the output" : "O modelo usado para gerar o resultado",
     "Reasoning content" : "Conteúdo de raciocínio",
     "The model reasoning behind the output" : "O raciocínio do modelo por trás do resultado",
-    "Too many files given. A maximum of 500 files is allowed." : "Foram fornecidos arquivos demais. É permitido um máximo de 500 arquivos.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "O tamanho total dos arquivos de entrada é muito grande. O limite máximo permitido é de 50 MB.",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "Tipo de arquivo de entrada “%1$s” inválido. Somente arquivos de imagem são aceitos.",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "Tipo de arquivo de entrada “%1$s” inválido. São suportadas apenas imagens nos formatos JPEG, PNG, GIF e WebP.",
     "Completion model" : "Modelo de conclusão",
     "The model used to generate the completion" : "O modelo usado para gerar a conclusão",
     "Output voice" : "Voz de saída",
@@ -177,7 +174,6 @@ OC.L10N.register(
     "Image generation provider" : "Provedor de geração de imagens",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provedor de fala-para-texto (para transcrever gravações do Talk, por exemplo)",
     "Text-to-speech provider" : "Provedor texto-para-fala",
-    "Analyze image provider" : "Provedor para analisar imagem",
     "This quota period is from {startDate} to {endDate}" : "Este período de cota é de {startDate} a {endDate}",
     "OpenAI options saved" : "Opções da OpenAI salvas",
     "Failed to save OpenAI options" : "Falha ao salvar as opções da OpenAI",
@@ -246,6 +242,7 @@ OC.L10N.register(
     "Prompt" : "Prompt",
     "Write transcript that you want the assistant to generate speech from" : "Escreva a transcrição a partir da qual você deseja que o assistente gere a fala",
     "Output speech" : "Fala de saída",
-    "The generated speech" : "A fala gerada"
+    "The generated speech" : "A fala gerada",
+    "Analyze image provider" : "Provedor para analisar imagem"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

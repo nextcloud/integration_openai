@@ -46,10 +46,7 @@ OC.L10N.register(
     "The model used to generate the output" : "Modellen som används för att generera utdata",
     "Reasoning content" : "Resonemangsinnehåll",
     "The model reasoning behind the output" : "Modellens resonemang bakom utdata",
-    "Too many files given. A maximum of 500 files is allowed." : "För många filer angavs. Högst 500 filer är tillåtna.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "Indatafilernas sammanlagda storlek är för stor. Högst 50 MB är tillåtet.",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "Ogiltig indatafiltyp \"%1$s\". Endast bildfiler stöds.",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "Ogiltig indatafiltyp \"%1$s\". Endast JPEG-, PNG-, GIF- och WebP-bilder stöds.",
     "Completion model" : "Slutförandemodell",
     "The model used to generate the completion" : "Modellen som används för att generera slutförandet",
     "Output voice" : "Röst för utdata",
@@ -193,7 +190,6 @@ OC.L10N.register(
     "Image generation provider" : "Leverantör för bildgenerering",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Tal-till-text-leverantör (till exempel för att transkribera Talk-inspelningar)",
     "Text-to-speech provider" : "Leverantör för text-till-tal",
-    "Analyze image provider" : "Leverantör för bildanalys",
     "This quota period is from {startDate} to {endDate}" : "Den här kvotperioden löper från {startDate} till {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Kvoten beräknas över en rullande period på den senaste %n dagen","Kvoten beräknas över en rullande period på de senaste %n dagarna"],
     "OpenAI options saved" : "OpenAI-inställningarna har sparats",
@@ -266,6 +262,7 @@ OC.L10N.register(
     "Prompt" : "Instruktion",
     "Write transcript that you want the assistant to generate speech from" : "Skriv den text som du vill att assistenten ska generera tal från",
     "Output speech" : "Genererat tal",
-    "The generated speech" : "Det genererade talet"
+    "The generated speech" : "Det genererade talet",
+    "Analyze image provider" : "Leverantör för bildanalys"
 },
 "nplurals=2; plural=(n != 1);");

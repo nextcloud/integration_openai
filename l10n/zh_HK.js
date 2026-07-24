@@ -46,10 +46,7 @@ OC.L10N.register(
     "The model used to generate the output" : "用來產生輸出的模型",
     "Reasoning content" : "推理內容",
     "The model reasoning behind the output" : "模型輸出背後的推理內容。",
-    "Too many files given. A maximum of 500 files is allowed." : "提供的檔案過多，最多只允許 500 個檔案。",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "輸入檔案總大小過大，最多允許 50 MB。",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "輸入檔案類型 \"%1$s\" 無效，只支援圖像檔案。",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "輸入檔案類型 \"%1$s\" 無效，只支援 JPEG、PNG、GIF 及 WebP 圖像。",
     "Completion model" : "補齊模型",
     "The model used to generate the completion" : "用來產生補齊的模型",
     "Output voice" : "輸出語音",
@@ -193,7 +190,6 @@ OC.L10N.register(
     "Image generation provider" : "圖像產生提供者",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "音頻轉文字提供者（舉例來說，用來轉錄 Talk 的錄音）",
     "Text-to-speech provider" : "文字轉語音提供者",
-    "Analyze image provider" : "分析影像提供者",
     "This quota period is from {startDate} to {endDate}" : "此配額期間從 {startDate} 至 {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["配額在過去%n天內的浮動期間內保留"],
     "OpenAI options saved" : "OpenAI 選項已儲存",
@@ -266,6 +262,7 @@ OC.L10N.register(
     "Prompt" : "提示詞",
     "Write transcript that you want the assistant to generate speech from" : "寫下您想要小幫手產生語音的文字稿",
     "Output speech" : "輸出語音",
-    "The generated speech" : "產生的語音"
+    "The generated speech" : "產生的語音",
+    "Analyze image provider" : "分析影像提供者"
 },
 "nplurals=1; plural=0;");

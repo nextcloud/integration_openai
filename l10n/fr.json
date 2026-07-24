@@ -44,10 +44,7 @@
     "The model used to generate the output" : "Le modèle utilisé pour générer la réponse",
     "Reasoning content" : "Contenu du raisonnement",
     "The model reasoning behind the output" : "Le raisonnement du modèle ayant conduit à la réponse",
-    "Too many files given. A maximum of 500 files is allowed." : "Trop de fichiers fournis. Un maximum de 500 fichiers est autorisé.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "La taille totale des fichiers d'entrée est trop importante. Un maximum de 50 Mo est autorisé.",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "Type de fichier d'entrée « %1$s » non valide. Seuls les fichiers image sont pris en charge.",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "Type de fichier d'entrée « %1$s » non valide. Seules les images JPEG, PNG, GIF et WebP sont prises en charge.",
     "Completion model" : "Modèle de complétion",
     "The model used to generate the completion" : "Le modèle utilisé pour générer la complétion",
     "Output voice" : "Voix de sortie",
@@ -190,7 +187,6 @@
     "Image generation provider" : "Fournisseur de génération d'images",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Fournisseur de synthèse vocale (pour transcrire des enregistrements de Discussion, par exemple)",
     "Text-to-speech provider" : "Service de synthèse vocale",
-    "Analyze image provider" : "Fournisseur d'analyse d'image",
     "This quota period is from {startDate} to {endDate}" : "Cette période de quota est du {startDate} au {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Le quota est conservé pendant une période glissante de %n jour.","Le quota est conservé pendant une période glissante de %n jours.","Le quota est conservé pendant une période glissante de %n jours."],
     "OpenAI options saved" : "Options OpenAI sauvegardées",
@@ -263,6 +259,7 @@
     "Prompt" : "Prompt",
     "Write transcript that you want the assistant to generate speech from" : "Écrire la transcription à partir de laquelle vous voulez générer une synthèse vocale",
     "Output speech" : "Synthèse vocale",
-    "The generated speech" : "La synthèse vocale générée"
+    "The generated speech" : "La synthèse vocale générée",
+    "Analyze image provider" : "Fournisseur d'analyse d'image"
 },"pluralForm" :"nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

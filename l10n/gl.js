@@ -150,7 +150,6 @@ OC.L10N.register(
     "Image generation provider" : "Provedor de xeración de imaxes",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Provedor de conversión de voz a texto (para transcribir as gravacións de Parladoiro, por exemplo)",
     "Text-to-speech provider" : "Provedor de «texto a voz»",
-    "Analyze image provider" : "Provedor de análise de imaxes",
     "This quota period is from {startDate} to {endDate}" : "Este período de cota vai do {startDate} ata o {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["A cota mantense durante un período flotante do último día","A cota mantense durante un período flotante dos últimos %n días"],
     "OpenAI options saved" : "Gardáronse as opcións de OpenAI",
@@ -223,6 +222,7 @@ OC.L10N.register(
     "Prompt" : "Indicación",
     "Write transcript that you want the assistant to generate speech from" : "Escriba a transcrición da que quere que o asistente xere o parrafeo",
     "Output speech" : "Parrafeo de saída",
-    "The generated speech" : "O parrafeo xerado"
+    "The generated speech" : "O parrafeo xerado",
+    "Analyze image provider" : "Provedor de análise de imaxes"
 },
 "nplurals=2; plural=(n != 1);");

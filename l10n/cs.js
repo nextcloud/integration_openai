@@ -150,7 +150,6 @@ OC.L10N.register(
     "Image generation provider" : "Poskytovatel vytváření obrázků",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Poskytovatel převodu řeči na text (například pro přepis nahrávek z Talk)",
     "Text-to-speech provider" : "Poskytovatel textu-na-řeč",
-    "Analyze image provider" : "Poskytovatel analýzy obrázků",
     "This quota period is from {startDate} to {endDate}" : "Období této kvóty je od  {startDate} do {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Kvóta je ponechávána po plovoucí období uplynulého %n dne","Kvóta je ponechávána po plovoucí období uplynulých %n dnů","Kvóta je ponechávána po plovoucí období uplynulých %n dnů","Kvóta je ponechávána po plovoucí období uplynulých %n dnů"],
     "OpenAI options saved" : "Předvolby pro OpenAI uloženy",
@@ -223,6 +222,7 @@ OC.L10N.register(
     "Prompt" : "Výzva",
     "Write transcript that you want the assistant to generate speech from" : "Napište přepis, ze kterého chcete, aby asistent vytvořil řeč",
     "Output speech" : "Výstupní řeč",
-    "The generated speech" : "Vytvořená řeč"
+    "The generated speech" : "Vytvořená řeč",
+    "Analyze image provider" : "Poskytovatel analýzy obrázků"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

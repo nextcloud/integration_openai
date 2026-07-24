@@ -44,10 +44,7 @@
     "The model used to generate the output" : "Väljundi loomiseks või koostamiseks kasutatud mudel",
     "Reasoning content" : "Sisu põhjendus/selgitus",
     "The model reasoning behind the output" : "Tehisaru mudeli põhjendus/selgitus väljundi koostamisele",
-    "Too many files given. A maximum of 500 files is allowed." : "Sisendis on liiga palju faile. Lubatud on kuni 500 faili.",
     "The total size of the input files is too large. A maximum of 50MB is allowed." : "Sisendfailide kogumaht on liiga suur. Lubatud on kuni 50 MB.",
-    "Invalid input file type \"%1$s\". Only image files are supported." : "„%1$s“ on vale sisendfaili tüüp. Toetatud on vaid pildifailid.",
-    "Invalid input file type \"%1$s\". Only JPEG, PNG, GIF and WebP images are supported." : "„%1$s“ on vale sisendfaili tüüp. Toetatud on vaid JPEG, PNG, GIF ja WebP pildifailid.",
     "Completion model" : "Täitmismudel",
     "The model used to generate the completion" : "Loomel kasutatud mudel",
     "Output voice" : "Väljundhääl",
@@ -183,7 +180,6 @@
     "Image generation provider" : "Pildiloome teenusepakkuja",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Kõnetuvastuse teenusepakkuja (näiteks kõnerakenduse üleskirjutuste jaoks)",
     "Text-to-speech provider" : "Kõnesünteesi teenusepakkuja",
-    "Analyze image provider" : "Pildianalüüsi teenusepakkuja",
     "This quota period is from {startDate} to {endDate}" : "Kvoot kehtib {startDate} kuni {endDate}",
     "_The quota is kept over a floating period of the last %n day_::_The quota is kept over a floating period of the last %n days_" : ["Kvooti arvestatakse libisevas ajavahemikus viimase %n päeva jooksul","Kvooti arvestatakse libisevas ajavahemikus viimase %n päeva jooksul"],
     "OpenAI options saved" : "OpenAI eelistused on salvestatud",
@@ -252,6 +248,7 @@
     "Prompt" : "Käsuviip",
     "Write transcript that you want the assistant to generate speech from" : "Kirjuta üles see, mille alusel tahad Abilisel lasta koostada kõne",
     "Output speech" : "Kõneväljund",
-    "The generated speech" : "Koostatud kõne"
+    "The generated speech" : "Koostatud kõne",
+    "Analyze image provider" : "Pildianalüüsi teenusepakkuja"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
