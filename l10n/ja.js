@@ -18,6 +18,7 @@ OC.L10N.register(
     "Bad credentials" : "不正な資格情報",
     "Name" : "名前",
     "Detect language" : "言語を検出する",
+    "Memories" : "メモリー",
     "Speed" : "スピード",
     "Language" : "言語",
     "Format" : "フォーマット",
