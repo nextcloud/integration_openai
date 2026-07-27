@@ -170,7 +170,7 @@ OC.L10N.register(
     "Max output tokens per request" : "Maximale Ausgabetoken pro Anfrage",
     "Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks." : "Maximale Anzahl generierter Ausgabetoken für eine einzelne Texterstellunganforderung. Dies gilt auch für die Sprache-zu-Text-Aufgaben.",
     "Multimodal LLM Support" : "Multimodale LLM-Unterstützung",
-    "Multimodal LLM Support allows you to enable or disable the use of images, audio, video and document attachments in the LLM." : "Mit der Funktion \"Multimodale LLM-Unterstützung\" können Sie die Verwendung von Bildern, Audio- und Videodateien sowie Dokumentanhängen im LLM aktivieren oder deaktivieren.",
+    "Multimodal LLM Support allows you to enable or disable the use of images, audio, video and document attachments in the LLM." : "Mit der Funktion \"Multimodale LLM-Unterstützung\" kann die Verwendung von Bildern, Audio- und Videodateien sowie Dokumentanhängen im LLM aktiviert oder deaktiviert werden.",
     "Image attachments" : "Bildanhänge",
     "Audio attachments" : "Audioanhänge",
     "Video attachments" : "Videoanhänge",
