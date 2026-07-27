@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.10.2 - 2026-07-27
+
+### Fixed
+- Fix on some instances EntityType not being found @lukasdotcom [#393](https://github.com/nextcloud/integration_openai/pull/393)
+- Fix: mistral passes references when tool calls are used @lukasdotcom [#409](https://github.com/nextcloud/integration_openai/pull/409)
+- fix: openrouter filters out non llm models by default @lukasdotcom [#404](https://github.com/nextcloud/integration_openai/pull/404)
+
 ## 3.10.1 - 2026-02-26
 
 ### Fixed
