@@ -39,6 +39,8 @@ class Application extends App implements IBootstrap {
 	public const APP_ID = 'integration_openai';
 
 	public const OPENAI_API_BASE_URL = 'https://api.openai.com/v1';
+	// Mistral speaks the OpenAI chat completion API but wants its own shape for document attachments
+	public const MISTRAL_API_BASE_URL_PREFIX = 'https://api.mistral.ai';
 	public const OPENAI_DEFAULT_REQUEST_TIMEOUT = 60 * 4;
 	public const USER_AGENT = 'Nextcloud OpenAI/LocalAI integration';
 

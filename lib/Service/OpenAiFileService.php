@@ -228,7 +228,11 @@ class OpenAiFileService {
 	}
 
 	/**
-	 * @return list<array{type: string, file: array{filename: string, file_data: string}}>
+	 * Backends disagree on how a document is attached to a chat completion, but
+	 * they all take the document inline as a base64 data URI, so no separate
+	 * upload API is needed - only the envelope differs.
+	 *
+	 * @return list<array<string, mixed>>
 	 */
 	private function buildDocumentContent(File $file, string $fileType): array {
 		if (!$this->openAiSettingsService->getMultimodalDocumentEnabled()) {
@@ -239,11 +243,23 @@ class OpenAiFileService {
 				$this->l10n->t('Document attachments are unsupported.'),
 			);
 		}
+		$dataUri = 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb')));
+
+		if ($this->isUsingMistral()) {
+			// Mistral takes a flat string, not an object. Sending OpenAI's shape gets
+			// rejected with a confusing HTTP 422 "Input should be a valid string".
+			return [[
+				'type' => 'document_url',
+				'document_url' => $dataUri,
+				'document_name' => $file->getName(),
+			]];
+		}
+
 		return [[
 			'type' => 'file',
 			'file' => [
 				'filename' => $file->getName(),
-				'file_data' => 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb'))),
+				'file_data' => $dataUri,
 			],
 		]];
 	}
@@ -270,5 +286,10 @@ class OpenAiFileService {
 	private function isUsingOpenAi(): bool {
 		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
 		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+	}
+
+	private function isUsingMistral(): bool {
+		$serviceUrl = strtolower($this->openAiSettingsService->getServiceUrl());
+		return str_starts_with($serviceUrl, Application::MISTRAL_API_BASE_URL_PREFIX);
 	}
 }
