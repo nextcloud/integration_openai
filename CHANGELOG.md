@@ -8,6 +8,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.0.0] - 2026-07-27
+
+### Breaking changes
+
+- Bump Nextcloud min and max version to 35 (drops support for Nextcloud 33 and 34) @lukasdotcom [#412](https://github.com/nextcloud/integration_openai/pull/412)
+
+### Added
+
+- Add streaming support @julien-nc [#366](https://github.com/nextcloud/integration_openai/pull/366)
+- Add audio translation task type and provider @julien-nc [#335](https://github.com/nextcloud/integration_openai/pull/335)
+- Stream reasoning content in all providers that support streaming @julien-nc [#385](https://github.com/nextcloud/integration_openai/pull/385)
+- Implement generate subtitles provider @edward-ly [#381](https://github.com/nextcloud/integration_openai/pull/381)
+- Add complexity and length as optional input for summary @lukasdotcom [#387](https://github.com/nextcloud/integration_openai/pull/387)
+- Improve change tone task type with more options @lukasdotcom [#388](https://github.com/nextcloud/integration_openai/pull/388)
+- Add strictness levels to proofread @lukasdotcom [#389](https://github.com/nextcloud/integration_openai/pull/389)
+- Implement TextToTextImprove task type @lukasdotcom [#392](https://github.com/nextcloud/integration_openai/pull/392)
+- Add MultimodalChatWithToolsProvider @lukasdotcom [#400](https://github.com/nextcloud/integration_openai/pull/400)
+- Support OCR for images using LLM @lukasdotcom [#374](https://github.com/nextcloud/integration_openai/pull/374)
+
+### Changed
+
+- Update dependencies and workflows @lukasdotcom [#412](https://github.com/nextcloud/integration_openai/pull/412)
+- Remove redundant fallback task types @lukasdotcom [#375](https://github.com/nextcloud/integration_openai/pull/375)
+- Improve context for i18n for AudioToAudioTranslateTaskType @lukasdotcom [#384](https://github.com/nextcloud/integration_openai/pull/384)
+- Stop processing when a task is cancelled @julien-nc [#386](https://github.com/nextcloud/integration_openai/pull/386)
+- Use the AudioToAudioTranslate server task type @julien-nc [#390](https://github.com/nextcloud/integration_openai/pull/390)
+- Clamp audio duration for quota @lukasdotcom [#395](https://github.com/nextcloud/integration_openai/pull/395)
+
+### Fixed
+
+- Throw UserFacingProcessingException if service is not responding properly @marcelklehr [#380](https://github.com/nextcloud/integration_openai/pull/380)
+- Bubble up more errors to the users @marcelklehr [#383](https://github.com/nextcloud/integration_openai/pull/383)
+- Fix on some instances EntityType not being found @lukasdotcom [#393](https://github.com/nextcloud/integration_openai/pull/393)
+- Allow compatible video MIME types for AudioToTextSubtitlesProvider when using OpenAI @edward-ly [#402](https://github.com/nextcloud/integration_openai/pull/402)
+- Fix OpenRouter filtering out non-LLM models by default @lukasdotcom [#404](https://github.com/nextcloud/integration_openai/pull/404)
+- Fix Mistral passing references when tool calls are used @lukasdotcom [#409](https://github.com/nextcloud/integration_openai/pull/409)
+
 ## [4.5.1] - 2026-05-22
 
 ### Fixed
