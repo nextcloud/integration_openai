@@ -13,6 +13,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCP\Files\File;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -23,6 +24,8 @@ use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
 
 class SummaryProvider implements ISynchronousProvider {
+
+	private const MAX_INPUT_ATTACHMENTS = 10;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
@@ -58,7 +61,7 @@ class SummaryProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShape(): array {
-		return [
+		$shape = [
 			'format' => new ShapeDescriptor(
 				$this->l->t('Format'),
 				$this->l->t('The format of the summary'),
@@ -80,6 +83,27 @@ class SummaryProvider implements ISynchronousProvider {
 				EShapeType::Enum
 			),
 		];
+
+		// Only advertise attachments when we can actually turn them into a document part,
+		// otherwise callers would send us files that always fail at request time.
+		if ($this->canSummarizeAttachments()) {
+			$shape['input_attachments'] = new ShapeDescriptor(
+				$this->l->t('Input attachments'),
+				$this->l->t('Files to summarize, sent to the language model as-is instead of extracting their text first.'),
+				EShapeType::ListOfFiles
+			);
+		}
+
+		return $shape;
+	}
+
+	/**
+	 * Attachments are inlined in a chat completion request, so both document
+	 * support and the chat endpoint are required.
+	 */
+	private function canSummarizeAttachments(): bool {
+		return $this->openAiSettingsService->getMultimodalDocumentEnabled()
+			&& ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled());
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
@@ -139,6 +163,28 @@ class SummaryProvider implements ISynchronousProvider {
 			$model = $input['model'];
 		}
 
+		// core resolves file slots into File objects before handing us the input
+		/** @var list<File> $files */
+		$files = [];
+		if (isset($input['input_attachments']) && is_array($input['input_attachments'])) {
+			foreach ($input['input_attachments'] as $attachment) {
+				if ($attachment instanceof File) {
+					$files[] = $attachment;
+				}
+			}
+		}
+		if ($files !== []) {
+			$result = $this->summarizeAttachments($userId, $files, $input, $model, $maxTokens, $reportProgress);
+			$this->openAiAPIService->updateExpTextProcessingTime(time() - $startTime);
+			return $result;
+		}
+
+		if ($prompt === '') {
+			// Callers leave the prompt empty when they attach a file. Getting here means the
+			// attachment never arrived, so fail loudly instead of summarizing nothing.
+			throw new ProcessingException('Nothing to summarize: no text and no readable attachment was provided');
+		}
+
 		$prompts = $this->chunkService->chunkSplitPrompt($prompt);
 		$newNumChunks = count($prompts);
 		$progress = 0.0;
@@ -153,24 +199,7 @@ class SummaryProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
-				$summarySystemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
-					. 'You should only return the summary without any additional information. ';
-				if (isset($input['format'])) {
-					if ($input['format'] === 'paragraph') {
-						$summarySystemPrompt .= 'Return the summary as a paragraph. ';
-					} elseif ($input['format'] === 'bullet_points') {
-						$summarySystemPrompt .= 'Return the summary as a list of bullet points. ';
-					} elseif ($input['format'] === 'sentence') {
-						$summarySystemPrompt .= 'Return the summary as a single sentence. Do not include more than one sentence. ';
-					}
-				}
-				if (isset($input['complexity'])) {
-					if ($input['complexity'] === 'complex') {
-						$summarySystemPrompt .= 'Use complex language and vocabulary appropriate for an expert in the subject. ';
-					} elseif ($input['complexity'] === 'simple') {
-						$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
-					}
-				}
+				$summarySystemPrompt = $this->buildSummarySystemPrompt($input);
 				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 
 					foreach ($prompts as $p) {
@@ -220,6 +249,95 @@ class SummaryProvider implements ISynchronousProvider {
 
 		$endTime = time();
 		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		return ['output' => $summary];
+	}
+
+	/**
+	 * @param array<string, mixed> $input
+	 */
+	private function buildSummarySystemPrompt(array $input): string {
+		$summarySystemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
+			. 'You should only return the summary without any additional information. ';
+		if (isset($input['format'])) {
+			if ($input['format'] === 'paragraph') {
+				$summarySystemPrompt .= 'Return the summary as a paragraph. ';
+			} elseif ($input['format'] === 'bullet_points') {
+				$summarySystemPrompt .= 'Return the summary as a list of bullet points. ';
+			} elseif ($input['format'] === 'sentence') {
+				$summarySystemPrompt .= 'Return the summary as a single sentence. Do not include more than one sentence. ';
+			}
+		}
+		if (isset($input['complexity'])) {
+			if ($input['complexity'] === 'complex') {
+				$summarySystemPrompt .= 'Use complex language and vocabulary appropriate for an expert in the subject. ';
+			} elseif ($input['complexity'] === 'simple') {
+				$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
+			}
+		}
+		return $summarySystemPrompt;
+	}
+
+	/**
+	 * Summarize attached files by handing them to the model directly.
+	 *
+	 * Nothing is chunked here: the whole point is that we never read the file
+	 * ourselves, so we have no text to split. The document is inlined in the
+	 * request, which means this only works over the chat completion endpoint.
+	 *
+	 * @param list<File> $files
+	 * @param array<string, mixed> $input
+	 * @return array{output: string}
+	 * @throws ProcessingException
+	 * @throws UserFacingProcessingException
+	 */
+	private function summarizeAttachments(
+		?string $userId,
+		array $files,
+		array $input,
+		string $model,
+		?int $maxTokens,
+		callable $reportProgress,
+	): array {
+		if (!$this->openAiAPIService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
+			throw new UserFacingProcessingException(
+				'Summarizing attachments requires the chat completion endpoint',
+				0,
+				null,
+				$this->l->t('Summarizing files requires a service that supports the chat completion endpoint.'),
+			);
+		}
+		if (count($files) > self::MAX_INPUT_ATTACHMENTS) {
+			throw new UserFacingProcessingException(
+				'Too many files. Max is ' . self::MAX_INPUT_ATTACHMENTS,
+				0,
+				null,
+				$this->l->t('Too many files given. A maximum of %d files is allowed.', [self::MAX_INPUT_ATTACHMENTS]),
+			);
+		}
+
+		$userPrompt = isset($input['input']) && is_string($input['input']) && $input['input'] !== ''
+			? $input['input']
+			: null;
+
+		if (!$reportProgress(0.0)) {
+			throw new ProcessingException('OpenAI/LocalAI task cancelled');
+		}
+
+		try {
+			$completion = $this->openAiAPIService->createChatCompletion(
+				$userId, $model, $userPrompt, $this->buildSummarySystemPrompt($input), null, 1, $maxTokens,
+				null, null, null, $files,
+			);
+		} catch (UserFacingProcessingException $e) {
+			throw $e;
+		} catch (\Throwable $e) {
+			throw new ProcessingException('OpenAI/LocalAI request failed: ' . $e->getMessage());
+		}
+
+		$summary = array_pop($completion['messages']);
+		if (!is_string($summary) || $summary === '') {
+			throw new ProcessingException('No result in OpenAI/LocalAI response.');
+		}
 		return ['output' => $summary];
 	}
 

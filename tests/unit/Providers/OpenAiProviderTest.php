@@ -1216,4 +1216,176 @@ TEXT;
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
+	private function mockPdfFile(string $content, string $name = 'report.pdf'): \OCP\Files\File&MockObject {
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Could not open temp stream');
+		}
+		fwrite($stream, $content);
+		rewind($stream);
+
+		$file = $this->createMock(\OCP\Files\File::class);
+		$file->method('isReadable')->willReturn(true);
+		$file->method('getSize')->willReturn(strlen($content));
+		$file->method('getMimeType')->willReturn('application/pdf');
+		$file->method('getName')->willReturn($name);
+		$file->method('fopen')->with('rb')->willReturn($stream);
+		return $file;
+	}
+
+	private const SUMMARY_SYSTEM_PROMPT = 'You are a helpful assistant that summarizes text in the same language as the text. '
+		. 'You should only return the summary without any additional information. ';
+
+	private const CHAT_COMPLETION_RESPONSE = '{
+		"id": "chatcmpl-123",
+		"object": "chat.completion",
+		"created": 1677652288,
+		"model": "gpt-4.1-mini",
+		"choices": [
+		  {
+			"index": 0,
+			"message": {
+			  "role": "assistant",
+			  "content": "This is a test response."
+			},
+			"finish_reason": "stop"
+		  }
+		],
+		"usage": {
+		  "prompt_tokens": 9,
+		  "completion_tokens": 12,
+		  "total_tokens": 21
+		}
+	}';
+
+	private function buildSummaryProvider(): SummaryProvider {
+		return new SummaryProvider(
+			$this->openAiApiService,
+			$this->openAiSettingsService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->chunkService,
+			self::TEST_USER1,
+		);
+	}
+
+	private function mockChatCompletionResponse(): \OCP\Http\Client\IResponse&MockObject {
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn(self::CHAT_COMPLETION_RESPONSE);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		return $iResponse;
+	}
+
+	/**
+	 * A PDF is inlined as an OpenAI "file" content part, and no text is chunked:
+	 * the whole point is that we never read the document ourselves.
+	 */
+	public function testSummaryProviderWithPdfAttachment(): void {
+		$provider = $this->buildSummaryProvider();
+		$pdfContent = 'fake-pdf-bytes';
+		$file = $this->mockPdfFile($pdfContent);
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				['role' => 'system', 'content' => self::SUMMARY_SYSTEM_PROMPT],
+				[
+					'role' => 'user',
+					'content' => [
+						[
+							'type' => 'file',
+							'file' => [
+								'filename' => 'report.pdf',
+								'file_data' => 'data:application/pdf;base64,' . base64_encode($pdfContent),
+							],
+						],
+					],
+				],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+		]);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)
+			->willReturn($this->mockChatCompletionResponse());
+
+		$result = $provider->process(self::TEST_USER1, [
+			// the caller leaves the text input empty, the file is the whole request
+			'input' => '',
+			'input_attachments' => [$file],
+		], fn () => true);
+
+		$this->assertEquals('This is a test response.', $result['output']);
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	/**
+	 * Mistral speaks the OpenAI chat completion API but rejects the OpenAI "file"
+	 * part with a 422, so documents have to go out as a flat document_url string.
+	 */
+	public function testSummaryProviderWithPdfAttachmentOnMistral(): void {
+		$previousServiceUrl = $this->openAiSettingsService->getServiceUrl();
+		$this->openAiSettingsService->setServiceUrl(Application::MISTRAL_API_BASE_URL_PREFIX . '/v1');
+
+		try {
+			$provider = $this->buildSummaryProvider();
+			$pdfContent = 'fake-pdf-bytes';
+			$file = $this->mockPdfFile($pdfContent);
+
+			$url = Application::MISTRAL_API_BASE_URL_PREFIX . '/v1/chat/completions';
+			$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+			$options['body'] = json_encode([
+				'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+				'messages' => [
+					['role' => 'system', 'content' => self::SUMMARY_SYSTEM_PROMPT],
+					[
+						'role' => 'user',
+						'content' => [
+							[
+								'type' => 'document_url',
+								'document_url' => 'data:application/pdf;base64,' . base64_encode($pdfContent),
+								'document_name' => 'report.pdf',
+							],
+						],
+					],
+				],
+				'n' => 1,
+				'stream' => false,
+				'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			]);
+
+			$this->iClient->expects($this->once())->method('post')->with($url, $options)
+				->willReturn($this->mockChatCompletionResponse());
+
+			$result = $provider->process(self::TEST_USER1, [
+				'input' => '',
+				'input_attachments' => [$file],
+			], fn () => true);
+
+			$this->assertEquals('This is a test response.', $result['output']);
+			$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		} finally {
+			$this->openAiSettingsService->setServiceUrl($previousServiceUrl);
+		}
+	}
+
+	public function testSummaryProviderAdvertisesAttachmentsOnlyWhenDocumentsAreEnabled(): void {
+		$provider = $this->buildSummaryProvider();
+		$previous = $this->openAiSettingsService->getMultimodalDocumentEnabled();
+
+		try {
+			$this->openAiSettingsService->setMultimodalDocumentEnabled(true);
+			$this->assertArrayHasKey('input_attachments', $provider->getOptionalInputShape());
+
+			$this->openAiSettingsService->setMultimodalDocumentEnabled(false);
+			$this->assertArrayNotHasKey('input_attachments', $provider->getOptionalInputShape());
+		} finally {
+			$this->openAiSettingsService->setMultimodalDocumentEnabled($previous);
+		}
+	}
+
 }
