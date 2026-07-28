@@ -10,14 +10,12 @@ OC.L10N.register(
     "Detect language" : "Вызначыць мову",
     "The maximum number of words/tokens that can be generated in the output." : "Максімальная колькасць слоў/токенаў, якія можна згенерыраваць на выхадзе.",
     "Model" : "Мадэль",
-    "Images" : "Відарысы",
-    "Question" : "Пытанне",
-    "The answer to the question" : "Адказ на пытанне",
+    "Voice" : "Голас",
     "Language" : "Мова",
     "The language of the audio file" : "Мова аўдыяфайла",
     "The maximum number of words/tokens that can be generated in the completion." : "Максімальная колькасць слоў/токенаў, якія можна згенерыраваць падчас завяршэння.",
+    "Format" : "Фармат",
     "Size" : "Памер",
-    "Voice" : "Голас",
     "Authentication" : "Аўтэнтыфікацыя",
     "API key" : "Ключ API",
     "Max input tokens per request" : "Максімальная колькасць уваходных токенаў на запыт",
@@ -37,6 +35,9 @@ OC.L10N.register(
     "Quota per user" : "Квота на карыстальніка",
     "Rule Priority" : "Прыярытэт правілаў",
     "Save" : "Захаваць",
-    "Delete" : "Выдаліць"
+    "Delete" : "Выдаліць",
+    "Images" : "Відарысы",
+    "Question" : "Пытанне",
+    "The answer to the question" : "Адказ на пытанне"
 },
 "nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);");

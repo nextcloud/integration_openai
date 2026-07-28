@@ -9,12 +9,11 @@ OC.L10N.register(
     "Unknown image generation error" : "Error de la xeneración d'imáxenes desconocíu",
     "Name" : "Nome",
     "Detect language" : "Detectar la llingua",
-    "Images" : "Imáxenes",
-    "Question" : "Entruga",
     "Memories" : "Recuerdos",
-    "Language" : "Llingua",
-    "Size" : "Tamañu",
     "Voice" : "Voz",
+    "Language" : "Llingua",
+    "Minimal" : "Mínimu",
+    "Size" : "Tamañu",
     "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
     "Authentication" : "Autenticación",
     "API key" : "Clave de l'API",
@@ -28,6 +27,8 @@ OC.L10N.register(
     "No result." : "Nun hai nengún resultáu.",
     "Category" : "Categoría",
     "Save" : "Guardar",
-    "Delete" : "Desaniciar"
+    "Delete" : "Desaniciar",
+    "Images" : "Imáxenes",
+    "Question" : "Entruga"
 },
 "nplurals=2; plural=(n != 1);");

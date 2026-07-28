@@ -8,13 +8,13 @@ OC.L10N.register(
     "Bad credentials" : "Gölluð auðkenni",
     "Name" : "Heiti",
     "Detect language" : "Greina tungumál",
-    "Images" : "Myndir",
     "Speed" : "Hraði",
     "Language" : "Tungumál",
-    "Input text" : "Inntakstexti",
+    "Format" : "Snið",
+    "Auto" : "Sjálfvirkt",
+    "Medium" : "miðlungs",
     "Size" : "Stærð",
     "Cannot generate less than 1 image" : "Get ekki útbúið minna en 1 mynd",
-    "Prompt" : "Kvaðning",
     "Request timeout (seconds)" : "Tímamörk á beiðni (sekúndur)",
     "Authentication" : "Auðkenning",
     "Authentication method" : "Auðkenningarmáti",
@@ -27,6 +27,9 @@ OC.L10N.register(
     "No result." : "Engar niðurstöður.",
     "Category" : "Flokkur",
     "Save" : "Vista",
-    "Delete" : "Eyða"
+    "Delete" : "Eyða",
+    "Images" : "Myndir",
+    "Input text" : "Inntakstexti",
+    "Prompt" : "Kvaðning"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

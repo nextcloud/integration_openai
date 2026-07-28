@@ -7,9 +7,9 @@ OC.L10N.register(
     "Bad HTTP method" : "Metodă HTTP nepotrivită",
     "Bad credentials" : "Credențiale greșite",
     "Name" : "Nume",
-    "Images" : "Imagini",
-    "Question" : "Întrebare",
     "Language" : "Limba",
+    "Auto" : "Auto",
+    "Medium" : "Mediu",
     "Authentication" : "Autentificare",
     "Authentication method" : "Modul de autentificare",
     "API key" : "Cheie API",
@@ -17,6 +17,8 @@ OC.L10N.register(
     "No recommendations. Start typing." : "Nu am găsit recomandări. Începeți să scrieți.",
     "No result." : "Niciun rezultat.",
     "Save" : "Salvează",
-    "Delete" : "Șterge"
+    "Delete" : "Șterge",
+    "Images" : "Imagini",
+    "Question" : "Întrebare"
 },
 "nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));");

@@ -4,7 +4,6 @@ OC.L10N.register(
     "Default" : "საწყისი პარამეტრები",
     "Unknown" : "უცნობია",
     "Name" : "სახელი",
-    "Images" : "სურათები",
     "Language" : "ენა",
     "Size" : "ზომა",
     "Request timeout (seconds)" : "მოთხოვნის დროის ამოწურვა (წამები)",
@@ -14,6 +13,7 @@ OC.L10N.register(
     "Start date" : "დაწყების თარიღი",
     "Category" : "კატეგორია",
     "Save" : "შენახვა",
-    "Delete" : "წაშლა"
+    "Delete" : "წაშლა",
+    "Images" : "სურათები"
 },
 "nplurals=2; plural=(n!=1);");

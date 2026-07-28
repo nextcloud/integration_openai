@@ -4,8 +4,9 @@ OC.L10N.register(
     "Unknown" : "ไม่ทราบ",
     "seconds" : "วินาที",
     "Name" : "ชื่อ",
-    "Images" : "รูปภาพ",
     "Language" : "ภาษา",
+    "Simple" : "เรียบง่าย",
+    "Medium" : "ปานกลาง",
     "Size" : "ขนาด",
     "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
     "Authentication" : "การตรวจสอบสิทธิ์",
@@ -16,6 +17,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
     "Category" : "หมวดหมู่",
     "Save" : "บันทึก",
-    "Delete" : "ลบ"
+    "Delete" : "ลบ",
+    "Images" : "รูปภาพ"
 },
 "nplurals=1; plural=0;");

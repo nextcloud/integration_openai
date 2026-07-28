@@ -2,9 +2,9 @@
     "Unknown" : "Nekonata",
     "seconds" : "sekundoj",
     "Name" : "Nomo",
-    "Images" : "Bildoj",
     "Speed" : "Rapideco",
     "Language" : "Lingvo",
+    "Auto" : "Aŭtomate",
     "Size" : "Grando",
     "Request timeout (seconds)" : "Eltempiĝo (sekundoj)",
     "Authentication" : "Aŭtentigo",
@@ -16,6 +16,7 @@
     "No result." : "Nenia rezulto.",
     "Category" : "Kategorio",
     "Save" : "Konservi",
-    "Delete" : "Forigi"
+    "Delete" : "Forigi",
+    "Images" : "Bildoj"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

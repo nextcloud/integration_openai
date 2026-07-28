@@ -7,15 +7,13 @@
     "Bad credentials" : "Virheelliset kirjautumistiedot",
     "Name" : "Nimi",
     "Detect language" : "Havaitse kieli",
-    "Analyze images" : "Analysoi kuvia",
-    "Images" : "Kuvat",
-    "Question" : "Kysymys",
-    "Generated response" : "Luotu vastaus",
-    "The answer to the question" : "Vastaus kysymykseen",
     "Memories" : "Muistot",
     "Speed" : "Nopeus",
     "Language" : "Kieli",
-    "Prompt" : "Kehote",
+    "Minimal" : "Minimaalinen",
+    "Format" : "Muoto",
+    "Auto" : "Automaattinen",
+    "Medium" : "Keskitasoinen",
     "Request timeout (seconds)" : "Pyynnön aikakatkaisu (sekunneissa)",
     "Authentication" : "Tunnistautuminen",
     "Authentication method" : "Tunnistautumistapa",
@@ -29,6 +27,12 @@
     "No result." : "Ei tulosta.",
     "Category" : "Kategoria",
     "Save" : "Tallenna",
-    "Delete" : "Poista"
+    "Delete" : "Poista",
+    "Analyze images" : "Analysoi kuvia",
+    "Images" : "Kuvat",
+    "Question" : "Kysymys",
+    "Generated response" : "Luotu vastaus",
+    "The answer to the question" : "Vastaus kysymykseen",
+    "Prompt" : "Kehote"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

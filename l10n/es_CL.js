@@ -4,7 +4,6 @@ OC.L10N.register(
     "Default" : "Por defecto",
     "Unknown" : "Desconocido",
     "Name" : "Nombre",
-    "Images" : "Imágenes",
     "Language" : "Idioma",
     "Size" : "Tamaño",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
@@ -14,6 +13,7 @@ OC.L10N.register(
     "Start date" : "Fecha de inicio",
     "Category" : "Categoría",
     "Save" : "Guardar",
-    "Delete" : "Eliminar"
+    "Delete" : "Eliminar",
+    "Images" : "Imágenes"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

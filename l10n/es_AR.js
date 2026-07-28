@@ -4,8 +4,8 @@ OC.L10N.register(
     "Unknown" : "Desconocido",
     "seconds" : "segundos",
     "Name" : "Nombre",
-    "Images" : "Imágenes",
     "Language" : "Idioma",
+    "Medium" : "Medio",
     "Size" : "Tamaño",
     "Request timeout (seconds)" : "Tiemo de vida de la solicitud (segundos)",
     "Authentication" : "Autenticación",
@@ -15,6 +15,7 @@ OC.L10N.register(
     "No recommendations. Start typing." : "No hay sugerencias. Comenzar a escribir",
     "Category" : "Categoría",
     "Save" : "Guardar",
-    "Delete" : "Eliminar"
+    "Delete" : "Eliminar",
+    "Images" : "Imágenes"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

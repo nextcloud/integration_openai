@@ -7,9 +7,10 @@ OC.L10N.register(
     "Bad HTTP method" : "שגיאה במתודת HTTP",
     "Bad credentials" : "פרטי גישה שגויים",
     "Name" : "שם",
-    "Images" : "תמונות",
     "Speed" : "מהירות",
     "Language" : "שפה",
+    "Auto" : "אוטומטי",
+    "Medium" : "בינוני",
     "Size" : "גודל",
     "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
     "Authentication" : "אימות",
@@ -23,6 +24,7 @@ OC.L10N.register(
     "No result." : "אין תוצאות.",
     "Category" : "קטגוריה",
     "Save" : "שמירה",
-    "Delete" : "מחיקה"
+    "Delete" : "מחיקה",
+    "Images" : "תמונות"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");

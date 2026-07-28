@@ -17,12 +17,12 @@ OC.L10N.register(
     "Usage" : "Uporaba",
     "Detect language" : "Zaznava jezika",
     "Maximum output words" : "Največje število besed odvoda",
-    "Images" : "Slike",
-    "Question" : "Vprašanje",
     "Memories" : "Spomini",
     "Speed" : "Hitrost",
     "Language" : "Jezik",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",
+    "Auto" : "Samodejno",
+    "Medium" : "Srednja",
     "Size" : "Velikost",
     "Cannot generate less than 1 image" : "Ne morem izdelati manj kot 1 sliko",
     "OpenAI and LocalAI integration" : "Združevalnik OpenAI in LocalAI",
@@ -44,6 +44,8 @@ OC.L10N.register(
     "No result." : "Ni zadetkov",
     "Category" : "Kategorija",
     "Save" : "Shrani",
-    "Delete" : "Izbriši"
+    "Delete" : "Izbriši",
+    "Images" : "Slike",
+    "Question" : "Vprašanje"
 },
 "nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);");
