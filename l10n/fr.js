@@ -13,7 +13,7 @@ OC.L10N.register(
     "Invalid models response received" : "Réponse invalide reçue",
     "Default" : "Défaut",
     "Text generation" : "Génération de texte",
-    "Image generation" : "Génération d'image",
+    "Image generation" : "Génération d'images",
     "Audio transcription" : "Transcription audio",
     "Text to speech" : "Texte vers voix",
     "Unknown" : "Inconnu",
