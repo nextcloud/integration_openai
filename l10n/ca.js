@@ -18,6 +18,7 @@ OC.L10N.register(
     "Auto" : "Automàtic",
     "Medium" : "Mig",
     "Size" : "Tamany",
+    "Cannot generate less than 1 image" : "No es pot generar menys d'una imatge",
     "Request timeout (seconds)" : "Temps d'espera de les sol·licituds (segons)",
     "Authentication" : "Autenticació",
     "Authentication method" : "Mètode d'autenticació",

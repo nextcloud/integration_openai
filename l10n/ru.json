@@ -70,6 +70,7 @@
     "Current system-wide usage / period" : "Текущее общесистемное использование / период",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Ограничение на использование данного типа API для каждого пользователя (0 для неограниченного количества)",
     "Start date" : "Дата начала",
+    "End date" : "Дата окончания",
     "Select enabled features" : "Выберите включенные функции",
     "Translation provider (to translate Talk messages for example)" : "Поставщик услуг перевода (например, для перевода сообщений Talk)",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Поставщики услуг обработки текста (для генерации текста, обобщения, записи контекста и т.д.)",
