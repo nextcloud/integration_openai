@@ -16,6 +16,9 @@ use OCP\IL10N;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IManager as ITaskProcessingManager;
+use OCP\TaskProcessing\Task;
+use OCP\TaskProcessing\TaskTypes\AudioToText;
+use Psr\Log\LoggerInterface;
 
 class OpenAiFileService {
 	private const MAX_FILE_SIZE_BYTES = 50_000_000;
@@ -71,6 +74,7 @@ class OpenAiFileService {
 		private OpenAiSettingsService $openAiSettingsService,
 		private IRootFolder $rootFolder,
 		private ITaskProcessingManager $taskProcessingManager,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -103,7 +107,7 @@ class OpenAiFileService {
 			$userFolder = $this->rootFolder->getUserFolder($userId);
 			$file = $userFolder->getFirstNodeById($fileId);
 		}
-		return $this->buildFileContentFromFile($file);
+		return $this->buildFileContentFromFile($file, $userId);
 	}
 
 	/**
@@ -114,7 +118,7 @@ class OpenAiFileService {
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContentFromFile(?File $file): array {
+	public function buildFileContentFromFile(?File $file, ?string $userId): array {
 		if (!$file instanceof File || !$file->isReadable()) {
 			throw new ProcessingException('File is not readable');
 		}
@@ -137,7 +141,7 @@ class OpenAiFileService {
 			return $this->buildImageContent($file, $fileType);
 			// OpenAI only supports this for very specific models and support is not that common
 		} elseif (str_starts_with($fileType, 'audio/')) {
-			return $this->buildAudioContent($file, $fileType);
+			return $this->buildAudioContent($file, $fileType, $userId);
 			// OpenAI does not currently support video attachments
 		} elseif (str_starts_with($fileType, 'video/')) {
 			return $this->buildVideoContent($file, $fileType);
@@ -177,16 +181,61 @@ class OpenAiFileService {
 	}
 
 	/**
-	 * @return list<array{type: string, input_audio: array{data: string, format: string}}>
+	 * @return list<array{type: string, input_audio?: array{data: string, format: string}, text?: string}>
 	 */
-	private function buildAudioContent(File $file, string $fileType): array {
+	private function buildAudioContent(File $file, string $fileType, ?string $userId): array {
 		if (!$this->openAiSettingsService->getMultimodalAudioEnabled()) {
-			throw new UserFacingProcessingException(
-				'Audio attachments are disabled',
-				0,
-				null,
-				$this->l10n->t('Audio attachments are unsupported.'),
-			);
+			if (!array_key_exists(AudioToText::ID, $this->taskProcessingManager->getAvailableTaskTypes())) {
+				throw new UserFacingProcessingException(
+					'Audio attachments are unsupported',
+					0,
+					null,
+					$this->l10n->t('Audio attachments are unsupported.'),
+				);
+			}
+			// Fallback to transcribing the audio
+			$customTaskID = 'multimodal_fallback:' . $file->getId();
+
+			// Check if the file has already been transcribed
+			$potentialTasks = $this->taskProcessingManager->getTasks($userId, AudioToText::ID, 'integration_openai', $customTaskID, Task::STATUS_SUCCESSFUL);
+			if (count($potentialTasks) > 0) {
+				$resultTask = $potentialTasks[0];
+			} else {
+				// Transcribe the audio
+				$task = new Task(
+					AudioToText::ID,
+					[
+						'input' => $file->getId(),
+					],
+					'integration_openai',
+					$userId,
+					$customTaskID,
+				);
+				$this->logger->info('Falling back to transcribing the audio for file {file}', ['file' => $file->getName()]);
+				try {
+					$resultTask = $this->taskProcessingManager->runTask($task);
+				} catch (\Throwable $e) {
+					$this->logger->error('Failed to transcribe audio for file {file}', ['file' => $file->getName(), 'exception' => $e]);
+					throw new UserFacingProcessingException(
+						'Failed to transcribe audio',
+						0,
+						null,
+						$this->l10n->t('Failed to transcribe audio.'),
+					);
+				}
+			}
+			if ($resultTask->getStatus() !== Task::STATUS_SUCCESSFUL) {
+				throw new UserFacingProcessingException(
+					'Failed to transcribe audio',
+					0,
+					null,
+					$this->l10n->t('Failed to transcribe audio.'),
+				);
+			}
+			return [[
+				'type' => 'text',
+				'text' => 'Filename:' . $file->getName() . "\Transcription:\n" . $resultTask->getOutput()['output'],
+			]];
 		}
 
 		if (!array_key_exists($fileType, self::SUPPORTED_INPUT_AUDIO_FORMATS)) {
