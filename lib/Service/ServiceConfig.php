@@ -273,6 +273,10 @@ class ServiceConfig implements JsonSerializable {
 		return str_starts_with(strtolower($this->url), 'https://openrouter.ai');
 	}
 
+	public function isUsingIonos(): bool {
+		return (bool)preg_match('#^https://([a-zA-Z0-9-]+\.)+ionos\.com#', strtolower($this->getRequestUrl()));
+	}
+
 	public function getApiKey(): string {
 		return $this->apiKey;
 	}
