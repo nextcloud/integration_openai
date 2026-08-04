@@ -938,6 +938,197 @@ class OpenAiAPIService {
 
 	/**
 	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @param string $model
+	 * @param string $size
+	 * @return array
+	 * @throws Exception
+	 * @throws UserFacingProcessingException
+	 */
+	public function requestImageEdit(
+		?string $userId,
+		ServiceConfig $service,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE,
+	): array {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE, $service)) {
+			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
+
+		$apiModel = $this->modelParam($service, $model, Application::DEFAULT_IMAGE_MODEL_ID) ?? $model;
+
+		if ($service->isUsingOpenAi()) {
+			$apiResponse = $this->requestOpenAiImageEdit($userId, $service, $prompt, $images, $apiModel, $size);
+		} elseif ($service->isUsingOpenRouter()) {
+			$apiResponse = $this->requestOpenRouterImageEdit($userId, $service, $prompt, $images, $apiModel, $size);
+		} elseif ($service->isUsingIonos()) {
+			$apiResponse = $this->requestIonosImageEdit($userId, $service, $prompt, $images, $apiModel, $size);
+		} else {
+			$apiResponse = $this->requestLocalAiImageEdit($userId, $service, $prompt, $images, $apiModel, $size);
+		}
+
+		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
+			$this->logger->warning('OpenAI image edit error', ['api_response' => $apiResponse]);
+			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		try {
+			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, 1, $service);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+		}
+
+		return $apiResponse;
+	}
+
+	/**
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @return array
+	 * @throws Exception
+	 */
+	private function requestOpenAiImageEdit(
+		?string $userId,
+		ServiceConfig $service,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size,
+	): array {
+		$params = [
+			'prompt' => $prompt,
+			'size' => $size,
+			'n' => 1,
+			'model' => $model,
+		];
+		foreach ($images as $index => $image) {
+			$mimeType = $image['mimeType'];
+			$extension = match ($mimeType) {
+				'image/jpeg' => 'jpg',
+				'image/webp' => 'webp',
+				'image/gif' => 'gif',
+				default => 'png',
+			};
+			$name = 'image_' . ($index);
+			$params[$name] = [
+				'name' => 'image[]',
+				'contents' => $image['content'],
+				'filename' => $name . '.' . $extension,
+				'headers' => [
+					'Content-Type' => $mimeType,
+				],
+			];
+		}
+
+		return $this->request($userId, $service, 'images/edits', $params, 'POST', 'multipart/form-data');
+	}
+
+	/**
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @return array
+	 * @throws Exception
+	 * @throws UserFacingProcessingException
+	 */
+	private function requestIonosImageEdit(
+		?string $userId,
+		ServiceConfig $service,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size,
+	): array {
+		if (count($images) > 1) {
+			throw new UserFacingProcessingException(
+				'IONOS image editing supports only one input image',
+				0,
+				null,
+				$this->l10n->t('Only one input image is supported.'),
+			);
+		}
+
+		$image = $images[0];
+		$params = [
+			'prompt' => $prompt,
+			'size' => $size,
+			'n' => 1,
+			'model' => $model,
+			'url' => 'data:' . $image['mimeType'] . ';base64,' . base64_encode($image['content']),
+		];
+
+		return $this->request($userId, $service, 'images/edits', $params, 'POST', 'multipart/form-data');
+	}
+
+	/**
+	 * OpenRouter image edit path using the unified /images API with input_references.
+	 *
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @return array
+	 * @throws Exception
+	 */
+	private function requestOpenRouterImageEdit(
+		?string $userId,
+		ServiceConfig $service,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size,
+	): array {
+		$inputReferences = [];
+		foreach ($images as $image) {
+			$inputReferences[] = [
+				'type' => 'image_url',
+				'image_url' => [
+					'url' => 'data:' . $image['mimeType'] . ';base64,' . base64_encode($image['content']),
+				],
+			];
+		}
+
+		$params = [
+			'prompt' => $prompt,
+			'size' => $size,
+			'n' => 1,
+			'model' => $model,
+			'input_references' => $inputReferences,
+		];
+
+		return $this->request($userId, $service, 'images', $params, 'POST');
+	}
+
+	/**
+	 * LocalAI and other OpenAI-compatible image edit path via /images/generations.
+	 *
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @return array
+	 * @throws Exception
+	 */
+	private function requestLocalAiImageEdit(
+		?string $userId,
+		ServiceConfig $service,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size,
+	): array {
+		$refImages = [];
+		foreach ($images as $image) {
+			$refImages[] = base64_encode($image['content']);
+		}
+
+		$params = [
+			'prompt' => $prompt,
+			'size' => $size,
+			'n' => 1,
+			'model' => $model,
+			'ref_images' => $refImages,
+		];
+
+		return $this->request($userId, $service, 'images/generations', $params, 'POST');
+	}
+
+	/**
+	 * @param string|null $userId
 	 * @return array
 	 */
 	public function getImageRequestOptions(?string $userId, ServiceConfig $service): array {
@@ -1153,12 +1344,16 @@ class OpenAiAPIService {
 					if ($contentType === 'multipart/form-data') {
 						$multipart = [];
 						foreach ($params as $key => $value) {
-							$part = [
-								'name' => $key,
-								'contents' => $value,
-							];
-							if ($key === 'file') {
-								$part['filename'] = 'file.mp3';
+							if (is_array($value) && array_key_exists('contents', $value)) {
+								$part = $value;
+							} else {
+								$part = [
+									'name' => $key,
+									'contents' => $value,
+								];
+								if ($key === 'file') {
+									$part['filename'] = 'file.mp3';
+								}
 							}
 							$multipart[] = $part;
 						}
