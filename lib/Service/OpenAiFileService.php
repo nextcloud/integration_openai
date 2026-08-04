@@ -18,6 +18,8 @@ use OCP\IL10N;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IManager as ITaskProcessingManager;
+use OCP\TaskProcessing\Task;
+use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
 
 class OpenAiFileService {
@@ -107,7 +109,7 @@ class OpenAiFileService {
 			$userFolder = $this->rootFolder->getUserFolder($userId);
 			$file = $userFolder->getFirstNodeById($fileId);
 		}
-		return $this->buildFileContentFromFile($file, $service);
+		return $this->buildFileContentFromFile($file, $service, $userId);
 	}
 
 	/**
@@ -119,7 +121,7 @@ class OpenAiFileService {
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContentFromFile(?File $file, ServiceConfig $service): array {
+	public function buildFileContentFromFile(?File $file, ServiceConfig $service, ?string $userId = null): array {
 		if (!$file instanceof File || !$file->isReadable()) {
 			throw new ProcessingException('File is not readable');
 		}
@@ -142,7 +144,7 @@ class OpenAiFileService {
 			return $this->buildImageContent($file, $fileType, $service);
 			// OpenAI only supports this for very specific models and support is not that common
 		} elseif (str_starts_with($fileType, 'audio/')) {
-			return $this->buildAudioContent($file, $fileType, $service);
+			return $this->buildAudioContent($file, $fileType, $service, $userId);
 			// OpenAI does not currently support video attachments
 		} elseif (str_starts_with($fileType, 'video/')) {
 			return $this->buildVideoContent($file, $fileType, $service);
@@ -184,16 +186,58 @@ class OpenAiFileService {
 	}
 
 	/**
-	 * @return list<array{type: string, input_audio: array{data: string, format: string}}>
+	 * @return list<array{type: string, input_audio?: array{data: string, format: string}, text?: string}>
 	 */
-	private function buildAudioContent(File $file, string $fileType, ServiceConfig $service): array {
+	private function buildAudioContent(File $file, string $fileType, ServiceConfig $service, ?string $userId): array {
 		if (!$service->getMultimodalAudioEnabled()) {
-			throw new UserFacingProcessingException(
-				'Audio attachments are disabled',
-				0,
-				null,
-				$this->l10n->t('Audio attachments are unsupported.'),
-			);
+			if (!array_key_exists(AudioToText::ID, $this->taskProcessingManager->getAvailableTaskTypes())) {
+				throw new UserFacingProcessingException(
+					'Audio attachments are disabled',
+					0,
+					null,
+					$this->l10n->t('Audio attachments are unsupported.'),
+				);
+			}
+			$customTaskID = 'multimodal_fallback:' . $file->getId();
+
+			$potentialTasks = $this->taskProcessingManager->getTasks($userId, AudioToText::ID, 'integration_openai', $customTaskID, Task::STATUS_SUCCESSFUL);
+			if (count($potentialTasks) > 0) {
+				$resultTask = $potentialTasks[0];
+			} else {
+				$task = new Task(
+					AudioToText::ID,
+					[
+						'input' => $file->getId(),
+					],
+					'integration_openai',
+					$userId,
+					$customTaskID,
+				);
+				$this->logger->info('Falling back to transcribing the audio for file {file}', ['file' => $file->getName()]);
+				try {
+					$resultTask = $this->taskProcessingManager->runTask($task);
+				} catch (\Throwable $e) {
+					$this->logger->error('Failed to transcribe audio for file {file}', ['file' => $file->getName(), 'exception' => $e]);
+					throw new UserFacingProcessingException(
+						'Failed to transcribe audio',
+						0,
+						null,
+						$this->l10n->t('Failed to transcribe audio.'),
+					);
+				}
+			}
+			if ($resultTask->getStatus() !== Task::STATUS_SUCCESSFUL) {
+				throw new UserFacingProcessingException(
+					'Failed to transcribe audio',
+					0,
+					null,
+					$this->l10n->t('Failed to transcribe audio.'),
+				);
+			}
+			return [[
+				'type' => 'text',
+				'text' => 'Filename:' . $file->getName() . "\Transcription:\n" . $resultTask->getOutput()['output'],
+			]];
 		}
 
 		if (!array_key_exists($fileType, self::SUPPORTED_INPUT_AUDIO_FORMATS)) {
