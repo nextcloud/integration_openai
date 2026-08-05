@@ -13,6 +13,7 @@ use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IManager;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
@@ -75,10 +76,10 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 
 	public function getOptionalOutputShape(): array {
 		return [
-			'enhanced_prompt' => new ShapeDescriptor(
-				$this->l10n->t('Improved prompt'),
-				$this->l10n->t('The prompt after LLM enhancement, as sent to the image model.'),
-				EShapeType::Text
+			'enhanced_prompts' => new ShapeDescriptor(
+				$this->l10n->t('Improved prompts'),
+				$this->l10n->t('The prompts after LLM enhancement, one per generated image, as sent to the image model.'),
+				EShapeType::ListOfTexts
 			),
 		];
 	}
@@ -93,10 +94,27 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 		}
 
 		$originalPrompt = $input['input'];
+		$nbImages = 1;
+		if (isset($input['numberOfImages']) && is_int($input['numberOfImages'])) {
+			$nbImages = $input['numberOfImages'];
+		}
+		if ($nbImages < 1 || $nbImages > 12) {
+			throw new UserFacingProcessingException(
+				'Invalid number of images',
+				0,
+				null,
+				$this->l10n->t('Invalid number of images'),
+			);
+		}
+
 		$instruction
-			= 'Improve the following image-generation prompt so a text-to-image model produces a high quality, visually rich, coherent image. '
-			. 'Add concrete visual details (subject, composition, lighting, style) only when they are reasonable. '
-			. 'Keep the original intent. Return ONLY the improved prompt as a single line, no preface, no quotes, no explanations.' . "\n\n"
+			= 'Improve the following image-generation prompt into exactly ' . $nbImages . ' DISTINCT variant(s) '
+			. 'so a text-to-image model produces high quality, visually rich, coherent images. '
+			. 'Each variant must keep the original intent but differ in concrete visual details '
+			. '(composition, lighting, style, camera angle, mood, etc.) so the resulting images are meaningfully different. '
+			. 'Add concrete visual details only when they are reasonable. '
+			. 'Return ONLY a JSON array of exactly ' . $nbImages . ' strings (the improved prompts), '
+			. 'no preface, no markdown, no quotes around the JSON, no explanations.' . "\n\n"
 			. 'Original prompt:' . "\n" . $originalPrompt;
 		$improveTask = new Task(
 			TextToText::ID,
@@ -106,24 +124,79 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 			'text2image_improved_prompt',
 		);
 
-		$improvedPrompt = $originalPrompt;
+		$improvedPrompts = array_fill(0, $nbImages, $originalPrompt);
 		try {
 			$finished = $this->taskProcessingManager->runTask($improveTask);
 			$output = $finished->getOutput();
 			if (is_array($output) && isset($output['output']) && is_string($output['output']) && trim($output['output']) !== '') {
-				$improvedPrompt = trim($output['output']);
+				$parsed = $this->parseImprovedPrompts(trim($output['output']), $nbImages, $originalPrompt);
+				if ($parsed !== null) {
+					$improvedPrompts = $parsed;
+				} else {
+					$this->logger->warning('Prompt improvement task returned no usable output, falling back to original prompt');
+				}
 			} else {
 				$this->logger->warning('Prompt improvement task returned no usable output, falling back to original prompt');
 			}
 		} catch (Throwable $e) {
 			$this->logger->warning('Prompt improvement task failed, falling back to original prompt: ' . $e->getMessage(), ['exception' => $e]);
 		}
-		$reportProgress(0.5);
+		$enhancedPromptProgressBase = 0.3;
+		$reportProgress($enhancedPromptProgressBase);
 
-		$newInput = $input;
-		$newInput['input'] = $improvedPrompt;
-		$output = $this->textToImageProvider->process($userId, $newInput, $reportProgress, $includeWatermark);
-		$output['enhanced_prompt'] = $improvedPrompt;
-		return $output;
+		$images = [];
+		for ($i = 0; $i < $nbImages; $i++) {
+			$newInput = $input;
+			$newInput['input'] = $improvedPrompts[$i];
+			$newInput['numberOfImages'] = 1;
+			$result = $this->textToImageProvider->process(
+				$userId,
+				$newInput,
+				static function (float $progress): bool {
+					return true;
+				},
+				$includeWatermark,
+			);
+			$reportProgress($enhancedPromptProgressBase + (0.7 * (float)($i + 1) / (float)$nbImages));
+			if (isset($result['images']) && is_array($result['images'])) {
+				array_push($images, ...$result['images']);
+			}
+		}
+
+		return [
+			'images' => $images,
+			'enhanced_prompts' => $improvedPrompts,
+		];
+	}
+
+	/**
+	 * @return list<string>|null
+	 */
+	private function parseImprovedPrompts(string $rawOutput, int $nbImages, string $fallback): ?array {
+		// Remove everything before the first "[" and after the last "]"
+		if (($firstBracket = strpos($rawOutput, '[')) !== false && ($lastBracket = strrpos($rawOutput, ']')) !== false && $lastBracket > $firstBracket) {
+			$rawOutput = substr($rawOutput, $firstBracket, $lastBracket - $firstBracket + 1);
+		}
+
+		$decoded = json_decode($rawOutput, true);
+		if (!is_array($decoded)) {
+			return null;
+		}
+
+		$prompts = [];
+		foreach ($decoded as $item) {
+			if (is_string($item) && trim($item) !== '') {
+				$prompts[] = trim($item);
+			}
+		}
+
+		if (count($prompts) >= $nbImages) {
+			return array_slice($prompts, 0, $nbImages);
+		}
+
+		while (count($prompts) < $nbImages) {
+			$prompts[] = $fallback;
+		}
+		return $prompts;
 	}
 }
