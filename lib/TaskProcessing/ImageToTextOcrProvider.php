@@ -105,7 +105,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 		$reportOutput = $options->getReportIntermediateOutput();
 		$preferStreaming = $options->getPreferStreaming();
 
-		if (!$this->openAiAPIService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
+		if (!$this->openAiSettingsService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
 			throw new ProcessingException('Must support chat completion endpoint');
 		}
 

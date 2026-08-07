@@ -127,7 +127,7 @@ class TextToTextProvider implements IProvider, ISynchronousOptionsAwareProvider 
 		}
 
 		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+			if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				if ($preferStreaming) {
 					$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 					$time = microtime(true);

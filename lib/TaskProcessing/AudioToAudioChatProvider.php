@@ -70,7 +70,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShape(): array {
-		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
+		$isUsingOpenAi = $this->openAiSettingsService->isUsingOpenAi();
 		$ois = [
 			'llm_model' => new ShapeDescriptor(
 				$this->l->t('Completion model'),
@@ -96,7 +96,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			);
 			$ois['speed'] = new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->openAiAPIService->isUsingOpenAi()
+				$this->openAiSettingsService->isUsingOpenAi()
 					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
@@ -106,7 +106,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
+		$isUsingOpenAi = $this->openAiSettingsService->isUsingOpenAi();
 		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
 		$models = $this->openAiAPIService->getModelEnumValues($this->userId);
 		$enumValues = [
@@ -122,7 +122,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
+		$isUsingOpenAi = $this->openAiSettingsService->isUsingOpenAi();
 		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
 		$adminLlmModel = $isUsingOpenAi
 			? 'gpt-audio'
@@ -192,7 +192,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		if (isset($input['llm_model']) && is_string($input['llm_model'])) {
 			$llmModel = $input['llm_model'];
 		} else {
-			$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
+			$isUsingOpenAi = $this->openAiSettingsService->isUsingOpenAi();
 			$llmModel = $isUsingOpenAi
 				? 'gpt-4o-audio-preview'
 				: $this->openAiSettingsService->getAdminDefaultCompletionModelId();
@@ -207,7 +207,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$speed = 1;
 		if (isset($input['speed']) && is_numeric($input['speed'])) {
 			$speed = $input['speed'];
-			if ($this->openAiAPIService->isUsingOpenAi()) {
+			if ($this->openAiSettingsService->isUsingOpenAi()) {
 				if ($speed > 4) {
 					$speed = 4;
 				} elseif ($speed < 0.25) {
@@ -221,7 +221,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 
 		// Using the chat API if connected to OpenAI
 		// there is an issue if the history mostly contains text, the model will answer text even if we add the audio modality
-		if ($this->openAiAPIService->isUsingOpenAi()) {
+		if ($this->openAiSettingsService->isUsingOpenAi()) {
 			return $this->oneStep($userId, $systemPrompt, $inputFile, $history, $outputVoice, $sttModel, $llmModel, $ttsModel, $speed, $serviceName);
 		}
 

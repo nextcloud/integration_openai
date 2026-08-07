@@ -136,7 +136,7 @@ class TopicsProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 					$topicsSystemPrompt = 'Extract topics from the following text. Detect the language of the text. Use the same language as the text. Output only the topics, comma separated.';
 
 					foreach ($prompts as $p) {

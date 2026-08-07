@@ -171,7 +171,7 @@ class SummaryProvider implements ISynchronousProvider {
 						$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
 					}
 				}
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 
 					foreach ($prompts as $p) {
 						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
