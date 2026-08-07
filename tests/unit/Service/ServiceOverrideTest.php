@@ -132,6 +132,7 @@ class ServiceOverrideTest extends TestCase {
 
 		$TTSProvider = new TextToSpeechProvider(
 			$this->openAiApiService,
+			$this->openAiSettingsService,
 			$l10n = $this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			\OCP\Server::get(IAppConfig::class),
@@ -174,6 +175,7 @@ class ServiceOverrideTest extends TestCase {
 
 		$TextToImageProvider = new TextToImageProvider(
 			$this->openAiApiService,
+			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			\OCP\Server::get(IClientService::class),

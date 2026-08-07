@@ -104,7 +104,7 @@ class TranslateService {
 			}
 			$prompt = $promptStart . PHP_EOL . PHP_EOL . $chunk;
 
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+			if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completionsObj = $this->openAiAPIService->createChatCompletion(
 					$userId, $model, $prompt, TranslateService::SYSTEM_PROMPT, null, 1, $maxTokens, TranslateService::JSON_RESPONSE_FORMAT
 				);

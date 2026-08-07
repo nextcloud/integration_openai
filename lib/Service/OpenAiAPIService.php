@@ -76,50 +76,11 @@ class OpenAiAPIService {
 
 	/**
 	 * @param ?string $serviceType
-	 * @return bool
-	 */
-	public function isUsingOpenAi(?string $serviceType = null): bool {
-		$serviceUrl = '';
-		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
-			$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
-		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
-			$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
-		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
-			$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
-		}
-		if ($serviceUrl === '') {
-			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		}
-		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-	}
-
-	/**
-	 * @param ?string $serviceType
-	 * @return bool
-	 */
-	public function isUsingOpenRouter(?string $serviceType = null): bool {
-		$serviceUrl = '';
-		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
-			$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
-		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
-			$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
-		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
-			$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
-		}
-		if ($serviceUrl === '') {
-			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		}
-		// Return true if the service URL references OpenRouter (e.g., openrouter.ai)
-		return str_starts_with(strtolower($serviceUrl), 'https://openrouter.ai');
-	}
-
-	/**
-	 * @param ?string $serviceType
 	 *
 	 * @return string
 	 */
 	public function getServiceName(?string $serviceType = null): string {
-		if ($this->isUsingOpenAi($serviceType)) {
+		if ($this->openAiSettingsService->isUsingOpenAi($serviceType)) {
 			if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
 				return $this->l10n->t('OpenAI\'s Image Generation');
 			}
@@ -243,7 +204,7 @@ class OpenAiAPIService {
 
 		try {
 			$this->logger->debug('Actually getting OpenAI models with a network request');
-			$params = $this->isUsingOpenRouter($serviceType) ? ['output_modalities' => 'all'] : [];
+			$params = $this->openAiSettingsService->isUsingOpenRouter($serviceType) ? ['output_modalities' => 'all'] : [];
 			$modelsResponse = $this->request($userId, 'models', $params, serviceType: $serviceType);
 		} catch (Exception $e) {
 			$this->logger->warning('Error retrieving models (exc): ' . $e->getMessage());
@@ -275,7 +236,7 @@ class OpenAiAPIService {
 	 * @param string $userId
 	 */
 	private function hasOwnOpenAiApiKey(string $userId): bool {
-		if (!$this->isUsingOpenAi()) {
+		if (!$this->openAiSettingsService->isUsingOpenAi()) {
 			return false;
 		}
 
@@ -296,7 +257,7 @@ class OpenAiAPIService {
 			$modelEnumValues = array_map(function (array $model) {
 				return new ShapeEnumValue($model['id'], $model['id']);
 			}, $modelResponse['data'] ?? []);
-			if ($this->isUsingOpenAi()) {
+			if ($this->openAiSettingsService->isUsingOpenAi()) {
 				array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
 			}
 			return $modelEnumValues;
@@ -722,7 +683,7 @@ class OpenAiAPIService {
 			$messages[] = [
 				// o1-* models don't support system messages
 				// system prompts as a user message seems to work fine though
-				'role' => ($this->isUsingOpenAi() && str_starts_with($modelRequestParam, 'o1-'))
+				'role' => ($this->openAiSettingsService->isUsingOpenAi() && str_starts_with($modelRequestParam, 'o1-'))
 					? 'user'
 					: 'system',
 				'content' => $systemPrompt,
@@ -845,7 +806,7 @@ class OpenAiAPIService {
 		if ($tools !== null) {
 			$params['tools'] = $tools;
 		}
-		if ($userId !== null && $this->isUsingOpenAi()) {
+		if ($userId !== null && $this->openAiSettingsService->isUsingOpenAi()) {
 			$params['user'] = $userId;
 		}
 
@@ -856,7 +817,7 @@ class OpenAiAPIService {
 		if ($extraParams !== null) {
 			$params = array_merge($extraParams, $params);
 		}
-		if ($stream && $this->isUsingOpenAi()) {
+		if ($stream && $this->openAiSettingsService->isUsingOpenAi()) {
 			$params['stream_options'] = array_merge(
 				is_array($params['stream_options'] ?? null) ? $params['stream_options'] : [],
 				['include_usage' => true],
@@ -953,7 +914,7 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 		// enforce whisper for OpenAI
-		if ($this->isUsingOpenAi()) {
+		if ($this->openAiSettingsService->isUsingOpenAi()) {
 			$model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID;
 		}
 
@@ -1158,7 +1119,7 @@ class OpenAiAPIService {
 	 * @return int
 	 */
 	public function getExpTextProcessingTime(): int {
-		return $this->isUsingOpenAi()
+		return $this->openAiSettingsService->isUsingOpenAi()
 			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME), lazy: true))
 			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME), lazy: true));
 	}
@@ -1171,7 +1132,7 @@ class OpenAiAPIService {
 		$oldTime = floatval($this->getExpTextProcessingTime());
 		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
-		if ($this->isUsingOpenAi()) {
+		if ($this->openAiSettingsService->isUsingOpenAi()) {
 			$this->appConfig->setValueString(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)), lazy: true);
 		} else {
 			$this->appConfig->setValueString(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)), lazy: true);
@@ -1182,7 +1143,7 @@ class OpenAiAPIService {
 	 * @return int
 	 */
 	public function getExpImgProcessingTime(): int {
-		return $this->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)
+		return $this->openAiSettingsService->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)
 			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME), lazy: true))
 			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME), lazy: true));
 	}
@@ -1195,7 +1156,7 @@ class OpenAiAPIService {
 		$oldTime = floatval($this->getExpImgProcessingTime());
 		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
-		if ($this->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)) {
+		if ($this->openAiSettingsService->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)) {
 			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)), lazy: true);
 		} else {
 			$this->appConfig->setValueString(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)), lazy: true);
@@ -1242,7 +1203,7 @@ class OpenAiAPIService {
 				return ['error' => 'An API key is required for api.openai.com'];
 			}
 
-			if ($this->isUsingOpenAi($serviceType) || !$useBasicAuth) {
+			if ($this->openAiSettingsService->isUsingOpenAi($serviceType) || !$useBasicAuth) {
 				if ($apiKey !== '') {
 					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
 				}
@@ -1252,7 +1213,7 @@ class OpenAiAPIService {
 				}
 			}
 
-			if (!$this->isUsingOpenAi($serviceType)) {
+			if (!$this->openAiSettingsService->isUsingOpenAi($serviceType)) {
 				$options['nextcloud']['allow_local_address'] = true;
 			}
 
@@ -1555,7 +1516,7 @@ class OpenAiAPIService {
 	 * @return bool whether the T2I provider is available
 	 */
 	public function isT2IAvailable(): bool {
-		if ($this->openAiSettingsService->imageOverrideEnabled() || $this->isUsingOpenAi()) {
+		if ($this->openAiSettingsService->imageOverrideEnabled() || $this->openAiSettingsService->isUsingOpenAi()) {
 			return true;
 		}
 		try {
@@ -1576,7 +1537,7 @@ class OpenAiAPIService {
 	 * @return bool whether the STT provider is available
 	 */
 	public function isSTTAvailable(): bool {
-		if ($this->openAiSettingsService->sttOverrideEnabled() || $this->isUsingOpenAi()) {
+		if ($this->openAiSettingsService->sttOverrideEnabled() || $this->openAiSettingsService->isUsingOpenAi()) {
 			return true;
 		}
 		try {
@@ -1597,7 +1558,7 @@ class OpenAiAPIService {
 	 * @return bool whether the TTS provider is available
 	 */
 	public function isTTSAvailable(): bool {
-		if ($this->openAiSettingsService->ttsOverrideEnabled() || $this->isUsingOpenAi()) {
+		if ($this->openAiSettingsService->ttsOverrideEnabled() || $this->openAiSettingsService->isUsingOpenAi()) {
 			return true;
 		}
 		try {

@@ -69,7 +69,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 		$prompt = 'What language is this (answer with the language name only, in English): ' . $text;
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+			if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, 100);
 				$completion = $completion['messages'];
 			} else {
@@ -107,7 +107,7 @@ class TranslationProvider implements ITranslationProvider, IDetectLanguageProvid
 			}
 			$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+			if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 				$completion = $this->openAiAPIService->createChatCompletion($this->userId, $adminModel, $prompt, null, null, 1, PHP_INT_MAX);
 				$completion = $completion['messages'];
 			} else {

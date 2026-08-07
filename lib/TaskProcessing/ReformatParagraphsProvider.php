@@ -183,7 +183,7 @@ In contrast, traditional motorcycle
 Aside from transportation, the price
 TEXT;
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $chunk, $systemPrompt, null, 1, $maxTokens);
 					$completion = $completion['messages'];
 				} else {
