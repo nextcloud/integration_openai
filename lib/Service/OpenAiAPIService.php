@@ -794,7 +794,7 @@ class OpenAiAPIService {
 			}
 			$content = [];
 			foreach ($files as $file) {
-				$content = array_merge($content, $this->openAiFileService->buildFileContentFromFile($file));
+				$content = array_merge($content, $this->openAiFileService->buildFileContentFromFile($file, $userId));
 			}
 			if ($userPrompt !== null) {
 				$content[] = [
