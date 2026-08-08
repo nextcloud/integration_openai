@@ -106,7 +106,7 @@ OC.L10N.register(
     "Complexity" : "Keerukus",
     "The complexity of the summary" : "Kokkuvõtte keerukus",
     "Auto" : "Automaatne",
-    "One Sentence" : "Ükse lause",
+    "One Sentence" : "Üks lause",
     "One Paragraph" : "Üks lõik",
     "Bullet Points" : "Jutupunktid",
     "Simple" : "Lihtne",
