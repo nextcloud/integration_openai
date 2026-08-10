@@ -319,6 +319,13 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getSummarySystemPrompt(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'system_prompt_summary', Application::DEFAULT_SUMMARY_SYSTEM_PROMPT, lazy: true) ?: Application::DEFAULT_SUMMARY_SYSTEM_PROMPT;
+	}
+
+	/**
 	 * @return int[]
 	 */
 	public function getQuotas(): array {

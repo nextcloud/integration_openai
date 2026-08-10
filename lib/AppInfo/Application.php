@@ -64,6 +64,9 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_QUOTA_PERIOD = 30;
 	public const DEFAULT_QUOTA_CONFIG = ['length' => self::DEFAULT_QUOTA_PERIOD, 'unit' => 'day', 'day' => 1];
 
+	public const DEFAULT_SUMMARY_SYSTEM_PROMPT = 'You are a helpful assistant that summarizes text in the same language as the text. '
+				. 'You should only return the summary without any additional information. ';
+
 	public const DEFAULT_OPENAI_TEXT_GENERATION_TIME = 10; // seconds
 	public const DEFAULT_LOCALAI_TEXT_GENERATION_TIME = 60; // seconds
 	public const DEFAULT_OPENAI_IMAGE_GENERATION_TIME = 20; // seconds

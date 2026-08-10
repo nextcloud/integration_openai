@@ -153,8 +153,7 @@ class SummaryProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
-				$summarySystemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
-					. 'You should only return the summary without any additional information. ';
+				$summarySystemPrompt = $this->openAiSettingsService->getSummarySystemPrompt();
 				if (isset($input['format'])) {
 					if ($input['format'] === 'paragraph') {
 						$summarySystemPrompt .= 'Return the summary as a paragraph. ';
