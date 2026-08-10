@@ -79,6 +79,11 @@ class SummaryProvider implements ISynchronousProvider {
 				$this->l->t('The model used to generate the completion'),
 				EShapeType::Enum
 			),
+			'talk_meeting' => new ShapeDescriptor(
+				$this->l->t("Talk meeting flag"),
+				$this->l->t('Flag that indicates if the summary is generated from a Talk meeting recording.'),
+				EShapeType::Number
+			),
 		];
 	}
 
@@ -106,6 +111,7 @@ class SummaryProvider implements ISynchronousProvider {
 			'model' => $adminModel,
 			'format' => 'auto',
 			'complexity' => 'medium',
+			'talk_meeting' => 0,
 		];
 	}
 
@@ -139,6 +145,7 @@ class SummaryProvider implements ISynchronousProvider {
 			$model = $input['model'];
 		}
 
+		$isTalkMeeting = (bool)($input['talk_meeting'] ?? 0);
 		$prompts = $this->chunkService->chunkSplitPrompt($prompt);
 		$newNumChunks = count($prompts);
 		$progress = 0.0;
@@ -153,7 +160,11 @@ class SummaryProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
-				$summarySystemPrompt = $this->openAiSettingsService->getSummarySystemPrompt();
+				if ($isTalkMeeting) {
+					$summarySystemPrompt = $this->openAiSettingsService->getTalkSummarySystemPrompt();
+				} else {
+					$summarySystemPrompt = $this->openAiSettingsService->getSummarySystemPrompt();
+				}
 				if (isset($input['format'])) {
 					if ($input['format'] === 'paragraph') {
 						$summarySystemPrompt .= 'Return the summary as a paragraph. ';
