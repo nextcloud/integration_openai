@@ -19,7 +19,7 @@
 				@update:model-value="onInput()" />
 			<p v-if="state.is_custom_service" class="settings-hint">
 				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'Your administrator defined a custom service address') }}
+				{{ customServiceHint }}
 			</p>
 			<div v-if="!state.is_custom_service || !state.use_basic_auth">
 				<NcNoteCard type="info">
@@ -189,6 +189,14 @@ export default {
 	},
 
 	computed: {
+		customServiceHint() {
+			const serviceName = this.state.service_name?.trim()
+			return serviceName
+				? t('integration_openai', 'Your administrator defined {serviceName} as the AI service', {
+					serviceName,
+				})
+				: t('integration_openai', 'Your administrator defined a custom service address')
+		},
 		quotaRangeText() {
 			return this.quotaInfo?.period?.unit === 'month'
 				? t('integration_openai', 'This quota period is from {startDate} to {endDate}', {

@@ -627,7 +627,7 @@ class OpenAiSettingsService {
 
 	/**
 	 * Get the user config for the settings page
-	 * @return array{api_key: string, basic_password: string, basic_user: string, is_custom_service: bool, use_basic_auth: bool, stt_language: string}
+	 * @return array{api_key: string, basic_password: string, basic_user: string, service_name: string, is_custom_service: bool, use_basic_auth: bool, stt_language: string}
 	 */
 	public function getUserConfig(string $userId): array {
 		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::OPENAI_API_BASE_URL;
@@ -635,6 +635,7 @@ class OpenAiSettingsService {
 			'api_key' => $this->getUserApiKey($userId),
 			'basic_user' => $this->getUserBasicUser($userId, false),
 			'basic_password' => $this->getUserBasicPassword($userId, false),
+			'service_name' => $this->getServiceName(),
 			'use_basic_auth' => $this->getUseBasicAuth(),
 			'is_custom_service' => $isCustomService,
 			'stt_language' => $this->getUserSTTLanguage($userId)
