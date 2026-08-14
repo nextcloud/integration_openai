@@ -55,11 +55,5 @@
 				<referencedClass name="OCP\TaskProcessing\TaskTypes\AudioToTextSubtitles" />
 			</errorLevel>
 		</UndefinedClass>
-		<UndefinedDocblockClass>
-			<errorLevel type="suppress">
-				<referencedClass name="Doctrine\DBAL\Schema\Table" />
-				<referencedClass name="Doctrine\DBAL\Schema\Schema" />
-			</errorLevel>
-		</UndefinedDocblockClass>
 	</issueHandlers>
 </psalm>
