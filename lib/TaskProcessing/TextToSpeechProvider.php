@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCP\IAppConfig;
 use OCP\IL10N;
@@ -26,6 +27,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
+		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private IAppConfig $appConfig,
@@ -72,7 +74,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 			),
 			'speed' => new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)
+				$this->openAiSettingsService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)
 					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
@@ -139,7 +141,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		$speed = 1;
 		if (isset($input['speed']) && is_numeric($input['speed'])) {
 			$speed = $input['speed'];
-			if ($this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)) {
+			if ($this->openAiSettingsService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)) {
 				if ($speed > 4) {
 					$speed = 4;
 				} elseif ($speed < 0.25) {

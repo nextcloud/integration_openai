@@ -140,7 +140,7 @@ class ProofreadProvider implements ISynchronousProvider {
 
 		foreach ($chunks as $textInput) {
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $textInput, $systemPrompt, null, 1, $maxTokens);
 					$completion = $completion['messages'];
 				} else {
@@ -167,7 +167,7 @@ class ProofreadProvider implements ISynchronousProvider {
 		if (count($chunks) > 1) {
 			$systemPrompt = 'Repeat the proofread feedback list. Ensure that no information is lost, but also not duplicated. ';
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $result, $systemPrompt, null, 1, $maxTokens);
 					$completion = $completion['messages'];
 				} else {

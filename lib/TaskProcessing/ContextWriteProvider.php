@@ -152,7 +152,7 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 				. ' Also, use the *WRITING STYLE* as a guide for how to write the text ONLY and not as a source of facts or events.'
 				. ' Detect the language used in the *SOURCE_MATERIAL*. Make sure to use the same language in your response. Do not mention the language explicitly.';
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 					if ($preferStreaming) {
 						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 						$time = microtime(true);

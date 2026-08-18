@@ -148,7 +148,7 @@ class TextToTextImproveProvider implements IProvider, ISynchronousOptionsAwarePr
 				. "\n\n*INSTRUCTIONS*:\n$instructions\n\n*TEXT*:\n\n$chunk\n\n"
 				. 'Do not mention the used language in your output. Here is your improved text in the same language:';
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->openAiSettingsService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
 					if ($preferStreaming) {
 						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
 						$time = microtime(true);

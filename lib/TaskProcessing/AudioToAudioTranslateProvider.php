@@ -95,7 +95,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 			),
 			'tts_speed' => new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)
+				$this->openAiSettingsService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)
 					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
@@ -206,7 +206,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		}
 
 		// translate
-		$completionModel = $this->openAiAPIService->isUsingOpenAi()
+		$completionModel = $this->openAiSettingsService->isUsingOpenAi()
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', lazy: true);
 		$maxTokens = $this->openAiSettingsService->getMaxTokens();
@@ -268,7 +268,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		$speed = 1;
 		if (isset($input['tts_speed']) && is_numeric($input['tts_speed'])) {
 			$speed = $input['tts_speed'];
-			if ($this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)) {
+			if ($this->openAiSettingsService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)) {
 				if ($speed > 4) {
 					$speed = 4;
 				} elseif ($speed < 0.25) {

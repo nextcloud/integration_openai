@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Service;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
 use OCP\IL10N;
@@ -119,7 +118,7 @@ class OpenAiFileService {
 			throw new ProcessingException('File is not readable');
 		}
 		// Maximum file size for openai is 50MB.
-		if ($this->isUsingOpenAi() && $file->getSize() > self::MAX_FILE_SIZE_BYTES) {
+		if ($this->openAiSettingsService->isUsingOpenAi() && $file->getSize() > self::MAX_FILE_SIZE_BYTES) {
 			throw new UserFacingProcessingException(
 				'Filesize of input files too large. Max is 50MB',
 				0,
@@ -160,7 +159,7 @@ class OpenAiFileService {
 				$this->l10n->t('Image attachments are unsupported.'),
 			);
 		}
-		if ($this->isUsingOpenAi() && !in_array($fileType, self::VALID_IMAGE_MIME_TYPES, true)) {
+		if ($this->openAiSettingsService->isUsingOpenAi() && !in_array($fileType, self::VALID_IMAGE_MIME_TYPES, true)) {
 			throw new UserFacingProcessingException(
 				'Invalid input file type for OpenAI ' . $fileType,
 				0,
@@ -228,7 +227,7 @@ class OpenAiFileService {
 	}
 
 	/**
-	 * @return list<array{type: string, file: array{filename: string, file_data: string}}>
+	 * @return list<array<string, mixed>>
 	 */
 	private function buildDocumentContent(File $file, string $fileType): array {
 		if (!$this->openAiSettingsService->getMultimodalDocumentEnabled()) {
@@ -239,11 +238,22 @@ class OpenAiFileService {
 				$this->l10n->t('Document attachments are unsupported.'),
 			);
 		}
+		$dataUri = 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb')));
+
+		if ($this->openAiSettingsService->isUsingMistral()) {
+			// Mistral does not accept the default openai shape so we use a fallback for them
+			return [[
+				'type' => 'document_url',
+				'document_url' => $dataUri,
+				'document_name' => $file->getName(),
+			]];
+		}
+
 		return [[
 			'type' => 'file',
 			'file' => [
 				'filename' => $file->getName(),
-				'file_data' => 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb'))),
+				'file_data' => $dataUri,
 			],
 		]];
 	}
@@ -265,10 +275,5 @@ class OpenAiFileService {
 			'type' => 'text',
 			'text' => 'Filename:' . $file->getName() . "\nContent:\n" . stream_get_contents($file->fopen('rb')),
 		]];
-	}
-
-	private function isUsingOpenAi(): bool {
-		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 	}
 }

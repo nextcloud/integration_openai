@@ -264,6 +264,51 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * Resolve the effective service URL for a service type, falling back to the main URL.
+	 *
+	 * @param ?string $serviceType
+	 */
+	private function resolveServiceUrl(?string $serviceType = null): string {
+		$serviceUrl = '';
+		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
+			$serviceUrl = $this->getImageServiceUrl();
+		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
+			$serviceUrl = $this->getSttServiceUrl();
+		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
+			$serviceUrl = $this->getTtsServiceUrl();
+		}
+		if ($serviceUrl === '') {
+			$serviceUrl = $this->getServiceUrl();
+		}
+		return $serviceUrl;
+	}
+
+	/**
+	 * @param ?string $serviceType
+	 */
+	public function isUsingOpenAi(?string $serviceType = null): bool {
+		$serviceUrl = $this->resolveServiceUrl($serviceType);
+		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
+	}
+
+	/**
+	 * @param ?string $serviceType
+	 */
+	public function isUsingOpenRouter(?string $serviceType = null): bool {
+		$serviceUrl = $this->resolveServiceUrl($serviceType);
+		// Return true if the service URL references OpenRouter (e.g., openrouter.ai)
+		return str_starts_with(strtolower($serviceUrl), 'https://openrouter.ai');
+	}
+
+	/**
+	 * @param ?string $serviceType
+	 */
+	public function isUsingMistral(?string $serviceType = null): bool {
+		$serviceUrl = $this->resolveServiceUrl($serviceType);
+		return str_starts_with(strtolower($serviceUrl), 'https://api.mistral.ai');
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getServiceName(): string {
@@ -630,7 +675,7 @@ class OpenAiSettingsService {
 	 * @return array{api_key: string, basic_password: string, basic_user: string, is_custom_service: bool, use_basic_auth: bool, stt_language: string}
 	 */
 	public function getUserConfig(string $userId): array {
-		$isCustomService = $this->getServiceUrl() !== '' && $this->getServiceUrl() !== Application::OPENAI_API_BASE_URL;
+		$isCustomService = !$this->isUsingOpenAi();
 		return [
 			'api_key' => $this->getUserApiKey($userId),
 			'basic_user' => $this->getUserBasicUser($userId, false),
@@ -645,10 +690,8 @@ class OpenAiSettingsService {
 	 * @return bool
 	 */
 	public function getUseMaxCompletionTokensParam(): bool {
-		$serviceUrl = $this->getServiceUrl();
-		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 		// we know OpenAI expects "use_max_completion_tokens_param", let's assume the other services don't
-		$default = $isUsingOpenAI ? '1' : '0';
+		$default = $this->isUsingOpenAi() ? '1' : '0';
 		return $this->appConfig->getValueString(Application::APP_ID, 'use_max_completion_tokens_param', $default, lazy: true) === '1';
 	}
 
@@ -663,14 +706,8 @@ class OpenAiSettingsService {
 	 * @return bool
 	 */
 	public function getIsImageRetrievalAuthenticated(): bool {
-		$serviceUrl = $this->getServiceUrl();
 		// the image_request_auth default depends on the service used for image generation
-		// if we override it, we check the one we are really gonna use
-		if ($this->imageOverrideEnabled()) {
-			$serviceUrl = $this->getImageServiceUrl();
-		}
-		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-		$default = $isUsingOpenAI ? '0' : '1';
+		$default = $this->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE) ? '0' : '1';
 		return $this->appConfig->getValueString(Application::APP_ID, 'image_request_auth', $default, lazy: true) === '1';
 	}
 

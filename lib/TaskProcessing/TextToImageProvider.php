@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
@@ -27,6 +28,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
+		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private IClientService $clientService,
@@ -85,7 +87,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)
+		$adminModel = $this->openAiSettingsService->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)
 			? ($this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
 			: $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', lazy: true);
 		return [

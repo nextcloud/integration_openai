@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCP\Files\File;
 use OCP\IAppConfig;
 use OCP\IL10N;
@@ -27,6 +28,7 @@ class AudioToTextSubtitlesProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
+		private OpenAiSettingsService $openAiSettingsService,
 		private LoggerInterface $logger,
 		private IAppConfig $appConfig,
 		private IL10N $l,
@@ -131,7 +133,7 @@ class AudioToTextSubtitlesProvider implements ISynchronousProvider {
 				$this->l->t('The input file type is invalid. Only audio or video files are allowed.'),
 			);
 		}
-		if ($this->openAiAPIService->isUsingOpenAi()) {
+		if ($this->openAiSettingsService->isUsingOpenAi()) {
 			$validFileTypes = [
 				'audio/mp3',
 				'audio/mp4',
