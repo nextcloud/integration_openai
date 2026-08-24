@@ -10,12 +10,16 @@ declare(strict_types=1);
 namespace OCA\OpenAi\Service;
 
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Vendor\RtfHtmlPhp\Document;
+use OCA\OpenAi\Vendor\RtfHtmlPhp\Html\HtmlFormatter;
+use OCA\OpenAi\Vendor\Smalot\PdfParser\Parser;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
 use OCP\IL10N;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use OCP\TaskProcessing\IManager as ITaskProcessingManager;
+use Psr\Log\LoggerInterface;
 
 class OpenAiFileService {
 	private const MAX_FILE_SIZE_BYTES = 50_000_000;
@@ -71,6 +75,7 @@ class OpenAiFileService {
 		private OpenAiSettingsService $openAiSettingsService,
 		private IRootFolder $rootFolder,
 		private ITaskProcessingManager $taskProcessingManager,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -143,6 +148,8 @@ class OpenAiFileService {
 			return $this->buildVideoContent($file, $fileType);
 		} elseif ($fileType === 'application/pdf') {
 			return $this->buildDocumentContent($file, $fileType);
+		} elseif ($fileType === 'text/rtf') {
+			return $this->buildRtfContent($file);
 		} else {
 			return $this->buildTextContent($file, $fileType);
 		}
@@ -228,16 +235,18 @@ class OpenAiFileService {
 	}
 
 	/**
-	 * @return list<array{type: string, file: array{filename: string, file_data: string}}>
+	 * @return list<array{type: string, text: string}|array{type: string, file: array{filename: string, file_data: string}}>
 	 */
 	private function buildDocumentContent(File $file, string $fileType): array {
 		if (!$this->openAiSettingsService->getMultimodalDocumentEnabled()) {
-			throw new UserFacingProcessingException(
-				'Document attachments are disabled',
-				0,
-				null,
-				$this->l10n->t('Document attachments are unsupported.'),
-			);
+			$this->logger->info('Falling back to extracting text from pdf for file', ['fileId' => $file->getId()]);
+			$parser = new Parser();
+			$pdf = $parser->parseContent(stream_get_contents($file->fopen('rb')));
+			$text = $pdf->getText();
+			return [[
+				'type' => 'text',
+				'text' => 'Filename:' . $file->getName() . "\nContent:\n" . $text,
+			]];
 		}
 		return [[
 			'type' => 'file',
@@ -245,6 +254,19 @@ class OpenAiFileService {
 				'filename' => $file->getName(),
 				'file_data' => 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb'))),
 			],
+		]];
+	}
+
+	/**
+	 * @return list<array{type: string, text: string}>
+	 */
+	private function buildRtfContent(File $file): array {
+		$document = new Document(stream_get_contents($file->fopen('rb')));
+		$formatter = new HtmlFormatter('UTF-8');
+		$html = $formatter->Format($document);
+		return [[
+			'type' => 'text',
+			'text' => 'Filename:' . $file->getName() . "\nContent:\n" . $html,
 		]];
 	}
 

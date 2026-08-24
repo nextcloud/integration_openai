@@ -178,17 +178,25 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function boot(IBootContext $context): void {
-		// Load PHP Exif Library for adding image metadata
-		\spl_autoload_register(function ($class) {
-			if (\substr_compare($class, 'OCA\OpenAi\Vendor\lsolesen\\pel\\', 0, 13) === 0) {
-				$classname = \str_replace('OCA\\OpenAi\\Vendor\\lsolesen\\pel\\', '', $class);
-				$load = \realpath(__DIR__ . '/../../vendor/fileeye/pel/src/' . $classname . '.php');
-				if ($load !== \false) {
-					include_once \realpath($load);
+		$vendorDir = __DIR__ . '/../../vendor';
+		\spl_autoload_register(function (string $class) use ($vendorDir) {
+			$prefixes = [
+				'OCA\\OpenAi\\Vendor\\lsolesen\\pel\\' => $vendorDir . '/fileeye/pel/src/',
+				'OCA\\OpenAi\\Vendor\\RtfHtmlPhp\\' => $vendorDir . '/henck/rtf-to-html/src/',
+				'OCA\\OpenAi\\Vendor\\Smalot\\PdfParser\\' => $vendorDir . '/smalot/pdfparser/src/Smalot/PdfParser/',
+			];
+			foreach ($prefixes as $prefix => $baseDir) {
+				if (!str_starts_with($class, $prefix)) {
+					continue;
 				}
+				$file = $baseDir . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+				if (is_file($file)) {
+					include_once $file;
+				}
+				return;
 			}
 		});
 		// Load getID3 library for adding audio metadata
-		require_once(__DIR__ . '/../../vendor/james-heinrich/getid3/getid3/getid3.php');
+		require_once($vendorDir . '/james-heinrich/getid3/getid3/getid3.php');
 	}
 }
