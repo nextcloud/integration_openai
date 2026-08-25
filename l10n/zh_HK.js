@@ -42,7 +42,6 @@ OC.L10N.register(
     "Invalid input file type \"%1$s\"." : "輸入檔案類型「%1$s」無效。",
     "Audio attachments are unsupported." : "不支援音訊附件。",
     "Video attachments are unsupported." : "不支援影片附件。",
-    "Document attachments are unsupported." : "不支援文件附件。",
     "Invalid input file type: \"%1$s\"." : "輸入檔案類型無效：「%1$s」。",
     "Name" : "名字",
     "Usage" : "使用量",

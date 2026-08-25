@@ -40,7 +40,6 @@
     "Invalid input file type \"%1$s\"." : "無效輸入檔案類型「%1$s」。",
     "Audio attachments are unsupported." : "不支援音訊附件。",
     "Video attachments are unsupported." : "不支援視訊附件。",
-    "Document attachments are unsupported." : "不支援文件附件。",
     "Invalid input file type: \"%1$s\"." : "無效的輸入檔案類型：「%1$s」。",
     "Name" : "名稱",
     "Usage" : "使用量",
