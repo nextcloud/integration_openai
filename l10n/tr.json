@@ -40,7 +40,6 @@
     "Invalid input file type \"%1$s\"." : "\"%1$s\" giriş dosyası türü geçersiz.",
     "Audio attachments are unsupported." : "Ses ek dosyaları desteklenmiyor.",
     "Video attachments are unsupported." : "Görüntü ek dosyaları desteklenmiyor.",
-    "Document attachments are unsupported." : "Belge ek dosyaları desteklenmiyor.",
     "Invalid input file type: \"%1$s\"." : "Giriş dosyası türü geçersiz: \"%1$s\".",
     "Name" : "Ad",
     "Usage" : "Kullanım",

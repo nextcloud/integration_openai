@@ -42,7 +42,6 @@ OC.L10N.register(
     "Invalid input file type \"%1$s\"." : "Netinkamas įvesties failo tipas „%1$s“.",
     "Audio attachments are unsupported." : "Garso priedai nepalaikomi.",
     "Video attachments are unsupported." : "Vaizdo įrašų priedai nepalaikomi.",
-    "Document attachments are unsupported." : "Dokumentų priedai nepalaikomi.",
     "Invalid input file type: \"%1$s\"." : "Netinkamas įvesties failo tipas: „%1$s“.",
     "Name" : "Pavadinimas",
     "Usage" : "Naudojimas",
