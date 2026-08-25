@@ -42,7 +42,6 @@ OC.L10N.register(
     "Invalid input file type \"%1$s\"." : "Cineál comhaid ionchuir neamhbhailí \"%1$s\".",
     "Audio attachments are unsupported." : "Ní thacaítear le ceangaltáin fuaime.",
     "Video attachments are unsupported." : "Ní thacaítear le ceangaltáin físe.",
-    "Document attachments are unsupported." : "Ní thacaítear le ceangaltáin doiciméad.",
     "Invalid input file type: \"%1$s\"." : "Cineál comhaid ionchuir neamhbhailí: \"%1$s\".",
     "Name" : "Ainm",
     "Usage" : "Úsáid",

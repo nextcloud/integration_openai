@@ -42,7 +42,6 @@ OC.L10N.register(
     "Invalid input file type \"%1$s\"." : "Tipo inválido do arquivo de entrada “%1$s”.",
     "Audio attachments are unsupported." : "Não é possível anexar áudios.",
     "Video attachments are unsupported." : "Não é possível anexar vídeos.",
-    "Document attachments are unsupported." : "Não é possível anexar documentos.",
     "Invalid input file type: \"%1$s\"." : "Tipo inválido do arquivo de entrada: “%1$s”.",
     "Name" : "Nome",
     "Usage" : "Uso",

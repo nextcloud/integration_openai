@@ -41,7 +41,6 @@ OC.L10N.register(
     "Invalid input file type \"%1$s\"." : "Vigane sisendfaili tüüp: „%1$s“.",
     "Audio attachments are unsupported." : "Helifailide manused pole toetatud.",
     "Video attachments are unsupported." : "Videomanused pole toetatud.",
-    "Document attachments are unsupported." : "Dokumendimanused pole toetatud.",
     "Invalid input file type: \"%1$s\"." : "Vigane sisendfaili tüüp: „%1$s“.",
     "Name" : "Nimi",
     "Usage" : "Kasutus",
