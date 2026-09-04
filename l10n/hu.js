@@ -43,6 +43,7 @@ OC.L10N.register(
     "Usage quotas per time period" : "Használati kvóták időszakonként",
     "Quota type" : "Kvóta típusa",
     "Start date" : "Kezdés ideje",
+    "End date" : "Befejezés dátuma",
     "Select enabled features" : "Válassza ki az engedélyezett funkciókat",
     "Speech-to-text provider (to transcribe Talk recordings for example)" : "Beszédfelismerő szolgáltatás (például a Talk átiratok készítéséhez)",
     "OpenAI options saved" : "OpenAI beállítások elmentve",
