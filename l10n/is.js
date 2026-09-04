@@ -28,7 +28,10 @@ OC.L10N.register(
     "Category" : "Flokkur",
     "Save" : "Vista",
     "Delete" : "Eyða",
+    "Analyze images" : "Greina myndir",
     "Images" : "Myndir",
+    "Question" : "Spurning",
+    "Generated response" : "Framkallað svar",
     "Input text" : "Inntakstexti",
     "Prompt" : "Kvaðning"
 },

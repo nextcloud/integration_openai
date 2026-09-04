@@ -26,7 +26,10 @@
     "Category" : "Flokkur",
     "Save" : "Vista",
     "Delete" : "Eyða",
+    "Analyze images" : "Greina myndir",
     "Images" : "Myndir",
+    "Question" : "Spurning",
+    "Generated response" : "Framkallað svar",
     "Input text" : "Inntakstexti",
     "Prompt" : "Kvaðning"
 },"pluralForm" :"nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);"
