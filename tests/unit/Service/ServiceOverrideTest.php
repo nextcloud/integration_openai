@@ -22,6 +22,7 @@ use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\StreamingService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
+use OCA\OpenAi\TaskProcessing\ImageToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
 use OCP\Http\Client\IClient;
@@ -217,6 +218,148 @@ class ServiceOverrideTest extends TestCase {
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
 		$TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText, 'numberOfImages' => 1], fn () => null);
+	}
+
+	public function testImageToImageProvider(): void {
+		$this->openAiSettingsService->setImageServiceUrl(self::OVERRIDE_IMAGE_BASE);
+		$this->openAiSettingsService->setAdminImageApiKey(self::APIKEY_IMAGE);
+		$this->openAiSettingsService->setImageRequestTimeout(self::REQUEST_TIMEOUT_IMAGE);
+
+		$imageToImageProvider = new ImageToImageProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(IClientService::class),
+			\OCP\Server::get(IAppConfig::class),
+			self::TEST_USER1,
+			\OCP\Server::get(WatermarkingService::class),
+		);
+
+		$inputImage = file_get_contents(__DIR__ . '/../../res/trees.jpg');
+		if (!$inputImage) {
+			throw new \RuntimeException('Could not read test resource `trees.jpg`');
+		}
+
+		$file = $this->createMock(\OCP\Files\File::class);
+		$file->method('isReadable')->willReturn(true);
+		$file->method('getContent')->willReturn($inputImage);
+		$file->method('getSize')->willReturn(strlen($inputImage));
+		$file->method('getMimeType')->willReturn('image/jpeg');
+
+		$prompt = 'Make the sky blue';
+		$response = json_encode([
+			'data' => [
+				[
+					'b64_json' => base64_encode($inputImage),
+				]
+			]
+		]);
+
+		$url = self::OVERRIDE_IMAGE_BASE . 'images/generations';
+		$options = [
+			'timeout' => self::REQUEST_TIMEOUT_IMAGE,
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Authorization' => 'Bearer ' . self::APIKEY_IMAGE,
+				'Content-Type' => 'application/json',
+			],
+			'nextcloud' => ['allow_local_address' => true],
+			'body' => json_encode([
+				'prompt' => $prompt,
+				'size' => '1024x1024',
+				'n' => 1,
+				'model' => Application::DEFAULT_IMAGE_MODEL_ID,
+				'ref_images' => [base64_encode($inputImage)],
+			]),
+		];
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$imageToImageProvider->process(
+			self::TEST_USER1,
+			['input' => [$file], 'prompt' => $prompt],
+			fn () => null,
+		);
+	}
+
+	public function testImageToImageProviderOpenRouter(): void {
+		$openRouterBase = 'https://openrouter.ai/api/v1/';
+		$this->openAiSettingsService->setImageServiceUrl($openRouterBase);
+		$this->openAiSettingsService->setAdminImageApiKey(self::APIKEY_IMAGE);
+		$this->openAiSettingsService->setImageRequestTimeout(self::REQUEST_TIMEOUT_IMAGE);
+
+		$imageToImageProvider = new ImageToImageProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(IClientService::class),
+			\OCP\Server::get(IAppConfig::class),
+			self::TEST_USER1,
+			\OCP\Server::get(WatermarkingService::class),
+		);
+
+		$inputImage = file_get_contents(__DIR__ . '/../../res/trees.jpg');
+		if (!$inputImage) {
+			throw new \RuntimeException('Could not read test resource `trees.jpg`');
+		}
+
+		$file = $this->createMock(\OCP\Files\File::class);
+		$file->method('isReadable')->willReturn(true);
+		$file->method('getContent')->willReturn($inputImage);
+		$file->method('getSize')->willReturn(strlen($inputImage));
+		$file->method('getMimeType')->willReturn('image/jpeg');
+
+		$prompt = 'Make the sky blue';
+		$response = json_encode([
+			'data' => [
+				[
+					'b64_json' => base64_encode($inputImage),
+				]
+			]
+		]);
+
+		$url = $openRouterBase . 'images';
+		$options = [
+			'timeout' => self::REQUEST_TIMEOUT_IMAGE,
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Authorization' => 'Bearer ' . self::APIKEY_IMAGE,
+				'Content-Type' => 'application/json',
+			],
+			'nextcloud' => ['allow_local_address' => true],
+			'body' => json_encode([
+				'prompt' => $prompt,
+				'size' => '1024x1024',
+				'n' => 1,
+				'model' => Application::DEFAULT_IMAGE_MODEL_ID,
+				'input_references' => [
+					[
+						'type' => 'image_url',
+						'image_url' => [
+							'url' => 'data:image/jpeg;base64,' . base64_encode($inputImage),
+						],
+					],
+				],
+			]),
+		];
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$imageToImageProvider->process(
+			self::TEST_USER1,
+			['input' => [$file], 'prompt' => $prompt],
+			fn () => null,
+		);
 	}
 
 	public function testAudioToTextProvider(): void {

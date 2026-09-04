@@ -26,6 +26,7 @@ use OCA\OpenAi\TaskProcessing\AudioToAudioTranslateProvider;
 use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
 use OCA\OpenAi\TaskProcessing\EmojiProvider;
 use OCA\OpenAi\TaskProcessing\HeadlineProvider;
+use OCA\OpenAi\TaskProcessing\ImageToImageProvider;
 use OCA\OpenAi\TaskProcessing\MultimodalChatWithToolsProvider;
 use OCA\OpenAi\TaskProcessing\ProofreadProvider;
 use OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider;
@@ -935,6 +936,78 @@ class OpenAiProviderTest extends TestCase {
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_IMAGE);
 		$this->assertEquals(1, $usage);
 		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testImageToImageProvider(): void {
+		$imageToImageProvider = new ImageToImageProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(IClientService::class),
+			\OCP\Server::get(IAppConfig::class),
+			self::TEST_USER1,
+			\OCP\Server::get(WatermarkingService::class),
+		);
+
+		$inputImage = file_get_contents(__DIR__ . '/../../res/trees.jpg');
+		if (!$inputImage) {
+			throw new \RuntimeException('Could not read test resource `trees.jpg`');
+		}
+
+		$file = $this->createMock(\OCP\Files\File::class);
+		$file->method('isReadable')->willReturn(true);
+		$file->method('getContent')->willReturn($inputImage);
+		$file->method('getSize')->willReturn(strlen($inputImage));
+		$file->method('getMimeType')->willReturn('image/jpeg');
+
+		$prompt = 'Make the sky blue';
+		$response = json_encode([
+			'data' => [
+				[
+					'b64_json' => base64_encode($inputImage),
+				]
+			]
+		]);
+
+		$url = self::OPENAI_API_BASE . 'images/edits';
+		$options = [
+			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
+			'headers' => [
+				'User-Agent' => Application::USER_AGENT,
+				'Authorization' => self::AUTHORIZATION_HEADER,
+			],
+			'multipart' => [
+				['name' => 'prompt', 'contents' => $prompt],
+				['name' => 'size', 'contents' => '1024x1024'],
+				['name' => 'n', 'contents' => 1],
+				['name' => 'model', 'contents' => Application::DEFAULT_IMAGE_MODEL_ID],
+				[
+					'name' => 'image[]',
+					'contents' => $inputImage,
+					'filename' => 'image_0.jpg',
+					'headers' => ['Content-Type' => 'image/jpeg'],
+				],
+			],
+		];
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $imageToImageProvider->process(
+			self::TEST_USER1,
+			['input' => [$file], 'prompt' => $prompt],
+			fn () => true,
+		);
+		$this->assertArrayHasKey('output', $result);
+		$this->assertEquals($inputImage, $result['output']);
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_IMAGE);
+		$this->assertEquals(1, $usage);
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
