@@ -33,6 +33,7 @@ OC.L10N.register(
     "Auto" : "Otomatis",
     "Medium" : "Sedang",
     "Size" : "Ukuran",
+    "Cannot generate less than 1 image" : "Tidak dapat menghasilkan kurang dari 1 gambar",
     "JSON object. Check the API documentation to get the list of all available parameters. For example: {example}" : "Objek JSON. Periksa dokumentasi API untuk mendapatkan daftar semua parameter yang tersedia. Contoh: {example}",
     "Failed to load models" : "Gagal memuat model",
     "Failed to load quota info" : "Gagal memuat info kuota",
