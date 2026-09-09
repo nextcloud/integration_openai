@@ -154,7 +154,7 @@ import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 
 import axios from '@nextcloud/axios'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 import { formatRelativeTime } from '@nextcloud/l10n'
 import { confirmPassword } from '@nextcloud/password-confirmation'
@@ -241,6 +241,24 @@ export default {
 			}
 			return this.pendingSaves[serviceId]
 		},
+		/**
+		 * Ask for the password confirmation the credentials endpoint requires.
+		 *
+		 * Dismissing the dialog is a deliberate choice rather than a failure,
+		 * so it must not be reported as one.
+		 *
+		 * @return {Promise<boolean>} whether the password was confirmed
+		 */
+		async confirmPasswordOrCancel() {
+			try {
+				await confirmPassword()
+				return true
+			} catch (error) {
+				showWarning(t('integration_openai', 'Password confirmation cancelled, nothing was changed'))
+				console.debug('Password confirmation was dismissed', error)
+				return false
+			}
+		},
 		async saveCredentials(serviceId) {
 			const stored = this.credentials[serviceId]
 			const values = {
@@ -254,8 +272,11 @@ export default {
 			if (stored.basic_password !== SECRET_PLACEHOLDER) {
 				values.basic_password = (stored.basic_password ?? '').trim()
 			}
+			if (!await this.confirmPasswordOrCancel()) {
+				return
+			}
+
 			try {
-				await confirmPassword()
 				const url = generateUrl('/apps/integration_openai/services/{id}/user-credentials', { id: serviceId })
 				await axios.put(url, { values })
 				showSuccess(t('integration_openai', 'OpenAI options saved'))

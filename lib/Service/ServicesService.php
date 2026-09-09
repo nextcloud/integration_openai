@@ -52,6 +52,23 @@ class ServicesService {
 		if ($this->servicesCache !== null) {
 			return $this->servicesCache;
 		}
+		$services = [];
+		foreach ($this->getStoredServices() as $values) {
+			foreach (ServiceConfig::SECRET_PROPERTIES as $secret) {
+				$values[$secret] = $this->decrypt($values[$secret] ?? '');
+			}
+			$services[] = ServiceConfig::fromArray($values['id'], $values);
+		}
+		$this->servicesCache = $services;
+		return $services;
+	}
+
+	/**
+	 * The stored rows of the service list, with the secrets still encrypted.
+	 *
+	 * @return list<array<string, mixed>> rows that have a string 'id'
+	 */
+	private function getStoredServices(): array {
 		$storedString = $this->appConfig->getValueString(Application::APP_ID, Application::SERVICES_CONFIG_KEY, '[]', lazy: true);
 		try {
 			$stored = json_decode($storedString, true, flags: JSON_THROW_ON_ERROR);
@@ -63,28 +80,14 @@ class ServicesService {
 			$stored = [];
 		}
 
-		$services = [];
+		$rows = [];
 		foreach ($stored as $values) {
 			if (!is_array($values) || !isset($values['id']) || !is_string($values['id'])) {
 				continue;
 			}
-			foreach (ServiceConfig::SECRET_PROPERTIES as $secret) {
-				$values[$secret] = $this->decrypt($values[$secret] ?? '');
-			}
-			$services[] = ServiceConfig::fromArray($values['id'], $values);
+			$rows[] = $values;
 		}
-		$this->servicesCache = $services;
-		return $services;
-	}
-
-	/**
-	 * @return ServiceConfig[] all services that expose at least one model for the given modality
-	 */
-	public function getServicesForModality(string $modality): array {
-		return array_values(array_filter(
-			$this->getServices(),
-			static fn (ServiceConfig $service) => count($service->getModels($modality)) > 0,
-		));
+		return $rows;
 	}
 
 	public function getService(string $id): ?ServiceConfig {
@@ -107,17 +110,13 @@ class ServicesService {
 		return $service;
 	}
 
-	/**
-	 * The first configured service, used where a single service has to be
-	 * picked without further context
-	 */
-	public function getDefaultService(): ?ServiceConfig {
-		return $this->getServices()[0] ?? null;
-	}
-
 	public function hasOpenAiService(): bool {
-		foreach ($this->getServices() as $service) {
-			if ($service->isUsingOpenAi()) {
+		// This answers the public capabilities endpoint, so it reads the stored
+		// rows directly: going through getServices() would decrypt every
+		// secret of every service just to look at the URLs.
+		foreach ($this->getStoredServices() as $values) {
+			$withoutSecrets = array_diff_key($values, array_flip(ServiceConfig::SECRET_PROPERTIES));
+			if (ServiceConfig::fromArray($values['id'], $withoutSecrets)->isUsingOpenAi()) {
 				return true;
 			}
 		}

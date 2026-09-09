@@ -78,13 +78,6 @@ class Application extends App implements IBootstrap {
 	public const MODALITY_IMAGE = 'image';
 	public const MODALITY_STT = 'stt';
 	public const MODALITY_TTS = 'tts';
-	public const MODALITIES = [
-		self::MODALITY_TEXT,
-		self::MODALITY_IMAGE,
-		self::MODALITY_STT,
-		self::MODALITY_TTS,
-	];
-
 	/** App config key holding the JSON list of connected services */
 	public const SERVICES_CONFIG_KEY = 'services';
 

@@ -24,7 +24,8 @@ use Throwable;
  * the first text model selected for that service.
  */
 class AudioToTextEnhancedProvider implements ISynchronousProvider {
-	use ProviderIdentity;
+	// No ProviderIdentity: this provider derives its ID and name from the
+	// transcription provider it wraps rather than from a model of its own.
 
 	public function __construct(
 		private AudioToTextProvider $audioToTextProvider,
@@ -32,7 +33,6 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
 		private ServiceConfig $service,
-		private string $model,
 	) {
 	}
 

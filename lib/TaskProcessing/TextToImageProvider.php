@@ -50,7 +50,9 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
+		// this provider feeds updateExpImgProcessingTime() below, so the
+		// estimate has to be read back from the same place
+		return $this->openAiAPIService->getExpImgProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {

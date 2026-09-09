@@ -169,7 +169,7 @@ class ProviderFactory {
 			$providers[] = new AudioToTextEnhancedProvider(
 				$audioToText,
 				new ReformatParagraphsProvider($this->openAiAPIService, $this->l, $this->chunkService, $service, $textModel),
-				$this->openAiAPIService, $this->logger, $service, $model,
+				$this->openAiAPIService, $this->logger, $service,
 			);
 		}
 		// ... and speech generation on top of that

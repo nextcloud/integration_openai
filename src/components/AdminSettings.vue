@@ -117,7 +117,7 @@ import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 
 import axios from '@nextcloud/axios'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
 import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateUrl } from '@nextcloud/router'
@@ -224,6 +224,24 @@ export default {
 				)
 			}
 		},
+		/**
+		 * Ask for the password confirmation the sensitive endpoints require.
+		 *
+		 * Dismissing the dialog is a deliberate choice rather than a failure,
+		 * so it must not be reported as one.
+		 *
+		 * @return {Promise<boolean>} whether the password was confirmed
+		 */
+		async confirmPasswordOrCancel() {
+			try {
+				await confirmPassword()
+				return true
+			} catch (error) {
+				showWarning(t('integration_openai', 'Password confirmation cancelled, nothing was changed'))
+				console.debug('Password confirmation was dismissed', error)
+				return false
+			}
+		},
 		applyToService(serviceId, values) {
 			const index = this.services.findIndex(service => service.id === serviceId)
 			if (index !== -1) {
@@ -250,8 +268,10 @@ export default {
 			if (!window.confirm(t('integration_openai', 'Remove {service}? The providers it exposes will stop working.', { service: service.display_name }))) {
 				return
 			}
+			if (!await this.confirmPasswordOrCancel()) {
+				return
+			}
 			try {
-				await confirmPassword()
 				this.cancelPendingSaves(service.id)
 				await axios.delete(generateUrl('/apps/integration_openai/services/{id}', { id: service.id }))
 				this.services = this.services.filter(s => s.id !== service.id)
@@ -352,10 +372,11 @@ export default {
 					quotas: service.quotas,
 				}
 
+			if (sensitive && !await this.confirmPasswordOrCancel()) {
+				return
+			}
+
 			try {
-				if (sensitive) {
-					await confirmPassword()
-				}
 				const url = sensitive
 					? generateUrl('/apps/integration_openai/services/{id}/sensitive', { id: serviceId })
 					: generateUrl('/apps/integration_openai/services/{id}', { id: serviceId })
