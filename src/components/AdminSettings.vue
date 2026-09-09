@@ -185,13 +185,23 @@ export default {
 			]
 		},
 		downloadQuotaUsageUrl() {
-			return generateUrl('/apps/integration_openai/quota/download-usage?type={type}&startDate={startDate}&endDate={endDate}&serviceId={serviceId}', {
+			const url = generateUrl('/apps/integration_openai/quota/download-usage?type={type}&startDate={startDate}&endDate={endDate}', {
 				type: this.quotaUsage.quota_type?.id ?? 0,
 				startDate: this.quotaUsage.start_date / 1000,
 				endDate: this.quotaUsage.end_date / 1000,
-				serviceId: this.quotaUsage.service?.id ?? '',
 			})
+			// no serviceId at all for "All services": an empty one would be
+			// taken as a filter and match no usage row
+			const serviceId = this.quotaUsage.service?.id
+			return serviceId
+				? url + '&' + new URLSearchParams({ serviceId }).toString()
+				: url
 		},
+	},
+
+	created() {
+		// debounced save per service, see debouncedSave()
+		this.pendingSaves = {}
 	},
 
 	mounted() {
@@ -242,6 +252,7 @@ export default {
 			}
 			try {
 				await confirmPassword()
+				this.cancelPendingSaves(service.id)
 				await axios.delete(generateUrl('/apps/integration_openai/services/{id}', { id: service.id }))
 				this.services = this.services.filter(s => s.id !== service.id)
 				showSuccess(t('integration_openai', 'Service removed'))
@@ -264,18 +275,38 @@ export default {
 		 */
 		saveService(serviceId, values, sensitive) {
 			this.applyToService(serviceId, values)
-			if (sensitive) {
-				this.saveSensitiveServiceDebounced(serviceId)
-			} else {
-				this.saveServiceDebounced(serviceId)
+			this.debouncedSave(serviceId, sensitive)()
+		},
+		/**
+		 * The debounced save of one service.
+		 *
+		 * Every service gets its own timer: a single shared one would drop the
+		 * pending save of a service as soon as another one is edited, losing
+		 * the first service's change.
+		 *
+		 * @param {string} serviceId ID of the service to save
+		 * @param {boolean} sensitive whether the change needs a confirmed password
+		 * @return {Function} the debounced save of this service
+		 */
+		debouncedSave(serviceId, sensitive) {
+			const key = (sensitive ? 'sensitive:' : 'plain:') + serviceId
+			if (this.pendingSaves[key] === undefined) {
+				this.pendingSaves[key] = debounce(() => this.putService(serviceId, sensitive), 2000)
+			}
+			return this.pendingSaves[key]
+		},
+		/**
+		 * Drop the pending saves of a service, so nothing is written after it
+		 * has been removed
+		 *
+		 * @param {string} serviceId ID of the service
+		 */
+		cancelPendingSaves(serviceId) {
+			for (const key of [`plain:${serviceId}`, `sensitive:${serviceId}`]) {
+				this.pendingSaves[key]?.clear()
+				delete this.pendingSaves[key]
 			}
 		},
-		saveServiceDebounced: debounce(function(serviceId) {
-			this.putService(serviceId, false)
-		}, 2000),
-		saveSensitiveServiceDebounced: debounce(function(serviceId) {
-			this.putService(serviceId, true)
-		}, 2000),
 		/**
 		 * @param {string} serviceId ID of the service to save
 		 * @param {boolean} sensitive whether to send the URL and the credentials

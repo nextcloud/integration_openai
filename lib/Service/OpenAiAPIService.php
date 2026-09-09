@@ -1010,7 +1010,7 @@ class OpenAiAPIService {
 		];
 
 		if ($service->getImageRequestAuth()) {
-			if ($service->getUseBasicAuth()) {
+			if ($service->usesBasicAuth()) {
 				if ($service->getBasicUser() !== '' && $service->getBasicPassword() !== '') {
 					$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($service->getBasicUser() . ':' . $service->getBasicPassword());
 				}
@@ -1137,7 +1137,6 @@ class OpenAiAPIService {
 			$apiKey = $service->getApiKey();
 			$basicUser = $service->getBasicUser();
 			$basicPassword = $service->getBasicPassword();
-			$useBasicAuth = $service->getUseBasicAuth();
 			$timeout = $service->getRequestTimeout();
 
 			$url = rtrim($serviceUrl, '/') . '/' . $endPoint;
@@ -1152,7 +1151,7 @@ class OpenAiAPIService {
 				return ['error' => 'An API key is required for api.openai.com'];
 			}
 
-			if ($service->isUsingOpenAi() || !$useBasicAuth) {
+			if (!$service->usesBasicAuth()) {
 				if ($apiKey !== '') {
 					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
 				}

@@ -206,6 +206,11 @@ export default {
 		},
 	},
 
+	created() {
+		// debounced save per service, see debouncedSave()
+		this.pendingSaves = {}
+	},
+
 	mounted() {
 		this.loadQuotaInfo()
 	},
@@ -218,11 +223,24 @@ export default {
 		}, 2000),
 		onSensitiveInput(serviceId, values) {
 			this.credentials[serviceId] = { ...this.credentials[serviceId], ...values }
-			this.saveCredentialsDebounced(serviceId)
+			this.debouncedSave(serviceId)()
 		},
-		saveCredentialsDebounced: debounce(function(serviceId) {
-			this.saveCredentials(serviceId)
-		}, 2000),
+		/**
+		 * The debounced save of the credentials of one service.
+		 *
+		 * Every service gets its own timer: a single shared one would drop the
+		 * pending save of a service as soon as the credentials of another one
+		 * are entered, losing the first service's key.
+		 *
+		 * @param {string} serviceId ID of the service to save
+		 * @return {Function} the debounced save of this service
+		 */
+		debouncedSave(serviceId) {
+			if (this.pendingSaves[serviceId] === undefined) {
+				this.pendingSaves[serviceId] = debounce(() => this.saveCredentials(serviceId), 2000)
+			}
+			return this.pendingSaves[serviceId]
+		},
 		async saveCredentials(serviceId) {
 			const stored = this.credentials[serviceId]
 			const values = {
