@@ -248,6 +248,24 @@ export default {
 				this.services.splice(index, 1, { ...this.services[index], ...values })
 			}
 		},
+		/**
+		 * A service as the backend returned it, without the redacted secrets.
+		 *
+		 * The backend sends a placeholder in place of every stored secret.
+		 * Merging that back would overwrite a secret the admin has typed but
+		 * whose debounced sensitive save has not run yet, and that save would
+		 * then send the placeholder, which the backend ignores: the typed
+		 * secret would be lost without anything saying so.
+		 *
+		 * @param {object} service the service as the backend returned it
+		 * @return {object} the same service without its secret properties
+		 */
+		withoutSecrets(service) {
+			const values = { ...service }
+			delete values.api_key
+			delete values.basic_password
+			return values
+		},
 		async addService() {
 			this.adding = true
 			try {
@@ -381,8 +399,8 @@ export default {
 					? generateUrl('/apps/integration_openai/services/{id}/sensitive', { id: serviceId })
 					: generateUrl('/apps/integration_openai/services/{id}', { id: serviceId })
 				const response = await axios.put(url, { values })
-				// the backend normalizes some values, and redacts the secrets again
-				this.applyToService(serviceId, response.data)
+				// the backend normalizes some values, so follow what it stored
+				this.applyToService(serviceId, this.withoutSecrets(response.data))
 				showSuccess(t('integration_openai', 'OpenAI admin options saved'))
 			} catch (error) {
 				showError(

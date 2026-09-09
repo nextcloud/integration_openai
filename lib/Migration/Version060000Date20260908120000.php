@@ -137,9 +137,11 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 		$this->migrateUserCredentials($mainService->getId());
 		$this->attributeQuotaUsage($serviceIdByQuotaType);
 
-		$this->servicesService->setServices($services);
-		// keep the ID generator in sync with the IDs handed out above
+		// The ID generator is brought in sync with the IDs handed out above
+		// before the service list is written, so that an upgrade aborting
+		// between the two cannot hand out an ID that is already in use.
 		$this->appConfig->setValueInt(Application::APP_ID, 'service_id_counter', count($services));
+		$this->servicesService->setServices($services);
 
 		$output->info('Migrated the OpenAI/LocalAI configuration to ' . count($services) . ' service(s)');
 

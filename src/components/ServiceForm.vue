@@ -304,10 +304,12 @@
 						<div class="line">
 							<NcTextField
 								:id="'openai-image-size-' + service.id"
-								:model-value="service.default_image_size"
+								v-model="defaultImageSize"
 								class="input"
+								:error="!defaultImageSizeValid"
+								:helper-text="defaultImageSizeValid ? '' : t('integration_openai', 'Not a {format} size yet, so it is not saved', { format: '<width>x<height>' })"
 								:label="t('integration_openai', 'Default image size')"
-								@update:model-value="onInput({ default_image_size: $event })" />
+								@update:model-value="onDefaultImageSizeInput" />
 							<NcButton variant="tertiary" :title="defaultImageSizeParamHint">
 								<template #icon>
 									<HelpCircleOutlineIcon />
@@ -463,9 +465,11 @@ export default {
 	data() {
 		return {
 			expanded: this.initiallyExpanded,
-			// edited locally so that a half-typed JSON object is not sent to
-			// the backend, which rejects it
+			// both are edited locally so that a half-typed value is not sent to
+			// the backend, which rejects it and would then also refuse every
+			// other property of the same request
 			llmExtraParams: this.service.llm_extra_params ?? '',
+			defaultImageSize: this.service.default_image_size ?? '',
 			// to prevent some browsers from filling fields with remembered passwords
 			readonly: true,
 			models: null,
@@ -487,6 +491,10 @@ export default {
 			} catch {
 				return false
 			}
+		},
+		defaultImageSizeValid() {
+			const size = this.defaultImageSize.trim()
+			return size === '' || /^\d+x\d+$/.test(size)
 		},
 		modalities() {
 			return [
@@ -562,6 +570,11 @@ export default {
 				this.llmExtraParams = value ?? ''
 			}
 		},
+		'service.default_image_size'(value) {
+			if (this.defaultImageSizeValid) {
+				this.defaultImageSize = value ?? ''
+			}
+		},
 	},
 
 	methods: {
@@ -574,6 +587,11 @@ export default {
 		onLlmExtraParamsInput() {
 			if (this.llmExtraParamsValid) {
 				this.onInput({ llm_extra_params: this.llmExtraParams.trim() })
+			}
+		},
+		onDefaultImageSizeInput() {
+			if (this.defaultImageSizeValid) {
+				this.onInput({ default_image_size: this.defaultImageSize.trim() })
 			}
 		},
 		onQuotaInput(index, value) {

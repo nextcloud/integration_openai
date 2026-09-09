@@ -408,10 +408,26 @@ class ServicesService {
 		}
 	}
 
+	/**
+	 * The ID of the next service.
+	 *
+	 * IDs are never reused, so the counter is the source of truth. It is
+	 * still checked against the IDs that are actually taken: an upgrade that
+	 * was aborted between writing the service list and the counter would
+	 * otherwise hand out an ID that is already in use.
+	 */
 	private function generateId(): string {
-		$counter = $this->appConfig->getValueInt(Application::APP_ID, 'service_id_counter', 0) + 1;
+		$taken = [];
+		foreach ($this->getStoredServices() as $values) {
+			$taken[$values['id']] = true;
+		}
+		$counter = $this->appConfig->getValueInt(Application::APP_ID, 'service_id_counter', 0);
+		do {
+			$counter++;
+			$id = 's' . $counter;
+		} while (isset($taken[$id]));
 		$this->appConfig->setValueInt(Application::APP_ID, 'service_id_counter', $counter);
-		return 's' . $counter;
+		return $id;
 	}
 
 	private function userKey(string $serviceId, string $key): string {
