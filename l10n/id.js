@@ -63,6 +63,7 @@ OC.L10N.register(
     "Current system-wide usage / period" : "Penggunaan sistem secara keseluruhan saat ini / periode",
     "A per-user limit for usage of this API type (0 for unlimited)" : "Batas per pengguna untuk penggunaan jenis API ini (0 untuk tanpa batas)",
     "Start date" : "Tanggal mulai",
+    "End date" : "Tanggal berakhir",
     "Select enabled features" : "Pilih fitur yang diaktifkan",
     "Text processing providers (to generate text, summarize, context write, etc.)" : "Penyedia pemrosesan teks (untuk menghasilkan teks, meringkas, menulis konteks, dll.)",
     "Default language" : "Bahasa bawaan",
