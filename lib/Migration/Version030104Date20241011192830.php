@@ -10,14 +10,15 @@ declare(strict_types=1);
 namespace OCA\OpenAi\Migration;
 
 use Closure;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\AppInfo\Application;
+use OCP\IAppConfig;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version030104Date20241011192830 extends SimpleMigrationStep {
 
 	public function __construct(
-		private OpenAiSettingsService $openAiSettingsService,
+		private IAppConfig $appConfig,
 	) {
 	}
 
@@ -27,10 +28,12 @@ class Version030104Date20241011192830 extends SimpleMigrationStep {
 	 * @param array $options
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
-		$value = $this->openAiSettingsService->getServiceUrl();
+		// this runs before the migration to multiple services, so the URL is
+		// still stored in a single app config value
+		$value = $this->appConfig->getValueString(Application::APP_ID, 'url', lazy: true);
 		if ($value !== '' && !str_ends_with(rtrim($value, '/ '), '/v1')) {
 			$newValue = rtrim($value, '/') . '/v1';
-			$this->openAiSettingsService->setServiceUrl($newValue);
+			$this->appConfig->setValueString(Application::APP_ID, 'url', $newValue, lazy: true);
 		}
 	}
 }

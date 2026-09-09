@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -25,24 +24,26 @@ use OCP\TaskProcessing\TaskTypes\MultimodalChatWithTools;
 use Psr\Log\LoggerInterface;
 
 class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsAwareProvider {
+	use ProviderIdentity;
 
 	private const MAX_INPUT_ATTACHMENTS = 10;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private WatermarkingService $watermarkingService,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2text:multimodal-chatwithtools';
+		return $this->buildProviderId('text2text:multimodal-chatwithtools');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -50,7 +51,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -103,7 +104,6 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		$reportOutput = $options->getReportIntermediateOutput();
 		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new ProcessingException('Invalid input');
@@ -159,7 +159,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		try {
 			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
-					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments
+					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments
 				);
 				$time = microtime(true);
 				$streamedOutput = '';
@@ -197,7 +197,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 				$returnValue = $chunks->getReturn();
 			} else {
 				$returnValue = $this->openAiAPIService->createChatCompletion(
-					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments
+					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments
 				);
 			}
 		} catch (UserFacingProcessingException $e) {
@@ -207,7 +207,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		}
 		if (count($returnValue['messages']) > 0 || count($returnValue['tool_calls']) > 0 || count($returnValue['images']) > 0 || count($returnValue['audio_messages']) > 0) {
 			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 			$attachments = [];
 
 			// Handle image output

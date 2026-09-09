@@ -26,20 +26,6 @@ class OpenAiAPIController extends Controller {
 	}
 
 	/**
-	 * @param string|null $serviceType
-	 * @return DataResponse
-	 */
-	public function getModels(?string $serviceType = null): DataResponse {
-		try {
-			$response = $this->openAiAPIService->getModels(null, true, $serviceType);
-			return new DataResponse($response);
-		} catch (Exception $e) {
-			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
-			return new DataResponse(['error' => $e->getMessage()], $code);
-		}
-	}
-
-	/**
 	 * Get quota usage and limits
 	 * @return DataResponse
 	 */

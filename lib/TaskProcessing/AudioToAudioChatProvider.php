@@ -9,11 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\Files\File;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -24,33 +22,36 @@ use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\AudioToAudioChat;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Audio chat through the integrated audio-in/audio-out chat completion
+ * endpoint, which OpenAI-compatible services expose as one request.
+ *
+ * This is only registered for models of services that have audio attachments
+ * enabled. Chaining separate speech-to-text, chat and text-to-speech providers
+ * is not done here: the Assistant app registers a fallback provider for that.
+ */
 class AudioToAudioChatProvider implements ISynchronousProvider {
-
-	// OpenAI supports wav and mp3
-	// https://platform.openai.com/docs/api-reference/chat/create#chat-create-messages
-	private const SUPPORTED_INPUT_AUDIO_FORMATS = [
-		'audio/mp3' => 'mp3',
-		'audio/mpeg' => 'mp3',
-		'audio/wav' => 'wav',
-		'audio/x-wav' => 'wav',
-	];
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IL10N $l,
 		private LoggerInterface $logger,
-		private IAppConfig $appConfig,
-		private OpenAiSettingsService $openAiSettingsService,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
+		/** Used to transcribe the input, which is part of the task output */
+		private string $sttModel,
+		/** Only needed when the model answers with text instead of audio */
+		private ?string $ttsModel,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-audio2audio:chat';
+		return $this->buildProviderId('audio2audio:chat');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -58,7 +59,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -70,13 +71,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShape(): array {
-		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
-		$ois = [
-			'llm_model' => new ShapeDescriptor(
-				$this->l->t('Completion model'),
-				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
-			),
+		return [
 			'voice' => new ShapeDescriptor(
 				$this->l->t('Output voice'),
 				$this->l->t('The voice used to generate speech'),
@@ -87,56 +82,30 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$this->l->t('The memories to be injected into the chat session.'),
 				EShapeType::ListOfTexts
 			),
-		];
-		if (!$isUsingOpenAi) {
-			$ois['tts_model'] = new ShapeDescriptor(
-				$this->l->t('Text-to-speech model'),
-				$this->l->t('The model used to generate the speech'),
-				EShapeType::Enum
-			);
-			$ois['speed'] = new ShapeDescriptor(
+			'speed' => new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->openAiAPIService->isUsingOpenAi()
+				$this->service->isUsingOpenAi()
 					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
-			);
-		}
-		return $ois;
+			),
+		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
-		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
-		$models = $this->openAiAPIService->getModelEnumValues($this->userId);
-		$enumValues = [
-			'voice' => array_map(function ($v) {
-				return new ShapeEnumValue($v, $v);
-			}, $voices),
-			'llm_model' => $models,
+		return [
+			'voice' => array_map(
+				static fn (string $voice) => new ShapeEnumValue($voice, $voice),
+				$this->service->getTtsVoices(),
+			),
 		];
-		if (!$isUsingOpenAi) {
-			$enumValues['tts_model'] = $models;
-		}
-		return $enumValues;
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
-		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
-		$adminLlmModel = $isUsingOpenAi
-			? 'gpt-audio'
-			: $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		$defaults = [
-			'voice' => $adminVoice,
-			'llm_model' => $adminLlmModel,
+		return [
+			'voice' => $this->service->getDefaultTtsVoice(),
+			'speed' => 1,
 		];
-		if (!$isUsingOpenAi) {
-			$adminTtsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
-			$defaults['tts_model'] = $adminTtsModel;
-			$defaults['speed'] = 1;
-		}
-		return $defaults;
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -183,31 +152,14 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		}
 		$history = $input['history'];
 
-		if (isset($input['tts_model']) && is_string($input['tts_model'])) {
-			$ttsModel = $input['tts_model'];
-		} else {
-			$ttsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
-		}
-
-		if (isset($input['llm_model']) && is_string($input['llm_model'])) {
-			$llmModel = $input['llm_model'];
-		} else {
-			$isUsingOpenAi = $this->openAiAPIService->isUsingOpenAi();
-			$llmModel = $isUsingOpenAi
-				? 'gpt-4o-audio-preview'
-				: $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		}
-
-		if (isset($input['voice']) && is_string($input['voice'])) {
-			$outputVoice = $input['voice'];
-		} else {
-			$outputVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE, lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
-		}
+		$outputVoice = isset($input['voice']) && is_string($input['voice'])
+			? $input['voice']
+			: $this->service->getDefaultTtsVoice();
 
 		$speed = 1;
 		if (isset($input['speed']) && is_numeric($input['speed'])) {
 			$speed = $input['speed'];
-			if ($this->openAiAPIService->isUsingOpenAi()) {
+			if ($this->service->isUsingOpenAi()) {
 				if ($speed > 4) {
 					$speed = 4;
 				} elseif ($speed < 0.25) {
@@ -216,23 +168,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			}
 		}
 
-		$sttModel = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
-		$serviceName = $this->appConfig->getValueString(Application::APP_ID, 'service_name', lazy: true) ?: Application::APP_ID;
-
-		// Using the chat API if connected to OpenAI
-		// there is an issue if the history mostly contains text, the model will answer text even if we add the audio modality
-		if ($this->openAiAPIService->isUsingOpenAi()) {
-			return $this->oneStep($userId, $systemPrompt, $inputFile, $history, $outputVoice, $sttModel, $llmModel, $ttsModel, $speed, $serviceName);
-		}
-
-		// 3 steps: STT -> LLM -> TTS
-		return $this->threeSteps($userId, $systemPrompt, $inputFile, $history, $outputVoice, $sttModel, $llmModel, $ttsModel, $speed, $serviceName);
-	}
-
-	private function oneStep(
-		?string $userId, string $systemPrompt, File $inputFile, array $history, string $outputVoice,
-		string $sttModel, string $llmModel, string $ttsModel, float $speed, string $serviceName,
-	): array {
+		$serviceName = $this->service->getDisplayName();
 		$result = [];
 		$extraParams = [
 			'modalities' => ['text', 'audio'],
@@ -240,7 +176,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		];
 		$systemPrompt .= ' Producing text responses will break the user interface. Important: You have multimodal voice capability, and you use voice exclusively to respond.';
 		$completion = $this->openAiAPIService->createChatCompletion(
-			$userId, $llmModel, null, $systemPrompt, $history, 1, 1000,
+			$userId, $this->service, $this->model, null, $systemPrompt, $history, 1, 1000,
 			$extraParams, null, null, [$inputFile]
 		);
 		$message = array_pop($completion['audio_messages']);
@@ -248,9 +184,12 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		// https://community.openai.com/t/gpt-4o-audio-preview-responds-in-text-not-audio/1006486/5
 		if ($message === null) {
 			// no audio, TTS the text message
+			if ($this->ttsModel === null) {
+				throw new ProcessingException($serviceName . ' answered with text and no text-to-speech model is configured for it');
+			}
 			try {
 				$textResponse = array_pop($completion['messages']);
-				$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $textResponse, $ttsModel, $outputVoice, $speed);
+				$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $this->service, $textResponse, $this->ttsModel, $outputVoice, $speed);
 				if (!isset($apiResponse['body'])) {
 					$this->logger->warning($serviceName . ' text to speech generation failed: no speech returned');
 					throw new ProcessingException($serviceName . ' text to speech generation failed: no speech returned');
@@ -275,10 +214,9 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		$result['output'] = $output;
 		$result['output_transcript'] = $textResponse;
 
-		// we still want the input transcription
+		// the transcript of the input is part of the task output
 		try {
-			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
-			$result['input_transcript'] = $inputTranscription;
+			$result['input_transcript'] = $this->openAiAPIService->transcribeFile($userId, $this->service, $inputFile, false, $this->sttModel);
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
 		} catch (\Throwable $e) {
@@ -287,54 +225,5 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 		}
 
 		return $result;
-	}
-
-	private function threeSteps(
-		?string $userId, string $systemPrompt, File $inputFile, array $history, string $outputVoice,
-		string $sttModel, string $llmModel, string $ttsModel, float $speed, string $serviceName,
-	): array {
-		// speech to text
-		try {
-			$inputTranscription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel);
-		} catch (UserFacingProcessingException $e) {
-			throw $e;
-		} catch (\Throwable $e) {
-			$this->logger->warning($serviceName . ' transcription failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new ProcessingException($serviceName . ' transcription failed with: ' . $e->getMessage());
-		}
-
-		// free prompt
-		try {
-			$completion = $this->openAiAPIService->createChatCompletion($userId, $llmModel, $inputTranscription, $systemPrompt, $history, 1, 1000);
-			$completion = $completion['messages'];
-		} catch (UserFacingProcessingException $e) {
-			throw $e;
-		} catch (\Throwable $e) {
-			throw new ProcessingException($serviceName . ' chat completion request failed: ' . $e->getMessage());
-		}
-		if (count($completion) === 0) {
-			throw new ProcessingException('No completion in ' . $serviceName . ' response.');
-		}
-		$llmResult = array_pop($completion);
-
-		// text to speech
-		try {
-			$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $llmResult, $ttsModel, $outputVoice, $speed);
-
-			if (!isset($apiResponse['body'])) {
-				$this->logger->warning($serviceName . ' text to speech generation failed: no speech returned');
-				throw new ProcessingException($serviceName . ' text to speech generation failed: no speech returned');
-			}
-			return [
-				'output' => $apiResponse['body'],
-				'output_transcript' => $llmResult,
-				'input_transcript' => $inputTranscription,
-			];
-		} catch (UserFacingProcessingException $e) {
-			throw $e;
-		} catch (\Throwable $e) {
-			$this->logger->warning($serviceName . ' text to speech generation failed with: ' . $e->getMessage(), ['exception' => $e]);
-			throw new ProcessingException($serviceName . ' text to speech generation failed with: ' . $e->getMessage());
-		}
 	}
 }

@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -23,22 +22,23 @@ use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
 
 class SummaryProvider implements ISynchronousProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private ChunkService $chunkService,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2text:summary';
+		return $this->buildProviderId('text2text:summary');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -46,7 +46,7 @@ class SummaryProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -74,17 +74,11 @@ class SummaryProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
-			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
 		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
 			'format' => [
 				new ShapeEnumValue($this->l->t('Auto'), 'auto'),
 				new ShapeEnumValue($this->l->t('One Sentence'), 'sentence'),
@@ -100,10 +94,8 @@ class SummaryProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
-			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
-			'model' => $adminModel,
+			'max_tokens' => $this->service->getMaxTokens(),
 			'format' => 'auto',
 			'complexity' => 'medium',
 		];
@@ -129,17 +121,14 @@ class SummaryProvider implements ISynchronousProvider {
 		}
 		$prompt = $input['input'];
 
-		$maxTokens = $this->openAiSettingsService->getMaxTokens();
+		$maxTokens = $this->service->getMaxTokens();
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		}
+		$model = $this->model;
 
-		$prompts = $this->chunkService->chunkSplitPrompt($prompt);
+		$prompts = $this->chunkService->chunkSplitPrompt($this->service, $prompt);
 		$newNumChunks = count($prompts);
 		$progress = 0.0;
 		do {
@@ -171,10 +160,10 @@ class SummaryProvider implements ISynchronousProvider {
 						$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
 					}
 				}
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
 
 					foreach ($prompts as $p) {
-						$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
 						$completions[] = $completion['messages'];
 						$progress += $increase;
 						$running = $reportProgress($progress);
@@ -187,7 +176,7 @@ class SummaryProvider implements ISynchronousProvider {
 						. 'Here is the text to summarize:\n\n' . $p . '\n';
 
 					foreach (array_map($wrapSummaryPrompt, $prompts) as $p) {
-						$completions[] = $this->openAiAPIService->createCompletion($userId, $p, 1, $model, $maxTokens);
+						$completions[] = $this->openAiAPIService->createCompletion($userId, $this->service, $p, 1, $model, $maxTokens);
 						$progress += $increase;
 						$running = $reportProgress($progress);
 						if (!$running) {
@@ -214,12 +203,12 @@ class SummaryProvider implements ISynchronousProvider {
 			));
 			$summary = implode(' ', $completionStrings);
 
-			$prompts = $this->chunkService->chunkSplitPrompt($summary);
+			$prompts = $this->chunkService->chunkSplitPrompt($this->service, $summary);
 			$newNumChunks = count($prompts);
 		} while ($oldNumChunks > $newNumChunks);
 
 		$endTime = time();
-		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 		return ['output' => $summary];
 	}
 

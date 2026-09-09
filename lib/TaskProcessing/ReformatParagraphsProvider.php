@@ -9,11 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
-use OCP\IAppConfig;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -22,6 +20,8 @@ use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 
 class ReformatParagraphsProvider implements ISynchronousProvider {
+	use ProviderIdentity;
+
 	private const TASK_TYPE_ID = 'core:text2text:reformatparagraphs';
 
 	private function parseAnchorsFromModelOutput(string $raw): array {
@@ -72,20 +72,19 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private IAppConfig $appConfig,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private ChunkService $chunkService,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2text:reformatparagraphs';
+		return $this->buildProviderId('text2text:reformatparagraphs');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -93,7 +92,7 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -111,25 +110,16 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
-			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
-		];
+		return [];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
-			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
-			'model' => $adminModel,
+			'max_tokens' => $this->service->getMaxTokens(),
 		];
 	}
 
@@ -158,12 +148,8 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		}
-		$chunks = $this->chunkService->chunkSplitPrompt($prompt, false);
+		$model = $this->model;
+		$chunks = $this->chunkService->chunkSplitPrompt($this->service, $prompt, false);
 		$result = '';
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
@@ -183,12 +169,12 @@ In contrast, traditional motorcycle
 Aside from transportation, the price
 TEXT;
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $chunk, $systemPrompt, null, 1, $maxTokens);
+				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $chunk, $systemPrompt, null, 1, $maxTokens);
 					$completion = $completion['messages'];
 				} else {
 					$instruction = $systemPrompt . ' Here is the text:' . "\n\n" . $chunk;
-					$completion = $this->openAiAPIService->createCompletion($userId, $instruction, 1, $model, $maxTokens);
+					$completion = $this->openAiAPIService->createCompletion($userId, $this->service, $instruction, 1, $model, $maxTokens);
 				}
 			} catch (UserFacingProcessingException $e) {
 				throw $e;
@@ -212,7 +198,7 @@ TEXT;
 		}
 
 		$endTime = time();
-		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 		return ['output' => $result];
 	}
 }

@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -25,22 +24,23 @@ use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextChangeTone;
 
 class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private ChunkService $chunkService,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-changetone';
+		return $this->buildProviderId('changetone');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -48,7 +48,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -82,25 +82,16 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
-			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
-		];
+		return [];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
-			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
-			'model' => $adminModel,
+			'max_tokens' => $this->service->getMaxTokens(),
 		];
 	}
 
@@ -140,13 +131,9 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 			$maxTokens = $input['max_tokens'];
 		}
 
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		}
+		$model = $this->model;
 
-		$chunks = $this->chunkService->chunkSplitPrompt($textInput, true, $maxTokens);
+		$chunks = $this->chunkService->chunkSplitPrompt($this->service, $textInput, true, $maxTokens);
 		$streamedOutput = '';
 		$streamedReasoning = '';
 		$fullOutput = '';
@@ -156,9 +143,9 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 		foreach ($chunks as $textInput) {
 			$prompt = "Reformulate the following text in a $toneInput tone in its original language. Output only the reformulation. Here is the text:" . "\n\n" . $textInput . "\n\n" . 'Do not mention the used language in your reformulation. Here is your reformulation in the same language:';
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
 					if ($preferStreaming) {
-						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens);
 						$time = microtime(true);
 						foreach ($chunks as $chunk) {
 							if (!in_array($chunk['kind'] ?? null, ['content', 'reasoning_content'], true)) {
@@ -194,12 +181,12 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 						$completion = $returnValue['messages'];
 						$reasoning = $returnValue['reasoning_messages'];
 					} else {
-						$returnValue = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$returnValue = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens);
 						$completion = $returnValue['messages'];
 						$reasoning = $returnValue['reasoning_messages'];
 					}
 				} else {
-					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+					$completion = $this->openAiAPIService->createCompletion($userId, $this->service, $prompt, 1, $model, $maxTokens);
 					$reasoning = [];
 				}
 			} catch (UserFacingProcessingException $e) {
@@ -223,7 +210,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 			throw new ProcessingException('No result in OpenAI/LocalAI response.');
 		}
 		$endTime = time();
-		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 		return [
 			'output' => $fullOutput,
 			'reasoning' => $fullReasoning,

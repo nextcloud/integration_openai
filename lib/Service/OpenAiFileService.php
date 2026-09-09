@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Service;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Vendor\RtfHtmlPhp\Document;
 use OCA\OpenAi\Vendor\RtfHtmlPhp\Html\HtmlFormatter;
 use OCA\OpenAi\Vendor\Smalot\PdfParser\Parser;
@@ -72,7 +71,6 @@ class OpenAiFileService {
 
 	public function __construct(
 		private IL10N $l10n,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IRootFolder $rootFolder,
 		private ITaskProcessingManager $taskProcessingManager,
 		private LoggerInterface $logger,
@@ -85,11 +83,12 @@ class OpenAiFileService {
 	 * @param int $fileId The ID of the file to build content from.
 	 * @param ?string $userId The user ID.
 	 * @param ?int $taskId The ID of the task
+	 * @param ServiceConfig $service The service the content is built for
 	 * @return list<array<string, mixed>> Content parts suitable for OpenAI chat message content.
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContentFromId(int $fileId, ?string $userId, ?int $taskId): array {
+	public function buildFileContentFromId(int $fileId, ?string $userId, ?int $taskId, ServiceConfig $service): array {
 		$file = null;
 		if ($taskId !== null) {
 			$task = $this->taskProcessingManager->getUserTask($taskId, $userId);
@@ -108,23 +107,24 @@ class OpenAiFileService {
 			$userFolder = $this->rootFolder->getUserFolder($userId);
 			$file = $userFolder->getFirstNodeById($fileId);
 		}
-		return $this->buildFileContentFromFile($file);
+		return $this->buildFileContentFromFile($file, $service);
 	}
 
 	/**
 	 * Builds file content from a File object.
 	 *
 	 * @param ?File $file The file to build content from.
+	 * @param ServiceConfig $service The service the content is built for
 	 * @return list<array<string, mixed>> Content parts suitable for OpenAI chat message content.
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContentFromFile(?File $file): array {
+	public function buildFileContentFromFile(?File $file, ServiceConfig $service): array {
 		if (!$file instanceof File || !$file->isReadable()) {
 			throw new ProcessingException('File is not readable');
 		}
 		// Maximum file size for openai is 50MB.
-		if ($this->isUsingOpenAi() && $file->getSize() > self::MAX_FILE_SIZE_BYTES) {
+		if ($service->isUsingOpenAi() && $file->getSize() > self::MAX_FILE_SIZE_BYTES) {
 			throw new UserFacingProcessingException(
 				'Filesize of input files too large. Max is 50MB',
 				0,
@@ -139,15 +139,15 @@ class OpenAiFileService {
 			$fileType = mime_content_type($file->fopen('rb'));
 		}
 		if (str_starts_with($fileType, 'image/')) {
-			return $this->buildImageContent($file, $fileType);
+			return $this->buildImageContent($file, $fileType, $service);
 			// OpenAI only supports this for very specific models and support is not that common
 		} elseif (str_starts_with($fileType, 'audio/')) {
-			return $this->buildAudioContent($file, $fileType);
+			return $this->buildAudioContent($file, $fileType, $service);
 			// OpenAI does not currently support video attachments
 		} elseif (str_starts_with($fileType, 'video/')) {
-			return $this->buildVideoContent($file, $fileType);
+			return $this->buildVideoContent($file, $fileType, $service);
 		} elseif ($fileType === 'application/pdf') {
-			return $this->buildDocumentContent($file, $fileType);
+			return $this->buildDocumentContent($file, $fileType, $service);
 		} elseif ($fileType === 'text/rtf') {
 			return $this->buildRtfContent($file);
 		} else {
@@ -158,8 +158,8 @@ class OpenAiFileService {
 	/**
 	 * @return list<array{type: string, image_url: array{url: string}}>
 	 */
-	private function buildImageContent(File $file, string $fileType): array {
-		if (!$this->openAiSettingsService->getMultimodalImageEnabled()) {
+	private function buildImageContent(File $file, string $fileType, ServiceConfig $service): array {
+		if (!$service->getMultimodalImageEnabled()) {
 			throw new UserFacingProcessingException(
 				'Image attachments are disabled',
 				0,
@@ -167,7 +167,7 @@ class OpenAiFileService {
 				$this->l10n->t('Image attachments are unsupported.'),
 			);
 		}
-		if ($this->isUsingOpenAi() && !in_array($fileType, self::VALID_IMAGE_MIME_TYPES, true)) {
+		if ($service->isUsingOpenAi() && !in_array($fileType, self::VALID_IMAGE_MIME_TYPES, true)) {
 			throw new UserFacingProcessingException(
 				'Invalid input file type for OpenAI ' . $fileType,
 				0,
@@ -186,8 +186,8 @@ class OpenAiFileService {
 	/**
 	 * @return list<array{type: string, input_audio: array{data: string, format: string}}>
 	 */
-	private function buildAudioContent(File $file, string $fileType): array {
-		if (!$this->openAiSettingsService->getMultimodalAudioEnabled()) {
+	private function buildAudioContent(File $file, string $fileType, ServiceConfig $service): array {
+		if (!$service->getMultimodalAudioEnabled()) {
 			throw new UserFacingProcessingException(
 				'Audio attachments are disabled',
 				0,
@@ -217,8 +217,8 @@ class OpenAiFileService {
 	/**
 	 * @return list<array{type: string, video_url: array{url: string}}>
 	 */
-	private function buildVideoContent(File $file, string $fileType): array {
-		if (!$this->openAiSettingsService->getMultimodalVideoEnabled()) {
+	private function buildVideoContent(File $file, string $fileType, ServiceConfig $service): array {
+		if (!$service->getMultimodalVideoEnabled()) {
 			throw new UserFacingProcessingException(
 				'Video attachments are disabled',
 				0,
@@ -237,8 +237,8 @@ class OpenAiFileService {
 	/**
 	 * @return list<array{type: string, text: string}|array{type: string, file: array{filename: string, file_data: string}}>
 	 */
-	private function buildDocumentContent(File $file, string $fileType): array {
-		if (!$this->openAiSettingsService->getMultimodalDocumentEnabled()) {
+	private function buildDocumentContent(File $file, string $fileType, ServiceConfig $service): array {
+		if (!$service->getMultimodalDocumentEnabled()) {
 			$this->logger->info('Falling back to extracting text from pdf for file', ['fileId' => $file->getId()]);
 			$parser = new Parser();
 			$pdf = $parser->parseContent(stream_get_contents($file->fopen('rb')));
@@ -287,10 +287,5 @@ class OpenAiFileService {
 			'type' => 'text',
 			'text' => 'Filename:' . $file->getName() . "\nContent:\n" . stream_get_contents($file->fopen('rb')),
 		]];
-	}
-
-	private function isUsingOpenAi(): bool {
-		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
 	}
 }

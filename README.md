@@ -9,12 +9,18 @@
 :warning: The smart pickers have been removed from this app
 as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
 
-This app implements:
+This app lets you connect any number of OpenAI-compatible services and pick, per service, which of their
+models you want to expose. Every selected model is registered as its own set of providers, named after the
+model, so you can offer several models side by side and choose between them in the AI admin settings.
 
-* Text generation providers: Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate (using any available large language model)
-* A Translation provider (using any available language model)
-* A SpeechToText provider (using Whisper)
-* An image generation provider
+Per modality, the following providers are registered for each selected model:
+
+* Text models: Free prompt, Chat, Chat with tools, Summarize, Headline, Topics, Context Write, Reformulate,
+  Improve, Emoji, Change tone, Proofread, Reformat paragraphs and Translate (plus OCR, image analysis and
+  audio chat when the service accepts the matching attachments)
+* Image models: image generation, also with an LLM-improved prompt
+* Transcription models: transcription, subtitles and transcription with paragraph reformatting
+* Speech models: text to speech
 
 :warning: Context Write, Summarize, Headline and Reformulate have mainly been tested with OpenAI.
 They might work when connecting to other services, without any guarantee.
@@ -107,12 +113,13 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 ### Admin settings
 
 There is an "Artificial intelligence" section in the **admin** settings where you can:
-* Choose whether you use OpenAI, a LocalAI instance or another remote service
-* Set a global API key (or basic auth credentials) for the Nextcloud instance
-* Configure default models and quota settings
+* Connect any number of services: OpenAI, LocalAI instances or any other remote service with an OpenAI-compatible API
+* Set the API key (or basic auth credentials) of each service
+* Select, per service and per modality, which models are exposed as providers
+* Configure the request behaviour and the usage quotas of each service, and the instance-wide quota period and rules
 
 ### Personal settings
 
-There is an "Artificial intelligence" section in the **personal** settings where users can set their personal API key or basic auth credentials,
-as well as view their usage quota.
+There is an "Artificial intelligence" section in the **personal** settings where users can set their personal API key or basic auth credentials
+for each connected service, as well as view their usage quota per service. Using your own credentials for a service lifts that service's quotas.
 Users can also choose to disable the Nextcloud Assistant even if the Assistant app is installed.

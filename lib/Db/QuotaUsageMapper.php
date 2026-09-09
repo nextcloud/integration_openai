@@ -72,13 +72,14 @@ class QuotaUsageMapper extends QBMapper {
 	/**
 	 * @param int $type Type of the quota
 	 * @param int $periodStart Start time of quota
+	 * @param string|null $serviceId only count the usage of this service
 	 * @return int
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 * @throws \RuntimeException
 	 */
-	public function getQuotaUnitsInTimePeriod(int $type, int $periodStart): int {
+	public function getQuotaUnitsInTimePeriod(int $type, int $periodStart, ?string $serviceId = null): int {
 		$qb = $this->db->getQueryBuilder();
 
 		// Get the sum of the units used in the time period
@@ -90,6 +91,11 @@ class QuotaUsageMapper extends QBMapper {
 			->andWhere(
 				$qb->expr()->gt('timestamp', $qb->createNamedParameter($periodStart, IQueryBuilder::PARAM_INT))
 			);
+		if ($serviceId !== null) {
+			$qb->andWhere(
+				$qb->expr()->eq('service_id', $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR))
+			);
+		}
 
 		// Execute the query and return the result
 		$result = (int)$qb->executeQuery()->fetchOne();
@@ -103,13 +109,14 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param int $type Type of the quota
 	 * @param int $periodStart Start time of quota
 	 * @param int|null $pool
+	 * @param string|null $serviceId only count the usage of this service
 	 * @return int
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 * @throws RuntimeException
 	 */
-	public function getQuotaUnitsOfUserInTimePeriod(string $userId, int $type, int $periodStart, ?int $pool = null): int {
+	public function getQuotaUnitsOfUserInTimePeriod(string $userId, int $type, int $periodStart, ?int $pool = null, ?string $serviceId = null): int {
 		$qb = $this->db->getQueryBuilder();
 
 		// Get the sum of the units used in the time period
@@ -128,6 +135,11 @@ class QuotaUsageMapper extends QBMapper {
 		} else {
 			$qb->andWhere(
 				$qb->expr()->eq('pool', $qb->createNamedParameter($pool, IQueryBuilder::PARAM_INT))
+			);
+		}
+		if ($serviceId !== null) {
+			$qb->andWhere(
+				$qb->expr()->eq('service_id', $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR))
 			);
 		}
 
@@ -190,16 +202,18 @@ class QuotaUsageMapper extends QBMapper {
 	 * @param int $type
 	 * @param int $units
 	 * @param int $pool
+	 * @param string $serviceId the service the usage happened on
 	 * @return QuotaUsage
 	 * @throws Exception
 	 */
-	public function createQuotaUsage(string $userId, int $type, int $units, int $pool = -1): QuotaUsage {
+	public function createQuotaUsage(string $userId, int $type, int $units, int $pool = -1, string $serviceId = ''): QuotaUsage {
 
 		$quotaUsage = new QuotaUsage();
 		$quotaUsage->setUserId($userId);
 		$quotaUsage->setType($type);
 		$quotaUsage->setUnits($units);
 		$quotaUsage->setPool($pool);
+		$quotaUsage->setServiceId($serviceId);
 		$quotaUsage->setTimestamp((new DateTime())->getTimestamp());
 		$insertedQuotaUsage = $this->insert($quotaUsage);
 
@@ -283,7 +297,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @throws Exception
 	 * @throws RuntimeException
 	 */
-	public function getUsersQuotaUsage(int $startTime, int $endTime, $type): array {
+	public function getUsersQuotaUsage(int $startTime, int $endTime, $type, ?string $serviceId = null): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('user_id')
@@ -294,6 +308,9 @@ class QuotaUsageMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT)))
 			->groupBy('user_id')
 			->orderBy('usage', 'DESC');
+		if ($serviceId !== null) {
+			$qb->andWhere($qb->expr()->eq('service_id', $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR)));
+		}
 
 		return $qb->executeQuery()->fetchAll();
 	}
@@ -306,7 +323,7 @@ class QuotaUsageMapper extends QBMapper {
 	 * @throws Exception
 	 * @throws RuntimeException
 	 */
-	public function getPoolsQuotaUsage(int $startTime, int $endTime, int $type): array {
+	public function getPoolsQuotaUsage(int $startTime, int $endTime, int $type, ?string $serviceId = null): array {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('pool')
@@ -318,6 +335,9 @@ class QuotaUsageMapper extends QBMapper {
 			->andWhere($qb->expr()->eq('type', $qb->createNamedParameter($type, IQueryBuilder::PARAM_INT)))
 			->groupBy('type', 'pool')
 			->orderBy('usage', 'DESC');
+		if ($serviceId !== null) {
+			$qb->andWhere($qb->expr()->eq('service_id', $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR)));
+		}
 
 		return $qb->executeQuery()->fetchAll();
 	}

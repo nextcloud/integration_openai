@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Cron;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\ServicesService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use Psr\Log\LoggerInterface;
@@ -19,6 +19,7 @@ class RefreshModels extends TimedJob {
 	public function __construct(
 		ITimeFactory $time,
 		private OpenAiAPIService $openAIAPIService,
+		private ServicesService $servicesService,
 		private LoggerInterface $logger,
 	) {
 		parent::__construct($time);
@@ -27,10 +28,12 @@ class RefreshModels extends TimedJob {
 
 	protected function run($argument) {
 		$this->logger->debug('Run daily model refresh job');
-		$this->openAIAPIService->getModels(null, true);
-		$this->openAIAPIService->getModels(null, true, Application::SERVICE_TYPE_TTS);
-		$this->openAIAPIService->getModels(null, true, Application::SERVICE_TYPE_STT);
-		$this->openAIAPIService->getModels(null, true, Application::SERVICE_TYPE_IMAGE);
-
+		foreach ($this->servicesService->getServices() as $service) {
+			try {
+				$this->openAIAPIService->getModels(null, $service, true);
+			} catch (\Throwable $e) {
+				$this->logger->info('Could not refresh the model list of service ' . $service->getId(), ['exception' => $e]);
+			}
+		}
 	}
 }

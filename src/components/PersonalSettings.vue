@@ -17,125 +17,126 @@
 				:options="languages"
 				:input-label="t('integration_openai', 'Default language')"
 				@update:model-value="onInput()" />
-			<p v-if="state.is_custom_service" class="settings-hint">
-				<InformationOutlineIcon :size="20" class="icon" />
-				{{ t('integration_openai', 'Your administrator defined a custom service address') }}
-			</p>
-			<div v-if="!state.is_custom_service || !state.use_basic_auth">
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Leave the API key empty to use the one defined by administrators') }}
-				</NcNoteCard>
-				<div class="line">
-					<NcTextField
-						id="openai-api-key"
-						v-model="state.api_key"
-						class="input"
-						:readonly="readonly"
-						type="password"
-						:label="t('integration_openai', 'API key')"
-						:show-trailing-button="!!state.api_key"
-						@update:model-value="onSensitiveInput"
-						@trailing-button-click="state.api_key = '' ; onSensitiveInput()"
-						@focus="readonly = false">
-						<template #icon>
-							<KeyOutlineIcon :size="20" />
-						</template>
-					</NcTextField>
-				</div>
-				<div v-if="!state.is_custom_service">
-					<NcNoteCard type="info">
-						{{ t('integration_openai', 'You can create a free API key in your OpenAI account settings') }}:
+
+			<h4>
+				{{ t('integration_openai', 'Your own credentials') }}
+			</h4>
+			<NcNoteCard v-if="services.length === 0" type="info">
+				{{ t('integration_openai', 'Your administrator has not connected any service yet.') }}
+			</NcNoteCard>
+			<NcNoteCard v-else type="info">
+				{{ t('integration_openai', 'For each service, you can use your own credentials instead of the ones your administrator configured. Leave the fields empty to use theirs. Using your own credentials for a service lifts the usage quotas of that service.') }}
+			</NcNoteCard>
+
+			<div v-for="service in services" :key="service.id" class="service">
+				<h5 class="service__title">
+					{{ service.display_name }}
+					<span class="service__url">{{ service.url }}</span>
+				</h5>
+				<div v-if="!service.use_basic_auth">
+					<div class="line">
+						<NcTextField
+							:id="'openai-api-key-' + service.id"
+							:model-value="credentials[service.id].api_key"
+							class="input"
+							:readonly="readonly"
+							type="password"
+							:label="t('integration_openai', 'API key')"
+							:show-trailing-button="!!credentials[service.id].api_key"
+							@update:model-value="onSensitiveInput(service.id, { api_key: $event })"
+							@trailing-button-click="onSensitiveInput(service.id, { api_key: '' })"
+							@focus="readonly = false">
+							<template #icon>
+								<KeyOutlineIcon :size="20" />
+							</template>
+						</NcTextField>
+					</div>
+					<p v-if="service.is_using_openai" class="settings-hint">
+						{{ t('integration_openai', 'You can create an API key in your OpenAI account settings') }}:
 						&nbsp;
-						<a :href="apiKeyUrl" target="_blank" class="external">
-							{{ apiKeyUrl }}
-						</a>
-					</NcNoteCard>
+						<a :href="apiKeyUrl" target="_blank" class="external">{{ apiKeyUrl }}</a>
+					</p>
+				</div>
+				<div v-else>
+					<div class="line">
+						<NcTextField
+							:id="'openai-basic-user-' + service.id"
+							:model-value="credentials[service.id].basic_user"
+							class="input"
+							:readonly="readonly"
+							:label="t('integration_openai', 'Basic Auth user')"
+							@update:model-value="onSensitiveInput(service.id, { basic_user: $event })"
+							@focus="readonly = false">
+							<template #icon>
+								<AccountOutlineIcon :size="20" />
+							</template>
+						</NcTextField>
+					</div>
+					<div class="line">
+						<NcTextField
+							:id="'openai-basic-password-' + service.id"
+							:model-value="credentials[service.id].basic_password"
+							class="input"
+							type="password"
+							:readonly="readonly"
+							:label="t('integration_openai', 'Basic Auth password')"
+							@update:model-value="onSensitiveInput(service.id, { basic_password: $event })"
+							@focus="readonly = false">
+							<template #icon>
+								<KeyOutlineIcon :size="20" />
+							</template>
+						</NcTextField>
+					</div>
 				</div>
 			</div>
-			<div v-else>
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Leave the username and password empty to use the ones defined by your administrator') }}
-				</NcNoteCard>
-				<div class="line">
-					<NcTextField
-						id="openai-basic-user"
-						v-model="state.basic_user"
-						class="input"
-						:readonly="readonly"
-						:label="t('integration_openai', 'Basic Auth user')"
-						:show-trailing-button="!!state.basic_user"
-						@update:model-value="onSensitiveInput()"
-						@trailing-button-click="state.basic_user = '' ; onSensitiveInput()"
-						@focus="readonly = false">
-						<template #icon>
-							<AccountOutlineIcon :size="20" />
-						</template>
-					</NcTextField>
-				</div>
-				<div class="line">
-					<NcTextField
-						id="openai-basic-password"
-						v-model="state.basic_password"
-						class="input"
-						type="password"
-						:readonly="readonly"
-						:label="t('integration_openai', 'Basic Auth password')"
-						:show-trailing-button="!!state.basic_password"
-						@update:model-value="onSensitiveInput()"
-						@trailing-button-click="state.basic_password = '' ; onSensitiveInput()"
-						@focus="readonly = false">
-						<template #icon>
-							<KeyOutlineIcon :size="20" />
-						</template>
-					</NcTextField>
-				</div>
-			</div>
-			<div v-if="quotaInfo !== null">
-				<!-- Show quota info -->
+
+			<div v-if="quotaInfo !== null && quotaInfo.services.length > 0">
 				<h4>
 					{{ t('integration_openai', 'Usage quota info') }}
 				</h4>
 				<NcNoteCard v-if="poolUsed" type="info">
 					{{ t('integration_openai', 'If you see a shared quota usage of 50% and a usage of 10% that means that you have used 10% of the total shared quota, and the sum of all other users affected by this quota is 40%.') }}
 				</NcNoteCard>
-				<!-- Loop through all quota types-->
-				<table class="quota-table">
-					<thead>
-						<tr>
-							<th width="120px">
-								{{ t('integration_openai', 'Quota type') }}
-							</th>
-							<th>{{ t('integration_openai', 'Usage') }}</th>
-							<th v-if="poolUsed">
-								{{ t('integration_openai', 'Shared Usage') }}
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="quota in quotaInfo.quota_usage" :key="quota.type">
-							<td>{{ t('integration_openai', capitalizedWord(quota.type)) }} </td>
-							<td v-if="quota.limit > 0">
-								{{ Math.round(quota.used / quota.limit * 100) + ' %' }}
-							</td>
-							<td v-else>
-								{{ quota.used + ' ' + quota.unit }}
-							</td>
-							<td v-if="quota.used_pool">
-								{{ quota.limit > 0 ? Math.round(quota.used_pool / quota.limit * 100) + ' %' : quota.used_pool + ' ' + quota.unit }}
-							</td>
-							<td v-else-if="poolUsed">
-								{{ t('integration_openai', 'Not Shared') }}
-							</td>
-						</tr>
-					</tbody>
-				</table>
+				<div v-for="service in quotaInfo.services" :key="service.id" class="service">
+					<h5 class="service__title">
+						{{ service.name }}
+					</h5>
+					<NcNoteCard v-if="service.has_own_credentials" type="success">
+						{{ t('integration_openai', 'You use your own credentials for this service, so no quota applies to you.') }}
+					</NcNoteCard>
+					<table v-else class="quota-table">
+						<thead>
+							<tr>
+								<th width="120px">
+									{{ t('integration_openai', 'Quota type') }}
+								</th>
+								<th>{{ t('integration_openai', 'Usage') }}</th>
+								<th v-if="poolUsed">
+									{{ t('integration_openai', 'Shared Usage') }}
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="quota in service.quota_usage" :key="quota.type">
+								<td>{{ quota.type }}</td>
+								<td v-if="quota.limit > 0">
+									{{ Math.round(quota.used / quota.limit * 100) + ' %' }}
+								</td>
+								<td v-else>
+									{{ quota.used + ' ' + quota.unit }}
+								</td>
+								<td v-if="quota.used_pool">
+									{{ quota.limit > 0 ? Math.round(quota.used_pool / quota.limit * 100) + ' %' : quota.used_pool + ' ' + quota.unit }}
+								</td>
+								<td v-else-if="poolUsed">
+									{{ t('integration_openai', 'Not Shared') }}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 				<NcNoteCard type="success">
 					{{ quotaRangeText }}
-				</NcNoteCard>
-			</div>
-			<div v-if="!state.is_custom_service">
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Specifying your own API key will allow unlimited usage') }}
 				</NcNoteCard>
 			</div>
 		</div>
@@ -144,47 +145,47 @@
 
 <script>
 import AccountOutlineIcon from 'vue-material-design-icons/AccountOutline.vue'
-import InformationOutlineIcon from 'vue-material-design-icons/InformationOutline.vue'
 import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
 
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { loadState } from '@nextcloud/initial-state'
+import { formatRelativeTime } from '@nextcloud/l10n'
 import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
-import { formatRelativeTime } from '@nextcloud/l10n'
+
+/** What the backend sends in place of a stored secret */
+const SECRET_PLACEHOLDER = '**********'
 
 export default {
 	name: 'PersonalSettings',
 
 	components: {
 		AccountOutlineIcon,
-		OpenAiIcon,
 		KeyOutlineIcon,
-		InformationOutlineIcon,
+		OpenAiIcon,
 		NcNoteCard,
-		NcTextField,
 		NcSelect,
+		NcTextField,
 	},
-
-	props: [],
 
 	data() {
 		return {
 			state: loadState('integration_openai', 'config'),
 			languages: loadState('integration_openai', 'languages'),
-			// to prevent some browsers to fill fields with remembered passwords
+			services: loadState('integration_openai', 'services'),
+			credentials: loadState('integration_openai', 'user-credentials'),
+			// to prevent some browsers from filling fields with remembered passwords
 			readonly: true,
 			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
 			quotaInfo: null,
-			showQuotaRemovalInfo: false,
 		}
 	},
 
@@ -199,11 +200,11 @@ export default {
 					'The quota is kept over a floating period of the last %n days', this.quotaInfo.period.length)
 		},
 		poolUsed() {
-			return this.quotaInfo !== null && this.quotaInfo.quota_usage.some((quota) => quota.used_pool)
+			return (this.quotaInfo?.services ?? []).some(
+				service => Object.values(service.quota_usage).some(quota => quota.used_pool),
+			)
 		},
 	},
-
-	watch: {},
 
 	mounted() {
 		this.loadQuotaInfo()
@@ -215,52 +216,49 @@ export default {
 				stt_language: this.state.stt_language.value,
 			})
 		}, 2000),
-		onSensitiveInput: debounce(async function() {
-			const values = {
-				basic_user: (this.state.basic_user ?? '').trim(),
-			}
-			if (this.state.api_key !== 'dummyApiKey') {
-				values.api_key = (this.state.api_key ?? '').trim()
-			}
-			if (this.state.basic_password !== 'dummyPassword') {
-				values.basic_password = (this.state.basic_password ?? '').trim()
-			}
-			await this.saveOptions(values, true)
+		onSensitiveInput(serviceId, values) {
+			this.credentials[serviceId] = { ...this.credentials[serviceId], ...values }
+			this.saveCredentialsDebounced(serviceId)
+		},
+		saveCredentialsDebounced: debounce(function(serviceId) {
+			this.saveCredentials(serviceId)
 		}, 2000),
-		async loadQuotaInfo() {
-			const url = generateUrl('/apps/integration_openai/quota-info')
+		async saveCredentials(serviceId) {
+			const stored = this.credentials[serviceId]
+			const values = {
+				basic_user: (stored.basic_user ?? '').trim(),
+			}
+			// secrets that were not touched come back as the placeholder and are
+			// left alone by the backend
+			if (stored.api_key !== SECRET_PLACEHOLDER) {
+				values.api_key = (stored.api_key ?? '').trim()
+			}
+			if (stored.basic_password !== SECRET_PLACEHOLDER) {
+				values.basic_password = (stored.basic_password ?? '').trim()
+			}
 			try {
-				const response = await axios.get(url)
+				await confirmPassword()
+				const url = generateUrl('/apps/integration_openai/services/{id}/user-credentials', { id: serviceId })
+				await axios.put(url, { values })
+				showSuccess(t('integration_openai', 'OpenAI options saved'))
+				this.loadQuotaInfo()
+			} catch (error) {
+				showError(t('integration_openai', 'Failed to save OpenAI options'))
+				console.error(error)
+			}
+		},
+		async loadQuotaInfo() {
+			try {
+				const response = await axios.get(generateUrl('/apps/integration_openai/quota-info'))
 				this.quotaInfo = response.data
-				if (this.quotaInfo === null) {
-					return
-				}
-				// Loop through all quota types and check if any are limited by admin
-				// If so, show a hint that the user can provide their own api key to remove the limit
-				for (const quota of this.quotaInfo.quota_usage) {
-					if (quota.limit > 0) {
-						this.showQuotaRemovalInfo = true
-						break
-					}
-				}
 			} catch (error) {
 				showError(t('integration_openai', 'Failed to load quota info'))
 				console.error(error)
 			}
 		},
-		capitalizedWord(word) {
-			return word.charAt(0).toUpperCase() + word.slice(1)
-		},
-		async saveOptions(values, sensitive = false) {
-			if (sensitive) {
-				await confirmPassword()
-			}
+		async saveOptions(values) {
 			try {
-				const req = {
-					values,
-				}
-				const url = sensitive ? generateUrl('/apps/integration_openai/config/sensitive') : generateUrl('/apps/integration_openai/config')
-				await axios.put(url, req)
+				await axios.put(generateUrl('/apps/integration_openai/config'), { values })
 				showSuccess(t('integration_openai', 'OpenAI options saved'))
 			} catch (error) {
 				showError(t('integration_openai', 'Failed to save OpenAI options'))
@@ -293,8 +291,24 @@ export default {
 		margin-right: 8px;
 	}
 
+	.service {
+		margin-top: 16px;
+
+		&__title {
+			display: flex;
+			align-items: baseline;
+			gap: 8px;
+			margin-bottom: 4px;
+		}
+
+		&__url {
+			font-weight: normal;
+			color: var(--color-text-maxcontrast);
+		}
+	}
+
 	.quota-table {
-		padding: 4px 8px 4px 8px;
+		padding: 4px 8px;
 		border: 2px solid var(--color-border);
 		border-radius: var(--border-radius);
 		tbody {
@@ -315,14 +329,6 @@ export default {
 		> input, .input {
 			width: 300px;
 		}
-		.spacer {
-			display: inline-block;
-			width: 36px;
-		}
-	}
-
-	button {
-		margin-right: 24px;
 	}
 }
 </style>

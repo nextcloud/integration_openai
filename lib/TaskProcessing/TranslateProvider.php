@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\TranslateService;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -25,22 +24,23 @@ use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextTranslate;
 
 class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private TranslateService $translateService,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-translate';
+		return $this->buildProviderId('translate');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -48,7 +48,7 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -76,25 +76,16 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
-			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
-		];
+		return [];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
-			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
-			'model' => $adminModel,
+			'max_tokens' => $this->service->getMaxTokens(),
 		];
 	}
 
@@ -117,11 +108,7 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 		$preferStreaming = $options->getPreferStreaming();
 
 		$startTime = time();
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		}
+		$model = $this->model;
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new ProcessingException('Invalid input text');
@@ -150,13 +137,14 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 				}
 			};
 			$translation = $this->translateService->translate(
+				$this->service,
 				$inputText, $input['origin_language'] ?? '', $input['target_language'] ?? '',
 				$model, $maxTokens, $userId, $reportProgress,
 				$preferStreaming, $reportTranslationOutput,
 			);
 
 			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 
 			if (empty(trim($translation))) {
 				throw new ProcessingException("Empty translation result from {$fromLanguage} to {$toLanguage}");

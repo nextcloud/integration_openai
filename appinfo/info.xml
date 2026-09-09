@@ -11,12 +11,18 @@
 ⚠️ The smart pickers have been removed from this app
 as they are now included in the [Assistant app](https://apps.nextcloud.com/apps/assistant).
 
-This app implements:
+This app lets you connect any number of OpenAI-compatible services and pick, per service, which of their
+models you want to expose. Every selected model is registered as its own set of providers, named after the
+model, so you can offer several models side by side and choose between them in the AI admin settings.
 
-* Text generation providers: Free prompt, Summarize, Headline, Context Write, Chat, and Reformulate (using any available large language model)
-* A Translation provider (using any available language model)
-* A SpeechToText provider (using Whisper)
-* An image generation provider
+Per modality, the following providers are registered for each selected model:
+
+* Text models: Free prompt, Chat, Chat with tools, Summarize, Headline, Topics, Context Write, Reformulate,
+  Improve, Emoji, Change tone, Proofread, Reformat paragraphs and Translate (plus OCR, image analysis and
+  audio chat when the service accepts the matching attachments)
+* Image models: image generation, also with an LLM-improved prompt
+* Transcription models: transcription, subtitles and transcription with paragraph reformatting
+* Speech models: text to speech
 
 ⚠️ Context Write, Summarize, Headline and Reformulate have mainly been tested with OpenAI.
 They might work when connecting to other services, without any guarantee.
@@ -101,7 +107,7 @@ Negative:
 
 Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud.com/blog/nextcloud-ethical-ai-rating/).
 ]]>	</description>
-	<version>5.0.0</version>
+	<version>6.0.0</version>
 	<licence>agpl</licence>
 	<author>Julien Veyssier</author>
 	<namespace>OpenAi</namespace>

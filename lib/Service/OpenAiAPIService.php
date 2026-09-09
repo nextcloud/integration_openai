@@ -31,7 +31,6 @@ use OCP\Lock\LockedException;
 use OCP\Notification\IManager as INotificationManager;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
-use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Throwable;
@@ -55,6 +54,7 @@ class OpenAiAPIService {
 		private OpenAiFileService $openAiFileService,
 		private INotificationManager $notificationManager,
 		private QuotaRuleService $quotaRuleService,
+		private ServicesService $servicesService,
 		IClientService $clientService,
 		private bool $isCLI,
 	) {
@@ -67,80 +67,12 @@ class OpenAiAPIService {
 	 * @param string $userId It can be an empty string
 	 * @param int $type
 	 * @param int $usage
+	 * @param ServiceConfig $service the service the usage happened on
 	 * @throws Exception If there is an error creating the quota usage.
 	 */
-	public function createQuotaUsage(string $userId, int $type, int $usage) {
-		$rule = $this->quotaRuleService->getRule($type, $userId);
-		$this->quotaUsageMapper->createQuotaUsage($userId, $type, $usage, $rule['pool'] ? $rule['id'] : -1);
-	}
-
-	/**
-	 * @param ?string $serviceType
-	 * @return bool
-	 */
-	public function isUsingOpenAi(?string $serviceType = null): bool {
-		$serviceUrl = '';
-		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
-			$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
-		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
-			$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
-		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
-			$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
-		}
-		if ($serviceUrl === '') {
-			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		}
-		return $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-	}
-
-	/**
-	 * @param ?string $serviceType
-	 * @return bool
-	 */
-	public function isUsingOpenRouter(?string $serviceType = null): bool {
-		$serviceUrl = '';
-		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
-			$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
-		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
-			$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
-		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
-			$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
-		}
-		if ($serviceUrl === '') {
-			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		}
-		// Return true if the service URL references OpenRouter (e.g., openrouter.ai)
-		return str_starts_with(strtolower($serviceUrl), 'https://openrouter.ai');
-	}
-
-	/**
-	 * @param ?string $serviceType
-	 *
-	 * @return string
-	 */
-	public function getServiceName(?string $serviceType = null): string {
-		if ($this->isUsingOpenAi($serviceType)) {
-			if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
-				return $this->l10n->t('OpenAI\'s Image Generation');
-			}
-			if ($serviceType === Application::SERVICE_TYPE_TTS) {
-				$this->l10n->t('OpenAI\'s Text to Speech');
-			}
-			return 'OpenAI';
-		} else {
-			$serviceName = $this->openAiSettingsService->getServiceName();
-			if ($serviceType === Application::SERVICE_TYPE_IMAGE && $this->openAiSettingsService->imageOverrideEnabled()) {
-				$serviceName = $this->openAiSettingsService->getImageServiceName();
-			} elseif ($serviceType === Application::SERVICE_TYPE_STT && $this->openAiSettingsService->sttOverrideEnabled()) {
-				$serviceName = $this->openAiSettingsService->getSttServiceName();
-			} elseif ($serviceType === Application::SERVICE_TYPE_TTS && $this->openAiSettingsService->ttsOverrideEnabled()) {
-				$serviceName = $this->openAiSettingsService->getTtsServiceName();
-			}
-			if ($serviceName === '') {
-				return 'LocalAI';
-			}
-			return $serviceName;
-		}
+	public function createQuotaUsage(string $userId, int $type, int $usage, ServiceConfig $service): void {
+		$rule = $this->quotaRuleService->getRule($type, $userId, $service);
+		$this->quotaUsageMapper->createQuotaUsage($userId, $type, $usage, $rule['pool'] ? $rule['id'] : -1, $service->getId());
 	}
 
 	/**
@@ -164,31 +96,25 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * Get the model list of a service
+	 *
 	 * @param ?string $userId
-	 * @param bool $refresh
-	 * @param ?string $serviceType
-	 * @return array|string[]
+	 * @param ServiceConfig $service
+	 * @param bool $refresh whether to bypass the caches and make a network request
+	 * @return array the model list response, with the models in the 'data' key
 	 * @throws Exception
 	 */
-	public function getModels(?string $userId, bool $refresh = false, ?string $serviceType = null): array {
-		// Use default service type if service type is not overridden
-		if ($serviceType === Application::SERVICE_TYPE_IMAGE && !$this->openAiSettingsService->imageOverrideEnabled()) {
-			$serviceType = null;
-		} elseif ($serviceType === Application::SERVICE_TYPE_STT && !$this->openAiSettingsService->sttOverrideEnabled()) {
-			$serviceType = null;
-		} elseif ($serviceType === Application::SERVICE_TYPE_TTS && !$this->openAiSettingsService->ttsOverrideEnabled()) {
-			$serviceType = null;
-		}
+	public function getModels(?string $userId, ServiceConfig $service, bool $refresh = false): array {
+		$serviceId = $service->getId();
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
-		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . ($userId ?? '') . '_' . ($serviceType ?? 'main');
-		$adminCacheKey = Application::MODELS_CACHE_KEY . '-main' . '_' . ($serviceType ?? 'main');
-		$dbCacheKey = $serviceType ? 'models' . '_' . $serviceType : 'models';
-		$memoryCacheKey = $serviceType ?? 'default';
+		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId . '_' . ($userId ?? '');
+		$adminCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId . '_main';
+		$dbCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId;
 
 		if (!$refresh) {
-			if (array_key_exists($memoryCacheKey, $this->modelsMemoryCache)) {
+			if (array_key_exists($serviceId, $this->modelsMemoryCache)) {
 				$this->logger->debug('Getting OpenAI models from the memory cache');
-				return $this->modelsMemoryCache[$memoryCacheKey];
+				return $this->modelsMemoryCache[$serviceId];
 			}
 
 			// try to get models from the user cache first
@@ -196,31 +122,24 @@ class OpenAiAPIService {
 				$userCachedModels = $cache->get($userCacheKey);
 				if ($userCachedModels) {
 					$this->logger->debug('Getting OpenAI models from user cache for user ' . $userId);
-					$this->modelsMemoryCache[$memoryCacheKey] = $userCachedModels;
+					$this->modelsMemoryCache[$serviceId] = $userCachedModels;
 					return $userCachedModels;
 				}
 			}
 
-			// if the user has an API key or uses basic auth, skip the admin cache
-			if ($userId === null || (
-				$this->openAiSettingsService->getUserApiKey($userId, false) === ''
-				&& (
-					!$this->openAiSettingsService->getUseBasicAuth()
-					|| $this->openAiSettingsService->getUserBasicUser($userId) === ''
-					|| $this->openAiSettingsService->getUserBasicPassword($userId) === ''
-				)
-			)) {
+			// if the user has their own credentials for this service, skip the admin cache
+			if (!$this->servicesService->userHasOwnCredentials($userId, $service)) {
 				// here we know there is either no user cache or userId is null
-				// so if there is no user-defined service credentials
+				// so if there are no user-defined service credentials
 				// we try to get the models from the admin cache
 				if ($adminCachedModels = $cache->get($adminCacheKey)) {
 					$this->logger->debug('Getting OpenAI models from the main distributed cache');
-					$this->modelsMemoryCache[$memoryCacheKey] = $adminCachedModels;
+					$this->modelsMemoryCache[$serviceId] = $adminCachedModels;
 					return $adminCachedModels;
 				}
 			}
 
-			// if we don't need to refresh to model list and it's not been found in the cache, it is obtained from the DB
+			// if we don't need to refresh the model list and it's not been found in the cache, it is obtained from the DB
 			$modelsObjectString = $this->appConfig->getValueString(Application::APP_ID, $dbCacheKey, '{"data":[],"object":"list"}');
 			$fallbackModels = [
 				'data' => [],
@@ -233,7 +152,7 @@ class OpenAiAPIService {
 				$newCache = $fallbackModels;
 			}
 			$cache->set($userId !== null ? $userCacheKey : $adminCacheKey, $newCache, Application::MODELS_CACHE_TTL);
-			$this->modelsMemoryCache[$memoryCacheKey] = $newCache;
+			$this->modelsMemoryCache[$serviceId] = $newCache;
 			return $newCache;
 		}
 
@@ -243,8 +162,8 @@ class OpenAiAPIService {
 
 		try {
 			$this->logger->debug('Actually getting OpenAI models with a network request');
-			$params = $this->isUsingOpenRouter($serviceType) ? ['output_modalities' => 'all'] : [];
-			$modelsResponse = $this->request($userId, 'models', $params, serviceType: $serviceType);
+			$params = $service->isUsingOpenRouter() ? ['output_modalities' => 'all'] : [];
+			$modelsResponse = $this->request($userId, $service, 'models', $params);
 		} catch (Exception $e) {
 			$this->logger->warning('Error retrieving models (exc): ' . $e->getMessage());
 			throw $e;
@@ -264,7 +183,7 @@ class OpenAiAPIService {
 		}
 
 		$cache->set($userId !== null ? $userCacheKey : $adminCacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
-		$this->modelsMemoryCache[$memoryCacheKey] = $modelsResponse;
+		$this->modelsMemoryCache[$serviceId] = $modelsResponse;
 		// we always store the model list after getting it
 		$modelsObjectString = json_encode($modelsResponse);
 		$this->appConfig->setValueString(Application::APP_ID, $dbCacheKey, $modelsObjectString);
@@ -272,50 +191,15 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * @param string $userId
-	 */
-	private function hasOwnOpenAiApiKey(string $userId): bool {
-		if (!$this->isUsingOpenAi()) {
-			return false;
-		}
-
-		if ($this->openAiSettingsService->getUserApiKey($userId) !== '') {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @return array
-	 */
-	public function getModelEnumValues(?string $userId, ?string $serviceType = null): array {
-		try {
-			$modelResponse = $this->getModels($userId, false, $serviceType);
-			$modelEnumValues = array_map(function (array $model) {
-				return new ShapeEnumValue($model['id'], $model['id']);
-			}, $modelResponse['data'] ?? []);
-			if ($this->isUsingOpenAi()) {
-				array_unshift($modelEnumValues, new ShapeEnumValue($this->l10n->t('Default'), 'Default'));
-			}
-			return $modelEnumValues;
-		} catch (Throwable $e) {
-			// avoid flooding the logs with errors from calls of task processing
-			$this->logger->info('Error getting model enum values', ['exception' => $e]);
-			return [];
-		}
-	}
-
-	/**
 	 * Check whether quota is exceeded for a user
 	 *
 	 * @param string|null $userId
 	 * @param int $type
+	 * @param ServiceConfig $service the service the request would be made to
 	 * @return bool
 	 * @throws Exception
 	 */
-	public function isQuotaExceeded(?string $userId, int $type): bool {
+	public function isQuotaExceeded(?string $userId, int $type, ServiceConfig $service): bool {
 		if ($userId === null) {
 			$this->logger->warning('Cannot check quota for anonymous user', ['app' => Application::APP_ID]);
 			return false;
@@ -325,13 +209,15 @@ class OpenAiAPIService {
 			throw new Exception('Invalid quota type', Http::STATUS_BAD_REQUEST);
 		}
 
-		if ($this->hasOwnOpenAiApiKey($userId)) {
-			// User has specified own OpenAI API key, no quota limit:
+		if ($this->servicesService->userHasOwnCredentials($userId, $service)) {
+			// User has specified their own credentials for this service, no quota limit:
 			return false;
 		}
-		$rule = $this->quotaRuleService->getRule($type, $userId);
+		$rule = $this->quotaRuleService->getRule($type, $userId, $service);
 		$quota = $rule['amount'];
 		$pool = $rule['pool'] ? $rule['id'] : null;
+		// a matching quota rule is a global budget, the fallback quota is the one of the service
+		$serviceId = $rule['id'] === null ? $service->getId() : null;
 
 		if ($quota === 0) {
 			//  Unlimited quota:
@@ -341,7 +227,7 @@ class OpenAiAPIService {
 		$quotaStart = $this->openAiSettingsService->getQuotaStart();
 
 		try {
-			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaStart, $pool);
+			$quotaUsage = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $type, $quotaStart, $pool, $serviceId);
 		} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
 			$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $type . '. Error: ' . $e->getMessage());
 			throw new Exception('Could not retrieve quota usage.', Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -350,7 +236,7 @@ class OpenAiAPIService {
 			return false;
 		}
 		$cache = $this->cacheFactory->createLocal(Application::APP_ID);
-		if ($cache->get('quota_exceeded_' . $userId . '_' . $type) === null) {
+		if ($cache->get('quota_exceeded_' . $userId . '_' . $type . '_' . $service->getId()) === null) {
 			$notification = $this->notificationManager->createNotification();
 			$notification->setApp(Application::APP_ID)
 				->setUser($userId)
@@ -358,7 +244,7 @@ class OpenAiAPIService {
 				->setObject('quota_exceeded', (string)$type)
 				->setSubject('quota_exceeded', ['type' => $type]);
 			$this->notificationManager->notify($notification);
-			$cache->set('quota_exceeded_' . $userId . '_' . $type, true, 3600);
+			$cache->set('quota_exceeded_' . $userId . '_' . $type . '_' . $service->getId(), true, 3600);
 		}
 		return true;
 	}
@@ -404,41 +290,55 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * Quota usage and limits of a user, per service
+	 *
 	 * @param string $userId
-	 * @return array
+	 * @return array{services: list<array<string, mixed>>, period: array, start: int, end: int}
 	 * @throws Exception
 	 */
 	public function getUserQuotaInfo(string $userId): array {
-		// Get quota limits (if the user has specified an own OpenAI API key, no quota limit, just supply default values as fillers)
-		$ownApikey = $this->hasOwnOpenAiApiKey($userId);
-		// Get quota period
 		$quotaPeriod = $this->openAiSettingsService->getQuotaPeriod();
 		$quotaStart = $this->openAiSettingsService->getQuotaStart();
 		$quotaEnd = $this->openAiSettingsService->getQuotaEnd();
-		// Get quota usage for each quota type:
-		$quotaInfo = [];
-		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
-			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
-			try {
-				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaStart);
-			} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
-				$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-				throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.'), Http::STATUS_INTERNAL_SERVER_ERROR);
-			}
-			if ($ownApikey) {
-				$quotaInfo[$quotaType]['limit'] = Application::DEFAULT_QUOTAS[$quotaType];
-			} else {
-				$rule = $this->quotaRuleService->getRule($quotaType, $userId);
-				$quotaInfo[$quotaType]['limit'] = $rule['amount'];
-				if ($rule['pool']) {
-					$quotaInfo[$quotaType]['used_pool'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod($userId, $quotaType, $quotaStart, $rule['id']);
+
+		$services = [];
+		foreach ($this->servicesService->getServices() as $service) {
+			// if the user has their own credentials for a service, no quota applies to it
+			$ownCredentials = $this->servicesService->userHasOwnCredentials($userId, $service);
+			$quotaInfo = [];
+			foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
+				$rule = $ownCredentials ? null : $this->quotaRuleService->getRule($quotaType, $userId, $service);
+				// a matching quota rule is a global budget, the fallback quota is the one of the service
+				$serviceId = ($rule === null || $rule['id'] === null) ? $service->getId() : null;
+				$quotaInfo[$quotaType] = [
+					'type' => $this->translatedQuotaType($quotaType),
+					'unit' => $this->translatedQuotaUnit($quotaType),
+					'limit' => $rule === null ? 0 : $rule['amount'],
+				];
+				try {
+					$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod(
+						$userId, $quotaType, $quotaStart, null, $serviceId,
+					);
+					if ($rule !== null && $rule['pool']) {
+						$quotaInfo[$quotaType]['used_pool'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod(
+							$userId, $quotaType, $quotaStart, $rule['id'], $serviceId,
+						);
+					}
+				} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
+					$this->logger->warning('Could not retrieve quota usage for user: ' . $userId . ' and quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+					throw new Exception($this->l10n->t('Unknown error while retrieving quota usage.'), Http::STATUS_INTERNAL_SERVER_ERROR);
 				}
 			}
-			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
+			$services[] = [
+				'id' => $service->getId(),
+				'name' => $service->getDisplayName(),
+				'has_own_credentials' => $ownCredentials,
+				'quota_usage' => $quotaInfo,
+			];
 		}
 
 		return [
-			'quota_usage' => $quotaInfo,
+			'services' => $services,
 			'period' => $quotaPeriod,
 			'start' => $quotaStart,
 			'end' => $quotaEnd,
@@ -446,27 +346,37 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * @return array
+	 * Instance-wide quota usage, per service
+	 *
+	 * @return list<array<string, mixed>>
 	 * @throws Exception
 	 */
 	public function getAdminQuotaInfo(): array {
-		// Get quota start time
 		$startTime = $this->openAiSettingsService->getQuotaStart();
-		// Get quota usage of all users for each quota type:
-		$quotaInfo = [];
-		foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
-			$quotaInfo[$quotaType]['type'] = $this->translatedQuotaType($quotaType);
-			try {
-				$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $startTime);
-			} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
-				$this->logger->warning('Could not retrieve quota usage for quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
-				// We can pass detailed error info to the UI here since the user is an admin in any case:
-				throw new Exception('Could not retrieve quota usage: ' . $e->getMessage(), Http::STATUS_INTERNAL_SERVER_ERROR);
+		$services = [];
+		foreach ($this->servicesService->getServices() as $service) {
+			$quotaInfo = [];
+			foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
+				$quotaInfo[$quotaType] = [
+					'type' => $this->translatedQuotaType($quotaType),
+					'unit' => $this->translatedQuotaUnit($quotaType),
+					'limit' => $service->getQuota($quotaType),
+				];
+				try {
+					$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsInTimePeriod($quotaType, $startTime, $service->getId());
+				} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {
+					$this->logger->warning('Could not retrieve quota usage for quota type: ' . $quotaType . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+					// We can pass detailed error info to the UI here since the user is an admin in any case:
+					throw new Exception('Could not retrieve quota usage: ' . $e->getMessage(), Http::STATUS_INTERNAL_SERVER_ERROR);
+				}
 			}
-			$quotaInfo[$quotaType]['unit'] = $this->translatedQuotaUnit($quotaType);
+			$services[] = [
+				'id' => $service->getId(),
+				'name' => $service->getDisplayName(),
+				'quota_usage' => $quotaInfo,
+			];
 		}
-
-		return $quotaInfo;
+		return $services;
 	}
 
 	/**
@@ -481,6 +391,7 @@ class OpenAiAPIService {
 	 */
 	public function createCompletion(
 		?string $userId,
+		ServiceConfig $service,
 		string $prompt,
 		int $n,
 		string $model,
@@ -488,26 +399,28 @@ class OpenAiAPIService {
 		?array $extraParams = null,
 	): array {
 
-		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT, $service)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
-		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
+		$maxTokensLimit = $service->getMaxTokens();
 		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
 			$maxTokens = $maxTokensLimit;
 		}
 
-		$params = [
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_COMPLETION_MODEL_ID : $model,
-			'prompt' => $prompt,
-			'max_tokens' => $maxTokens,
-			'n' => $n,
-		];
+		$params = [];
+		$modelParam = $this->modelParam($service, $model, Application::DEFAULT_COMPLETION_MODEL_ID);
+		if ($modelParam !== null) {
+			$params['model'] = $modelParam;
+		}
+		$params['prompt'] = $prompt;
+		$params['max_tokens'] = $maxTokens;
+		$params['n'] = $n;
 		if ($userId !== null) {
 			$params['user'] = $userId;
 		}
 
-		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
+		$adminExtraParams = $service->getLlmExtraParamsArray();
 		if ($adminExtraParams !== null) {
 			$params = array_merge($adminExtraParams, $params);
 		}
@@ -515,7 +428,7 @@ class OpenAiAPIService {
 			$params = array_merge($extraParams, $params);
 		}
 
-		$response = $this->request($userId, 'completions', $params, 'POST');
+		$response = $this->request($userId, $service, 'completions', $params, 'POST');
 
 		if (!isset($response['choices'])) {
 			$this->logger->warning('Text generation error: ' . json_encode($response));
@@ -525,7 +438,7 @@ class OpenAiAPIService {
 		if (isset($response['usage'], $response['usage']['total_tokens'])) {
 			$usage = $response['usage']['total_tokens'];
 			try {
-				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage, $service);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -545,6 +458,7 @@ class OpenAiAPIService {
 
 	public function createStreamedChatCompletion(
 		?string $userId,
+		ServiceConfig $service,
 		string $model,
 		?string $userPrompt = null,
 		?string $systemPrompt = null,
@@ -556,12 +470,13 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?array $files = null,
 	): \Generator {
-		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT, $service)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
 		$params = $this->buildChatCompletionRequestParams(
 			$userId,
+			$service,
 			$model,
 			$userPrompt,
 			$systemPrompt,
@@ -577,12 +492,12 @@ class OpenAiAPIService {
 
 		$response = $this->request(
 			$userId,
+			$service,
 			'chat/completions',
 			$params,
 			'POST',
 			null,
 			true,
-			null,
 			0,
 			true,
 		);
@@ -592,7 +507,7 @@ class OpenAiAPIService {
 		if (isset($streamResult['usage']['total_tokens'])) {
 			$usage = $streamResult['usage']['total_tokens'];
 			try {
-				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage, $service);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -603,6 +518,7 @@ class OpenAiAPIService {
 
 	public function createChatCompletion(
 		?string $userId,
+		ServiceConfig $service,
 		string $model,
 		?string $userPrompt = null,
 		?string $systemPrompt = null,
@@ -615,7 +531,7 @@ class OpenAiAPIService {
 		?array $files = null,
 	): array {
 		$response = $this->requestChatCompletion(
-			$userId, $model, $userPrompt, $systemPrompt, $history,
+			$userId, $service, $model, $userPrompt, $systemPrompt, $history,
 			$n, $maxTokens, $extraParams, $toolMessage, $tools, $files,
 			false,
 		);
@@ -623,7 +539,7 @@ class OpenAiAPIService {
 		if (isset($response['usage'], $response['usage']['total_tokens'])) {
 			$usage = $response['usage']['total_tokens'];
 			try {
-				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TEXT, $usage, $service);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TEXT . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -650,6 +566,7 @@ class OpenAiAPIService {
 	 */
 	public function requestChatCompletion(
 		?string $userId,
+		ServiceConfig $service,
 		string $model,
 		?string $userPrompt = null,
 		?string $systemPrompt = null,
@@ -662,12 +579,13 @@ class OpenAiAPIService {
 		?array $files = null,
 		bool $stream = false,
 	): array {
-		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT)) {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT, $service)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
 		$params = $this->buildChatCompletionRequestParams(
 			$userId,
+			$service,
 			$model,
 			$userPrompt,
 			$systemPrompt,
@@ -681,7 +599,7 @@ class OpenAiAPIService {
 			$stream,
 		);
 
-		return $this->request($userId, 'chat/completions', $params, 'POST');
+		return $this->request($userId, $service, 'chat/completions', $params, 'POST');
 	}
 
 	/**
@@ -701,6 +619,7 @@ class OpenAiAPIService {
 	 */
 	private function buildChatCompletionRequestParams(
 		?string $userId,
+		ServiceConfig $service,
 		string $model,
 		?string $userPrompt = null,
 		?string $systemPrompt = null,
@@ -713,16 +632,14 @@ class OpenAiAPIService {
 		?array $files = null,
 		bool $stream = false,
 	): array {
-		$modelRequestParam = $model === Application::DEFAULT_MODEL_ID
-			? Application::DEFAULT_COMPLETION_MODEL_ID
-			: $model;
+		$modelRequestParam = $this->modelParam($service, $model, Application::DEFAULT_COMPLETION_MODEL_ID);
 
 		$messages = [];
 		if ($systemPrompt !== null) {
 			$messages[] = [
 				// o1-* models don't support system messages
 				// system prompts as a user message seems to work fine though
-				'role' => ($this->isUsingOpenAi() && str_starts_with($modelRequestParam, 'o1-'))
+				'role' => ($service->isUsingOpenAi() && str_starts_with($modelRequestParam ?? '', 'o1-'))
 					? 'user'
 					: 'system',
 				'content' => $systemPrompt,
@@ -774,7 +691,7 @@ class OpenAiAPIService {
 							}
 							// If the history contains a file that isn't supported anymore we should skip it so the chat isn't broken
 							try {
-								$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null));
+								$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null, $service));
 							} catch (ProcessingException|UserFacingProcessingException $e) {
 								$this->logger->warning('Could not build file content from id: ' . $item['file_id'] . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 							}
@@ -794,7 +711,7 @@ class OpenAiAPIService {
 			}
 			$content = [];
 			foreach ($files as $file) {
-				$content = array_merge($content, $this->openAiFileService->buildFileContentFromFile($file));
+				$content = array_merge($content, $this->openAiFileService->buildFileContentFromFile($file, $service));
 			}
 			if ($userPrompt !== null) {
 				$content[] = [
@@ -824,18 +741,19 @@ class OpenAiAPIService {
 			}
 		}
 
-		$params = [
-			'model' => $modelRequestParam,
-			'messages' => $messages,
-			'n' => $n,
-			'stream' => $stream,
-		];
+		$params = [];
+		if ($modelRequestParam !== null) {
+			$params['model'] = $modelRequestParam;
+		}
+		$params['messages'] = $messages;
+		$params['n'] = $n;
+		$params['stream'] = $stream;
 
-		$maxTokensLimit = $this->openAiSettingsService->getMaxTokens();
+		$maxTokensLimit = $service->getMaxTokens();
 		if ($maxTokens === null || $maxTokens > $maxTokensLimit) {
 			$maxTokens = $maxTokensLimit;
 		}
-		if ($this->openAiSettingsService->getUseMaxCompletionTokensParam()) {
+		if ($service->getUseMaxCompletionTokensParam()) {
 			// max_tokens is now deprecated https://platform.openai.com/docs/api-reference/chat/create
 			$params['max_completion_tokens'] = $maxTokens;
 		} else {
@@ -845,18 +763,18 @@ class OpenAiAPIService {
 		if ($tools !== null) {
 			$params['tools'] = $tools;
 		}
-		if ($userId !== null && $this->isUsingOpenAi()) {
+		if ($userId !== null && $service->isUsingOpenAi()) {
 			$params['user'] = $userId;
 		}
 
-		$adminExtraParams = $this->getAdminExtraParams('llm_extra_params');
+		$adminExtraParams = $service->getLlmExtraParamsArray();
 		if ($adminExtraParams !== null) {
 			$params = array_merge($adminExtraParams, $params);
 		}
 		if ($extraParams !== null) {
 			$params = array_merge($extraParams, $params);
 		}
-		if ($stream && $this->isUsingOpenAi()) {
+		if ($stream && $service->isUsingOpenAi()) {
 			$params['stream_options'] = array_merge(
 				is_array($params['stream_options'] ?? null) ? $params['stream_options'] : [],
 				['include_usage' => true],
@@ -867,19 +785,18 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * @param string $configKey
-	 * @return array|null
+	 * The value of the model request parameter, or null when it should not be
+	 * sent at all.
+	 *
+	 * The "Default" pseudo model means the service serves one fixed model and
+	 * does not expect the parameter. OpenAI always requires it, so we fall back
+	 * to a sensible default there.
 	 */
-	private function getAdminExtraParams(string $configKey): ?array {
-		$stringValue = $this->appConfig->getValueString(Application::APP_ID, $configKey, lazy: true);
-		if ($stringValue === '') {
-			return null;
+	private function modelParam(ServiceConfig $service, string $model, string $openAiFallback): ?string {
+		if ($model !== Application::DEFAULT_MODEL_ID) {
+			return $model;
 		}
-		$arrayValue = json_decode($stringValue, true);
-		if (!is_array($arrayValue)) {
-			return null;
-		}
-		return $arrayValue;
+		return $service->isUsingOpenAi() ? $openAiFallback : null;
 	}
 
 	/**
@@ -891,12 +808,14 @@ class OpenAiAPIService {
 	 */
 	public function transcribeBase64Mp3(
 		?string $userId,
+		ServiceConfig $service,
 		string $audioBase64,
 		bool $translate = true,
 		string $model = Application::DEFAULT_MODEL_ID,
 	): string {
 		return $this->transcribe(
 			$userId,
+			$service,
 			base64_decode(str_replace('data:audio/mp3;base64,', '', $audioBase64)),
 			$translate,
 			$model
@@ -915,6 +834,7 @@ class OpenAiAPIService {
 	 */
 	public function transcribeFile(
 		?string $userId,
+		ServiceConfig $service,
 		File $file,
 		bool $translate = false,
 		string $model = Application::DEFAULT_MODEL_ID,
@@ -922,7 +842,7 @@ class OpenAiAPIService {
 		string $responseFormat = 'verbose_json',
 	): string {
 		try {
-			$transcriptionResponse = $this->transcribe($userId, $file->getContent(), $translate, $model, $language, $responseFormat);
+			$transcriptionResponse = $this->transcribe($userId, $service, $file->getContent(), $translate, $model, $language, $responseFormat);
 		} catch (NotPermittedException|LockedException|GenericFileException $e) {
 			$this->logger->warning('Could not read audio file: ' . $file->getPath() . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			throw new Exception($this->l10n->t('Could not read audio file.'), Http::STATUS_INTERNAL_SERVER_ERROR);
@@ -943,25 +863,24 @@ class OpenAiAPIService {
 	 */
 	public function transcribe(
 		?string $userId,
+		ServiceConfig $service,
 		string $audioFileContent,
 		bool $translate = true,
 		string $model = Application::DEFAULT_MODEL_ID,
 		string $language = 'default',
 		string $responseFormat = 'verbose_json', // Verbose needed for extraction of audio duration
 	): string {
-		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION)) {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TRANSCRIPTION, $service)) {
 			throw new Exception($this->l10n->t('Audio transcription quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
-		// enforce whisper for OpenAI
-		if ($this->isUsingOpenAi()) {
-			$model = Application::DEFAULT_TRANSCRIPTION_MODEL_ID;
-		}
 
-		$params = [
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_TRANSCRIPTION_MODEL_ID : $model,
-			'file' => $audioFileContent,
-			'response_format' => $responseFormat,
-		];
+		$params = [];
+		$modelParam = $this->modelParam($service, $model, Application::DEFAULT_TRANSCRIPTION_MODEL_ID);
+		if ($modelParam !== null) {
+			$params['model'] = $modelParam;
+		}
+		$params['file'] = $audioFileContent;
+		$params['response_format'] = $responseFormat;
 		// Gets the user's preferred language if it's not the default one
 		if ($language === 'default') {
 			$language = $this->openAiSettingsService->getUserSTTLanguage($userId);
@@ -972,7 +891,7 @@ class OpenAiAPIService {
 		$endpoint = $translate ? 'audio/translations' : 'audio/transcriptions';
 		$contentType = 'multipart/form-data';
 
-		$response = $this->request($userId, $endpoint, $params, 'POST', $contentType, serviceType: Application::SERVICE_TYPE_STT);
+		$response = $this->request($userId, $service, $endpoint, $params, 'POST', $contentType);
 
 		if (in_array($responseFormat, Application::SUPPORTED_SUBTITLE_FORMATS)) {
 			if (!isset($response['body'])) {
@@ -993,7 +912,7 @@ class OpenAiAPIService {
 				$audioDuration = ($hours * 3600) + ($minutes * 60) + $seconds + $millisecondAdjustment;
 
 				try {
-					$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+					$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration, $service);
 				} catch (DBException $e) {
 					$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 				}
@@ -1023,7 +942,7 @@ class OpenAiAPIService {
 			}
 
 			try {
-				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_TRANSCRIPTION, $audioDuration, $service);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_TRANSCRIPTION . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -1042,12 +961,13 @@ class OpenAiAPIService {
 	 */
 	public function requestImageCreation(
 		?string $userId,
+		ServiceConfig $service,
 		string $prompt,
 		string $model,
 		int $n = 1,
 		string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE,
 	): array {
-		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE, $service)) {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
@@ -1055,17 +975,20 @@ class OpenAiAPIService {
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => $n,
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model,
 		];
+		$modelParam = $this->modelParam($service, $model, Application::DEFAULT_IMAGE_MODEL_ID);
+		if ($modelParam !== null) {
+			$params['model'] = $modelParam;
+		}
 
-		$apiResponse = $this->request($userId, 'images/generations', $params, 'POST', serviceType: Application::SERVICE_TYPE_IMAGE);
+		$apiResponse = $this->request($userId, $service, 'images/generations', $params, 'POST');
 
 		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
 			$this->logger->warning('OpenAI image generation error', ['api_response' => $apiResponse]);
 			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		} else {
 			try {
-				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, $n, $service);
 			} catch (DBException $e) {
 				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 			}
@@ -1077,39 +1000,22 @@ class OpenAiAPIService {
 	 * @param string|null $userId
 	 * @return array
 	 */
-	public function getImageRequestOptions(?string $userId): array {
+	public function getImageRequestOptions(?string $userId, ServiceConfig $service): array {
+		$service = $this->servicesService->applyUserCredentials($service, $userId);
 		$requestOptions = [
-			'timeout' => $this->openAiSettingsService->getRequestTimeout(),
+			'timeout' => $service->getRequestTimeout(),
 			'headers' => [
 				'User-Agent' => Application::USER_AGENT,
 			],
 		];
 
-		if ($this->openAiSettingsService->getIsImageRetrievalAuthenticated()) {
-			if ($this->openAiSettingsService->imageOverrideEnabled()) {
-				$useBasicAuth = $this->openAiSettingsService->getAdminImageUseBasicAuth();
-
-				$apiKey = $this->openAiSettingsService->getAdminImageApiKey();
-				$basicUser = $this->openAiSettingsService->getAdminImageBasicUser();
-				$basicPassword = $this->openAiSettingsService->getAdminImageBasicPassword();
-
-				$requestOptions['timeout'] = $this->openAiSettingsService->getImageRequestTimeout();
-			} else {
-				// image service settings are not overridden
-				$useBasicAuth = $this->openAiSettingsService->getUseBasicAuth();
-
-				// this has no equivalent when the service URL is overridden
-				// so the user-defined credentials will be ignored
-				$apiKey = $this->openAiSettingsService->getUserApiKey($userId, true);
-				$basicUser = $this->openAiSettingsService->getUserBasicUser($userId, true);
-				$basicPassword = $this->openAiSettingsService->getUserBasicPassword($userId, true);
-			}
-			if ($useBasicAuth) {
-				if ($basicUser !== '' && $basicPassword !== '') {
-					$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($basicUser . ':' . $basicPassword);
+		if ($service->getImageRequestAuth()) {
+			if ($service->getUseBasicAuth()) {
+				if ($service->getBasicUser() !== '' && $service->getBasicPassword() !== '') {
+					$requestOptions['headers']['Authorization'] = 'Basic ' . base64_encode($service->getBasicUser() . ':' . $service->getBasicPassword());
 				}
 			} else {
-				$requestOptions['headers']['Authorization'] = 'Bearer ' . $apiKey;
+				$requestOptions['headers']['Authorization'] = 'Bearer ' . $service->getApiKey();
 			}
 		}
 		return $requestOptions;
@@ -1126,28 +1032,32 @@ class OpenAiAPIService {
 	 */
 	public function requestSpeechCreation(
 		?string $userId,
+		ServiceConfig $service,
 		string $prompt,
 		string $model,
 		string $voice,
 		float $speed = 1,
 	): array {
-		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH)) {
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_SPEECH, $service)) {
 			throw new Exception($this->l10n->t('Speech generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
 		$params = [
 			'input' => $prompt,
 			'voice' => $voice === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_VOICE : $voice,
-			'model' => $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_SPEECH_MODEL_ID : $model,
-			'response_format' => 'mp3',
-			'speed' => $speed,
 		];
+		$modelParam = $this->modelParam($service, $model, Application::DEFAULT_SPEECH_MODEL_ID);
+		if ($modelParam !== null) {
+			$params['model'] = $modelParam;
+		}
+		$params['response_format'] = 'mp3';
+		$params['speed'] = $speed;
 
-		$apiResponse = $this->request($userId, 'audio/speech', $params, 'POST', serviceType: Application::SERVICE_TYPE_TTS);
+		$apiResponse = $this->request($userId, $service, 'audio/speech', $params, 'POST');
 
 		try {
 			$charCount = mb_strlen($prompt);
-			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount);
+			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount, $service);
 		} catch (DBException $e) {
 			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_SPEECH . '. Error: ' . $e->getMessage());
 		}
@@ -1157,8 +1067,8 @@ class OpenAiAPIService {
 	/**
 	 * @return int
 	 */
-	public function getExpTextProcessingTime(): int {
-		return $this->isUsingOpenAi()
+	public function getExpTextProcessingTime(ServiceConfig $service): int {
+		return $service->isUsingOpenAi()
 			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME), lazy: true))
 			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME), lazy: true));
 	}
@@ -1167,11 +1077,11 @@ class OpenAiAPIService {
 	 * @param int $runtime
 	 * @return void
 	 */
-	public function updateExpTextProcessingTime(int $runtime): void {
-		$oldTime = floatval($this->getExpTextProcessingTime());
+	public function updateExpTextProcessingTime(int $runtime, ServiceConfig $service): void {
+		$oldTime = floatval($this->getExpTextProcessingTime($service));
 		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
-		if ($this->isUsingOpenAi()) {
+		if ($service->isUsingOpenAi()) {
 			$this->appConfig->setValueString(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)), lazy: true);
 		} else {
 			$this->appConfig->setValueString(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)), lazy: true);
@@ -1181,8 +1091,8 @@ class OpenAiAPIService {
 	/**
 	 * @return int
 	 */
-	public function getExpImgProcessingTime(): int {
-		return $this->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)
+	public function getExpImgProcessingTime(ServiceConfig $service): int {
+		return $service->isUsingOpenAi()
 			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME), lazy: true))
 			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME), lazy: true));
 	}
@@ -1191,11 +1101,11 @@ class OpenAiAPIService {
 	 * @param int $runtime
 	 * @return void
 	 */
-	public function updateExpImgProcessingTime(int $runtime): void {
-		$oldTime = floatval($this->getExpImgProcessingTime());
+	public function updateExpImgProcessingTime(int $runtime, ServiceConfig $service): void {
+		$oldTime = floatval($this->getExpImgProcessingTime($service));
 		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
 
-		if ($this->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)) {
+		if ($service->isUsingOpenAi()) {
 			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)), lazy: true);
 		} else {
 			$this->appConfig->setValueString(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)), lazy: true);
@@ -1210,25 +1120,25 @@ class OpenAiAPIService {
 	 * @param string $method HTTP query method
 	 * @param string|null $contentType
 	 * @param bool $logErrors if set to false error logs will be suppressed
-	 * @param string|null $serviceType
 	 * @param int $retryCount number of retries that have been attempted so far
 	 * @return array decoded request result or error
 	 * @throws Exception|UserFacingProcessingException
 	 */
 	public function request(
-		?string $userId, string $endPoint, array $params = [], string $method = 'GET',
-		?string $contentType = null, bool $logErrors = true, ?string $serviceType = null,
+		?string $userId, ServiceConfig $service, string $endPoint, array $params = [], string $method = 'GET',
+		?string $contentType = null, bool $logErrors = true,
 		int $retryCount = 0,
 		bool $stream = false,
 	): array {
 		try {
-			$context = $this->getRequestContext($userId, $serviceType);
-			$serviceUrl = $context['serviceUrl'];
-			$apiKey = $context['apiKey'];
-			$basicUser = $context['basicUser'];
-			$basicPassword = $context['basicPassword'];
-			$useBasicAuth = $context['useBasicAuth'];
-			$timeout = $context['timeout'];
+			// the user's own credentials take precedence over the admin ones
+			$service = $this->servicesService->applyUserCredentials($service, $userId);
+			$serviceUrl = $service->getRequestUrl();
+			$apiKey = $service->getApiKey();
+			$basicUser = $service->getBasicUser();
+			$basicPassword = $service->getBasicPassword();
+			$useBasicAuth = $service->getUseBasicAuth();
+			$timeout = $service->getRequestTimeout();
 
 			$url = rtrim($serviceUrl, '/') . '/' . $endPoint;
 			$options = [
@@ -1242,7 +1152,7 @@ class OpenAiAPIService {
 				return ['error' => 'An API key is required for api.openai.com'];
 			}
 
-			if ($this->isUsingOpenAi($serviceType) || !$useBasicAuth) {
+			if ($service->isUsingOpenAi() || !$useBasicAuth) {
 				if ($apiKey !== '') {
 					$options['headers']['Authorization'] = 'Bearer ' . $apiKey;
 				}
@@ -1252,7 +1162,7 @@ class OpenAiAPIService {
 				}
 			}
 
-			if (!$this->isUsingOpenAi($serviceType)) {
+			if (!$service->isUsingOpenAi()) {
 				$options['nextcloud']['allow_local_address'] = true;
 			}
 
@@ -1365,7 +1275,7 @@ class OpenAiAPIService {
 					}
 					$this->logger->warning("Rate limit exceeded, retrying in $sleep seconds", ['retry_count' => $retryCount]);
 					sleep($sleep);
-					return $this->request($userId, $endPoint, $params, $method, $contentType, $logErrors, $serviceType, $retryCount + 1, $stream);
+					return $this->request($userId, $service, $endPoint, $params, $method, $contentType, $logErrors, $retryCount + 1, $stream);
 				} else {
 					$this->logger->warning('Rate limit exceeded, maximum retries reached', ['retry_count' => $retryCount]);
 				}
@@ -1392,14 +1302,14 @@ class OpenAiAPIService {
 				throw new UserFacingProcessingException(
 					$this->l10n->t('API request error: ') . $errorMessage,
 					intval($e->getCode()),
-					userFacingMessage: $this->l10n->t('%s API error: Invalid API key or invalid Basic Authentication. Contact your system administrator.', [$this->getServiceName()]),
+					userFacingMessage: $this->l10n->t('%s API error: Invalid API key or invalid Basic Authentication. Contact your system administrator.', [$service->getDisplayName()]),
 				);
 			}
 			if ($e->getResponse()->getStatusCode() >= 500) {
 				throw new UserFacingProcessingException(
 					$this->l10n->t('API request error: ') . $errorMessage,
 					intval($e->getCode()),
-					userFacingMessage: $this->l10n->t('%s API error: AI backend is currently not available. Contact your system administrator.', [$this->getServiceName()]),
+					userFacingMessage: $this->l10n->t('%s API error: AI backend is currently not available. Contact your system administrator.', [$service->getDisplayName()]),
 				);
 			}
 			throw new Exception(
@@ -1413,61 +1323,9 @@ class OpenAiAPIService {
 			throw new UserFacingProcessingException(
 				$this->l10n->t('API connection error: ') . $e->getMessage(),
 				intval($e->getCode()),
-				userFacingMessage: $this->l10n->t('%s API error: AI backend is currently not reachable. Contact your system administrator.', [$this->getServiceName()]),
+				userFacingMessage: $this->l10n->t('%s API error: AI backend is currently not reachable. Contact your system administrator.', [$service->getDisplayName()]),
 			);
 		}
-	}
-
-	/**
-	 * @param string|null $userId
-	 * @param string|null $serviceType
-	 * @return array{serviceUrl: string, apiKey: string, basicUser: string, basicPassword: string, useBasicAuth: bool, timeout: int}
-	 */
-	private function getRequestContext(?string $userId, ?string $serviceType = null): array {
-		if ($serviceType === Application::SERVICE_TYPE_IMAGE && $this->openAiSettingsService->imageOverrideEnabled()) {
-			return [
-				'serviceUrl' => $this->openAiSettingsService->getImageServiceUrl(),
-				'apiKey' => $this->openAiSettingsService->getAdminImageApiKey(),
-				'basicUser' => $this->openAiSettingsService->getAdminImageBasicUser(),
-				'basicPassword' => $this->openAiSettingsService->getAdminImageBasicPassword(),
-				'useBasicAuth' => $this->openAiSettingsService->getAdminImageUseBasicAuth(),
-				'timeout' => $this->openAiSettingsService->getImageRequestTimeout(),
-			];
-		}
-		if ($serviceType === Application::SERVICE_TYPE_STT && $this->openAiSettingsService->sttOverrideEnabled()) {
-			return [
-				'serviceUrl' => $this->openAiSettingsService->getSttServiceUrl(),
-				'apiKey' => $this->openAiSettingsService->getAdminSttApiKey(),
-				'basicUser' => $this->openAiSettingsService->getAdminSttBasicUser(),
-				'basicPassword' => $this->openAiSettingsService->getAdminSttBasicPassword(),
-				'useBasicAuth' => $this->openAiSettingsService->getAdminSttUseBasicAuth(),
-				'timeout' => $this->openAiSettingsService->getSttRequestTimeout(),
-			];
-		}
-		if ($serviceType === Application::SERVICE_TYPE_TTS && $this->openAiSettingsService->ttsOverrideEnabled()) {
-			return [
-				'serviceUrl' => $this->openAiSettingsService->getTtsServiceUrl(),
-				'apiKey' => $this->openAiSettingsService->getAdminTtsApiKey(),
-				'basicUser' => $this->openAiSettingsService->getAdminTtsBasicUser(),
-				'basicPassword' => $this->openAiSettingsService->getAdminTtsBasicPassword(),
-				'useBasicAuth' => $this->openAiSettingsService->getAdminTtsUseBasicAuth(),
-				'timeout' => $this->openAiSettingsService->getTtsRequestTimeout(),
-			];
-		}
-
-		$serviceUrl = $this->openAiSettingsService->getServiceUrl();
-		if ($serviceUrl === '') {
-			$serviceUrl = Application::OPENAI_API_BASE_URL;
-		}
-
-		return [
-			'serviceUrl' => $serviceUrl,
-			'apiKey' => $this->openAiSettingsService->getUserApiKey($userId, true),
-			'basicUser' => $this->openAiSettingsService->getUserBasicUser($userId, true),
-			'basicPassword' => $this->openAiSettingsService->getUserBasicPassword($userId, true),
-			'useBasicAuth' => $this->openAiSettingsService->getUseBasicAuth(),
-			'timeout' => $this->openAiSettingsService->getRequestTimeout(),
-		];
 	}
 
 	/**
@@ -1550,12 +1408,10 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * Check if the T2I provider is available
-	 *
-	 * @return bool whether the T2I provider is available
+	 * Check whether a service can generate images
 	 */
-	public function isT2IAvailable(): bool {
-		if ($this->openAiSettingsService->imageOverrideEnabled() || $this->isUsingOpenAi()) {
+	public function isT2IAvailable(ServiceConfig $service): bool {
+		if ($service->isUsingOpenAi()) {
 			return true;
 		}
 		try {
@@ -1563,7 +1419,7 @@ class OpenAiAPIService {
 				'prompt' => 'a',
 				'model' => 'invalid-model',
 			];
-			$this->request(null, 'images/generations', $params, 'POST', logErrors: false, serviceType: Application::SERVICE_TYPE_IMAGE);
+			$this->request(null, $service, 'images/generations', $params, 'POST', logErrors: false);
 		} catch (Exception $e) {
 			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
 		}
@@ -1571,12 +1427,10 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * Check if the STT provider is available
-	 *
-	 * @return bool whether the STT provider is available
+	 * Check whether a service can transcribe audio
 	 */
-	public function isSTTAvailable(): bool {
-		if ($this->openAiSettingsService->sttOverrideEnabled() || $this->isUsingOpenAi()) {
+	public function isSTTAvailable(ServiceConfig $service): bool {
+		if ($service->isUsingOpenAi()) {
 			return true;
 		}
 		try {
@@ -1584,7 +1438,7 @@ class OpenAiAPIService {
 				'model' => 'invalid-model',
 				'file' => 'a',
 			];
-			$this->request(null, 'audio/translations', $params, 'POST', 'multipart/form-data', logErrors: false, serviceType: Application::SERVICE_TYPE_STT);
+			$this->request(null, $service, 'audio/translations', $params, 'POST', 'multipart/form-data', logErrors: false);
 		} catch (Exception $e) {
 			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
 		}
@@ -1592,12 +1446,10 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * Check if the TTS provider is available
-	 *
-	 * @return bool whether the TTS provider is available
+	 * Check whether a service can generate speech
 	 */
-	public function isTTSAvailable(): bool {
-		if ($this->openAiSettingsService->ttsOverrideEnabled() || $this->isUsingOpenAi()) {
+	public function isTTSAvailable(ServiceConfig $service): bool {
+		if ($service->isUsingOpenAi()) {
 			return true;
 		}
 		try {
@@ -1608,7 +1460,7 @@ class OpenAiAPIService {
 				'response_format' => 'mp3',
 			];
 
-			$this->request(null, 'audio/speech', $params, 'POST', logErrors: false, serviceType: Application::SERVICE_TYPE_TTS);
+			$this->request(null, $service, 'audio/speech', $params, 'POST', logErrors: false);
 		} catch (Exception $e) {
 			return $e->getCode() !== Http::STATUS_NOT_FOUND && $e->getCode() !== Http::STATUS_UNAUTHORIZED;
 		}
@@ -1616,17 +1468,19 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * Updates the admin config with the availability of the providers
+	 * Detect which modalities a service supports and switch off the ones it
+	 * does not. The text modality is always assumed to be available.
 	 *
-	 * @return array the updated config
+	 * @return array<string, bool> the detected modality switches
 	 * @throws Exception
 	 */
-	public function autoDetectFeatures(): array {
-		$config = [];
-		$config['t2i_provider_enabled'] = $this->isT2IAvailable();
-		$config['stt_provider_enabled'] = $this->isSTTAvailable();
-		$config['tts_provider_enabled'] = $this->isTTSAvailable();
-		$this->openAiSettingsService->setAdminConfig($config);
-		return $config;
+	public function autoDetectModalities(ServiceConfig $service): array {
+		$detected = [
+			'image_enabled' => $this->isT2IAvailable($service),
+			'stt_enabled' => $this->isSTTAvailable($service),
+			'tts_enabled' => $this->isTTSAvailable($service),
+		];
+		$this->servicesService->updateService($service->getId(), $detected);
+		return $detected;
 	}
 }

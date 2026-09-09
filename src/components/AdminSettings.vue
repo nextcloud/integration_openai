@@ -9,684 +9,112 @@
 			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
 		</h2>
 		<div id="openai-content">
-			<div>
-				<NcNoteCard v-if="!state.assistant_enabled" type="warning">
-					{{ t('integration_openai', 'The Assistant app is not enabled. You need it to use the features provided by the OpenAI/LocalAI integration app.') }}
-					<a class="external" :href="appSettingsAssistantUrl" target="_blank">
-						{{ t('integration_openai', 'Assistant app') }}
-					</a>
-				</NcNoteCard>
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Services with an OpenAI-compatible API:') }}
-					<div class="services">
-						<a class="external" href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>
-						<a class="external" href="https://docs.ionos.com/cloud/ai/ai-model-hub" target="_blank">IONOS AI Model Hub</a>
-						<a class="external" href="https://console.groq.com" target="_blank">Groqcloud</a>
-						<a class="external" href="https://localai.io/" target="_blank">LocalAI</a>
-						<a class="external" href="https://ollama.com/" target="_blank">Ollama</a>
-						<a class="external" href="https://mistral.ai" target="_blank">MistralAI</a>
-						<a class="external" href="https://www.plusserver.com/en/ai-platform/" target="_blank">Plusserver</a>
-					</div>
-				</NcNoteCard>
-				<div class="line">
-					<NcTextField
-						id="openai-url"
-						v-model="state.url"
-						class="input"
-						:label="t('integration_openai', 'Service URL')"
-						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080/v1' })"
-						:show-trailing-button="!!state.url"
-						@update:model-value="onSensitiveInput(true)"
-						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
-						<template #icon>
-							<EarthIcon :size="20" />
-						</template>
-					</NcTextField>
-					<NcButton variant="tertiary"
-						:title="t('integration_openai', 'Leave empty to use {openaiApiUrl}', { openaiApiUrl: 'https://api.openai.com/v1' })">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</div>
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'With the current configuration, the target URL used to get the models is:') }}
-					<br>
-					<strong>{{ modelEndpointUrl }}</strong>
-				</NcNoteCard>
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. More often than not "/v1" at the end is required even if the model list loads without it. This URL will be accessed by your Nextcloud server.') }}
-					<br>
-					{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case, make sure \'allow_local_remote_servers\' is set to true in config.php.', { example: 'http://localhost:8080/v1' }) }}
-				</NcNoteCard>
-				<div v-if="state.url !== ''" class="line">
-					<NcTextField
-						id="openai-service-name"
-						v-model="state.service_name"
-						class="input"
-						:label="t('integration_openai', 'Service name (optional)')"
-						:placeholder="t('integration_openai', 'Example: LocalAI of university ABC')"
-						:show-trailing-button="!!state.service_name"
-						@update:model-value="onInput()"
-						@trailing-button-click="state.service_name = '' ; onInput()" />
-					<NcButton variant="tertiary"
-						:title="t('integration_openai', 'This name will be displayed as provider name in the AI admin settings')">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</div>
-				<div class="line">
-					<NcInputField
-						id="openai-api-timeout"
-						v-model="state.request_timeout"
-						class="input"
-						type="number"
-						:label="t('integration_openai', 'Request timeout (seconds)')"
-						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
-						:show-trailing-button="!!state.request_timeout"
-						@update:model-value="onInput()"
-						@trailing-button-click="state.request_timeout = '' ; onInput()">
-						<template #icon>
-							<TimerAlertOutlineIcon :size="20" />
-						</template>
-						<template #trailing-button-icon>
-							<CloseIcon :size="20" />
-						</template>
-					</NcInputField>
-					<NcButton variant="tertiary"
-						:title="t('integration_openai', 'Timeout for the request to the external API')">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</div>
-			</div>
-			<div>
-				<h2>
-					{{ t('integration_openai', 'Authentication') }}
-				</h2>
-				<div v-show="state.url !== ''" class="line column">
-					<label>
-						{{ t('integration_openai', 'Authentication method') }}
-					</label>
-					<div class="radios">
-						<NcCheckboxRadioSwitch
-							:button-variant="true"
-							:model-value="!state.use_basic_auth"
-							type="radio"
-							button-variant-grouped="horizontal"
-							name="auth_method"
-							@update:model-value="onCheckboxChanged(false, 'use_basic_auth')">
-							{{ t('assistant', 'API key') }}
-						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch
-							:button-variant="true"
-							:model-value="state.use_basic_auth"
-							type="radio"
-							button-variant-grouped="horizontal"
-							name="auth_method"
-							@update:model-value="onCheckboxChanged(true, 'use_basic_auth')">
-							{{ t('assistant', 'Basic Authentication') }}
-						</NcCheckboxRadioSwitch>
-					</div>
-				</div>
-				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
-					<NcTextField
-						id="openai-api-key"
-						v-model="state.api_key"
-						class="input"
-						type="password"
-						:readonly="readonly"
-						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
-						:show-trailing-button="!!state.api_key"
-						@update:model-value="onSensitiveInput(true)"
-						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
-						@focus="readonly = false">
-						<template #icon>
-							<KeyOutlineIcon :size="20" />
-						</template>
-					</NcTextField>
-				</div>
-				<NcNoteCard v-show="state.url === ''" type="info">
-					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings') }}:
-					&nbsp;
-					<a :href="apiKeyUrl" target="_blank" class="external">
-						{{ apiKeyUrl }}
-					</a>
-				</NcNoteCard>
-				<div v-show="state.url !== '' && state.use_basic_auth">
-					<div class="line">
-						<NcTextField
-							id="openai-basic-user"
-							v-model="state.basic_user"
-							class="input"
-							:readonly="readonly"
-							:label="t('integration_openai', 'Basic Auth user')"
-							:show-trailing-button="!!state.basic_user"
-							@update:model-value="onSensitiveInput(true)"
-							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)"
-							@focus="readonly = false">
-							<template #icon>
-								<AccountOutlineIcon :size="20" />
-							</template>
-						</NcTextField>
-					</div>
-					<div class="line">
-						<NcTextField
-							id="openai-basic-password"
-							v-model="state.basic_password"
-							class="input"
-							type="password"
-							:readonly="readonly"
-							:label="t('integration_openai', 'Basic Auth password')"
-							:show-trailing-button="!!state.basic_password"
-							@update:model-value="onSensitiveInput(true)"
-							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)"
-							@focus="readonly = false">
-							<template #icon>
-								<KeyOutlineIcon :size="20" />
-							</template>
-						</NcTextField>
-					</div>
-				</div>
-			</div>
-			<div>
-				<h2>
-					{{ t('integration_openai', 'Text generation') }}
-				</h2>
-				<div v-if="state.url !== ''" class="line column">
-					<label>
-						<EarthIcon :size="20" class="icon" />
-						{{ t('integration_openai', 'Text completion endpoint') }}
-					</label>
-					<div class="radios">
-						<NcCheckboxRadioSwitch
-							:button-variant="true"
-							:model-value="state.chat_endpoint_enabled"
-							type="radio"
-							button-variant-grouped="horizontal"
-							name="chat_endpoint"
-							@update:model-value="onCheckboxChanged(true, 'chat_endpoint_enabled', false)">
-							{{ t('assistant', 'Chat completions') }}
-						</NcCheckboxRadioSwitch>
-						<NcCheckboxRadioSwitch
-							:button-variant="true"
-							:model-value="!state.chat_endpoint_enabled"
-							type="radio"
-							button-variant-grouped="horizontal"
-							name="chat_endpoint"
-							@update:model-value="onCheckboxChanged(false, 'chat_endpoint_enabled', false)">
-							{{ t('assistant', 'Completions') }}
-						</NcCheckboxRadioSwitch>
-					</div>
-				</div>
-				<NcNoteCard type="info">
-					{{ state.url === ''
-						? t('integration_openai', 'Selection of chat/completion endpoint is not available for OpenAI since it implicitly uses chat completions for "instruction following" fine-tuned models.')
-						: t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
-				</NcNoteCard>
-				<div v-if="models"
-					class="line line-select">
-					<NcSelect
-						v-model="selectedModel.text"
-						class="model-select"
-						:clearable="state.default_completion_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels(models)"
-						:input-label="t('integration_openai', 'Default completion model to use')"
-						:no-wrap="true"
-						input-id="openai-model-select"
-						@update:model-value="onModelSelected('text', $event)" />
-					<a v-if="state.url === ''"
-						:title="t('integration_openai', 'More information about OpenAI models')"
-						href="https://beta.openai.com/docs/models"
-						target="_blank">
-						<NcButton variant="tertiary" aria-label="openai-info">
-							<template #icon>
-								<HelpCircleOutlineIcon />
-							</template>
-						</NcButton>
-					</a>
-					<a v-else
-						:title="t('integration_openai', 'More information about LocalAI models')"
-						href="https://localai.io/model-compatibility/index.html"
-						target="_blank">
-						<NcButton variant="tertiary" aria-label="localai-info">
-							<template #icon>
-								<HelpCircleOutlineIcon />
-							</template>
-						</NcButton>
-					</a>
-				</div>
-				<div class="line">
-					<NcTextField
-						id="llm-extra-params"
-						v-model="state.llm_extra_params"
-						class="input"
-						:label="t('integration_openai', 'Extra completion model parameters')"
-						:show-trailing-button="!!state.llm_extra_params"
-						@update:model-value="onInput()"
-						@trailing-button-click="state.llm_extra_params = '' ; onInput()" />
-					<NcButton variant="tertiary"
-						:title="llmExtraParamHint">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</div>
-				<div class="line">
-					<!--Input for max chunk size (prompt length) for a single request-->
-					<NcInputField
-						id="openai-chunk-size"
-						v-model="state.chunk_size"
-						class="input"
-						type="number"
-						:label="t('integration_openai', 'Max input tokens per request')"
-						:show-trailing-button="!!state.chunk_size"
-						@update:model-value="onInput()"
-						@trailing-button-click="state.chunk_size = '' ; onInput()">
-						<template #trailing-button-icon>
-							<CloseIcon :size="20" />
-						</template>
-					</NcInputField>
-					<NcButton variant="tertiary"
-						:title="t('integration_openai', 'Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)')">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</div>
-				<div class="line">
-					<!--Input for max number of tokens to generate for a single request-->
-					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
-					<NcInputField
-						id="openai-api-max-tokens"
-						v-model="state.max_tokens"
-						class="input"
-						type="number"
-						:label="t('integration_openai', 'Max output tokens per request')"
-						:show-trailing-button="!!state.max_tokens"
-						@update:model-value="onInput()"
-						@trailing-button-click="state.max_tokens = '' ; onInput()">
-						<template #trailing-button-icon>
-							<CloseIcon :size="20" />
-						</template>
-					</NcInputField>
-					<NcButton variant="tertiary"
-						:title="t('integration_openai', 'Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks.')">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</div>
-				<div class="line">
-					<NcFormBoxSwitch
-						:model-value="state.use_max_completion_tokens_param"
-						@update:model-value="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
-						{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
-					</NcFormBoxSwitch>
-				</div>
-				<h3>
-					{{ t('integration_openai', 'Multimodal LLM Support') }}
-				</h3>
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'Multimodal LLM Support allows you to enable or disable the use of images, audio, video and document attachments in the LLM.') }}
-				</NcNoteCard>
-				<NcFormBox class="features-form-box">
-					<NcFormBoxSwitch
-						:model-value="state.multimodal_image_enabled"
-						@update:model-value="onCheckboxChanged($event, 'multimodal_image_enabled', false)">
-						{{ t('integration_openai', 'Image attachments') }}
-					</NcFormBoxSwitch>
-					<NcFormBoxSwitch
-						:model-value="state.multimodal_audio_enabled"
-						@update:model-value="onCheckboxChanged($event, 'multimodal_audio_enabled', false)">
-						{{ t('integration_openai', 'Audio attachments') }}
-					</NcFormBoxSwitch>
-					<NcFormBoxSwitch
-						:model-value="state.multimodal_video_enabled"
-						@update:model-value="onCheckboxChanged($event, 'multimodal_video_enabled', false)">
-						{{ t('integration_openai', 'Video attachments') }}
-					</NcFormBoxSwitch>
-					<NcFormBoxSwitch
-						:model-value="state.multimodal_document_enabled"
-						@update:model-value="onCheckboxChanged($event, 'multimodal_document_enabled', false)">
-						{{ t('integration_openai', 'Document attachments') }}
-					</NcFormBoxSwitch>
-				</NcFormBox>
-			</div>
-			<div>
-				<h2>
-					{{ t('integration_openai', 'Image generation') }}
-				</h2>
-				<ServiceOverridePanel
-					context-prefix="image"
-					:state="state"
-					:readonly="readonly"
-					:ai-task="t('integration_openai', 'image generation')"
-					:default-url="modelEndpointUrl"
-					@focus="readonly = false"
-					@input="handleOverrideInput"
-					@sensitive-input="handleOverrideSensitiveInput"
-					@checkbox-changed="onCheckboxChanged" />
-				<div v-if="imageModels"
-					class="line line-select">
-					<NcSelect
-						v-model="selectedModel.image"
-						class="model-select"
-						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels(imageModels)"
-						:input-label="t('integration_openai', 'Default image generation model to use')"
-						:no-wrap="true"
-						input-id="openai-model-select"
-						@update:model-value="onModelSelected('image', $event)" />
-					<a v-if="state.url === ''"
-						:title="t('integration_openai', 'More information about OpenAI models')"
-						href="https://beta.openai.com/docs/models"
-						target="_blank">
-						<NcButton variant="tertiary" aria-label="openai-info">
-							<template #icon>
-								<HelpCircleOutlineIcon />
-							</template>
-						</NcButton>
-					</a>
-					<a v-else
-						:title="t('integration_openai', 'More information about LocalAI models')"
-						href="https://localai.io/model-compatibility/index.html"
-						target="_blank">
-						<NcButton variant="tertiary" aria-label="localai-info">
-							<template #icon>
-								<HelpCircleOutlineIcon />
-							</template>
-						</NcButton>
-					</a>
-				</div>
-				<NcNoteCard v-else type="info">
-					{{ t('integration_openai', 'No models to list') }}
-				</NcNoteCard>
-				<div class="line">
-					<NcTextField
-						id="default-image-size"
-						v-model="state.default_image_size"
-						class="input"
-						:label="t('integration_openai', 'Default image size')"
-						:show-trailing-button="!!state.default_image_size"
-						@update:model-value="onInput()"
-						@trailing-button-click="state.default_image_size = '' ; onInput()" />
-					<NcButton variant="tertiary"
-						:title="defaultImageSizeParamHint">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</div>
-				<div class="line">
-					<NcFormBoxSwitch
-						:model-value="state.image_request_auth"
-						@update:model-value="onCheckboxChanged($event, 'image_request_auth', false)">
-						{{ t('integration_openai', 'Use authentication for image retrieval request') }}
-					</NcFormBoxSwitch>
-				</div>
-			</div>
-			<div>
-				<h2>
-					{{ t('integration_openai', 'Audio transcription') }}
-				</h2>
-				<ServiceOverridePanel
-					context-prefix="stt"
-					:state="state"
-					:readonly="readonly"
-					:ai-task="t('integration_openai', 'audio transcription')"
-					:default-url="modelEndpointUrl"
-					@focus="readonly = false"
-					@input="handleOverrideInput"
-					@sensitive-input="handleOverrideSensitiveInput"
-					@checkbox-changed="onCheckboxChanged" />
-				<div v-if="sttModels"
-					class="line line-select">
-					<NcSelect
-						v-model="selectedModel.stt"
-						class="model-select"
-						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
-						:options="formattedModels(sttModels)"
-						:input-label="t('integration_openai', 'Default transcription model to use')"
-						:no-wrap="true"
-						input-id="openai-stt-model-select"
-						@update:model-value="onModelSelected('stt', $event)" />
-					<a v-if="state.url === ''"
-						:title="t('integration_openai', 'More information about OpenAI models')"
-						href="https://beta.openai.com/docs/models"
-						target="_blank">
-						<NcButton variant="tertiary" aria-label="openai-info">
-							<template #icon>
-								<HelpCircleOutlineIcon />
-							</template>
-						</NcButton>
-					</a>
-					<a v-else
-						:title="t('integration_openai', 'More information about LocalAI models')"
-						href="https://localai.io/model-compatibility/index.html"
-						target="_blank">
-						<NcButton variant="tertiary" aria-label="localai-info">
-							<template #icon>
-								<HelpCircleOutlineIcon />
-							</template>
-						</NcButton>
-					</a>
-				</div>
-				<NcNoteCard v-else type="info">
-					{{ t('integration_openai', 'No models to list') }}
-				</NcNoteCard>
-			</div>
-			<h2>
-				{{ t('integration_openai', 'Text to speech') }}
-			</h2>
-			<ServiceOverridePanel
-				context-prefix="tts"
-				:state="state"
-				:readonly="readonly"
-				:ai-task="t('integration_openai', 'text to speech')"
-				:default-url="modelEndpointUrl"
-				@focus="readonly = false"
-				@input="handleOverrideInput"
-				@sensitive-input="handleOverrideSensitiveInput"
-				@checkbox-changed="onCheckboxChanged" />
-			<div v-if="ttsModels"
-				class="line line-select">
-				<NcSelect
-					v-model="selectedModel.tts"
-					class="model-select"
-					:clearable="state.default_tts_model_id !== DEFAULT_MODEL_ITEM.id"
-					:options="formattedModels(ttsModels)"
-					:input-label="t('integration_openai', 'Default speech generation model to use')"
-					:no-wrap="true"
-					input-id="openai-tts-model-select"
-					@update:model-value="onModelSelected('tts', $event)" />
-				<a v-if="state.url === ''"
-					:title="t('integration_openai', 'More information about OpenAI models')"
-					href="https://beta.openai.com/docs/models"
-					target="_blank">
-					<NcButton variant="tertiary" aria-label="openai-info">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
+			<NcNoteCard v-if="!state.assistant_enabled" type="warning">
+				{{ t('integration_openai', 'The Assistant app is not enabled. You need it to use the features provided by the OpenAI/LocalAI integration app.') }}
+				<a class="external" :href="appSettingsAssistantUrl" target="_blank">
+					{{ t('integration_openai', 'Assistant app') }}
 				</a>
-				<a v-else
-					:title="t('integration_openai', 'More information about LocalAI models')"
-					href="https://localai.io/model-compatibility/index.html"
-					target="_blank">
-					<NcButton variant="tertiary" aria-label="localai-info">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</a>
-			</div>
-			<NcNoteCard v-else type="info">
-				{{ t('integration_openai', 'No models to list') }}
 			</NcNoteCard>
-			<div class="line column">
-				<label>{{ t('integration_openai', 'TTS Voices') }}
-					<NcButton
-						:title="t('integration_openai', 'A list of voices supported by the endpoint you are using. Defaults to openai\'s list.')"
-						variant="tertiary"
-						aria-label="voices-info">
-						<template #icon>
-							<HelpCircleOutlineIcon />
-						</template>
-					</NcButton>
-				</label>
-				<NcSelect v-model="state.tts_voices"
-					:label-outside="true"
-					multiple
-					taggable
-					style="width: 350px;"
-					@input="onInput()" />
-			</div>
-			<NcSelect
-				v-model="state.default_tts_voice"
-				class="model-select"
-				:options="state.tts_voices"
-				:input-label="t('integration_openai', 'Default voice to use')"
-				:no-wrap="true"
-				input-id="openai-tts-voices-select"
-				@click="onInput()" />
-			<div>
-				<h2 style="margin: 10px 0 -10px 0">
-					{{ t('integration_openai', 'Usage limits') }}
-				</h2>
-				<div class="line">
-					<!--Time period in days for the token usage-->
-					<QuotaPeriodPicker
-						v-model:value="state.quota_period"
-						@update:value="onInput()" />
+
+			<h3>{{ t('integration_openai', 'Connected services') }}</h3>
+			<NcNoteCard type="info">
+				{{ t('integration_openai', 'Connect as many OpenAI-compatible services as you need. For each of them, select the models you want to expose per modality: every selected model becomes a provider you can pick in the AI admin settings.') }}
+				<div class="services">
+					<a class="external" href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>
+					<a class="external" href="https://docs.ionos.com/cloud/ai/ai-model-hub" target="_blank">IONOS AI Model Hub</a>
+					<a class="external" href="https://console.groq.com" target="_blank">Groqcloud</a>
+					<a class="external" href="https://localai.io/" target="_blank">LocalAI</a>
+					<a class="external" href="https://ollama.com/" target="_blank">Ollama</a>
+					<a class="external" href="https://mistral.ai" target="_blank">MistralAI</a>
+					<a class="external" href="https://www.plusserver.com/en/ai-platform/" target="_blank">Plusserver</a>
 				</div>
-				<h2>
-					{{ t('integration_openai', 'Usage quotas per time period') }}
-				</h2>
-				<NcNoteCard type="info">
-					{{ t('integration_openai', 'A per-user quota for each quota type can be set. If the user has not provided their own API key, and a rule is not specified for this user or any of their groups, this quota will be enforced.') }}
-					{{ t('integration_openai', '"0" means unlimited usage for a particular quota type.') }}
-				</NcNoteCard>
-				<!--Loop through all quota types and list an input for them on this line-->
-				<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
-				<table class="quota-table">
-					<thead>
-						<tr>
-							<th width="120px">
-								{{ t('integration_openai', 'Quota type') }}
-							</th>
-							<th>{{ t('integration_openai', 'Per-user quota / period') }}</th>
-							<th v-if="quotaInfo !== null">
-								{{ t('integration_openai', 'Current system-wide usage / period') }}
-							</th>
-						</tr>
-					</thead>
-					<tbody v-if="quotaInfo !== null">
-						<tr v-for="(_,index) in state.quotas" :key="index">
-							<td class="text-cell">
-								{{ quotaInfo[index].type }}
-							</td>
-							<td>
-								<input :id="'openai-api-quota-' + index"
-									v-model.number="state.quotas[index]"
-									:title="t('integration_openai', 'A per-user limit for usage of this API type (0 for unlimited)')"
-									type="number"
-									@input="onInput()">
-								<span v-if="quotaInfo !== null" class="text-cell">
-									{{ quotaInfo[index].unit }}
-								</span>
-							</td>
-							<td v-if="quotaInfo !== null" class="text-cell">
-								{{ quotaInfo[index].used }}
-							</td>
-						</tr>
-					</tbody>
-				</table>
-				<div class="line">
-					<NcInputField
-						id="openai-api-usage-storage-time"
-						v-model="state.usage_storage_time"
-						class="input"
-						type="number"
-						:label="t('integration_openai', 'Time period (days) for usage storage')"
-						@update:model-value="onInput()" />
-				</div>
-				<div class="line-gap">
-					<NcDateTimePickerNative
-						v-model="quota_usage.start_date"
-						:label="t('integration_openai', 'Start date')" />
-					<NcDateTimePickerNative
-						v-model="quota_usage.end_date"
-						:label="t('integration_openai', 'End date')" />
-					<NcSelect
-						v-model="quota_usage.quota_type"
-						:options="quotaTypes"
-						:input-label="t('integration_openai', 'Quota type')" />
-					<NcButton :href="downloadQuotaUsageUrl" class="download-button">
-						{{ t('integration_openai', 'Download quota usage') }}
-					</NcButton>
-				</div>
-				<h2>{{ t('integration_openai', 'Quota Rules') }}</h2>
-				<QuotaRules :quota-info="quotaInfo" />
+			</NcNoteCard>
+
+			<NcEmptyContent v-if="services.length === 0"
+				:name="t('integration_openai', 'No service connected yet')"
+				:description="t('integration_openai', 'Connect a service to expose its models as providers.')">
+				<template #icon>
+					<OpenAiIcon />
+				</template>
+			</NcEmptyContent>
+
+			<ServiceForm v-for="service in services"
+				:key="service.id"
+				:service="service"
+				:usage="usageOf(service.id)"
+				:initially-expanded="services.length === 1"
+				@save="values => saveService(service.id, values, false)"
+				@save-sensitive="values => saveService(service.id, values, true)"
+				@detected="values => applyToService(service.id, values)"
+				@delete="deleteService(service)" />
+
+			<div class="line">
+				<NcButton variant="primary" :disabled="adding" @click="addService">
+					<template #icon>
+						<NcLoadingIcon v-if="adding" :size="20" />
+						<PlusIcon v-else :size="20" />
+					</template>
+					{{ t('integration_openai', 'Connect a service') }}
+				</NcButton>
 			</div>
-			<div>
-				<h2>
-					{{ t('integration_openai', 'Select enabled features') }}
-				</h2>
-				<NcFormBox class="features-form-box">
-					<NcFormBoxSwitch
-						:model-value="state.translation_provider_enabled"
-						@update:model-value="onCheckboxChanged($event, 'translation_provider_enabled', false)">
-						{{ t('integration_openai', 'Translation provider (to translate Talk messages for example)') }}
-					</NcFormBoxSwitch>
-					<NcFormBoxSwitch
-						:model-value="state.llm_provider_enabled"
-						@update:model-value="onCheckboxChanged($event, 'llm_provider_enabled', false)">
-						{{ t('integration_openai', 'Text processing providers (to generate text, summarize, context write, etc.)') }}
-					</NcFormBoxSwitch>
-					<NcFormBoxSwitch
-						:model-value="state.t2i_provider_enabled"
-						@update:model-value="onCheckboxChanged($event, 't2i_provider_enabled', false)">
-						{{ t('integration_openai', 'Image generation provider') }}
-					</NcFormBoxSwitch>
-					<NcFormBoxSwitch
-						:model-value="state.stt_provider_enabled"
-						@update:model-value="onCheckboxChanged($event, 'stt_provider_enabled', false)">
-						{{ t('integration_openai', 'Speech-to-text provider (to transcribe Talk recordings for example)') }}
-					</NcFormBoxSwitch>
-					<NcFormBoxSwitch
-						:model-value="state.tts_provider_enabled"
-						@update:model-value="onCheckboxChanged($event, 'tts_provider_enabled', false)">
-						{{ t('integration_openai', 'Text-to-speech provider') }}
-					</NcFormBoxSwitch>
-				</NcFormBox>
+
+			<h3>{{ t('integration_openai', 'Usage limits') }}</h3>
+			<div class="line">
+				<QuotaPeriodPicker
+					v-model:value="state.quota_period"
+					@update:value="onInput()" />
 			</div>
+			<NcNoteCard type="info">
+				{{ t('integration_openai', 'The quota amounts themselves are configured per service. Quota rules apply across all services.') }}
+			</NcNoteCard>
+			<div class="line">
+				<NcInputField
+					id="openai-api-usage-storage-time"
+					v-model="state.usage_storage_time"
+					class="input"
+					type="number"
+					:label="t('integration_openai', 'Time period (days) for usage storage')"
+					@update:model-value="onInput()" />
+			</div>
+			<div class="line-gap">
+				<NcDateTimePickerNative
+					v-model="quotaUsage.start_date"
+					:label="t('integration_openai', 'Start date')" />
+				<NcDateTimePickerNative
+					v-model="quotaUsage.end_date"
+					:label="t('integration_openai', 'End date')" />
+				<NcSelect
+					v-model="quotaUsage.quota_type"
+					:options="quotaTypes"
+					:input-label="t('integration_openai', 'Quota type')" />
+				<NcSelect
+					v-model="quotaUsage.service"
+					:options="serviceOptions"
+					:input-label="t('integration_openai', 'Service')" />
+				<NcButton :href="downloadQuotaUsageUrl" class="download-button">
+					{{ t('integration_openai', 'Download quota usage') }}
+				</NcButton>
+			</div>
+
+			<h3>{{ t('integration_openai', 'Quota Rules') }}</h3>
+			<QuotaRules :quota-info="quotaRuleTypes" />
 		</div>
 	</div>
 </template>
 
 <script>
-import AccountOutlineIcon from 'vue-material-design-icons/AccountOutline.vue'
-import CloseIcon from 'vue-material-design-icons/Close.vue'
-import EarthIcon from 'vue-material-design-icons/Earth.vue'
-import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
-import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
-import TimerAlertOutlineIcon from 'vue-material-design-icons/TimerAlertOutline.vue'
-import QuotaRules from './Rules/QuotaRules.vue'
+import PlusIcon from 'vue-material-design-icons/Plus.vue'
 
 import OpenAiIcon from './icons/OpenAiIcon.vue'
+import QuotaRules from './Rules/QuotaRules.vue'
 
 import NcButton from '@nextcloud/vue/components/NcButton'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
-import NcFormBox from '@nextcloud/vue/components/NcFormBox'
-import NcFormBoxSwitch from '@nextcloud/vue/components/NcFormBoxSwitch'
+import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcInputField from '@nextcloud/vue/components/NcInputField'
+import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
@@ -695,59 +123,38 @@ import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import QuotaPeriodPicker from './QuotaPeriodPicker.vue'
-import ServiceOverridePanel from './ServiceOverridePanel.vue'
-
-const DEFAULT_MODEL_ITEM = { id: 'Default' }
+import ServiceForm from './ServiceForm.vue'
 
 export default {
 	name: 'AdminSettings',
 
 	components: {
-		QuotaPeriodPicker,
-		ServiceOverridePanel,
 		OpenAiIcon,
-		AccountOutlineIcon,
-		CloseIcon,
-		EarthIcon,
-		HelpCircleOutlineIcon,
-		KeyOutlineIcon,
-		TimerAlertOutlineIcon,
-		NcButton,
-		NcSelect,
-		NcCheckboxRadioSwitch,
-		NcFormBox,
-		NcFormBoxSwitch,
-		NcTextField,
-		NcInputField,
-		NcNoteCard,
-		NcDateTimePickerNative,
+		PlusIcon,
+		QuotaPeriodPicker,
 		QuotaRules,
+		ServiceForm,
+		NcButton,
+		NcDateTimePickerNative,
+		NcEmptyContent,
+		NcInputField,
+		NcLoadingIcon,
+		NcNoteCard,
+		NcSelect,
 	},
 
 	data() {
 		const state = loadState('integration_openai', 'admin-config')
 		return {
 			state,
-			// to prevent some browsers to fill fields with remembered passwords
-			readonly: true,
-			models: null,
-			imageModels: null,
-			sttModels: null,
-			ttsModels: null,
-			selectedModel: {
-				text: null,
-				image: null,
-				stt: null,
-				tts: null,
-			},
-			apiKeyUrl: 'https://platform.openai.com/account/api-keys',
-			quotaInfo: null,
-			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
-			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '1024x1024' }),
-			DEFAULT_MODEL_ITEM,
+			services: loadState('integration_openai', 'services'),
+			/** Instance-wide usage per service, keyed by service ID */
+			usage: null,
+			adding: false,
 			appSettingsAssistantUrl: generateUrl('/settings/apps/integration/assistant'),
-			quota_usage: {
-				quota_type: { id: 0, label: '' },
+			quotaUsage: {
+				quota_type: { id: 0, label: t('integration_openai', 'Text generation') },
+				service: null,
 				start_date: new Date(state.quota_start_date * 1000),
 				end_date: new Date(state.quota_end_date * 1000),
 			},
@@ -755,312 +162,201 @@ export default {
 	},
 
 	computed: {
+		/** The quota types, in the order the backend numbers them */
+		quotaTypeDefinitions() {
+			return [
+				{ type: t('integration_openai', 'Text generation'), unit: t('integration_openai', 'tokens') },
+				{ type: t('integration_openai', 'Image generation'), unit: t('integration_openai', 'images') },
+				{ type: t('integration_openai', 'Audio transcription'), unit: t('integration_openai', 'seconds') },
+				{ type: t('integration_openai', 'Text to speech'), unit: t('integration_openai', 'characters') },
+			]
+		},
 		quotaTypes() {
-			return (this.quotaInfo ?? []).map((q, idx) => ({ id: idx, label: q.type }))
+			return this.quotaTypeDefinitions.map((quotaType, id) => ({ id, label: quotaType.type }))
+		},
+		/** The quota types, in the shape the rules component expects */
+		quotaRuleTypes() {
+			return this.quotaTypeDefinitions
+		},
+		serviceOptions() {
+			return [
+				{ id: null, label: t('integration_openai', 'All services') },
+				...this.services.map(service => ({ id: service.id, label: service.display_name })),
+			]
 		},
 		downloadQuotaUsageUrl() {
-			return generateUrl('/apps/integration_openai/quota/download-usage?type={type}&startDate={startDate}&endDate={endDate}', {
-				type: this.quota_usage.quota_type?.id,
-				startDate: this.quota_usage.start_date / 1000,
-				endDate: this.quota_usage.end_date / 1000,
+			return generateUrl('/apps/integration_openai/quota/download-usage?type={type}&startDate={startDate}&endDate={endDate}&serviceId={serviceId}', {
+				type: this.quotaUsage.quota_type?.id ?? 0,
+				startDate: this.quotaUsage.start_date / 1000,
+				endDate: this.quotaUsage.end_date / 1000,
+				serviceId: this.quotaUsage.service?.id ?? '',
 			})
-		},
-		modelEndpointUrl() {
-			if (this.state.url === '') {
-				return 'https://api.openai.com/v1/models'
-			}
-			return this.state.url.replace(/\/*$/, '/models')
-		},
-		isUsingOpenAI() {
-			return this.state.url === ''
-		},
-		configured() {
-			return !!this.state.url || !!this.state.api_key || !!this.state.basic_user || !!this.state.basic_password
 		},
 	},
 
 	mounted() {
-		if (this.configured) {
-			this.getAllModels(false)
-		}
-		this.loadQuotaInfo()
+		this.loadUsage()
 	},
 
 	methods: {
-		formattedModels(models) {
-			if (models) {
-				return models.map(m => {
-					return {
-						id: m.id,
-						value: m.id,
-						label: m.id
-							+ (m.owned_by ? ' (' + m.owned_by + ')' : ''),
-					}
-				})
-			}
-			return []
+		usageOf(serviceId) {
+			return this.usage?.[serviceId] ?? null
 		},
-		modelToNcSelectObject(model) {
-			return {
-				id: model.id,
-				value: model.id,
-				label: model.id + (model.owned_by ? ' (' + model.owned_by + ')' : ''),
-			}
-		},
-		autoDetectFeatures() {
-			return axios.post(generateUrl('/apps/integration_openai/admin-config/auto-detect-features')).then((response) => {
-				const data = response.data ?? {}
-				console.debug(data)
-				this.state = {
-					...this.state,
-					...data,
-				}
-			}).catch((error) => {
-				showError(
-					t('integration_openai', 'Failed to auto update config')
-						+ ': ' + this.reduceStars(error.response?.data?.error),
-					{ timeout: 10000 },
-				)
-				console.error(error)
-			})
-		},
-		async getAllModels(shouldSave = true) {
-			const models = this.getModels() // Gets the default models. getModels returns a promise
-			console.debug(this.models)
-			const [imageModels, sttModels, ttsModels] = await Promise.all([
-				this.state.image_url === '' ? models : this.getModels('image'),
-				this.state.stt_url === '' ? models : this.getModels('stt'),
-				this.state.tts_url === '' ? models : this.getModels('tts'),
-			])
-			this.models = await models
-			this.imageModels = imageModels
-			this.sttModels = sttModels
-			this.ttsModels = ttsModels
-
-			const defaultCompletionModelId = this.state.default_completion_model_id
-			const completionModelToSelect = this.models.find(m => m.id === defaultCompletionModelId)
-					|| this.models.find(m => m.id === 'gpt-4.1-mini')
-					|| this.models[1]
-					|| this.models[0]
-
-			const defaultImageModelId = this.state.default_image_model_id
-			const imageModelToSelect = this.imageModels.find(m => m.id === defaultImageModelId)
-					|| this.imageModels.find(m => m.id.match(/image/i))
-					|| this.imageModels[1]
-					|| this.imageModels[0]
-
-			const defaultSttModelId = this.state.default_stt_model_id
-			const sttModelToSelect = this.sttModels.find(m => m.id === defaultSttModelId)
-					|| this.sttModels.find(m => m.id.match(/whisper/i))
-					|| this.sttModels[1]
-					|| this.sttModels[0]
-
-			const defaultTtsModelId = this.state.default_tts_model_id
-			const ttsModelToSelect = this.ttsModels.find(m => m.id === defaultTtsModelId)
-					|| this.ttsModels.find(m => m.id.match(/tts/i))
-					|| this.ttsModels[1]
-					|| this.ttsModels[0]
-
-			this.selectedModel.text = this.modelToNcSelectObject(completionModelToSelect)
-			this.selectedModel.image = this.modelToNcSelectObject(imageModelToSelect)
-			this.selectedModel.stt = this.modelToNcSelectObject(sttModelToSelect)
-			this.selectedModel.tts = this.modelToNcSelectObject(ttsModelToSelect)
-
-			// save if url/credentials were changed OR if the values are not up-to-date in the stored settings
-			if (shouldSave
-					|| this.state.default_completion_model_id !== this.selectedModel.text.id
-					|| this.state.default_image_model_id !== this.selectedModel.image.id
-					|| this.state.default_stt_model_id !== this.selectedModel.stt.id
-					|| this.state.default_tts_model_id !== this.selectedModel.tts.id) {
-				this.saveOptions({
-					default_completion_model_id: this.selectedModel.text.id,
-					default_image_model_id: this.selectedModel.image.id,
-					default_stt_model_id: this.selectedModel.stt.id,
-					default_tts_model_id: this.selectedModel.tts.id,
-				}, false)
-			}
-
-			this.state.default_completion_model_id = completionModelToSelect.id
-			this.state.default_image_model_id = imageModelToSelect.id
-			this.state.default_stt_model_id = sttModelToSelect.id
-			this.state.default_tts_model_id = ttsModelToSelect.id
-		},
-		getModels(serviceType = '') {
-			const url = generateUrl('/apps/integration_openai/models')
-			return axios.get(url, {
-				params: { serviceType },
-			}).then((response) => {
-				const result = response.data?.data ?? []
-				if (this.isUsingOpenAI) {
-					result.unshift(DEFAULT_MODEL_ITEM)
-				}
-				return result
-			}).catch((error) => {
-				showError(
-					t('integration_openai', 'Failed to load models')
-						+ ': ' + this.reduceStars(error.response?.data?.error),
-					{ timeout: 10000 },
-				)
-				console.error(error)
-			})
-		},
-		onModelSelected(type, selected) {
-			console.debug(`Selected model: ${type}: ${selected}`)
-			if (selected == null) {
-				if (type === 'image') {
-					this.selectedModel.image = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
-					this.state.default_image_model_id = DEFAULT_MODEL_ITEM.id
-				} else if (type === 'text') {
-					this.selectedModel.text = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
-					this.state.default_completion_model_id = DEFAULT_MODEL_ITEM.id
-				} else if (type === 'stt') {
-					this.selectedModel.stt = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
-					this.state.default_stt_model_id = DEFAULT_MODEL_ITEM.id
-				} else if (type === 'tts') {
-					this.selectedModel.tts = this.modelToNcSelectObject(DEFAULT_MODEL_ITEM)
-					this.state.default_tts_model_id = DEFAULT_MODEL_ITEM.id
-				}
-			} else {
-				if (type === 'image') {
-					this.state.default_image_model_id = selected.id
-				} else if (type === 'text') {
-					this.state.default_completion_model_id = selected.id
-				} else if (type === 'stt') {
-					this.state.default_stt_model_id = selected.id
-				} else if (type === 'tts') {
-					this.state.default_tts_model_id = selected.id
-				}
-			}
-			this.saveOptions({
-				default_completion_model_id: this.state.default_completion_model_id,
-				default_image_model_id: this.state.default_image_model_id,
-				default_stt_model_id: this.state.default_stt_model_id,
-				default_tts_model_id: this.state.default_tts_model_id,
-			})
-		},
-		loadQuotaInfo() {
-			const url = generateUrl('/apps/integration_openai/admin-quota-info')
-			return axios.get(url)
-				.then((response) => {
-					this.quotaInfo = response.data
-					if (this.quotaInfo.length > 0) {
-						this.quota_usage.quota_type = { id: 0, label: this.quotaInfo[0].type }
-					}
-				})
-				.catch((error) => {
-					showError(
-						t('integration_openai', 'Failed to load quota info')
-						+ ': ' + this.reduceStars(error.response?.data?.error),
-						{ timeout: 10000 },
-					)
-				})
-		},
-		capitalizedWord(word) {
-			return word.charAt(0).toUpperCase() + word.slice(1)
-		},
-		handleOverrideInput(values) {
-			Object.assign(this.state, values)
-			this.onInput()
-		},
-		handleOverrideSensitiveInput(values, getModels = true) {
-			Object.assign(this.state, values)
-			this.onSensitiveInput(getModels)
-		},
-		async onCheckboxChanged(newValue, key, getModels = true, sensitive = false) {
-			this.state[key] = newValue
-			await this.saveOptions({ [key]: this.state[key] }, sensitive)
-			if (getModels) {
-				this.getAllModels()
-			}
-		},
-		onSensitiveInput: debounce(async function(getModels = true) {
-			const values = {
-				basic_user: (this.state.basic_user ?? '').trim(),
-				url: (this.state.url ?? '').trim(),
-				image_url: (this.state.image_url ?? '').trim(),
-				stt_url: (this.state.stt_url ?? '').trim(),
-				tts_url: (this.state.tts_url ?? '').trim(),
-			}
-			if (this.state.api_key !== 'dummyApiKey') {
-				values.api_key = (this.state.api_key ?? '').trim()
-			}
-			if (this.state.basic_password !== 'dummyPassword') {
-				values.basic_password = (this.state.basic_password ?? '').trim()
-			}
-
-			if (this.state.image_api_key !== 'dummyApiKey') {
-				values.image_api_key = (this.state.image_api_key ?? '').trim()
-			}
-			if (this.state.image_basic_password !== 'dummyPassword') {
-				values.image_basic_password = (this.state.image_basic_password ?? '').trim()
-			}
-			if (this.state.stt_api_key !== 'dummyApiKey') {
-				values.stt_api_key = (this.state.stt_api_key ?? '').trim()
-			}
-			if (this.state.stt_basic_password !== 'dummyPassword') {
-				values.stt_basic_password = (this.state.stt_basic_password ?? '').trim()
-			}
-			if (this.state.tts_api_key !== 'dummyApiKey') {
-				values.tts_api_key = (this.state.tts_api_key ?? '').trim()
-			}
-			if (this.state.tts_basic_password !== 'dummyPassword') {
-				values.tts_basic_password = (this.state.tts_basic_password ?? '').trim()
-			}
-
-			await this.saveOptions(values, true)
-			if (getModels) {
-				this.getAllModels()
-			}
-			this.autoDetectFeatures()
-		}, 2000),
-		onInput: debounce(async function() {
-			// sanitize quotas
-			this.state.quotas = this.state.quotas.map(e => parseInt(e)).map(e => isNaN(e) || e < 0 ? 0 : e)
-			const values = {
-				service_name: this.state.service_name,
-				request_timeout: parseInt(this.state.request_timeout),
-				chunk_size: parseInt(this.state.chunk_size),
-				max_tokens: parseInt(this.state.max_tokens),
-				llm_extra_params: this.state.llm_extra_params,
-				default_image_size: this.state.default_image_size,
-				quota_period: this.state.quota_period,
-				quotas: this.state.quotas,
-				tts_voices: this.state.tts_voices,
-				default_tts_voice: this.state.default_tts_voice,
-				usage_storage_time: this.state.usage_storage_time,
-				image_service_name: this.state.image_service_name,
-				image_request_timeout: this.state.image_request_timeout,
-				image_use_basic_auth: this.state.image_use_basic_auth,
-				stt_service_name: this.state.stt_service_name,
-				stt_request_timeout: this.state.stt_request_timeout,
-				stt_use_basic_auth: this.state.stt_use_basic_auth,
-				tts_service_name: this.state.tts_service_name,
-				tts_request_timeout: this.state.tts_request_timeout,
-				tts_use_basic_auth: this.state.tts_use_basic_auth,
-			}
-			await this.saveOptions(values, false)
-		}, 2000),
-		async saveOptions(values, sensitive = false, notify = true) {
-			if (sensitive) {
-				await confirmPassword()
-			}
-
-			const req = {
-				values,
-			}
-			const url = sensitive ? generateUrl('/apps/integration_openai/admin-config/sensitive') : generateUrl('/apps/integration_openai/admin-config')
+		async loadUsage() {
 			try {
-				await axios.put(url, req)
-				if (notify) {
-					showSuccess(t('integration_openai', 'OpenAI admin options saved'))
-				}
+				const response = await axios.get(generateUrl('/apps/integration_openai/admin-quota-info'))
+				this.usage = Object.fromEntries((response.data ?? []).map(service => [service.id, service.quota_usage]))
 			} catch (error) {
+				showError(
+					t('integration_openai', 'Failed to load quota info')
+					+ ': ' + this.reduceStars(error.response?.data?.error),
+					{ timeout: 10000 },
+				)
+			}
+		},
+		applyToService(serviceId, values) {
+			const index = this.services.findIndex(service => service.id === serviceId)
+			if (index !== -1) {
+				this.services.splice(index, 1, { ...this.services[index], ...values })
+			}
+		},
+		async addService() {
+			this.adding = true
+			try {
+				const response = await axios.post(generateUrl('/apps/integration_openai/services'))
+				this.services.push(response.data)
+			} catch (error) {
+				showError(
+					t('integration_openai', 'Failed to add the service')
+					+ ': ' + this.reduceStars(error.response?.data?.error),
+					{ timeout: 10000 },
+				)
 				console.error(error)
+			} finally {
+				this.adding = false
+			}
+		},
+		async deleteService(service) {
+			if (!window.confirm(t('integration_openai', 'Remove {service}? The providers it exposes will stop working.', { service: service.display_name }))) {
+				return
+			}
+			try {
+				await confirmPassword()
+				await axios.delete(generateUrl('/apps/integration_openai/services/{id}', { id: service.id }))
+				this.services = this.services.filter(s => s.id !== service.id)
+				showSuccess(t('integration_openai', 'Service removed'))
+			} catch (error) {
+				showError(
+					t('integration_openai', 'Failed to remove the service')
+					+ ': ' + this.reduceStars(error.response?.data?.error),
+					{ timeout: 10000 },
+				)
+				console.error(error)
+			}
+		},
+		/**
+		 * Apply the change locally right away and save it, so typing stays
+		 * responsive while the debounced request is pending.
+		 *
+		 * @param {string} serviceId ID of the service to change
+		 * @param {object} values properties to change
+		 * @param {boolean} sensitive whether the change needs a confirmed password
+		 */
+		saveService(serviceId, values, sensitive) {
+			this.applyToService(serviceId, values)
+			if (sensitive) {
+				this.saveSensitiveServiceDebounced(serviceId)
+			} else {
+				this.saveServiceDebounced(serviceId)
+			}
+		},
+		saveServiceDebounced: debounce(function(serviceId) {
+			this.putService(serviceId, false)
+		}, 2000),
+		saveSensitiveServiceDebounced: debounce(function(serviceId) {
+			this.putService(serviceId, true)
+		}, 2000),
+		/**
+		 * @param {string} serviceId ID of the service to save
+		 * @param {boolean} sensitive whether to send the URL and the credentials
+		 */
+		async putService(serviceId, sensitive) {
+			const service = this.services.find(s => s.id === serviceId)
+			if (service === undefined) {
+				return
+			}
+			const values = sensitive
+				? {
+					url: (service.url ?? '').trim(),
+					basic_user: (service.basic_user ?? '').trim(),
+					api_key: (service.api_key ?? '').trim(),
+					basic_password: (service.basic_password ?? '').trim(),
+				}
+				: {
+					name: service.name,
+					use_basic_auth: service.use_basic_auth,
+					request_timeout: parseInt(service.request_timeout) || 1,
+					chat_endpoint_enabled: service.chat_endpoint_enabled,
+					use_max_completion_tokens_param: service.use_max_completion_tokens_param,
+					llm_extra_params: service.llm_extra_params,
+					max_tokens: parseInt(service.max_tokens) || 1,
+					chunk_size: parseInt(service.chunk_size) || 0,
+					multimodal_image_enabled: service.multimodal_image_enabled,
+					multimodal_audio_enabled: service.multimodal_audio_enabled,
+					multimodal_video_enabled: service.multimodal_video_enabled,
+					multimodal_document_enabled: service.multimodal_document_enabled,
+					tts_voices: service.tts_voices,
+					default_tts_voice: service.default_tts_voice,
+					default_image_size: service.default_image_size,
+					image_request_auth: service.image_request_auth,
+					text_enabled: service.text_enabled,
+					image_enabled: service.image_enabled,
+					stt_enabled: service.stt_enabled,
+					tts_enabled: service.tts_enabled,
+					text_models: service.text_models,
+					image_models: service.image_models,
+					stt_models: service.stt_models,
+					tts_models: service.tts_models,
+					quotas: service.quotas,
+				}
+
+			try {
+				if (sensitive) {
+					await confirmPassword()
+				}
+				const url = sensitive
+					? generateUrl('/apps/integration_openai/services/{id}/sensitive', { id: serviceId })
+					: generateUrl('/apps/integration_openai/services/{id}', { id: serviceId })
+				const response = await axios.put(url, { values })
+				// the backend normalizes some values, and redacts the secrets again
+				this.applyToService(serviceId, response.data)
+				showSuccess(t('integration_openai', 'OpenAI admin options saved'))
+			} catch (error) {
 				showError(
 					t('integration_openai', 'Failed to save OpenAI admin options')
 					+ ': ' + this.reduceStars(error.response?.data?.error),
 					{ timeout: 10000 },
 				)
+				console.error(error)
+			}
+		},
+		onInput: debounce(async function() {
+			await this.saveAdminConfig({
+				quota_period: this.state.quota_period,
+				usage_storage_time: parseInt(this.state.usage_storage_time) || 1,
+			})
+		}, 2000),
+		async saveAdminConfig(values) {
+			try {
+				await axios.put(generateUrl('/apps/integration_openai/admin-config'), { values })
+				showSuccess(t('integration_openai', 'OpenAI admin options saved'))
+			} catch (error) {
+				showError(
+					t('integration_openai', 'Failed to save OpenAI admin options')
+					+ ': ' + this.reduceStars(error.response?.data?.error),
+					{ timeout: 10000 },
+				)
+				console.error(error)
 			}
 		},
 		reduceStars(text) {
@@ -1079,100 +375,44 @@ export default {
 		margin-left: 40px;
 	}
 
-	h2 {
-		justify-content: start;
+	h2,
+	.line {
 		display: flex;
+		justify-content: start;
 		align-items: center;
+		margin-top: 12px;
 		gap: 8px;
-		margin-top: 8px;
+	}
+
+	h2 .icon {
+		margin-right: 8px;
+	}
+
+	h3 {
+		margin-top: 24px;
+	}
+
+	.line-gap {
+		display: flex;
+		align-items: end;
+		gap: 12px;
+		margin-top: 12px;
+		flex-wrap: wrap;
+	}
+
+	.line .input {
+		width: 300px;
 	}
 
 	.services {
 		display: flex;
-		gap: 4px;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin-top: 8px;
 	}
 
-	.radios {
-		display: flex;
+	.download-button {
+		margin-bottom: 2px;
 	}
-
-	.quota-table {
-		padding: 4px 8px 4px 8px;
-		border: 2px solid var(--color-border);
-		border-radius: var(--border-radius);
-		.text-cell {
-			opacity: 0.5;
-		}
-		th, td {
-			width: 300px;
-			text-align: left;
-			> input:invalid {
-				border-color: var(--color-error);
-			}
-		}
-	}
-
-	.line {
-		align-items: center;
-	}
-
-	.line-gap {
-		gap: 8px;
-		align-items: normal;
-
-		.download-button {
-			align-self: flex-end;
-		}
-
-		> * {
-			margin-bottom: 20px;
-		}
-	}
-
-	.line, .line-gap {
-		display: flex;
-		margin-top: 12px;
-		.icon {
-			margin-right: 4px;
-		}
-		&.line-select {
-			align-items: end;
-		}
-		> label {
-			width: 350px;
-			display: flex;
-			align-items: center;
-		}
-		> input, .input {
-			width: 350px;
-			margin-top: 0;
-		}
-		> input:invalid {
-			border-color: var(--color-error);
-		}
-		> input[type='radio'] {
-			width: auto;
-		}
-
-		&.column {
-			flex-direction: column;
-			align-items: start;
-			gap: 8px;
-		}
-	}
-
-	.model-select {
-		min-width: 350px;
-		margin: 0 !important;
-	}
-}
-
-.notecard {
-	max-width: 900px;
-}
-
-.features-form-box {
-	width: max-content;
-	max-width: 100%;
 }
 </style>
