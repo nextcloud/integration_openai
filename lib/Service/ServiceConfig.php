@@ -50,6 +50,7 @@ class ServiceConfig implements JsonSerializable {
 		'image_enabled' => 'boolean',
 		'stt_enabled' => 'boolean',
 		'tts_enabled' => 'boolean',
+		'translation_enabled' => 'boolean',
 		'text_models' => 'array',
 		'image_models' => 'array',
 		'stt_models' => 'array',
@@ -94,6 +95,7 @@ class ServiceConfig implements JsonSerializable {
 		private bool $imageEnabled = true,
 		private bool $sttEnabled = true,
 		private bool $ttsEnabled = true,
+		private bool $translationEnabled = true,
 		private array $textModels = [],
 		private array $imageModels = [],
 		private array $sttModels = [],
@@ -169,6 +171,8 @@ class ServiceConfig implements JsonSerializable {
 					break;
 				case 'tts_enabled': $new->ttsEnabled = (bool)$value;
 					break;
+				case 'translation_enabled': $new->translationEnabled = (bool)$value;
+					break;
 				case 'text_models': $new->textModels = self::normalizeModels($value);
 					break;
 				case 'image_models': $new->imageModels = self::normalizeModels($value);
@@ -177,7 +181,7 @@ class ServiceConfig implements JsonSerializable {
 					break;
 				case 'tts_models': $new->ttsModels = self::normalizeModels($value);
 					break;
-				case 'quotas': $new->quotas = self::normalizeQuotas($value);
+				case 'quotas': $new->quotas = self::normalizeQuotas($value, $new->quotas);
 					break;
 			}
 		}
@@ -198,11 +202,16 @@ class ServiceConfig implements JsonSerializable {
 	}
 
 	/**
+	 * Merge the given quotas onto the ones already set, so that a partial
+	 * update does not reset the quota types it does not mention. A new service
+	 * passes the defaults as the base.
+	 *
 	 * @param mixed $quotas
+	 * @param array<int, int> $base
 	 * @return array<int, int>
 	 */
-	private static function normalizeQuotas(mixed $quotas): array {
-		$normalized = Application::DEFAULT_QUOTAS;
+	private static function normalizeQuotas(mixed $quotas, array $base): array {
+		$normalized = $base;
 		if (!is_array($quotas)) {
 			return $normalized;
 		}
@@ -366,6 +375,15 @@ class ServiceConfig implements JsonSerializable {
 		return $this->imageRequestAuth ?? !$this->isUsingOpenAi();
 	}
 
+	/**
+	 * Whether this service offers the translation task types. Translation is
+	 * part of the text modality, but has its own switch because it is often
+	 * served by a dedicated instance.
+	 */
+	public function getTranslationEnabled(): bool {
+		return $this->translationEnabled;
+	}
+
 	public function isModalityEnabled(string $modality): bool {
 		return match ($modality) {
 			Application::MODALITY_TEXT => $this->textEnabled,
@@ -449,6 +467,7 @@ class ServiceConfig implements JsonSerializable {
 			'image_enabled' => $this->imageEnabled,
 			'stt_enabled' => $this->sttEnabled,
 			'tts_enabled' => $this->ttsEnabled,
+			'translation_enabled' => $this->translationEnabled,
 			'text_models' => $this->textModels,
 			'image_models' => $this->imageModels,
 			'stt_models' => $this->sttModels,

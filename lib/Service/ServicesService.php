@@ -401,6 +401,13 @@ class ServicesService {
 				throw new Exception('llm_extra_params must be a JSON object');
 			}
 		}
+		if (isset($values['url']) && $values['url'] !== '' && !filter_var($values['url'], FILTER_VALIDATE_URL)) {
+			throw new Exception('Invalid service URL');
+		}
+		if (isset($values['default_image_size']) && $values['default_image_size'] !== ''
+			&& preg_match('/^\d+x\d+$/', (string)$values['default_image_size']) !== 1) {
+			throw new Exception('Invalid image size value. Expected the format <width>x<height>');
+		}
 	}
 
 	private function generateId(): string {

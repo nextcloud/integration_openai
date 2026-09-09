@@ -89,11 +89,15 @@ class ProviderFactory {
 			new EmojiProvider($this->openAiAPIService, $this->l, $service, $model),
 			new ChangeToneProvider($this->openAiAPIService, $this->l, $this->chunkService, $service, $model),
 			new ProofreadProvider($this->openAiAPIService, $this->l, $this->chunkService, $service, $model),
-			new TranslateProvider($this->openAiAPIService, $this->l, $this->translateService, $service, $model),
 			new MultimodalChatWithToolsProvider(
 				$this->openAiAPIService, $this->l, $this->logger, $this->watermarkingService, $service, $model,
 			),
 		];
+		if ($service->getTranslationEnabled()) {
+			$providers[] = new TranslateProvider(
+				$this->openAiAPIService, $this->l, $this->translateService, $service, $model,
+			);
+		}
 		if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
 			$providers[] = new ReformatParagraphsProvider(
 				$this->openAiAPIService, $this->l, $this->chunkService, $service, $model,
@@ -170,7 +174,7 @@ class ProviderFactory {
 		}
 		// ... and speech generation on top of that
 		$ttsModel = $service->getFirstModel(Application::MODALITY_TTS);
-		if ($ttsModel !== null) {
+		if ($ttsModel !== null && $service->getTranslationEnabled()) {
 			$providers[] = new AudioToAudioTranslateProvider(
 				$this->openAiAPIService, $this->translateService, $this->watermarkingService,
 				$this->logger, $this->l10nFactory, $this->l, $this->userManager,

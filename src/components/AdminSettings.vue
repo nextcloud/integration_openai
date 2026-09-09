@@ -344,6 +344,7 @@ export default {
 					image_enabled: service.image_enabled,
 					stt_enabled: service.stt_enabled,
 					tts_enabled: service.tts_enabled,
+					translation_enabled: service.translation_enabled,
 					text_models: service.text_models,
 					image_models: service.image_models,
 					stt_models: service.stt_models,

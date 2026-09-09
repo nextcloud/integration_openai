@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
+use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\WatermarkingService;
@@ -115,6 +116,11 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 		$size = $this->service->getDefaultImageSize();
 		if (isset($input['size']) && is_string($input['size']) && preg_match('/^\d+x\d+$/', $input['size'])) {
 			$size = trim($input['size']);
+		}
+		if (preg_match('/^\d+x\d+$/', $size) !== 1) {
+			// the service is misconfigured, fall back to the default rather
+			// than sending a size the API cannot parse
+			$size = Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 		}
 		[$x, $y] = explode('x', $size, 2);
 		if ((int)$x > 4096 || (int)$y > 4096) {

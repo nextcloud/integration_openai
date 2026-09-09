@@ -261,6 +261,12 @@
 							@update:model-value="onInput({ use_max_completion_tokens_param: $event })">
 							{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
 						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							:model-value="service.translation_enabled"
+							type="switch"
+							@update:model-value="onInput({ translation_enabled: $event })">
+							{{ t('integration_openai', 'Offer translation') }}
+						</NcCheckboxRadioSwitch>
 						<h5>{{ t('integration_openai', 'Multimodal LLM Support') }}</h5>
 						<NcNoteCard type="info">
 							{{ t('integration_openai', 'Which kinds of attachments the models of this service accept.') }}

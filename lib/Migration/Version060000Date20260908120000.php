@@ -100,7 +100,10 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 			return;
 		}
 
-		$mainService = $this->buildMainService();
+		// The service list is the marker this migration is guarded by, so it is
+		// written only once every other step has succeeded. Until then nothing
+		// observable has changed and an aborted upgrade can simply be re-run.
+		$mainService = $this->buildMainService('s1');
 		$services = [$mainService];
 		/** @var array<int, string> $serviceIdByQuotaType */
 		$serviceIdByQuotaType = [
@@ -111,7 +114,7 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 		];
 
 		foreach ($this->getOverrides() as $prefix => [$modality, $quotaType]) {
-			$service = $this->buildOverrideService($prefix, $modality);
+			$service = $this->buildOverrideService($prefix, $modality, 's' . (count($services) + 1));
 			if ($service === null) {
 				continue;
 			}
@@ -119,10 +122,17 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 			$serviceIdByQuotaType[$quotaType] = $service->getId();
 		}
 
-		$output->info('Migrated the OpenAI/LocalAI configuration to ' . count($services) . ' service(s)');
-
+		// Both of these are re-runnable: the credential migration moves one
+		// preference at a time, and the usage attribution only touches rows
+		// that have no service yet.
 		$this->migrateUserCredentials($mainService->getId());
 		$this->attributeQuotaUsage($serviceIdByQuotaType);
+
+		$this->servicesService->setServices($services);
+		// keep the ID generator in sync with the IDs handed out above
+		$this->appConfig->setValueInt(Application::APP_ID, 'service_id_counter', count($services));
+
+		$output->info('Migrated the OpenAI/LocalAI configuration to ' . count($services) . ' service(s)');
 
 		foreach (self::OBSOLETE_CONFIG_KEYS as $key) {
 			$this->appConfig->deleteKey(Application::APP_ID, $key);
@@ -147,7 +157,7 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 	 * The main configuration becomes the first service. It serves every
 	 * modality that was enabled and not overridden by its own URL.
 	 */
-	private function buildMainService(): ServiceConfig {
+	private function buildMainService(string $id): ServiceConfig {
 		$values = [
 			'name' => $this->getString('service_name'),
 			'url' => $this->getString('url'),
@@ -174,6 +184,7 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 			'quotas' => $this->getQuotas(),
 			// The models that were configured as defaults are the ones to expose
 			'text_enabled' => $this->getBool('llm_provider_enabled', true),
+			'translation_enabled' => $this->getBool('translation_provider_enabled', true),
 			'text_models' => [$this->getString('default_completion_model_id') ?: Application::DEFAULT_COMPLETION_MODEL_ID],
 		];
 
@@ -184,14 +195,14 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 			$values[$modality . '_models'] = $overridden ? [] : [$this->getOldModel($modality)];
 		}
 
-		return $this->servicesService->addService($values);
+		return ServiceConfig::fromArray($id, $values);
 	}
 
 	/**
 	 * A modality that had its own URL becomes a service that serves only that
 	 * modality
 	 */
-	private function buildOverrideService(string $prefix, string $modality): ?ServiceConfig {
+	private function buildOverrideService(string $prefix, string $modality, string $id): ?ServiceConfig {
 		$url = $this->getString($prefix . 'url');
 		if ($url === '') {
 			return null;
@@ -213,11 +224,12 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 			'image_enabled' => false,
 			'stt_enabled' => false,
 			'tts_enabled' => false,
+			'translation_enabled' => $this->getBool('translation_provider_enabled', true),
 		];
 		$values[$modality . '_enabled'] = $this->isModalityEnabledInOldConfig($modality);
 		$values[$modality . '_models'] = [$this->getOldModel($modality)];
 
-		return $this->servicesService->addService($values);
+		return ServiceConfig::fromArray($id, $values);
 	}
 
 	private function isModalityEnabledInOldConfig(string $modality): bool {

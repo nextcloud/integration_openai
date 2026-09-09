@@ -107,8 +107,10 @@ class OpenAiAPIService {
 	public function getModels(?string $userId, ServiceConfig $service, bool $refresh = false): array {
 		$serviceId = $service->getId();
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
-		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId . '_' . ($userId ?? '');
-		$adminCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId . '_main';
+		// the user ID goes into its own 'user_' namespace so that no UID can
+		// ever produce the admin key and poison the list served to everyone
+		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId . '_user_' . ($userId ?? '');
+		$adminCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId . '_admin';
 		$dbCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId;
 
 		if (!$refresh) {
