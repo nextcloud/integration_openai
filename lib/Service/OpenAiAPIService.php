@@ -115,6 +115,26 @@ class OpenAiAPIService {
 
 	/**
 	 * @param ?string $serviceType
+	 * @return bool
+	 */
+	public function isUsingIonos(?string $serviceType = null): bool {
+		$serviceUrl = '';
+		if ($serviceType === Application::SERVICE_TYPE_IMAGE) {
+			$serviceUrl = $this->openAiSettingsService->getImageServiceUrl();
+		} elseif ($serviceType === Application::SERVICE_TYPE_STT) {
+			$serviceUrl = $this->openAiSettingsService->getSttServiceUrl();
+		} elseif ($serviceType === Application::SERVICE_TYPE_TTS) {
+			$serviceUrl = $this->openAiSettingsService->getTtsServiceUrl();
+		}
+		if ($serviceUrl === '') {
+			$serviceUrl = $this->openAiSettingsService->getServiceUrl();
+		}
+		// Return true if the service URL references IONOS
+		return (bool)preg_match('#^https://([a-zA-Z0-9-]+\.)+ionos\.com#', strtolower($serviceUrl));
+	}
+
+	/**
+	 * @param ?string $serviceType
 	 *
 	 * @return string
 	 */
@@ -1075,6 +1095,193 @@ class OpenAiAPIService {
 
 	/**
 	 * @param string|null $userId
+	 * @param string $prompt
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @param string $model
+	 * @param string $size
+	 * @return array
+	 * @throws Exception
+	 * @throws UserFacingProcessingException
+	 */
+	public function requestImageEdit(
+		?string $userId,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size = Application::DEFAULT_DEFAULT_IMAGE_SIZE,
+	): array {
+
+		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_IMAGE)) {
+			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
+		}
+
+		$model = $model === Application::DEFAULT_MODEL_ID ? Application::DEFAULT_IMAGE_MODEL_ID : $model;
+
+		if ($this->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)) {
+			$apiResponse = $this->requestOpenAiImageEdit($userId, $prompt, $images, $model, $size);
+		} elseif ($this->isUsingOpenRouter(Application::SERVICE_TYPE_IMAGE)) {
+			$apiResponse = $this->requestOpenRouterImageEdit($userId, $prompt, $images, $model, $size);
+		} elseif ($this->isUsingIonos(Application::SERVICE_TYPE_IMAGE)) {
+			$apiResponse = $this->requestIonosImageEdit($userId, $prompt, $images, $model, $size);
+		} else {
+			$apiResponse = $this->requestLocalAiImageEdit($userId, $prompt, $images, $model, $size);
+		}
+
+		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
+			$this->logger->warning('OpenAI image edit error', ['api_response' => $apiResponse]);
+			throw new Exception($this->l10n->t('Unknown image generation error'), Http::STATUS_INTERNAL_SERVER_ERROR);
+		}
+
+		try {
+			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_IMAGE, 1);
+		} catch (DBException $e) {
+			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_IMAGE . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+		}
+
+		return $apiResponse;
+	}
+
+	/**
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @return array
+	 * @throws Exception
+	 */
+	private function requestOpenAiImageEdit(
+		?string $userId,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size,
+	): array {
+		$params = [
+			'prompt' => $prompt,
+			'size' => $size,
+			'n' => 1,
+			'model' => $model,
+		];
+		foreach ($images as $index => $image) {
+			$mimeType = $image['mimeType'];
+			$extension = match ($mimeType) {
+				'image/jpeg' => 'jpg',
+				'image/webp' => 'webp',
+				'image/gif' => 'gif',
+				default => 'png',
+			};
+			$name = 'image_' . ($index);
+			$params[$name] = [
+				'name' => 'image[]',
+				'contents' => $image['content'],
+				'filename' => $name . '.' . $extension,
+				'headers' => [
+					'Content-Type' => $mimeType,
+				],
+			];
+		}
+
+		return $this->request($userId, 'images/edits', $params, 'POST', 'multipart/form-data', serviceType: Application::SERVICE_TYPE_IMAGE);
+	}
+
+	/**
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @return array
+	 * @throws Exception
+	 * @throws UserFacingProcessingException
+	 */
+	private function requestIonosImageEdit(
+		?string $userId,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size,
+	): array {
+		if (count($images) > 1) {
+			throw new UserFacingProcessingException(
+				'IONOS image editing supports only one input image',
+				0,
+				null,
+				$this->l10n->t('Only one input image is supported.'),
+			);
+		}
+
+		$image = $images[0];
+		$params = [
+			'prompt' => $prompt,
+			'size' => $size,
+			'n' => 1,
+			'model' => $model,
+			'url' => 'data:' . $image['mimeType'] . ';base64,' . base64_encode($image['content']),
+		];
+
+		return $this->request($userId, 'images/edits', $params, 'POST', 'multipart/form-data', serviceType: Application::SERVICE_TYPE_IMAGE);
+	}
+
+	/**
+	 * OpenRouter image edit path using the unified /images API with input_references.
+	 *
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @return array
+	 * @throws Exception
+	 */
+	private function requestOpenRouterImageEdit(
+		?string $userId,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size,
+	): array {
+		$inputReferences = [];
+		foreach ($images as $image) {
+			$inputReferences[] = [
+				'type' => 'image_url',
+				'image_url' => [
+					'url' => 'data:' . $image['mimeType'] . ';base64,' . base64_encode($image['content']),
+				],
+			];
+		}
+
+		$params = [
+			'prompt' => $prompt,
+			'size' => $size,
+			'n' => 1,
+			'model' => $model,
+			'input_references' => $inputReferences,
+		];
+
+		return $this->request($userId, 'images', $params, 'POST', serviceType: Application::SERVICE_TYPE_IMAGE);
+	}
+
+	/**
+	 * LocalAI and other OpenAI-compatible image edit path via /images/generations.
+	 *
+	 * @param list<array{content: string, mimeType: string}> $images
+	 * @return array
+	 * @throws Exception
+	 */
+	private function requestLocalAiImageEdit(
+		?string $userId,
+		string $prompt,
+		array $images,
+		string $model,
+		string $size,
+	): array {
+		$refImages = [];
+		foreach ($images as $image) {
+			$refImages[] = base64_encode($image['content']);
+		}
+
+		$params = [
+			'prompt' => $prompt,
+			'size' => $size,
+			'n' => 1,
+			'model' => $model,
+			'ref_images' => $refImages,
+		];
+
+		return $this->request($userId, 'images/generations', $params, 'POST', serviceType: Application::SERVICE_TYPE_IMAGE);
+	}
+
+	/**
+	 * @param string|null $userId
 	 * @return array
 	 */
 	public function getImageRequestOptions(?string $userId): array {
@@ -1283,12 +1490,16 @@ class OpenAiAPIService {
 					if ($contentType === 'multipart/form-data') {
 						$multipart = [];
 						foreach ($params as $key => $value) {
-							$part = [
-								'name' => $key,
-								'contents' => $value,
-							];
-							if ($key === 'file') {
-								$part['filename'] = 'file.mp3';
+							if (is_array($value) && array_key_exists('contents', $value)) {
+								$part = $value;
+							} else {
+								$part = [
+									'name' => $key,
+									'contents' => $value,
+								];
+								if ($key === 'file') {
+									$part['filename'] = 'file.mp3';
+								}
 							}
 							$multipart[] = $part;
 						}
