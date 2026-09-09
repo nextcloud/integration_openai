@@ -58,8 +58,15 @@ class MultiServiceTest extends TestCase {
 	 * @var MockObject|IClient
 	 */
 	private $iClient;
-	/** @var ServiceConfig[] */
-	private array $services = [];
+	/**
+	 * The services created by a test, removed again in tearDown().
+	 *
+	 * Not named $services: Test\TestCase uses that for its overridden server
+	 * services.
+	 *
+	 * @var ServiceConfig[]
+	 */
+	private array $createdServices = [];
 
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
@@ -105,10 +112,10 @@ class MultiServiceTest extends TestCase {
 	}
 
 	protected function tearDown(): void {
-		foreach ($this->services as $service) {
+		foreach ($this->createdServices as $service) {
 			$this->servicesService->deleteService($service->getId());
 		}
-		$this->services = [];
+		$this->createdServices = [];
 		parent::tearDown();
 	}
 
@@ -133,7 +140,7 @@ class MultiServiceTest extends TestCase {
 	 */
 	private function addService(array $values): ServiceConfig {
 		$service = $this->servicesService->addService($values);
-		$this->services[] = $service;
+		$this->createdServices[] = $service;
 		return $service;
 	}
 

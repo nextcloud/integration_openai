@@ -33,7 +33,6 @@ use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Throwable;
 use function json_encode;
 
 /**
@@ -41,7 +40,6 @@ use function json_encode;
  */
 class OpenAiAPIService {
 	private IClient $client;
-	private array $modelsMemoryCache = [];
 
 	public function __construct(
 		private LoggerInterface $logger,
@@ -96,74 +94,20 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * Get the model list of a service
+	 * Get the model list of a service, freshly fetched from it.
+	 *
+	 * The list is not cached: it only feeds the model picker of the admin
+	 * settings, which asks for it when the admin refreshes a service, and a
+	 * stale list there would be worse than a slightly slower page.
 	 *
 	 * @param ?string $userId
 	 * @param ServiceConfig $service
-	 * @param bool $refresh whether to bypass the caches and make a network request
 	 * @return array the model list response, with the models in the 'data' key
 	 * @throws Exception
 	 */
-	public function getModels(?string $userId, ServiceConfig $service, bool $refresh = false): array {
-		$serviceId = $service->getId();
-		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
-		// the user ID goes into its own 'user_' namespace so that no UID can
-		// ever produce the admin key and poison the list served to everyone
-		$userCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId . '_user_' . ($userId ?? '');
-		$adminCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId . '_admin';
-		$dbCacheKey = Application::MODELS_CACHE_KEY . '_' . $serviceId;
-
-		if (!$refresh) {
-			if (array_key_exists($serviceId, $this->modelsMemoryCache)) {
-				$this->logger->debug('Getting OpenAI models from the memory cache');
-				return $this->modelsMemoryCache[$serviceId];
-			}
-
-			// try to get models from the user cache first
-			if ($userId !== null) {
-				$userCachedModels = $cache->get($userCacheKey);
-				if ($userCachedModels) {
-					$this->logger->debug('Getting OpenAI models from user cache for user ' . $userId);
-					$this->modelsMemoryCache[$serviceId] = $userCachedModels;
-					return $userCachedModels;
-				}
-			}
-
-			// if the user has their own credentials for this service, skip the admin cache
-			if (!$this->servicesService->userHasOwnCredentials($userId, $service)) {
-				// here we know there is either no user cache or userId is null
-				// so if there are no user-defined service credentials
-				// we try to get the models from the admin cache
-				if ($adminCachedModels = $cache->get($adminCacheKey)) {
-					$this->logger->debug('Getting OpenAI models from the main distributed cache');
-					$this->modelsMemoryCache[$serviceId] = $adminCachedModels;
-					return $adminCachedModels;
-				}
-			}
-
-			// if we don't need to refresh the model list and it's not been found in the cache, it is obtained from the DB
-			$modelsObjectString = $this->appConfig->getValueString(Application::APP_ID, $dbCacheKey, '{"data":[],"object":"list"}');
-			$fallbackModels = [
-				'data' => [],
-				'object' => 'list',
-			];
-			try {
-				$newCache = json_decode($modelsObjectString, true) ?? $fallbackModels;
-			} catch (Throwable $e) {
-				$this->logger->warning('Could not decode the model JSON string', ['model_string', $modelsObjectString, 'exception' => $e]);
-				$newCache = $fallbackModels;
-			}
-			$cache->set($userId !== null ? $userCacheKey : $adminCacheKey, $newCache, Application::MODELS_CACHE_TTL);
-			$this->modelsMemoryCache[$serviceId] = $newCache;
-			return $newCache;
-		}
-
-		// we know we are refreshing so we clear the caches and make the network request
-		$cache->remove($adminCacheKey);
-		$cache->remove($userCacheKey);
-
+	public function getModels(?string $userId, ServiceConfig $service): array {
 		try {
-			$this->logger->debug('Actually getting OpenAI models with a network request');
+			$this->logger->debug('Getting the models of service ' . $service->getId() . ' with a network request');
 			$params = $service->isUsingOpenRouter() ? ['output_modalities' => 'all'] : [];
 			$modelsResponse = $this->request($userId, $service, 'models', $params);
 		} catch (Exception $e) {
@@ -184,11 +128,6 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Invalid models response received'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
-		$cache->set($userId !== null ? $userCacheKey : $adminCacheKey, $modelsResponse, Application::MODELS_CACHE_TTL);
-		$this->modelsMemoryCache[$serviceId] = $modelsResponse;
-		// we always store the model list after getting it
-		$modelsObjectString = json_encode($modelsResponse);
-		$this->appConfig->setValueString(Application::APP_ID, $dbCacheKey, $modelsObjectString);
 		return $modelsResponse;
 	}
 
@@ -311,11 +250,16 @@ class OpenAiAPIService {
 			foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
 				$rule = $ownCredentials ? null : $this->quotaRuleService->getRule($quotaType, $userId, $service);
 				// a matching quota rule is a global budget, the fallback quota is the one of the service
-				$serviceId = ($rule === null || $rule['id'] === null) ? $service->getId() : null;
+				$instanceWide = $rule !== null && $rule['id'] !== null;
+				$serviceId = $instanceWide ? null : $service->getId();
 				$quotaInfo[$quotaType] = [
 					'type' => $this->translatedQuotaType($quotaType),
 					'unit' => $this->translatedQuotaUnit($quotaType),
 					'limit' => $rule === null ? 0 : $rule['amount'],
+					// the usage of an instance-wide budget is the same number
+					// under every service, so the frontend can say so instead
+					// of looking like the quota applies several times over
+					'instance_wide' => $instanceWide,
 				];
 				try {
 					$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod(
@@ -1067,51 +1011,72 @@ class OpenAiAPIService {
 	}
 
 	/**
-	 * @return int
+	 * The measured processing time of a service, in seconds
 	 */
 	public function getExpTextProcessingTime(ServiceConfig $service): int {
-		return $service->isUsingOpenAi()
-			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_text_generation_time', strval(Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME), lazy: true))
-			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_text_generation_time', strval(Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME), lazy: true));
+		return $this->getExpProcessingTime(
+			$service,
+			Application::TEXT_PROCESSING_TIME_KEY,
+			$service->isUsingOpenAi()
+				? Application::DEFAULT_OPENAI_TEXT_GENERATION_TIME
+				: Application::DEFAULT_LOCALAI_TEXT_GENERATION_TIME,
+		);
 	}
 
-	/**
-	 * @param int $runtime
-	 * @return void
-	 */
 	public function updateExpTextProcessingTime(int $runtime, ServiceConfig $service): void {
-		$oldTime = floatval($this->getExpTextProcessingTime($service));
-		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
-
-		if ($service->isUsingOpenAi()) {
-			$this->appConfig->setValueString(Application::APP_ID, 'openai_text_generation_time', strval(intval($newTime)), lazy: true);
-		} else {
-			$this->appConfig->setValueString(Application::APP_ID, 'localai_text_generation_time', strval(intval($newTime)), lazy: true);
-		}
+		$this->updateExpProcessingTime(
+			$service,
+			Application::TEXT_PROCESSING_TIME_KEY,
+			$this->getExpTextProcessingTime($service),
+			$runtime,
+		);
 	}
 
 	/**
-	 * @return int
+	 * The measured image processing time of a service, in seconds
 	 */
 	public function getExpImgProcessingTime(ServiceConfig $service): int {
-		return $service->isUsingOpenAi()
-			? intval($this->appConfig->getValueString(Application::APP_ID, 'openai_image_generation_time', strval(Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME), lazy: true))
-			: intval($this->appConfig->getValueString(Application::APP_ID, 'localai_image_generation_time', strval(Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME), lazy: true));
+		return $this->getExpProcessingTime(
+			$service,
+			Application::IMAGE_PROCESSING_TIME_KEY,
+			$service->isUsingOpenAi()
+				? Application::DEFAULT_OPENAI_IMAGE_GENERATION_TIME
+				: Application::DEFAULT_LOCALAI_IMAGE_GENERATION_TIME,
+		);
+	}
+
+	public function updateExpImgProcessingTime(int $runtime, ServiceConfig $service): void {
+		$this->updateExpProcessingTime(
+			$service,
+			Application::IMAGE_PROCESSING_TIME_KEY,
+			$this->getExpImgProcessingTime($service),
+			$runtime,
+		);
 	}
 
 	/**
-	 * @param int $runtime
-	 * @return void
+	 * The processing times are measured per service, so that a slow service
+	 * does not skew the runtime estimate of a fast one. Until a service has
+	 * answered once, the default of the kind of service it is applies.
 	 */
-	public function updateExpImgProcessingTime(int $runtime, ServiceConfig $service): void {
-		$oldTime = floatval($this->getExpImgProcessingTime($service));
-		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * $oldTime + Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
+	private function getExpProcessingTime(ServiceConfig $service, string $key, int $default): int {
+		return $this->appConfig->getValueInt(
+			Application::APP_ID,
+			$key . '_' . $service->getId(),
+			$default,
+			lazy: true,
+		);
+	}
 
-		if ($service->isUsingOpenAi()) {
-			$this->appConfig->setValueString(Application::APP_ID, 'openai_image_generation_time', strval(intval($newTime)), lazy: true);
-		} else {
-			$this->appConfig->setValueString(Application::APP_ID, 'localai_image_generation_time', strval(intval($newTime)), lazy: true);
-		}
+	private function updateExpProcessingTime(ServiceConfig $service, string $key, int $oldTime, int $runtime): void {
+		$newTime = (1.0 - Application::EXPECTED_RUNTIME_LOWPASS_FACTOR) * floatval($oldTime)
+			+ Application::EXPECTED_RUNTIME_LOWPASS_FACTOR * floatval($runtime);
+		$this->appConfig->setValueInt(
+			Application::APP_ID,
+			$key . '_' . $service->getId(),
+			intval($newTime),
+			lazy: true,
+		);
 	}
 
 	/**

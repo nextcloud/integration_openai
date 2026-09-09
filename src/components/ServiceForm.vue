@@ -220,11 +220,13 @@
 						<div class="line">
 							<NcTextField
 								:id="'openai-llm-extra-params-' + service.id"
-								:model-value="service.llm_extra_params"
+								v-model="llmExtraParams"
 								class="input"
+								:error="!llmExtraParamsValid"
+								:helper-text="llmExtraParamsValid ? '' : t('integration_openai', 'Not a JSON object yet, so it is not saved')"
 								:label="t('integration_openai', 'Extra completion model parameters')"
 								:placeholder="'{&quot;temperature&quot;:0.7}'"
-								@update:model-value="onInput({ llm_extra_params: $event })" />
+								@update:model-value="onLlmExtraParamsInput" />
 							<NcButton variant="tertiary" :title="llmExtraParamHint">
 								<template #icon>
 									<HelpCircleOutlineIcon />
@@ -461,6 +463,9 @@ export default {
 	data() {
 		return {
 			expanded: this.initiallyExpanded,
+			// edited locally so that a half-typed JSON object is not sent to
+			// the backend, which rejects it
+			llmExtraParams: this.service.llm_extra_params ?? '',
 			// to prevent some browsers from filling fields with remembered passwords
 			readonly: true,
 			models: null,
@@ -472,6 +477,17 @@ export default {
 	},
 
 	computed: {
+		llmExtraParamsValid() {
+			if (this.llmExtraParams.trim() === '') {
+				return true
+			}
+			try {
+				const parsed = JSON.parse(this.llmExtraParams)
+				return parsed !== null && typeof parsed === 'object'
+			} catch {
+				return false
+			}
+		},
 		modalities() {
 			return [
 				{
@@ -539,6 +555,13 @@ export default {
 		'service.url'() {
 			this.models = null
 		},
+		// the backend normalizes what it stored, so follow it unless the admin
+		// is in the middle of typing something else
+		'service.llm_extra_params'(value) {
+			if (this.llmExtraParamsValid) {
+				this.llmExtraParams = value ?? ''
+			}
+		},
 	},
 
 	methods: {
@@ -547,6 +570,11 @@ export default {
 		},
 		onSensitiveInput(values) {
 			this.$emit('save-sensitive', values)
+		},
+		onLlmExtraParamsInput() {
+			if (this.llmExtraParamsValid) {
+				this.onInput({ llm_extra_params: this.llmExtraParams.trim() })
+			}
 		},
 		onQuotaInput(index, value) {
 			const quotas = { ...this.service.quotas }

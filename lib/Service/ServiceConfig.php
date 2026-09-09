@@ -83,10 +83,13 @@ class ServiceConfig implements JsonSerializable {
 		private string $llmExtraParams = '',
 		private int $maxTokens = Application::DEFAULT_MAX_NUM_OF_TOKENS,
 		private int $chunkSize = Application::DEFAULT_CHUNK_SIZE,
+		// these mirror the defaults of the single-service configuration, so
+		// that a migrated service and a newly connected one accept the same
+		// kinds of attachment
 		private bool $multimodalImageEnabled = true,
-		private bool $multimodalAudioEnabled = false,
+		private bool $multimodalAudioEnabled = true,
 		private bool $multimodalVideoEnabled = false,
-		private bool $multimodalDocumentEnabled = false,
+		private bool $multimodalDocumentEnabled = true,
 		private array $ttsVoices = Application::DEFAULT_SPEECH_VOICES,
 		private string $defaultTtsVoice = Application::DEFAULT_SPEECH_VOICE,
 		private string $defaultImageSize = Application::DEFAULT_DEFAULT_IMAGE_SIZE,
@@ -483,10 +486,12 @@ class ServiceConfig implements JsonSerializable {
 	 * @return array<string, mixed>
 	 */
 	public function jsonSerializeForUser(): array {
+		// deliberately without the URL: users only need to tell the services
+		// apart, and the full endpoint of an internal service is not theirs
+		// to know
 		return [
 			'id' => $this->id,
 			'display_name' => $this->getDisplayName(),
-			'url' => $this->getRequestUrl(),
 			// the effective scheme, so the user is asked for the credential
 			// that requests to this service actually use
 			'use_basic_auth' => $this->usesBasicAuth(),

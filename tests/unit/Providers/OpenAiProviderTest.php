@@ -318,6 +318,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$generator = $this->openAiApiService->createStreamedChatCompletion(
 			self::TEST_USER1,
+			$this->service,
 			Application::DEFAULT_MODEL_ID,
 			'This is a test prompt',
 		);
@@ -1123,6 +1124,7 @@ TEXT;
 
 		$result = $this->openAiApiService->createChatCompletion(
 			self::TEST_USER1,
+			$this->service,
 			Application::DEFAULT_MODEL_ID,
 			'Tell me more about Amsterdam',
 		);

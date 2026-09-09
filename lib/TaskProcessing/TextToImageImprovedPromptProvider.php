@@ -27,7 +27,8 @@ use Throwable;
  * for that service.
  */
 class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvider {
-	use ProviderIdentity;
+	// No ProviderIdentity: this provider derives its ID and name from the
+	// image provider it wraps rather than from a model of its own.
 
 	public function __construct(
 		private TextToImageProvider $textToImageProvider,
@@ -36,7 +37,6 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 		private IL10N $l10n,
 		private OpenAiAPIService $openAiAPIService,
 		private ServiceConfig $service,
-		private string $model,
 	) {
 	}
 

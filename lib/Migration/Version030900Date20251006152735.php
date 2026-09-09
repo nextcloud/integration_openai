@@ -21,8 +21,9 @@ class Version030900Date20251006152735 extends SimpleMigrationStep {
 	 * @param array $options
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
-		// This used to refresh the model list into oc_appconfig. Model lists are
-		// stored per service now and refreshed by the migration to multiple
-		// services, so there is nothing left to do here.
+		// This used to refresh the model list into oc_appconfig, so that the
+		// task types had enum values right after the upgrade. The models a
+		// service exposes are configured explicitly now and the list is only
+		// fetched when the admin asks for it, so there is nothing left to do.
 	}
 }

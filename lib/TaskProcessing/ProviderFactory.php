@@ -140,7 +140,7 @@ class ProviderFactory {
 			$providers[] = new TextToImageImprovedPromptProvider(
 				$textToImage,
 				new TextToTextProvider($this->openAiAPIService, $this->l, $service, $textModel),
-				$this->logger, $this->l, $this->openAiAPIService, $service, $model,
+				$this->logger, $this->l, $this->openAiAPIService, $service,
 			);
 		}
 		return $providers;
@@ -169,7 +169,7 @@ class ProviderFactory {
 			$providers[] = new AudioToTextEnhancedProvider(
 				$audioToText,
 				new ReformatParagraphsProvider($this->openAiAPIService, $this->l, $this->chunkService, $service, $textModel),
-				$this->openAiAPIService, $this->logger, $service,
+				$this->openAiAPIService, $this->logger, $this->l, $service,
 			);
 		}
 		// ... and speech generation on top of that

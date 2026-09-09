@@ -127,7 +127,6 @@ Learn more about the Nextcloud Ethical AI Rating [in our blog](https://nextcloud
 	</dependencies>
 	<background-jobs>
 		<job>OCA\OpenAi\Cron\CleanupQuotaDb</job>
-		<job>OCA\OpenAi\Cron\RefreshModels</job>
 	</background-jobs>
 	<settings>
 		<admin>OCA\OpenAi\Settings\Admin</admin>

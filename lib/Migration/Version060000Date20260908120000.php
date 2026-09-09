@@ -13,6 +13,7 @@ use Closure;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\ServicesService;
+use OCP\BackgroundJob\IJobList;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\DB\Types;
@@ -53,12 +54,15 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 		'tts_url', 'tts_service_name', 'tts_api_key', 'tts_basic_user',
 		'tts_basic_password', 'tts_use_basic_auth', 'tts_request_timeout',
 		'models', 'models_image', 'models_stt', 'models_tts',
+		'openai_text_generation_time', 'localai_text_generation_time',
+		'openai_image_generation_time', 'localai_image_generation_time',
 	];
 
 	public function __construct(
 		private IAppConfig $appConfig,
 		private IConfig $config,
 		private IDBConnection $db,
+		private IJobList $jobList,
 		private ServicesService $servicesService,
 	) {
 	}
@@ -95,6 +99,11 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 	 * @param array $options
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
+		// The model lists are fetched on demand now, so the job that used to
+		// warm their cache is gone. This is outside the guard below because it
+		// also has to clean up after an upgrade that stopped halfway.
+		$this->jobList->remove('OCA\\OpenAi\\Cron\\RefreshModels');
+
 		if ($this->appConfig->getValueString(Application::APP_ID, Application::SERVICES_CONFIG_KEY, '', lazy: true) !== '') {
 			// already migrated
 			return;
@@ -242,15 +251,15 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 	}
 
 	/**
-	 * The model that was configured as the default for a modality. The
-	 * "Default" pseudo model means the service serves one fixed model.
+	 * The model that was configured as the default for one of the overridable
+	 * modalities. The "Default" pseudo model means the service serves one
+	 * fixed model, which is what the old configuration fell back to for these.
 	 */
 	private function getOldModel(string $modality): string {
 		$key = match ($modality) {
 			Application::MODALITY_IMAGE => 'default_image_model_id',
 			Application::MODALITY_STT => 'default_stt_model_id',
 			Application::MODALITY_TTS => 'default_speech_model_id',
-			default => 'default_completion_model_id',
 		};
 		return $this->getString($key) ?: Application::DEFAULT_MODEL_ID;
 	}

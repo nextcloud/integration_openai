@@ -124,7 +124,7 @@ class ServiceController extends Controller {
 	public function models(string $id): DataResponse {
 		try {
 			$service = $this->servicesService->getServiceOrFail($id);
-			return new DataResponse($this->openAiAPIService->getModels(null, $service, true));
+			return new DataResponse($this->openAiAPIService->getModels(null, $service));
 		} catch (Exception $e) {
 			$code = $e->getCode() === 0 ? Http::STATUS_BAD_REQUEST : intval($e->getCode());
 			return new DataResponse(['error' => $e->getMessage()], $code);

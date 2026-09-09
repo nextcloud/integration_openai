@@ -51,6 +51,15 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_LOCALAI_IMAGE_GENERATION_TIME = 90; // seconds
 	public const EXPECTED_RUNTIME_LOWPASS_FACTOR = 0.1;
 
+	/**
+	 * Prefixes of the app config keys holding the measured processing time of
+	 * a service. The ID of the service is appended to them, so that a slow
+	 * service does not skew the runtime estimate of a fast one.
+	 */
+	public const TEXT_PROCESSING_TIME_KEY = 'text_generation_time';
+	public const IMAGE_PROCESSING_TIME_KEY = 'image_generation_time';
+	public const PROCESSING_TIME_KEYS = [self::TEXT_PROCESSING_TIME_KEY, self::IMAGE_PROCESSING_TIME_KEY];
+
 	public const QUOTA_TYPE_TEXT = 0;
 	public const QUOTA_TYPE_IMAGE = 1;
 	public const QUOTA_TYPE_TRANSCRIPTION = 2;
@@ -63,9 +72,7 @@ class Application extends App implements IBootstrap {
 		self::QUOTA_TYPE_SPEECH => 0, // 0 = unlimited
 	];
 
-	public const MODELS_CACHE_KEY = 'models';
 	public const QUOTA_RULES_CACHE_PREFIX = 'quota_rules';
-	public const MODELS_CACHE_TTL = 60 * 30;
 
 	public const LANGUAGE_CODES_AND_ENDONYMS = [['en', 'English'], ['zh', '中文'], ['de', 'Deutsch'], ['es', 'Español'], ['ru', 'Русский'], ['ko', '한국어'], ['fr', 'Français'], ['ja', '日本語'], ['pt', 'Português'], ['tr', 'Türkçe'], ['pl', 'Polski'], ['ca', 'Català'], ['nl', 'Nederlands'], ['ar', 'العربية'], ['sv', 'Svenska'], ['it', 'Italiano'], ['id', 'Bahasa Indonesia'], ['hi', 'हिन्दी'], ['fi', 'Suomi'], ['vi', 'Tiếng Việt'], ['he', 'עברית'], ['uk', 'Українська'], ['el', 'Ελληνικά'], ['ms', 'Bahasa Melayu'], ['cs', 'Česky'], ['ro', 'Română'], ['da', 'Dansk'], ['hu', 'Magyar'], ['ta', 'தமிழ்'], ['no', 'Norsk (bokmål / riksmål)'], ['th', 'ไทย / Phasa Thai'], ['ur', 'اردو'], ['hr', 'Hrvatski'], ['bg', 'Български'], ['lt', 'Lietuvių'], ['la', 'Latina'], ['mi', 'Māori'], ['ml', 'മലയാളം'], ['cy', 'Cymraeg'], ['sk', 'Slovenčina'], ['te', 'తెలుగు'], ['fa', 'فارسی'], ['lv', 'Latviešu'], ['bn', 'বাংলা'], ['sr', 'Српски'], ['az', 'Azərbaycanca / آذربايجان'], ['sl', 'Slovenščina'], ['kn', 'ಕನ್ನಡ'], ['et', 'Eesti'], ['mk', 'Македонски'], ['br', 'Brezhoneg'], ['eu', 'Euskara'], ['is', 'Íslenska'], ['hy', 'Հայերեն'], ['ne', 'नेपाली'], ['mn', 'Монгол'], ['bs', 'Bosanski'], ['kk', 'Қазақша'], ['sq', 'Shqip'], ['sw', 'Kiswahili'], ['gl', 'Galego'], ['mr', 'मराठी'], ['pa', 'ਪੰਜਾਬੀ / पंजाबी / پنجابي'], ['si', 'සිංහල'], ['km', 'ភាសាខ្មែរ'], ['sn', 'chiShona'], ['yo', 'Yorùbá'], ['so', 'Soomaaliga'], ['af', 'Afrikaans'], ['oc', 'Occitan'], ['ka', 'ქართული'], ['be', 'Беларуская'], ['tg', 'Тоҷикӣ'], ['sd', 'सिनधि'], ['gu', 'ગુજરાતી'], ['am', 'አማርኛ'], ['yi', 'ייִדיש'], ['lo', 'ລາວ / Pha xa lao'], ['uz', 'Ўзбек'], ['fo', 'Føroyskt'], ['ht', 'Krèyol ayisyen'], ['ps', 'پښتو'], ['tk', 'Туркмен / تركمن'], ['nn', 'Norsk (nynorsk)'], ['mt', 'bil-Malti'], ['sa', 'संस्कृतम्'], ['lb', 'Lëtzebuergesch'], ['my', 'Myanmasa'], ['bo', 'བོད་ཡིག / Bod skad'], ['tl', 'Tagalog'], ['mg', 'Malagasy'], ['as', 'অসমীয়া'], ['tt', 'Tatarça'], ['haw', 'ʻŌlelo Hawaiʻi'], ['ln', 'Lingála'], ['ha', 'هَوُسَ'], ['ba', 'Башҡорт'], ['jw', 'ꦧꦱꦗꦮ'], ['su', 'Basa Sunda'], ['yue', '粤语']];
 

@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
+use OCP\IL10N;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
@@ -32,6 +33,7 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 		private ReformatParagraphsProvider $reformatParagraphsProvider,
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
+		private IL10N $l,
 		private ServiceConfig $service,
 	) {
 	}
@@ -41,7 +43,7 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->audioToTextProvider->getName() . ' (with paragraph reformatting)';
+		return $this->l->t('%s (with paragraph reformatting)', [$this->audioToTextProvider->getName()]);
 	}
 
 	public function getTaskTypeId(): string {

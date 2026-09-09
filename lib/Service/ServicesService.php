@@ -182,7 +182,9 @@ class ServicesService {
 			throw new Exception('Unknown service: ' . $id);
 		}
 		$this->storeServices($remaining);
-		$this->appConfig->deleteKey(Application::APP_ID, Application::MODELS_CACHE_KEY . '_' . $id);
+		foreach (Application::PROCESSING_TIME_KEYS as $key) {
+			$this->appConfig->deleteKey(Application::APP_ID, $key . '_' . $id);
+		}
 		$this->deleteAllUserCredentials($id);
 	}
 
@@ -364,13 +366,10 @@ class ServicesService {
 			sensitive: true,
 		);
 		$this->servicesCache = null;
-		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
-		// the URL or the credentials may have changed, so the cached model
-		// lists cannot be trusted anymore
-		$cache->clear(Application::MODELS_CACHE_KEY);
 		// the quota amounts of a service are part of the cached fallback quota
 		// rule, so a changed quota would otherwise not be enforced
-		$cache->clear(Application::QUOTA_RULES_CACHE_PREFIX);
+		$this->cacheFactory->createDistributed(Application::APP_ID)
+			->clear(Application::QUOTA_RULES_CACHE_PREFIX);
 	}
 
 	/**
