@@ -275,6 +275,17 @@
 					</NcButton>
 				</div>
 				<div class="line">
+					<NcTextArea
+						id="summary-system-prompt"
+						v-model="state.summary_system_prompt"
+						class="input"
+						:label="t('integration_openai', 'Summary system prompt')"
+						:helper-text="t('integration_openai', 'System prompt used when generating text summaries. Leave empty to use the default prompt.')"
+						:rows="5"
+						resize="vertical"
+						@update:model-value="onInput()" />
+				</div>
+				<div class="line">
 					<!--Input for max chunk size (prompt length) for a single request-->
 					<NcInputField
 						id="openai-chunk-size"
@@ -687,6 +698,7 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess } from '@nextcloud/dialogs'
@@ -718,6 +730,7 @@ export default {
 		NcFormBox,
 		NcFormBoxSwitch,
 		NcTextField,
+		NcTextArea,
 		NcInputField,
 		NcNoteCard,
 		NcDateTimePickerNative,
@@ -1022,6 +1035,7 @@ export default {
 				chunk_size: parseInt(this.state.chunk_size),
 				max_tokens: parseInt(this.state.max_tokens),
 				llm_extra_params: this.state.llm_extra_params,
+				summary_system_prompt: this.state.summary_system_prompt,
 				default_image_size: this.state.default_image_size,
 				quota_period: this.state.quota_period,
 				quotas: this.state.quotas,

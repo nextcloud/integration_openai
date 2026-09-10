@@ -35,6 +35,7 @@ class OpenAiSettingsService {
 		'max_tokens' => 'integer',
 		'use_max_completion_tokens_param' => 'boolean',
 		'llm_extra_params' => 'string',
+		'summary_system_prompt' => 'string',
 		'quota_period' => 'array',
 		'quotas' => 'array',
 		'usage_storage_time' => 'integer',
@@ -296,6 +297,17 @@ class OpenAiSettingsService {
 	 */
 	public function getLlmExtraParams(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'llm_extra_params', lazy: true);
+	}
+	/**
+	 * @return string
+	 */
+	public function getSummarySystemPrompt(): string {
+		return $this->appConfig->getValueString(
+			Application::APP_ID,
+			'summary_system_prompt',
+			Application::DEFAULT_SUMMARY_SYSTEM_PROMPT,
+			lazy: true
+		) ?: Application::DEFAULT_SUMMARY_SYSTEM_PROMPT;
 	}
 
 	/**
@@ -579,6 +591,7 @@ class OpenAiSettingsService {
 			'max_tokens' => $this->getMaxTokens(),
 			'use_max_completion_tokens_param' => $this->getUseMaxCompletionTokensParam(),
 			'llm_extra_params' => $this->getLlmExtraParams(),
+			'summary_system_prompt' => $this->getSummarySystemPrompt(),
 			// Updated to get max tokens
 			'quota_period' => $this->getQuotaPeriod(),
 			// Updated to get quota period
@@ -926,6 +939,14 @@ class OpenAiSettingsService {
 		}
 		$this->appConfig->setValueString(Application::APP_ID, 'llm_extra_params', $llmExtraParams, lazy: true);
 	}
+	public function setSummarySystemPrompt(string $summarySystemPrompt): void {
+		$this->appConfig->setValueString(
+			Application::APP_ID,
+			'summary_system_prompt',
+			$summarySystemPrompt,
+			lazy: true
+		);
+	}
 
 	/**
 	 * Setter for quotaPeriod; minimum is 1 day.
@@ -1261,6 +1282,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['llm_extra_params'])) {
 			$this->setLlmExtraParams($adminConfig['llm_extra_params']);
+		}
+		if (isset($adminConfig['summary_system_prompt'])) {
+			$this->setSummarySystemPrompt($adminConfig['summary_system_prompt']);
 		}
 		if (isset($adminConfig['quota_period'])) {
 			$this->setQuotaPeriod($adminConfig['quota_period']);
