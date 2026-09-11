@@ -78,7 +78,7 @@ class HeadlineProvider implements ISynchronousProvider {
 	public function getOptionalInputShapeDefaults(): array {
 		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
-			'max_tokens' => 100,
+			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
 			'model' => $adminModel,
 		];
 	}
