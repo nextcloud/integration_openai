@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\WatermarkingService;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -23,23 +22,24 @@ use OCP\TaskProcessing\ShapeEnumValue;
 use Psr\Log\LoggerInterface;
 
 class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IL10N $l,
 		private LoggerInterface $logger,
-		private IAppConfig $appConfig,
-		private ?string $userId,
 		private WatermarkingService $watermarkingService,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2speech';
+		return $this->buildProviderId('text2speech');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName(Application::SERVICE_TYPE_TTS);
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -47,7 +47,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -65,14 +65,9 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 				$this->l->t('The voice to use'),
 				EShapeType::Enum
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the speech'),
-				EShapeType::Enum
-			),
 			'speed' => new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)
+				$this->service->isUsingOpenAi()
 					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
@@ -81,21 +76,17 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
 		return [
-			'voice' => array_map(function ($v) {
-				return new ShapeEnumValue($v, $v);
-			}, $voices),
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId, Application::SERVICE_TYPE_TTS),
+			'voice' => array_map(
+				static fn (string $voice) => new ShapeEnumValue($voice, $voice),
+				$this->service->getTtsVoices(),
+			),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
-		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
 		return [
-			'voice' => $adminVoice,
-			'model' => $adminModel,
+			'voice' => $this->service->getDefaultTtsVoice(),
 			'speed' => 1,
 		];
 	}
@@ -123,23 +114,16 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		if ($includeWatermark) {
 			$prompt .= "\n\n" . $this->l->t('This was generated using Artificial Intelligence.');
 		}
+		$model = $this->model;
 
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
-		}
-
-		if (isset($input['voice']) && is_string($input['voice'])) {
-			$voice = $input['voice'];
-		} else {
-			$voice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE, lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
-		}
+		$voice = isset($input['voice']) && is_string($input['voice'])
+			? $input['voice']
+			: $this->service->getDefaultTtsVoice();
 
 		$speed = 1;
 		if (isset($input['speed']) && is_numeric($input['speed'])) {
 			$speed = $input['speed'];
-			if ($this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)) {
+			if ($this->service->isUsingOpenAi()) {
 				if ($speed > 4) {
 					$speed = 4;
 				} elseif ($speed < 0.25) {
@@ -149,7 +133,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 		}
 
 		try {
-			$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $prompt, $model, $voice, $speed);
+			$apiResponse = $this->openAiAPIService->requestSpeechCreation($userId, $this->service, $prompt, $model, $voice, $speed);
 
 			if (!isset($apiResponse['body'])) {
 				$this->logger->warning('OpenAI/LocalAI\'s text to speech generation failed: no speech returned');

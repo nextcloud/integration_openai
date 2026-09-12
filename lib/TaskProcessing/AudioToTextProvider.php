@@ -11,8 +11,8 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\Files\File;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -24,21 +24,23 @@ use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
 
 class AudioToTextProvider implements ISynchronousProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private LoggerInterface $logger,
-		private IAppConfig $appConfig,
 		private IL10N $l,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-audio2text';
+		return $this->buildProviderId('audio2text');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName(Application::SERVICE_TYPE_STT);
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -46,7 +48,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -100,10 +102,10 @@ class AudioToTextProvider implements ISynchronousProvider {
 			throw new ProcessingException('Invalid language');
 		}
 
-		$model = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
+		$model = $this->model;
 
 		try {
-			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $model, $language);
+			$transcription = $this->openAiAPIService->transcribeFile($userId, $this->service, $inputFile, false, $model, $language);
 			return ['output' => $transcription];
 		} catch (UserFacingProcessingException $e) {
 			throw $e;

@@ -11,9 +11,9 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCP\Http\Client\IClientService;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -24,24 +24,25 @@ use OCP\TaskProcessing\TaskTypes\TextToImage;
 use Psr\Log\LoggerInterface;
 
 class TextToImageProvider implements ISynchronousWatermarkingProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IL10N $l,
 		private LoggerInterface $logger,
 		private IClientService $clientService,
-		private IAppConfig $appConfig,
-		private ?string $userId,
 		private WatermarkingService $watermarkingService,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2image';
+		return $this->buildProviderId('text2image');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName(Application::SERVICE_TYPE_IMAGE);
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -49,7 +50,9 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		// this provider feeds updateExpImgProcessingTime() below, so the
+		// estimate has to be read back from the same place
+		return $this->openAiAPIService->getExpImgProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -63,34 +66,22 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getOptionalInputShape(): array {
-		$defaultImageSize = $this->appConfig->getValueString(Application::APP_ID, 'default_image_size', lazy: true) ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+		$defaultImageSize = $this->service->getDefaultImageSize();
 		return [
 			'size' => new ShapeDescriptor(
 				$this->l->t('Size'),
 				$this->l->t('Optional. The size of the generated images. Must be in 256x256 format. Default is %s', [$defaultImageSize]),
 				EShapeType::Text
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the images'),
-				EShapeType::Enum
-			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId, serviceType: Application::SERVICE_TYPE_IMAGE),
-		];
+		return [];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_IMAGE)
-			? ($this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', lazy: true);
-		return [
-			'model' => $adminModel,
-		];
+		return [];
 	}
 
 	public function getOutputShapeEnumValues(): array {
@@ -124,23 +115,23 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 			throw new UserFacingProcessingException('numberOfImages is out of bounds', userFacingMessage: $this->l->t('Cannot generate less than 1 image'));
 		}
 
-		$size = $this->appConfig->getValueString(Application::APP_ID, 'default_image_size', lazy: true) ?: Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+		$size = $this->service->getDefaultImageSize();
 		if (isset($input['size']) && is_string($input['size']) && preg_match('/^\d+x\d+$/', $input['size'])) {
 			$size = trim($input['size']);
+		}
+		if (preg_match('/^\d+x\d+$/', $size) !== 1) {
+			// the service is misconfigured, fall back to the default rather
+			// than sending a size the API cannot parse
+			$size = Application::DEFAULT_DEFAULT_IMAGE_SIZE;
 		}
 		[$x, $y] = explode('x', $size, 2);
 		if ((int)$x > 4096 || (int)$y > 4096) {
 			throw new UserFacingProcessingException('size is out of bounds', userFacingMessage: $this->l->t('Cannot generate images larger than 4096x4096'));
 		}
-
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->appConfig->getValueString(Application::APP_ID, 'default_image_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
-		}
+		$model = $this->model;
 
 		try {
-			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $prompt, $model, $nbImages, $size);
+			$apiResponse = $this->openAiAPIService->requestImageCreation($userId, $this->service, $prompt, $model, $nbImages, $size);
 			$b64s = array_map(static function (array $result) {
 				return $result['b64_json'] ?? null;
 			}, $apiResponse['data']);
@@ -162,7 +153,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 				throw new ProcessingException('OpenAI/LocalAI\'s text to image generation failed: no image returned');
 			}
 			$client = $this->clientService->newClient();
-			$requestOptions = $this->openAiAPIService->getImageRequestOptions($userId);
+			$requestOptions = $this->openAiAPIService->getImageRequestOptions($userId, $this->service);
 			$output = ['images' => []];
 			foreach ($urls as $url) {
 				$imageResponse = $client->get($url, $requestOptions);
@@ -176,7 +167,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 				$output['images'][] = $image;
 			}
 			$endTime = time();
-			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime);
+			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime, $this->service);
 			/** @var array<string, list<numeric|string>|numeric|string> $output */
 			return $output;
 		} catch (UserFacingProcessingException $e) {

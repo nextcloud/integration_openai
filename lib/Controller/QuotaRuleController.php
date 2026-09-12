@@ -90,9 +90,9 @@ class QuotaRuleController extends Controller {
 	 * @return Http\StreamResponse|TextPlainResponse
 	 */
 	#[NoCSRFRequired]
-	public function getQuotaUsage(int $startDate, int $endDate, int $type): Response {
+	public function getQuotaUsage(int $startDate, int $endDate, int $type, ?string $serviceId = null): Response {
 		try {
-			$result = $this->quotaRuleService->getQuotaUsage($startDate, $endDate, $type);
+			$result = $this->quotaRuleService->getQuotaUsage($startDate, $endDate, $type, $serviceId);
 			$csv = fopen('php://memory', 'w');
 			try {
 				foreach ($result as $row) {

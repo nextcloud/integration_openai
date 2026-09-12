@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  *
  *
- * This unit test is designed to test the functionality of all providers
- * exposed by the app. It does not test the
+ * This unit test checks that the providers of a service talk to that service:
+ * with its URL, its credentials and its request timeout. It does not test the
  * actual openAI/LocalAI api calls, but rather mocks them.
  */
 
@@ -14,11 +14,12 @@ namespace OCA\OpenAi\Tests\Unit\Service;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
-use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\ServiceConfig;
+use OCA\OpenAi\Service\ServicesService;
 use OCA\OpenAi\Service\StreamingService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
@@ -35,28 +36,37 @@ use Test\Util\User\Dummy;
 /**
  * @group DB
  */
-class ServiceOverrideTest extends TestCase {
+class MultiServiceTest extends TestCase {
 	public const APP_NAME = 'integration_openai';
 	public const TEST_USER1 = 'testuser';
-	public const OPENAI_API_BASE = 'https://api.openai.com/v1/';
-	public const OVERRIDE_SPEECH_BASE = 'https://speech-generator.ai/v1/';
+	public const SPEECH_BASE = 'https://speech-generator.ai/v1';
 	public const APIKEY_SPEECH = 'This is a speech PHPUnit test API key';
 	public const REQUEST_TIMEOUT_SPEECH = 10;
-	public const OVERRIDE_IMAGE_BASE = 'https://image-generator.ai/v1/';
+	public const SPEECH_MODEL = 'my-tts-model';
+	public const IMAGE_BASE = 'https://image-generator.ai/v1';
 	public const APIKEY_IMAGE = 'This is a image PHPUnit test API key';
 	public const REQUEST_TIMEOUT_IMAGE = 12;
-	public const OVERRIDE_TRANSCRIPTION_BASE = 'https://transcription-generator.ai/v1/';
+	public const IMAGE_MODEL = 'my-image-model';
+	public const TRANSCRIPTION_BASE = 'https://transcription-generator.ai/v1';
 	public const APIKEY_TRANSCRIPTION = 'This is a transcription PHPUnit test API key';
 	public const REQUEST_TIMEOUT_TRANSCRIPTION = 14;
+	public const TRANSCRIPTION_MODEL = 'my-whisper-model';
 
 	private OpenAiAPIService $openAiApiService;
-	private OpenAiSettingsService $openAiSettingsService;
-	private ChunkService $chunkService;
+	private ServicesService $servicesService;
 	/**
 	 * @var MockObject|IClient
 	 */
 	private $iClient;
-	private QuotaUsageMapper $quotaUsageMapper;
+	/**
+	 * The services created by a test, removed again in tearDown().
+	 *
+	 * Not named $services: Test\TestCase uses that for its overridden server
+	 * services.
+	 *
+	 * @var ServiceConfig[]
+	 */
+	private array $createdServices = [];
 
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
@@ -70,11 +80,7 @@ class ServiceOverrideTest extends TestCase {
 
 		$this->loginAsUser(self::TEST_USER1);
 
-		$this->openAiSettingsService = \OCP\Server::get(OpenAiSettingsService::class);
-
-		$this->chunkService = \OCP\Server::get(ChunkService::class);
-
-		$this->quotaUsageMapper = \OCP\Server::get(QuotaUsageMapper::class);
+		$this->servicesService = \OCP\Server::get(ServicesService::class);
 
 		// We'll hijack the client service and subsequently iClient to return a mock response from the OpenAI API
 		$clientService = $this->createMock(IClientService::class);
@@ -87,22 +93,30 @@ class ServiceOverrideTest extends TestCase {
 			\OCP\Server::get(IAppConfig::class),
 			\OCP\Server::get(ICacheFactory::class),
 			\OCP\Server::get(QuotaUsageMapper::class),
-			$this->openAiSettingsService,
+			\OCP\Server::get(OpenAiSettingsService::class),
 			new StreamingService(
 				$this->createMock(\OCP\IL10N::class),
 			),
 			new OpenAiFileService(
 				$this->createMock(\OCP\IL10N::class),
-				$this->openAiSettingsService,
 				$this->createMock(\OCP\Files\IRootFolder::class),
 				$this->createMock(\OCP\TaskProcessing\IManager::class),
 				$this->createMock(\Psr\Log\LoggerInterface::class),
 			),
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
+			$this->servicesService,
 			$clientService,
 			true
 		);
+	}
+
+	protected function tearDown(): void {
+		foreach ($this->createdServices as $service) {
+			$this->servicesService->deleteService($service->getId());
+		}
+		$this->createdServices = [];
+		parent::tearDown();
 	}
 
 	public static function tearDownAfterClass(): void {
@@ -118,27 +132,38 @@ class ServiceOverrideTest extends TestCase {
 		$backend->deleteUser(self::TEST_USER1);
 		\OCP\Server::get(\OCP\IUserManager::class)->removeBackend($backend);
 
-		$openAiSettingsService = \OCP\Server::get(OpenAiSettingsService::class);
-		$openAiSettingsService->setImageServiceUrl('');
-		$openAiSettingsService->setTtsServiceUrl('');
-		$openAiSettingsService->setSttServiceUrl('');
-
 		parent::tearDownAfterClass();
 	}
 
-	public function testTextToSpeechProvider(): void {
-		$this->openAiSettingsService->setTtsServiceUrl(self::OVERRIDE_SPEECH_BASE);
-		$this->openAiSettingsService->setAdminTtsApiKey(self::APIKEY_SPEECH);
-		$this->openAiSettingsService->setTtsRequestTimeout(self::REQUEST_TIMEOUT_SPEECH);
+	/**
+	 * @param array<string, mixed> $values
+	 */
+	private function addService(array $values): ServiceConfig {
+		$service = $this->servicesService->addService($values);
+		$this->createdServices[] = $service;
+		return $service;
+	}
 
-		$TTSProvider = new TextToSpeechProvider(
+	public function testTextToSpeechProvider(): void {
+		$service = $this->addService([
+			'url' => self::SPEECH_BASE,
+			'api_key' => self::APIKEY_SPEECH,
+			'request_timeout' => self::REQUEST_TIMEOUT_SPEECH,
+			'tts_models' => [self::SPEECH_MODEL],
+		]);
+
+		$ttsProvider = new TextToSpeechProvider(
 			$this->openAiApiService,
-			$l10n = $this->createMock(\OCP\IL10N::class),
+			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
-			\OCP\Server::get(IAppConfig::class),
-			self::TEST_USER1,
 			\OCP\Server::get(WatermarkingService::class),
+			$service,
+			self::SPEECH_MODEL,
 		);
+
+		// the provider is named after its model and the service it belongs to
+		$this->assertSame(self::SPEECH_MODEL . ' (speech-generator.ai)', $ttsProvider->getName());
+		$this->assertStringContainsString($service->getId(), $ttsProvider->getId());
 
 		$inputText = 'This is a test prompt';
 
@@ -148,13 +173,13 @@ class ServiceOverrideTest extends TestCase {
 			throw new \RuntimeException('Could not read test resourcce `speech.mp3`');
 		}
 
-		$url = self::OVERRIDE_SPEECH_BASE . 'audio/speech';
+		$url = self::SPEECH_BASE . '/audio/speech';
 
 		$options = ['timeout' => self::REQUEST_TIMEOUT_SPEECH, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => 'Bearer ' . self::APIKEY_SPEECH, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
 		$options['body'] = json_encode([
 			'input' => $inputText,
 			'voice' => Application::DEFAULT_SPEECH_VOICE,
-			'model' => Application::DEFAULT_SPEECH_MODEL_ID,
+			'model' => self::SPEECH_MODEL,
 			'response_format' => 'mp3',
 			'speed' => 1,
 		]);
@@ -165,22 +190,25 @@ class ServiceOverrideTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$TTSProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null, includeWatermark: false);
+		$ttsProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null, includeWatermark: false);
 	}
 
 	public function testTextToImageProvider(): void {
-		$this->openAiSettingsService->setImageServiceUrl(self::OVERRIDE_IMAGE_BASE);
-		$this->openAiSettingsService->setAdminImageApiKey(self::APIKEY_IMAGE);
-		$this->openAiSettingsService->setImageRequestTimeout(self::REQUEST_TIMEOUT_IMAGE);
+		$service = $this->addService([
+			'url' => self::IMAGE_BASE,
+			'api_key' => self::APIKEY_IMAGE,
+			'request_timeout' => self::REQUEST_TIMEOUT_IMAGE,
+			'image_models' => [self::IMAGE_MODEL],
+		]);
 
-		$TextToImageProvider = new TextToImageProvider(
+		$textToImageProvider = new TextToImageProvider(
 			$this->openAiApiService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			\OCP\Server::get(IClientService::class),
-			\OCP\Server::get(IAppConfig::class),
-			self::TEST_USER1,
 			\OCP\Server::get(WatermarkingService::class),
+			$service,
+			self::IMAGE_MODEL,
 		);
 
 		$inputText = 'This is a test prompt';
@@ -199,14 +227,14 @@ class ServiceOverrideTest extends TestCase {
 			]
 		]);
 
-		$url = self::OVERRIDE_IMAGE_BASE . 'images/generations';
+		$url = self::IMAGE_BASE . '/images/generations';
 
 		$options = ['timeout' => self::REQUEST_TIMEOUT_IMAGE, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => 'Bearer ' . self::APIKEY_IMAGE, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
 		$options['body'] = json_encode([
 			'prompt' => $inputText,
 			'size' => '1024x1024',
 			'n' => 1,
-			'model' => Application::DEFAULT_IMAGE_MODEL_ID,
+			'model' => self::IMAGE_MODEL,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
@@ -216,19 +244,23 @@ class ServiceOverrideTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText, 'numberOfImages' => 1], fn () => null);
+		$textToImageProvider->process(self::TEST_USER1, ['input' => $inputText, 'numberOfImages' => 1], fn () => null);
 	}
 
 	public function testAudioToTextProvider(): void {
-		$this->openAiSettingsService->setSttServiceUrl(self::OVERRIDE_TRANSCRIPTION_BASE);
-		$this->openAiSettingsService->setAdminSttApiKey(self::APIKEY_TRANSCRIPTION);
-		$this->openAiSettingsService->setSttRequestTimeout(self::REQUEST_TIMEOUT_TRANSCRIPTION);
+		$service = $this->addService([
+			'url' => self::TRANSCRIPTION_BASE,
+			'api_key' => self::APIKEY_TRANSCRIPTION,
+			'request_timeout' => self::REQUEST_TIMEOUT_TRANSCRIPTION,
+			'stt_models' => [self::TRANSCRIPTION_MODEL],
+		]);
 
 		$audioToTextProvider = new AudioToTextProvider(
 			$this->openAiApiService,
 			$this->createMock(\Psr\Log\LoggerInterface::class),
-			\OCP\Server::get(IAppConfig::class),
 			$this->createMock(\OCP\IL10N::class),
+			$service,
+			self::TRANSCRIPTION_MODEL,
 		);
 
 		$file = $this->createMock(\OCP\Files\File::class);
@@ -245,11 +277,11 @@ class ServiceOverrideTest extends TestCase {
 			'text' => 'Transcribed text'
 		]);
 
-		$url = self::OVERRIDE_TRANSCRIPTION_BASE . 'audio/transcriptions';
+		$url = self::TRANSCRIPTION_BASE . '/audio/transcriptions';
 
 		$options = ['timeout' => self::REQUEST_TIMEOUT_TRANSCRIPTION, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => 'Bearer ' . self::APIKEY_TRANSCRIPTION], 'nextcloud' => ['allow_local_address' => true]];
 		$options['multipart'] = [
-			['name' => 'model', 'contents' => Application::DEFAULT_TRANSCRIPTION_MODEL_ID],
+			['name' => 'model', 'contents' => self::TRANSCRIPTION_MODEL],
 			['name' => 'file', 'contents' => $inputSpeech, 'filename' => 'file.mp3'],
 			['name' => 'response_format', 'contents' => 'verbose_json'],
 		];
@@ -263,4 +295,20 @@ class ServiceOverrideTest extends TestCase {
 		$audioToTextProvider->process(self::TEST_USER1, ['input' => $file], fn () => null);
 	}
 
+	public function testProvidersOfDifferentServicesHaveDifferentIds(): void {
+		$first = $this->addService(['url' => self::IMAGE_BASE, 'image_models' => [self::IMAGE_MODEL]]);
+		$second = $this->addService(['url' => self::SPEECH_BASE, 'image_models' => [self::IMAGE_MODEL]]);
+
+		$makeProvider = fn (ServiceConfig $service) => new TextToImageProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(IClientService::class),
+			\OCP\Server::get(WatermarkingService::class),
+			$service,
+			self::IMAGE_MODEL,
+		);
+
+		$this->assertNotSame($makeProvider($first)->getId(), $makeProvider($second)->getId());
+	}
 }

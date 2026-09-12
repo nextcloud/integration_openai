@@ -9,22 +9,32 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCP\TaskProcessing\IManager;
+use OCA\OpenAi\Service\ServiceConfig;
+use OCP\IL10N;
 use OCP\TaskProcessing\ISynchronousProvider;
-use OCP\TaskProcessing\Task;
 use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+/**
+ * Transcribes audio and reformats the transcription into paragraphs.
+ *
+ * Both steps run on the same service: the transcription with the
+ * speech-to-text model this provider is registered for, the reformatting with
+ * the first text model selected for that service.
+ */
 class AudioToTextEnhancedProvider implements ISynchronousProvider {
+	// No ProviderIdentity: this provider derives its ID and name from the
+	// transcription provider it wraps rather than from a model of its own.
 
 	public function __construct(
 		private AudioToTextProvider $audioToTextProvider,
+		private ReformatParagraphsProvider $reformatParagraphsProvider,
 		private OpenAiAPIService $openAiAPIService,
-		private IManager $taskProcessingManager,
 		private LoggerInterface $logger,
+		private IL10N $l,
+		private ServiceConfig $service,
 	) {
 	}
 
@@ -33,7 +43,7 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 	}
 
 	public function getName(): string {
-		return $this->audioToTextProvider->getName() . ' (with paragraph reformatting)';
+		return $this->l->t('%s (with paragraph reformatting)', [$this->audioToTextProvider->getName()]);
 	}
 
 	public function getTaskTypeId(): string {
@@ -42,7 +52,7 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 
 	public function getExpectedRuntime(): int {
 		// The audio to text provider may not be openai and this assumes it is
-		return $this->audioToTextProvider->getExpectedRuntime() + $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->audioToTextProvider->getExpectedRuntime() + $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -85,23 +95,14 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 			return ['output' => $transcription];
 		}
 
-		$reformatTask = new Task(
-			\OCP\TaskProcessing\TaskTypes\TextToTextReformatParagraphs::ID,
-			['input' => $transcription],
-			Application::APP_ID,
-			$userId,
-			'audio2text_enhanced',
-		);
-
 		try {
-			$finished = $this->taskProcessingManager->runTask($reformatTask);
-			$output = $finished->getOutput();
-			if (is_array($output) && isset($output['output']) && is_string($output['output']) && $output['output'] !== '') {
+			$output = $this->reformatParagraphsProvider->process($userId, ['input' => $transcription], $reportProgress);
+			if (isset($output['output']) && is_string($output['output']) && $output['output'] !== '') {
 				return ['output' => $output['output']];
 			}
-			$this->logger->warning('ReformatParagraphs follow-up task returned no usable output, falling back to raw transcription');
+			$this->logger->warning('Paragraph reformatting returned no usable output, falling back to raw transcription');
 		} catch (Throwable $e) {
-			$this->logger->warning('ReformatParagraphs follow-up task failed, falling back to raw transcription: ' . $e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('Paragraph reformatting failed, falling back to raw transcription: ' . $e->getMessage(), ['exception' => $e]);
 		}
 
 		return ['output' => $transcription];

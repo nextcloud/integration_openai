@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -24,22 +23,23 @@ use OCP\TaskProcessing\TaskTypes\ImageToTextOpticalCharacterRecognition;
 use Psr\Log\LoggerInterface;
 
 class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private LoggerInterface $logger,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-image2text-ocr';
+		return $this->buildProviderId('image2text-ocr');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -47,7 +47,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -65,25 +65,16 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 				$this->l->t('The maximum number of words/tokens that can be generated in the output.'),
 				EShapeType::Number
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the output'),
-				EShapeType::Enum
-			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
-		];
+		return [];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
-			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
-			'model' => $adminModel,
+			'max_tokens' => $this->service->getMaxTokens(),
 		];
 	}
 
@@ -105,7 +96,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 		$reportOutput = $options->getReportIntermediateOutput();
 		$preferStreaming = $options->getPreferStreaming();
 
-		if (!$this->openAiAPIService->isUsingOpenAi() && !$this->openAiSettingsService->getChatEndpointEnabled()) {
+		if (!$this->service->isUsingOpenAi() && !$this->service->getChatEndpointEnabled()) {
 			throw new ProcessingException('Must support chat completion endpoint');
 		}
 
@@ -118,11 +109,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 
 		$files = $input['input'];
 
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		}
+		$model = $this->model;
 
 		$maxTokens = null;
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
@@ -157,7 +144,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 			try {
 				if ($preferStreaming) {
 					$chunks = $this->openAiAPIService->createStreamedChatCompletion(
-						$userId, $model, $userPrompt, $systemPrompt, null, 1, $maxTokens, null, null, null, [$file],
+						$userId, $this->service, $this->model, $userPrompt, $systemPrompt, null, 1, $maxTokens, null, null, null, [$file],
 					);
 					$time = microtime(true);
 					foreach ($chunks as $chunk) {
@@ -188,7 +175,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 					$messages = $returnValue['messages'];
 				} else {
 					$completion = $this->openAiAPIService->createChatCompletion(
-						$userId, $model, $userPrompt, $systemPrompt, null, 1, $maxTokens, null, null, null, [$file],
+						$userId, $this->service, $this->model, $userPrompt, $systemPrompt, null, 1, $maxTokens, null, null, null, [$file],
 					);
 					$messages = $completion['messages'];
 				}

@@ -8,32 +8,13 @@
 namespace OCA\OpenAi\AppInfo;
 
 use OCA\OpenAi\Capabilities;
+use OCA\OpenAi\Listener\TaskProcessingProviderListener;
 use OCA\OpenAi\Notification\Notifier;
-use OCA\OpenAi\OldProcessing\Translation\TranslationProvider as OldTranslationProvider;
-use OCA\OpenAi\TaskProcessing\AudioToAudioChatProvider;
-use OCA\OpenAi\TaskProcessing\AudioToAudioTranslateProvider;
-use OCA\OpenAi\TaskProcessing\AudioToTextEnhancedProvider;
-use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
-use OCA\OpenAi\TaskProcessing\AudioToTextSubtitlesProvider;
-use OCA\OpenAi\TaskProcessing\ChangeToneProvider;
-use OCA\OpenAi\TaskProcessing\ContextWriteProvider;
-use OCA\OpenAi\TaskProcessing\EmojiProvider;
-use OCA\OpenAi\TaskProcessing\HeadlineProvider;
-use OCA\OpenAi\TaskProcessing\ReformulateProvider;
-use OCA\OpenAi\TaskProcessing\SummaryProvider;
-use OCA\OpenAi\TaskProcessing\TextToImageImprovedPromptProvider;
-use OCA\OpenAi\TaskProcessing\TextToImageProvider;
-use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
-use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
-use OCA\OpenAi\TaskProcessing\TextToTextImproveProvider;
-use OCA\OpenAi\TaskProcessing\TextToTextProvider;
-use OCA\OpenAi\TaskProcessing\TopicsProvider;
-use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\IAppConfig;
+use OCP\TaskProcessing\Events\GetTaskProcessingProvidersEvent;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'integration_openai';
@@ -70,6 +51,15 @@ class Application extends App implements IBootstrap {
 	public const DEFAULT_LOCALAI_IMAGE_GENERATION_TIME = 90; // seconds
 	public const EXPECTED_RUNTIME_LOWPASS_FACTOR = 0.1;
 
+	/**
+	 * Prefixes of the app config keys holding the measured processing time of
+	 * a service. The ID of the service is appended to them, so that a slow
+	 * service does not skew the runtime estimate of a fast one.
+	 */
+	public const TEXT_PROCESSING_TIME_KEY = 'text_generation_time';
+	public const IMAGE_PROCESSING_TIME_KEY = 'image_generation_time';
+	public const PROCESSING_TIME_KEYS = [self::TEXT_PROCESSING_TIME_KEY, self::IMAGE_PROCESSING_TIME_KEY];
+
 	public const QUOTA_TYPE_TEXT = 0;
 	public const QUOTA_TYPE_IMAGE = 1;
 	public const QUOTA_TYPE_TRANSCRIPTION = 2;
@@ -82,96 +72,34 @@ class Application extends App implements IBootstrap {
 		self::QUOTA_TYPE_SPEECH => 0, // 0 = unlimited
 	];
 
-	public const MODELS_CACHE_KEY = 'models';
 	public const QUOTA_RULES_CACHE_PREFIX = 'quota_rules';
-	public const MODELS_CACHE_TTL = 60 * 30;
 
 	public const LANGUAGE_CODES_AND_ENDONYMS = [['en', 'English'], ['zh', '中文'], ['de', 'Deutsch'], ['es', 'Español'], ['ru', 'Русский'], ['ko', '한국어'], ['fr', 'Français'], ['ja', '日本語'], ['pt', 'Português'], ['tr', 'Türkçe'], ['pl', 'Polski'], ['ca', 'Català'], ['nl', 'Nederlands'], ['ar', 'العربية'], ['sv', 'Svenska'], ['it', 'Italiano'], ['id', 'Bahasa Indonesia'], ['hi', 'हिन्दी'], ['fi', 'Suomi'], ['vi', 'Tiếng Việt'], ['he', 'עברית'], ['uk', 'Українська'], ['el', 'Ελληνικά'], ['ms', 'Bahasa Melayu'], ['cs', 'Česky'], ['ro', 'Română'], ['da', 'Dansk'], ['hu', 'Magyar'], ['ta', 'தமிழ்'], ['no', 'Norsk (bokmål / riksmål)'], ['th', 'ไทย / Phasa Thai'], ['ur', 'اردو'], ['hr', 'Hrvatski'], ['bg', 'Български'], ['lt', 'Lietuvių'], ['la', 'Latina'], ['mi', 'Māori'], ['ml', 'മലയാളം'], ['cy', 'Cymraeg'], ['sk', 'Slovenčina'], ['te', 'తెలుగు'], ['fa', 'فارسی'], ['lv', 'Latviešu'], ['bn', 'বাংলা'], ['sr', 'Српски'], ['az', 'Azərbaycanca / آذربايجان'], ['sl', 'Slovenščina'], ['kn', 'ಕನ್ನಡ'], ['et', 'Eesti'], ['mk', 'Македонски'], ['br', 'Brezhoneg'], ['eu', 'Euskara'], ['is', 'Íslenska'], ['hy', 'Հայերեն'], ['ne', 'नेपाली'], ['mn', 'Монгол'], ['bs', 'Bosanski'], ['kk', 'Қазақша'], ['sq', 'Shqip'], ['sw', 'Kiswahili'], ['gl', 'Galego'], ['mr', 'मराठी'], ['pa', 'ਪੰਜਾਬੀ / पंजाबी / پنجابي'], ['si', 'සිංහල'], ['km', 'ភាសាខ្មែរ'], ['sn', 'chiShona'], ['yo', 'Yorùbá'], ['so', 'Soomaaliga'], ['af', 'Afrikaans'], ['oc', 'Occitan'], ['ka', 'ქართული'], ['be', 'Беларуская'], ['tg', 'Тоҷикӣ'], ['sd', 'सिनधि'], ['gu', 'ગુજરાતી'], ['am', 'አማርኛ'], ['yi', 'ייִדיש'], ['lo', 'ລາວ / Pha xa lao'], ['uz', 'Ўзбек'], ['fo', 'Føroyskt'], ['ht', 'Krèyol ayisyen'], ['ps', 'پښتو'], ['tk', 'Туркмен / تركمن'], ['nn', 'Norsk (nynorsk)'], ['mt', 'bil-Malti'], ['sa', 'संस्कृतम्'], ['lb', 'Lëtzebuergesch'], ['my', 'Myanmasa'], ['bo', 'བོད་ཡིག / Bod skad'], ['tl', 'Tagalog'], ['mg', 'Malagasy'], ['as', 'অসমীয়া'], ['tt', 'Tatarça'], ['haw', 'ʻŌlelo Hawaiʻi'], ['ln', 'Lingála'], ['ha', 'هَوُسَ'], ['ba', 'Башҡорт'], ['jw', 'ꦧꦱꦗꦮ'], ['su', 'Basa Sunda'], ['yue', '粤语']];
 
-	public const SERVICE_TYPE_IMAGE = 'image';
-	public const SERVICE_TYPE_STT = 'stt';
-	public const SERVICE_TYPE_TTS = 'tts';
+	/**
+	 * The modalities the admin can select models for. Each selected model of a
+	 * modality is exposed as one task processing provider per task type of
+	 * that modality.
+	 */
+	public const MODALITY_TEXT = 'text';
+	public const MODALITY_IMAGE = 'image';
+	public const MODALITY_STT = 'stt';
+	public const MODALITY_TTS = 'tts';
+	/** App config key holding the JSON list of connected services */
+	public const SERVICES_CONFIG_KEY = 'services';
 
-	private IAppConfig $appConfig;
+	/** Sent to and accepted from the frontend in place of a stored secret */
+	public const SECRET_PLACEHOLDER = '**********';
 
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_ID, $urlParams);
-
-		$container = $this->getContainer();
-		$this->appConfig = $container->get(IAppConfig::class);
 	}
 
 	public function register(IRegistrationContext $context): void {
-		// deprecated APIs
-		if ($this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1') {
-			$context->registerTranslationProvider(OldTranslationProvider::class);
-		}
-
-		$translationProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'translation_provider_enabled', '1') === '1';
-		$sttProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1';
-		$ttsProviderEnabled = $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1';
-
-		// Task processing
-		if ($translationProviderEnabled) {
-			$context->registerTaskProcessingProvider(TranslateProvider::class);
-		}
-		if ($translationProviderEnabled && $sttProviderEnabled && $ttsProviderEnabled) {
-			$context->registerTaskProcessingProvider(AudioToAudioTranslateProvider::class);
-		}
-		if ($sttProviderEnabled) {
-			$context->registerTaskProcessingProvider(AudioToTextProvider::class);
-			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AudioToTextSubtitles')) {
-				$context->registerTaskProcessingProvider(AudioToTextSubtitlesProvider::class);
-			}
-			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
-				$context->registerTaskProcessingProvider(AudioToTextEnhancedProvider::class);
-			}
-		}
-
-		$serviceUrl = $this->appConfig->getValueString(Application::APP_ID, 'url');
-		$isUsingOpenAI = $serviceUrl === '' || $serviceUrl === Application::OPENAI_API_BASE_URL;
-
-		if ($this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1') {
-			$context->registerTaskProcessingProvider(TextToTextProvider::class);
-			$context->registerTaskProcessingProvider(TextToTextChatProvider::class);
-			$context->registerTaskProcessingProvider(SummaryProvider::class);
-			$context->registerTaskProcessingProvider(HeadlineProvider::class);
-			$context->registerTaskProcessingProvider(TopicsProvider::class);
-			$context->registerTaskProcessingProvider(ContextWriteProvider::class);
-			$context->registerTaskProcessingProvider(ReformulateProvider::class);
-			$context->registerTaskProcessingProvider(TextToTextImproveProvider::class);
-			$context->registerTaskProcessingProvider(EmojiProvider::class);
-			$context->registerTaskProcessingProvider(ChangeToneProvider::class);
-			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\TextToTextChatWithToolsProvider::class);
-			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\MultimodalChatWithToolsProvider::class);
-			$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ProofreadProvider::class);
-			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\TextToTextReformatParagraphs')) {
-				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ReformatParagraphsProvider::class);
-			}
-			if ($this->appConfig->getValueString(Application::APP_ID, 'multimodal_image_enabled', '1') === '1') {
-				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\ImageToTextOcrProvider::class);
-				$context->registerTaskProcessingProvider(\OCA\OpenAi\TaskProcessing\AnalyzeImagesProvider::class);
-			}
-		}
-		$context->registerTaskProcessingProvider(TextToSpeechProvider::class);
-		if ($this->appConfig->getValueString(Application::APP_ID, 't2i_provider_enabled', '1') === '1') {
-			$context->registerTaskProcessingProvider(TextToImageProvider::class);
-			$context->registerTaskProcessingProvider(TextToImageImprovedPromptProvider::class);
-		}
-
-		// only register audio chat stuff if we're using OpenAI or stt+llm+tts are enabled
-		if (
-			$isUsingOpenAI
-			|| (
-				$this->appConfig->getValueString(Application::APP_ID, 'stt_provider_enabled', '1') === '1'
-				&& $this->appConfig->getValueString(Application::APP_ID, 'llm_provider_enabled', '1') === '1'
-				&& $this->appConfig->getValueString(Application::APP_ID, 'tts_provider_enabled', '1') === '1'
-			)
-		) {
-			if (class_exists('OCP\\TaskProcessing\\TaskTypes\\AudioToAudioChat')) {
-				$context->registerTaskProcessingProvider(AudioToAudioChatProvider::class);
-			}
-		}
+		// The task processing providers of this app depend on the admin's
+		// service and model selection, so they cannot be registered as
+		// classes. They are built per (service, model, task type) instead.
+		$context->registerEventListener(GetTaskProcessingProvidersEvent::class, TaskProcessingProviderListener::class);
 
 		$context->registerCapability(Capabilities::class);
 		$context->registerNotifierService(Notifier::class);

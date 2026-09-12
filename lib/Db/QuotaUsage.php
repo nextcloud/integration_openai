@@ -24,6 +24,8 @@ use OCP\DB\Types;
  * @method void setTimestamp(int $timestamp)
  * @method int getPool()
  * @method void setPool(int $pool)
+ * @method string getServiceId()
+ * @method void setServiceId(string $serviceId)
  */
 class QuotaUsage extends Entity implements JsonSerializable {
 	/** @var string */
@@ -36,6 +38,8 @@ class QuotaUsage extends Entity implements JsonSerializable {
 	protected $timestamp;
 	/** @var int */
 	protected $pool;
+	/** @var string */
+	protected $serviceId;
 
 	public function __construct() {
 		$this->addType('user_id', Types::STRING);
@@ -43,6 +47,7 @@ class QuotaUsage extends Entity implements JsonSerializable {
 		$this->addType('units', Types::INTEGER);
 		$this->addType('timestamp', Types::INTEGER);
 		$this->addType('pool', Types::INTEGER);
+		$this->addType('service_id', Types::STRING);
 	}
 
 	public function jsonSerialize(): array {
@@ -52,7 +57,8 @@ class QuotaUsage extends Entity implements JsonSerializable {
 			'type' => $this->getType(),
 			'units' => $this->getUnits(),
 			'timestamp' => $this->getTimestamp(),
-			'pool' => $this->getPool()
+			'pool' => $this->getPool(),
+			'service_id' => $this->getServiceId(),
 		];
 	}
 }

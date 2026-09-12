@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -24,22 +23,23 @@ use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\ContextWrite;
 
 class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private ChunkService $chunkService,
 		private IL10N $l,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-contextwrite';
+		return $this->buildProviderId('contextwrite');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -47,7 +47,7 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -65,25 +65,16 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
-			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
-		];
+		return [];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
-			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
-			'model' => $adminModel,
+			'max_tokens' => $this->service->getMaxTokens(),
 		];
 	}
 
@@ -127,13 +118,9 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 			$maxTokens = $input['max_tokens'];
 		}
 
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		}
+		$model = $this->model;
 
-		$chunks = $this->chunkService->chunkSplitPrompt($sourceMaterial, true, $maxTokens);
+		$chunks = $this->chunkService->chunkSplitPrompt($this->service, $sourceMaterial, true, $maxTokens);
 		$fullOutput = '';
 		$fullReasoning = '';
 
@@ -152,9 +139,9 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 				. ' Also, use the *WRITING STYLE* as a guide for how to write the text ONLY and not as a source of facts or events.'
 				. ' Detect the language used in the *SOURCE_MATERIAL*. Make sure to use the same language in your response. Do not mention the language explicitly.';
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
 					if ($preferStreaming) {
-						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens);
 						$time = microtime(true);
 						foreach ($chunks as $chunk) {
 							if (!in_array($chunk['kind'] ?? null, ['content', 'reasoning_content'], true)) {
@@ -190,12 +177,12 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 						$completion = $returnValue['messages'];
 						$reasoning = $returnValue['reasoning_messages'];
 					} else {
-						$returnValue = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+						$returnValue = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens);
 						$completion = $returnValue['messages'];
 						$reasoning = $returnValue['reasoning_messages'];
 					}
 				} else {
-					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+					$completion = $this->openAiAPIService->createCompletion($userId, $this->service, $prompt, 1, $model, $maxTokens);
 					$reasoning = [];
 				}
 			} catch (UserFacingProcessingException $e) {
@@ -219,7 +206,7 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 			throw new ProcessingException('No result in OpenAI/LocalAI response.');
 		}
 		$endTime = time();
-		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 		return [
 			'output' => $fullOutput,
 			'reasoning' => $fullReasoning,

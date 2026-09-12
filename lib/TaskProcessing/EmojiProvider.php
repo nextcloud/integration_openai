@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -21,21 +20,22 @@ use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\GenerateEmoji;
 
 class EmojiProvider implements ISynchronousProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2text:emoji';
+		return $this->buildProviderId('text2text:emoji');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -43,7 +43,7 @@ class EmojiProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -61,25 +61,16 @@ class EmojiProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
-			),
 		];
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		return [
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
-		];
+		return [];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
 			'max_tokens' => 100,
-			'model' => $adminModel,
 		];
 	}
 
@@ -109,18 +100,14 @@ class EmojiProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		}
+		$model = $this->model;
 
 		try {
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $prompt, null, null, 1, $maxTokens);
+			if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
+				$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens);
 				$completion = $completion['messages'];
 			} else {
-				$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+				$completion = $this->openAiAPIService->createCompletion($userId, $this->service, $prompt, 1, $model, $maxTokens);
 			}
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
@@ -129,7 +116,7 @@ class EmojiProvider implements ISynchronousProvider {
 		}
 		if (count($completion) > 0) {
 			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 			return ['output' => array_pop($completion)];
 		}
 

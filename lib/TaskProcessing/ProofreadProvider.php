@@ -9,10 +9,9 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -23,22 +22,23 @@ use OCP\TaskProcessing\ShapeEnumValue;
 use OCP\TaskProcessing\TaskTypes\TextToTextProofread;
 
 class ProofreadProvider implements ISynchronousProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
 		private ChunkService $chunkService,
-		private ?string $userId,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2text:proofread';
+		return $this->buildProviderId('text2text:proofread');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -46,7 +46,7 @@ class ProofreadProvider implements ISynchronousProvider {
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -69,11 +69,6 @@ class ProofreadProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
-			'model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the completion'),
-				EShapeType::Enum
-			),
 		];
 	}
 
@@ -84,16 +79,13 @@ class ProofreadProvider implements ISynchronousProvider {
 				new ShapeEnumValue($this->l->t('Standard'), 'standard'),
 				new ShapeEnumValue($this->l->t('Strict'), 'strict'),
 			],
-			'model' => $this->openAiAPIService->getModelEnumValues($this->userId),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 		return [
 			'strictness' => 'standard',
-			'max_tokens' => $this->openAiSettingsService->getMaxTokens(),
-			'model' => $adminModel,
+			'max_tokens' => $this->service->getMaxTokens(),
 		];
 	}
 
@@ -127,25 +119,21 @@ class ProofreadProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
-		if (isset($input['model']) && is_string($input['model'])) {
-			$model = $input['model'];
-		} else {
-			$model = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
-		}
+		$model = $this->model;
 
-		$chunks = $this->chunkService->chunkSplitPrompt($textInput, true, $maxTokens);
+		$chunks = $this->chunkService->chunkSplitPrompt($this->service, $textInput, true, $maxTokens);
 		$result = '';
 		$increase = 1.0 / ((float)count($chunks) + 1.0);
 		$progress = 0.0;
 
 		foreach ($chunks as $textInput) {
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $textInput, $systemPrompt, null, 1, $maxTokens);
+				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $textInput, $systemPrompt, null, 1, $maxTokens);
 					$completion = $completion['messages'];
 				} else {
 					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $textInput;
-					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+					$completion = $this->openAiAPIService->createCompletion($userId, $this->service, $prompt, 1, $model, $maxTokens);
 				}
 			} catch (UserFacingProcessingException $e) {
 				throw $e;
@@ -167,12 +155,12 @@ class ProofreadProvider implements ISynchronousProvider {
 		if (count($chunks) > 1) {
 			$systemPrompt = 'Repeat the proofread feedback list. Ensure that no information is lost, but also not duplicated. ';
 			try {
-				if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $model, $result, $systemPrompt, null, 1, $maxTokens);
+				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $result, $systemPrompt, null, 1, $maxTokens);
 					$completion = $completion['messages'];
 				} else {
 					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $result;
-					$completion = $this->openAiAPIService->createCompletion($userId, $prompt, 1, $model, $maxTokens);
+					$completion = $this->openAiAPIService->createCompletion($userId, $this->service, $prompt, 1, $model, $maxTokens);
 				}
 			} catch (UserFacingProcessingException $e) {
 				throw $e;
@@ -186,7 +174,7 @@ class ProofreadProvider implements ISynchronousProvider {
 		$progress += $increase;
 		$reportProgress($progress);
 		$endTime = time();
-		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+		$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 		return ['output' => $result];
 	}
 

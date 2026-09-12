@@ -1,6 +1,6 @@
 {
   "name": "integration_openai",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "OpenAI integration",
   "main": "index.js",
   "directories": {

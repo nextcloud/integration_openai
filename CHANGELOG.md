@@ -8,6 +8,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.0.0] - unreleased
+
+### Breaking changes
+
+- Providers are now registered per selected model instead of once per task type, so their IDs and names changed. Existing per-task-type provider preferences in the AI admin settings have to be set again.
+- The single service configuration was replaced by a list of connected services. The existing configuration, including the per-modality URL overrides, is migrated to services automatically.
+- The optional `model` input was removed from the providers: a provider always uses the model it was registered for.
+- The deprecated `ITranslationProvider` implementation was removed. The TextToTextTranslate providers cover translation.
+
+### Added
+
+- Connect any number of OpenAI-compatible services, each with its own URL, credentials, request behaviour and quotas
+- Select per service and per modality which models are exposed, including models the service does not list
+- Users can provide their own credentials for each connected service, which lifts that service's quotas
+
+### Changed
+
+- Quota amounts and usage are tracked per service; quota rules stay instance-wide
+- The measured processing time behind the expected runtime of a provider is now recorded per service
+- Model lists are fetched when the admin asks for them instead of being cached, so the daily model refresh job is gone
+
 ## [5.0.0] - 2026-07-27
 
 ### Breaking changes

@@ -25,7 +25,6 @@ class QuotaRuleService {
 	public function __construct(
 		private QuotaRuleMapper $quotaRuleMapper,
 		private QuotaUserMapper $quotaUserMapper,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IGroupManager $groupManager,
 		private ICacheFactory $cacheFactory,
 		private IUserManager $userManager,
@@ -36,15 +35,20 @@ class QuotaRuleService {
 	}
 
 	/**
-	 * Returns the quota rule for the given user
+	 * Returns the quota rule that applies to the given user.
+	 *
+	 * Quota rules are instance-wide: a matching rule is a single budget across
+	 * all services. When no rule matches, the quota configured on the service
+	 * applies, which is signalled by a null 'id'.
 	 *
 	 * @param int $quotaType
 	 * @param string $userId It can be an empty string
-	 * @return array
+	 * @param ServiceConfig $service the service the request is made to
+	 * @return array{amount: int, pool: bool|int, id: int|null}
 	 */
-	public function getRule(int $quotaType, string $userId) {
+	public function getRule(int $quotaType, string $userId, ServiceConfig $service) {
 		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
-		$cacheKey = Application::QUOTA_RULES_CACHE_PREFIX . $quotaType . '-' . $userId;
+		$cacheKey = Application::QUOTA_RULES_CACHE_PREFIX . $quotaType . '-' . $userId . '-' . $service->getId();
 		$rule = $cache->get($cacheKey);
 		if ($rule === null) {
 			try {
@@ -57,7 +61,7 @@ class QuotaRuleService {
 				$rule = $this->quotaRuleMapper->getRule($quotaType, $userId, $groups)->jsonSerialize();
 			} catch (DoesNotExistException|MultipleObjectsReturnedException) {
 				$rule = [
-					'amount' => $this->openAiSettingsService->getQuotas()[$quotaType],
+					'amount' => $service->getQuota($quotaType),
 					'pool' => false,
 					'id' => null,
 				];
@@ -187,10 +191,10 @@ class QuotaRuleService {
 			}
 		}
 	}
-	public function getQuotaUsage(int $startDate, int $endDate, int $type): array {
+	public function getQuotaUsage(int $startDate, int $endDate, int $type, ?string $serviceId = null): array {
 		$data = [[$this->l10n->t('Name'), $this->l10n->t('Usage')]];
-		$users = $this->quotaUsageMapper->getUsersQuotaUsage($startDate, $endDate, $type);
-		$pools = $this->quotaUsageMapper->getPoolsQuotaUsage($startDate, $endDate, $type);
+		$users = $this->quotaUsageMapper->getUsersQuotaUsage($startDate, $endDate, $type, $serviceId);
+		$pools = $this->quotaUsageMapper->getPoolsQuotaUsage($startDate, $endDate, $type, $serviceId);
 		$usersIdx = 0;
 		$poolsIdx = 0;
 		while ($usersIdx < count($users) && $poolsIdx < count($pools)) {

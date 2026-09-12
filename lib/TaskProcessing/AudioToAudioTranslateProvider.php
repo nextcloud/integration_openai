@@ -12,11 +12,10 @@ namespace OCA\OpenAi\TaskProcessing;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\TranslateService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCP\Files\File;
-use OCP\IAppConfig;
 use OCP\IL10N;
 use OCP\IUserManager;
 use OCP\L10N\IFactory;
@@ -31,28 +30,41 @@ use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\AudioToAudioTranslate;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Translates spoken audio into spoken audio of another language by chaining
+ * transcription, translation and speech generation on one service.
+ *
+ * Registered once per selected speech-to-text model; the models for the other
+ * two steps are the first text and text-to-speech models selected for the same
+ * service.
+ */
 class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private TranslateService $translateService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private WatermarkingService $watermarkingService,
 		private LoggerInterface $logger,
 		private IFactory $l10nFactory,
 		private IL10N $l,
-		private IAppConfig $appConfig,
 		private IUserManager $userManager,
-		private ?string $userId,
+		private ServiceConfig $service,
+		/** The speech-to-text model this provider is registered for */
+		private string $model,
+		/** The text model used to translate the transcription */
+		private string $textModel,
+		/** The text-to-speech model used to read out the translation */
+		private string $ttsModel,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-audio2audio:translate';
+		return $this->buildProviderId('audio2audio:translate');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName(Application::SERVICE_TYPE_STT);
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -88,14 +100,9 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				$this->l->t('The voice to use'),
 				EShapeType::Enum
 			),
-			'tts_model' => new ShapeDescriptor(
-				$this->l->t('Model'),
-				$this->l->t('The model used to generate the speech'),
-				EShapeType::Enum
-			),
 			'tts_speed' => new ShapeDescriptor(
 				$this->l->t('Speed'),
-				$this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)
+				$this->service->isUsingOpenAi()
 					? $this->l->t('Speech speed modifier (Valid values: 0.25-4)')
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
@@ -104,21 +111,17 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
-		$voices = json_decode($this->appConfig->getValueString(Application::APP_ID, 'tts_voices', lazy: true)) ?: Application::DEFAULT_SPEECH_VOICES;
 		return [
-			'tts_voice' => array_map(function ($v) {
-				return new ShapeEnumValue($v, $v);
-			}, $voices),
-			'tts_model' => $this->openAiAPIService->getModelEnumValues($this->userId, Application::SERVICE_TYPE_TTS),
+			'tts_voice' => array_map(
+				static fn (string $voice) => new ShapeEnumValue($voice, $voice),
+				$this->service->getTtsVoices(),
+			),
 		];
 	}
 
 	public function getOptionalInputShapeDefaults(): array {
-		$adminVoice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
-		$adminModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
 		return [
-			'tts_voice' => $adminVoice,
-			'tts_model' => $adminModel,
+			'tts_voice' => $this->service->getDefaultTtsVoice(),
 			'tts_speed' => 1,
 		];
 	}
@@ -166,9 +169,8 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		}
 
 		// STT
-		$sttModel = $this->appConfig->getValueString(Application::APP_ID, 'default_stt_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID;
 		try {
-			$transcription = $this->openAiAPIService->transcribeFile($userId, $inputFile, false, $sttModel, $input['origin_language']);
+			$transcription = $this->openAiAPIService->transcribeFile($userId, $this->service, $inputFile, false, $this->model, $input['origin_language']);
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
 		} catch (Exception $e) {
@@ -206,10 +208,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		}
 
 		// translate
-		$completionModel = $this->openAiAPIService->isUsingOpenAi()
-			? ($this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', Application::DEFAULT_MODEL_ID, lazy: true) ?: Application::DEFAULT_MODEL_ID)
-			: $this->appConfig->getValueString(Application::APP_ID, 'default_completion_model_id', lazy: true);
-		$maxTokens = $this->openAiSettingsService->getMaxTokens();
+		$maxTokens = $this->service->getMaxTokens();
 
 		try {
 			$reportTranslationOutput = function (string $translationOutput) use ($reportOutput, $transcription, $watermarkSuffix) {
@@ -222,8 +221,9 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				}
 			};
 			$translatedText = $this->translateService->translate(
+				$this->service,
 				$transcription, $input['origin_language'], $input['target_language'],
-				$completionModel, $maxTokens, $userId, null,
+				$this->textModel, $maxTokens, $userId, null,
 				$preferStreaming, $reportTranslationOutput,
 			);
 
@@ -254,21 +254,14 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 
 		// TTS
 		$ttsPrompt = $translatedText . $watermarkSuffix;
-		if (isset($input['tts_model']) && is_string($input['tts_model'])) {
-			$ttsModel = $input['tts_model'];
-		} else {
-			$ttsModel = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_model_id', Application::DEFAULT_SPEECH_MODEL_ID, lazy: true) ?: Application::DEFAULT_SPEECH_MODEL_ID;
-		}
-		if (isset($input['tts_voice']) && is_string($input['tts_voice'])) {
-			$voice = $input['tts_voice'];
-		} else {
-			$voice = $this->appConfig->getValueString(Application::APP_ID, 'default_speech_voice', Application::DEFAULT_SPEECH_VOICE, lazy: true) ?: Application::DEFAULT_SPEECH_VOICE;
-		}
+		$voice = isset($input['tts_voice']) && is_string($input['tts_voice'])
+			? $input['tts_voice']
+			: $this->service->getDefaultTtsVoice();
 
 		$speed = 1;
 		if (isset($input['tts_speed']) && is_numeric($input['tts_speed'])) {
 			$speed = $input['tts_speed'];
-			if ($this->openAiAPIService->isUsingOpenAi(Application::SERVICE_TYPE_TTS)) {
+			if ($this->service->isUsingOpenAi()) {
 				if ($speed > 4) {
 					$speed = 4;
 				} elseif ($speed < 0.25) {
@@ -279,7 +272,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 
 		try {
 			$apiResponse = $this->openAiAPIService->requestSpeechCreation(
-				$userId, $ttsPrompt, $ttsModel, $voice, $speed,
+				$userId, $this->service, $ttsPrompt, $this->ttsModel, $voice, $speed,
 			);
 
 			if (!isset($apiResponse['body'])) {

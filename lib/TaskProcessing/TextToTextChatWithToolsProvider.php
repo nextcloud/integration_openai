@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
@@ -23,20 +22,22 @@ use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextChatWithTools;
 
 class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsAwareProvider {
+	use ProviderIdentity;
 
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private IL10N $l,
+		private ServiceConfig $service,
+		private string $model,
 	) {
 	}
 
 	public function getId(): string {
-		return Application::APP_ID . '-text2text:chatwithtools';
+		return $this->buildProviderId('text2text:chatwithtools');
 	}
 
 	public function getName(): string {
-		return $this->openAiAPIService->getServiceName();
+		return $this->buildProviderName();
 	}
 
 	public function getTaskTypeId(): string {
@@ -44,7 +45,7 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 	}
 
 	public function getExpectedRuntime(): int {
-		return $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -97,7 +98,6 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		$reportOutput = $options->getReportIntermediateOutput();
 		$preferStreaming = $options->getPreferStreaming();
 		$startTime = time();
-		$adminModel = $this->openAiSettingsService->getAdminDefaultCompletionModelId();
 
 		if (!isset($input['input']) || !is_string($input['input'])) {
 			throw new ProcessingException('Invalid input');
@@ -141,7 +141,7 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		try {
 			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
-					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
+					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
 				);
 				$time = microtime(true);
 				$streamedOutput = '';
@@ -179,7 +179,7 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 				$returnValue = $chunks->getReturn();
 			} else {
 				$returnValue = $this->openAiAPIService->createChatCompletion(
-					$userId, $adminModel, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
+					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
 				);
 			}
 		} catch (UserFacingProcessingException $e) {
@@ -189,7 +189,7 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		}
 		if (count($returnValue['messages']) > 0 || count($returnValue['tool_calls']) > 0) {
 			$endTime = time();
-			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime);
+			$this->openAiAPIService->updateExpTextProcessingTime($endTime - $startTime, $this->service);
 			return [
 				'output' => array_pop($returnValue['messages']) ?? '',
 				'reasoning' => count($returnValue['reasoning_messages']) > 0 ? array_pop($returnValue['reasoning_messages']) : '',

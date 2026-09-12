@@ -9,6 +9,8 @@ namespace OCA\OpenAi\Settings;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiSettingsService;
+use OCA\OpenAi\Service\ServiceConfig;
+use OCA\OpenAi\Service\ServicesService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
 use OCP\IL10N;
@@ -18,6 +20,7 @@ class Personal implements ISettings {
 	public function __construct(
 		private IInitialState $initialStateService,
 		private OpenAiSettingsService $openAiSettingsService,
+		private ServicesService $servicesService,
 		private IL10N $l,
 		private ?string $userId,
 	) {
@@ -31,11 +34,9 @@ class Personal implements ISettings {
 			return new TemplateResponse(Application::APP_ID, 'personalSettings');
 		}
 		$userConfig = $this->openAiSettingsService->getUserConfig($this->userId);
-		$userConfig['api_key'] = $userConfig['api_key'] === '' ? '' : 'dummyApiKey';
-		$userConfig['basic_password'] = $userConfig['basic_password'] === '' ? '' : 'dummyPassword';
 		$languages = Application::LANGUAGE_CODES_AND_ENDONYMS;
 		array_unshift($languages, ['detect_language', $this->l->t('Detect language')]);
-		$languages = array_map(static function (array $language) use ($userConfig) {
+		$languages = array_map(static function (array $language) {
 			return [
 				'value' => $language[0],
 				'label' => $language[1],
@@ -53,6 +54,15 @@ class Personal implements ISettings {
 			}
 		}
 		$this->initialStateService->provideInitialState('config', $userConfig);
+		// users can provide their own credentials for any connected service
+		$this->initialStateService->provideInitialState('services', array_map(
+			static fn (ServiceConfig $service) => $service->jsonSerializeForUser(),
+			$this->servicesService->getServices(),
+		));
+		$this->initialStateService->provideInitialState(
+			'user-credentials',
+			$this->servicesService->getUserCredentialsForFrontend($this->userId),
+		);
 		return new TemplateResponse(Application::APP_ID, 'personalSettings');
 	}
 
