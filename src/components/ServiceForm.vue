@@ -474,6 +474,8 @@ export default {
 			readonly: true,
 			models: null,
 			loadingModels: false,
+			// so that expanding a service again does not re-query the service
+			modelsLoaded: false,
 			detecting: false,
 			llmExtraParamHint: t('integration_openai', 'JSON object. Check the API documentation to get the list of all available parameters. For example: {example}', { example: '{"stop":".","temperature":0.7}' }, null, { escape: false, sanitize: false }),
 			defaultImageSizeParamHint: t('integration_openai', 'Must be in 256x256 format (default is {default})', { default: '1024x1024' }),
@@ -562,6 +564,15 @@ export default {
 	watch: {
 		'service.url'() {
 			this.models = null
+			this.modelsLoaded = false
+			if (this.expanded) {
+				this.loadModels()
+			}
+		},
+		expanded(value) {
+			if (value && !this.modelsLoaded) {
+				this.loadModels()
+			}
 		},
 		// the backend normalizes what it stored, so follow it unless the admin
 		// is in the middle of typing something else
@@ -575,6 +586,14 @@ export default {
 				this.defaultImageSize = value ?? ''
 			}
 		},
+	},
+
+	mounted() {
+		// the models of an already expanded service are fetched right away, so
+		// that the admin does not have to ask for them before picking any
+		if (this.expanded) {
+			this.loadModels()
+		}
 	},
 
 	methods: {
@@ -606,6 +625,7 @@ export default {
 				const url = generateUrl('/apps/integration_openai/services/{id}/models', { id: this.service.id })
 				const response = await axios.get(url)
 				this.models = (response.data?.data ?? []).map(model => model.id)
+				this.modelsLoaded = true
 			} catch (error) {
 				showError(
 					t('integration_openai', 'Failed to load the models of {service}', { service: this.service.display_name })
