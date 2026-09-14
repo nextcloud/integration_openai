@@ -273,6 +273,10 @@ class ServiceConfig implements JsonSerializable {
 		return str_starts_with(strtolower($this->url), 'https://openrouter.ai');
 	}
 
+	public function isUsingMistral(): bool {
+		return str_starts_with(strtolower($this->url), 'https://api.mistral.ai');
+	}
+
 	public function getApiKey(): string {
 		return $this->apiKey;
 	}
