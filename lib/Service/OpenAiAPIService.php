@@ -842,7 +842,8 @@ class OpenAiAPIService {
 			$params['max_tokens'] = $maxTokens;
 		}
 
-		if ($tools !== null) {
+		// IONOS does not like an empty tool array
+		if ($tools !== null && count($tools) > 0) {
 			$params['tools'] = $tools;
 		}
 		if ($userId !== null && $this->isUsingOpenAi()) {
