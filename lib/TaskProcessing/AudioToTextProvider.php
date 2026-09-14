@@ -36,7 +36,7 @@ class AudioToTextProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('audio2text');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

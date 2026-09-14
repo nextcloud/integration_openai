@@ -36,7 +36,7 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('translate');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

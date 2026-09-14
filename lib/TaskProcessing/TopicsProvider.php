@@ -35,7 +35,7 @@ class TopicsProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text:topics');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

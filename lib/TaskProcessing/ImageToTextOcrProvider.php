@@ -35,7 +35,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('image2text-ocr');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

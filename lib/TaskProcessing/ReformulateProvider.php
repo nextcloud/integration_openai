@@ -35,7 +35,7 @@ class ReformulateProvider implements IProvider, ISynchronousOptionsAwareProvider
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('reformulate');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

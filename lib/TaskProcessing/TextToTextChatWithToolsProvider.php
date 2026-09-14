@@ -33,7 +33,7 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text:chatwithtools');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

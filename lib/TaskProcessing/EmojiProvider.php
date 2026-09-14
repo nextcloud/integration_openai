@@ -31,7 +31,7 @@ class EmojiProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text:emoji');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

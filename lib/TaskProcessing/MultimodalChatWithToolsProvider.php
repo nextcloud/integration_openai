@@ -39,7 +39,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text:multimodal-chatwithtools');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

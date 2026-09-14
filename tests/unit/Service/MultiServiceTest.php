@@ -23,6 +23,7 @@ use OCA\OpenAi\Service\ServicesService;
 use OCA\OpenAi\Service\StreamingService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
+use OCA\OpenAi\TaskProcessing\ProviderFactory;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
 use OCP\Http\Client\IClient;
@@ -51,6 +52,7 @@ class MultiServiceTest extends TestCase {
 	public const APIKEY_TRANSCRIPTION = 'This is a transcription PHPUnit test API key';
 	public const REQUEST_TIMEOUT_TRANSCRIPTION = 14;
 	public const TRANSCRIPTION_MODEL = 'my-whisper-model';
+	public const TEXT_MODEL = 'my/text-model';
 
 	private OpenAiAPIService $openAiApiService;
 	private ServicesService $servicesService;
@@ -310,5 +312,42 @@ class MultiServiceTest extends TestCase {
 		);
 
 		$this->assertNotSame($makeProvider($first)->getId(), $makeProvider($second)->getId());
+	}
+
+	public function testProviderIdsEndInTheirTaskTypeId(): void {
+		$service = $this->addService([
+			'url' => self::IMAGE_BASE,
+			'text_models' => [self::TEXT_MODEL],
+			'image_models' => [self::IMAGE_MODEL],
+			'stt_models' => [self::TRANSCRIPTION_MODEL],
+			'tts_models' => [self::SPEECH_MODEL],
+			'translation_enabled' => true,
+			'multimodal_image_enabled' => true,
+			'multimodal_audio_enabled' => true,
+		]);
+
+		$models = implode('|', array_map(
+			static fn (string $model) => preg_quote(TextToImageProvider::slugifyModel($model), '/'),
+			[self::TEXT_MODEL, self::IMAGE_MODEL, self::TRANSCRIPTION_MODEL, self::SPEECH_MODEL],
+		));
+		$prefix = Application::APP_ID . '-' . $service->getId() . '-';
+
+		$checked = 0;
+		foreach (\OCP\Server::get(ProviderFactory::class)->getProviders() as $provider) {
+			if (!str_starts_with($provider->getId(), $prefix)) {
+				// a service another test left behind
+				continue;
+			}
+			// the ID says which service, which model and which task type, and
+			// nothing else but the variant of a provider that serves a task
+			// type its service already covers
+			$taskSlug = TextToImageProvider::slugifyTaskType($provider->getTaskTypeId());
+			$this->assertMatchesRegularExpression(
+				'/^' . preg_quote($prefix, '/') . '(' . $models . ')-' . preg_quote($taskSlug, '/') . '(-[a-z-]+)?$/',
+				$provider->getId(),
+			);
+			$checked++;
+		}
+		$this->assertGreaterThan(15, $checked, 'the factory should have built a provider per task type');
 	}
 }

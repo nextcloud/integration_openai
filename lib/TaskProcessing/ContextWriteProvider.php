@@ -35,7 +35,7 @@ class ContextWriteProvider implements IProvider, ISynchronousOptionsAwareProvide
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('contextwrite');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

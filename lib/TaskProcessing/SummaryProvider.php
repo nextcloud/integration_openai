@@ -34,7 +34,7 @@ class SummaryProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text:summary');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

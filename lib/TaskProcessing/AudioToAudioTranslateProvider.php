@@ -60,7 +60,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('audio2audio:translate');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

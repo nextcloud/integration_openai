@@ -36,7 +36,7 @@ class AudioToTextSubtitlesProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('audio2text-subtitles');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

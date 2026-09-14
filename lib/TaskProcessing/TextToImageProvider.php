@@ -38,7 +38,7 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2image');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

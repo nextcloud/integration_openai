@@ -36,7 +36,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('changetone');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

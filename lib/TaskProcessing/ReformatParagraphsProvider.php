@@ -80,7 +80,7 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text:reformatparagraphs');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

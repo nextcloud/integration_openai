@@ -31,7 +31,7 @@ class HeadlineProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text:headline');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

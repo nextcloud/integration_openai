@@ -34,7 +34,7 @@ class ProofreadProvider implements ISynchronousProvider {
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text:proofread');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

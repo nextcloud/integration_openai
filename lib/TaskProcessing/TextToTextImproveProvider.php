@@ -35,7 +35,7 @@ class TextToTextImproveProvider implements IProvider, ISynchronousOptionsAwarePr
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('improve');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

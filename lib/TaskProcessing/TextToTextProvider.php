@@ -33,7 +33,7 @@ class TextToTextProvider implements IProvider, ISynchronousOptionsAwareProvider 
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('text2text');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {

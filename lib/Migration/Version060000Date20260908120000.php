@@ -63,36 +63,53 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 
 	/**
 	 * The task processing providers of the old configuration, by the modality
-	 * whose service and model they were served by.
+	 * whose service and model they were served by, mapping the task slug their
+	 * ID ended in to the one the new ID ends in.
 	 *
-	 * There was one provider per task type, so their IDs carried nothing but
-	 * the task they performed. The new IDs name the service and the model as
-	 * well, but end in the very same task slug, which makes the rewrite below
-	 * a rename.
+	 * There was one provider per task type, so their IDs carried nothing but the
+	 * task they performed. The new IDs name the service and the model as well,
+	 * and end in the ID of the task type rather than in a slug of their own, so
+	 * the handful of task slugs that were not named after their task type are
+	 * rewritten here along with the rest of the ID.
 	 *
 	 * The two providers that chain a second modality on top of their own are
 	 * listed under the modality of the ID they were derived from: the
 	 * audio-in/audio-out chat was built on the text provider, the audio
 	 * translation on the transcription one.
 	 */
-	private const OLD_PROVIDER_SLUGS = [
+	private const NEW_SLUG_BY_OLD_SLUG = [
 		Application::MODALITY_TEXT => [
-			'text2text', 'text2text:chat', 'text2text:chatwithtools',
-			'text2text:multimodal-chatwithtools', 'text2text:summary',
-			'text2text:headline', 'text2text:topics', 'text2text:emoji',
-			'text2text:proofread', 'text2text:reformatparagraphs',
-			'contextwrite', 'reformulate', 'improve', 'changetone', 'translate',
-			'image2text-ocr', 'analyze-images', 'audio2audio:chat',
+			'text2text' => 'text2text',
+			'text2text:chat' => 'text2text:chat',
+			'text2text:chatwithtools' => 'text2text:chatwithtools',
+			'text2text:multimodal-chatwithtools' => 'text2text:multimodal-chatwithtools',
+			'text2text:summary' => 'text2text:summary',
+			'text2text:headline' => 'text2text:headline',
+			'text2text:topics' => 'text2text:topics',
+			'text2text:emoji' => 'generateemoji',
+			'text2text:proofread' => 'text2text:proofread',
+			'text2text:reformatparagraphs' => 'text2text:reformatparagraphs',
+			'contextwrite' => 'contextwrite',
+			'reformulate' => 'text2text:reformulation',
+			'improve' => 'text2text:improve',
+			'changetone' => 'text2text:changetone',
+			'translate' => 'text2text:translate',
+			'image2text-ocr' => 'image2text:ocr',
+			'analyze-images' => 'analyze-images',
+			'audio2audio:chat' => 'audio2audio:chat',
 		],
 		Application::MODALITY_IMAGE => [
-			'text2image', 'text2image-improved-prompt',
+			'text2image' => 'text2image',
+			'text2image-improved-prompt' => 'text2image-improved-prompt',
 		],
 		Application::MODALITY_STT => [
-			'audio2text', 'audio2text-subtitles', 'audio2text-enhanced',
-			'audio2audio:translate',
+			'audio2text' => 'audio2text',
+			'audio2text-subtitles' => 'audio2text:subtitles',
+			'audio2text-enhanced' => 'audio2text-enhanced',
+			'audio2audio:translate' => 'audio2audio:translate',
 		],
 		Application::MODALITY_TTS => [
-			'text2speech',
+			'text2speech' => 'text2speech',
 		],
 	];
 
@@ -371,15 +388,15 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 
 		/** @var array<string, string> $newIdByOldId */
 		$newIdByOldId = [];
-		foreach (self::OLD_PROVIDER_SLUGS as $modality => $slugs) {
+		foreach (self::NEW_SLUG_BY_OLD_SLUG as $modality => $slugs) {
 			$service = $serviceByModality[$modality];
 			$model = $service->getFirstModel($modality);
 			if ($model === null) {
 				continue;
 			}
 			$prefix = Application::APP_ID . '-' . $service->getId() . '-' . self::slugifyModel($model) . '-';
-			foreach ($slugs as $slug) {
-				$newIdByOldId[Application::APP_ID . '-' . $slug] = $prefix . $slug;
+			foreach ($slugs as $oldSlug => $newSlug) {
+				$newIdByOldId[Application::APP_ID . '-' . $oldSlug] = $prefix . $newSlug;
 			}
 		}
 

@@ -34,7 +34,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 	}
 
 	public function getId(): string {
-		return $this->buildProviderId('analyze-images');
+		return $this->buildProviderId();
 	}
 
 	public function getName(): string {
