@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Quota amounts and usage are tracked per service; quota rules stay instance-wide
+- Quota amounts, quota rules and usage are tracked per service. Existing quota rules applied to every service, so each of them is copied to every connected service on upgrade
 - The measured processing time behind the expected runtime of a provider is now recorded per service
 - Model lists are fetched when the admin asks for them instead of being cached, so the daily model refresh job is gone
 

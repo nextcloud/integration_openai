@@ -28,11 +28,12 @@ class QuotaRuleController extends Controller {
 
 	/**
 	 * POST /rule Creates a new empty rule returning the value of the rule
+	 * @param string|null $serviceId the service the rule applies to
 	 * @return DataResponse
 	 */
-	public function addRule(): DataResponse {
+	public function addRule(?string $serviceId = null): DataResponse {
 		try {
-			$result = $this->quotaRuleService->addRule();
+			$result = $this->quotaRuleService->addRule($serviceId);
 			return new DataResponse($result);
 		} catch (Exception $e) {
 			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
@@ -42,7 +43,7 @@ class QuotaRuleController extends Controller {
 	/**
 	 * PUT /rule
 	 * @param int $id
-	 * @param array $rule expects: type, amount, priority, pool, entities[]
+	 * @param array $rule expects: type, amount, priority, pool, service_id, entities[]
 	 * @return DataResponse
 	 */
 	public function updateRule(int $id, array $rule): DataResponse {
@@ -57,6 +58,9 @@ class QuotaRuleController extends Controller {
 		}
 		if (!isset($rule['pool']) || !is_bool($rule['pool'])) {
 			return new DataResponse(['error' => 'Missing or invalid pool value'], Http::STATUS_BAD_REQUEST);
+		}
+		if (!isset($rule['service_id']) || !is_string($rule['service_id'])) {
+			return new DataResponse(['error' => 'Missing or invalid service'], Http::STATUS_BAD_REQUEST);
 		}
 		if (!isset($rule['entities']) || !is_array($rule['entities'])) {
 			return new DataResponse(['error' => 'Missing or invalid entities'], Http::STATUS_BAD_REQUEST);

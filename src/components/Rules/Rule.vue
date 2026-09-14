@@ -7,6 +7,11 @@
 		<b>{{ t('integration_openai', 'Rule {number}', { number: ruleData.id }) }}</b>
 		<div
 			class="controls-row">
+			<NcSelect
+				:model-value="service"
+				:options="serviceOptions"
+				:input-label="t('integration_openai', 'Service')"
+				@update:model-value="update('service_id', $event?.id)" />
 			<MultiselectWho
 				class="user-selector"
 				:value="ruleData.entities"
@@ -91,6 +96,10 @@ export default {
 			type: Object,
 			required: true,
 		},
+		services: {
+			type: Array,
+			required: true,
+		},
 	},
 
 	emits: ['update:ruleData', 'delete'],
@@ -102,6 +111,12 @@ export default {
 	},
 
 	computed: {
+		serviceOptions() {
+			return this.services.map((service) => ({ id: service.id, label: service.display_name }))
+		},
+		service() {
+			return this.serviceOptions.find((option) => option.id === this.ruleData.service_id) ?? null
+		},
 		unit() {
 			console.debug('quotaInfo', this.quotaInfo)
 			if (this.quotaInfo[this.ruleData.type] === undefined) {

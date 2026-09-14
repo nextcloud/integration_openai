@@ -116,7 +116,7 @@ There is an "Artificial intelligence" section in the **admin** settings where yo
 * Connect any number of services: OpenAI, LocalAI instances or any other remote service with an OpenAI-compatible API
 * Set the API key (or basic auth credentials) of each service
 * Select, per service and per modality, which models are exposed as providers
-* Configure the request behaviour and the usage quotas of each service, and the instance-wide quota period and rules
+* Configure the request behaviour, the usage quotas and the quota rules of each service, as well as the instance-wide quota period
 
 ### Personal settings
 

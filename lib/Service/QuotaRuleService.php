@@ -31,15 +31,17 @@ class QuotaRuleService {
 		private QuotaUsageMapper $quotaUsageMapper,
 		private IL10N $l10n,
 		private LoggerInterface $logger,
+		private ServicesService $servicesService,
 	) {
 	}
 
 	/**
-	 * Returns the quota rule that applies to the given user.
+	 * Returns the quota rule of a service that applies to the given user.
 	 *
-	 * Quota rules are instance-wide: a matching rule is a single budget across
-	 * all services. When no rule matches, the quota configured on the service
-	 * applies, which is signalled by a null 'id'.
+	 * Quota rules belong to one service: the budget a matching rule grants is
+	 * spent on that service alone. When no rule of the service matches, the
+	 * quota configured on the service itself applies, which is signalled by a
+	 * null 'id'.
 	 *
 	 * @param int $quotaType
 	 * @param string $userId It can be an empty string
@@ -58,7 +60,7 @@ class QuotaRuleService {
 					throw new DoesNotExistException('User not found: ' . $userId);
 				}
 				$groups = $this->groupManager->getUserGroupIds($user);
-				$rule = $this->quotaRuleMapper->getRule($quotaType, $userId, $groups)->jsonSerialize();
+				$rule = $this->quotaRuleMapper->getRule($quotaType, $userId, $groups, $service->getId())->jsonSerialize();
 			} catch (DoesNotExistException|MultipleObjectsReturnedException) {
 				$rule = [
 					'amount' => $service->getQuota($quotaType),
@@ -108,11 +110,22 @@ class QuotaRuleService {
 	}
 
 	/**
+	 * @param string|null $serviceId the service the rule applies to, the first
+	 *                               configured one when none is given
 	 * @return array created rule with entities
 	 * @throws Exception
 	 */
-	public function addRule(): array {
-		$id = $this->quotaRuleMapper->addRule(0, 0, 0, 0);
+	public function addRule(?string $serviceId = null): array {
+		if ($serviceId === null) {
+			$services = $this->servicesService->getServices();
+			if ($services === []) {
+				throw new Exception('No service to add a quota rule for');
+			}
+			$serviceId = $services[0]->getId();
+		} else {
+			$this->validateService($serviceId);
+		}
+		$id = $this->quotaRuleMapper->addRule(0, 0, 0, 0, $serviceId);
 		$this->clearCache();
 		return [
 			'id' => $id,
@@ -120,6 +133,7 @@ class QuotaRuleService {
 			'amount' => 0,
 			'priority' => 0,
 			'pool' => false,
+			'service_id' => $serviceId,
 			'entities' => [],
 		];
 	}
@@ -132,8 +146,9 @@ class QuotaRuleService {
 	 */
 	public function updateRule(int $id, array $rule): array {
 		$this->validateRuleBasics($rule);
+		$this->validateService($rule['service_id']);
 		$this->validateEntities($rule['entities']);
-		$this->quotaRuleMapper->updateRule($id, $rule['type'], $rule['amount'], $rule['priority'], $rule['pool']);
+		$this->quotaRuleMapper->updateRule($id, $rule['type'], $rule['amount'], $rule['priority'], $rule['pool'], $rule['service_id']);
 		$this->quotaUserMapper->setUsers($id, $rule['entities']);
 		$rule['id'] = $id;
 		$this->clearCache();
@@ -169,6 +184,17 @@ class QuotaRuleService {
 		}
 		if ($rule['amount'] < 0) {
 			throw new Exception('Amount must be >= 0');
+		}
+	}
+
+	/**
+	 * Validate the service a quota rule applies to
+	 *
+	 * @throws Exception if no such service is configured
+	 */
+	private function validateService(string $serviceId): void {
+		if ($this->servicesService->getService($serviceId) === null) {
+			throw new Exception('Unknown service: ' . $serviceId);
 		}
 	}
 

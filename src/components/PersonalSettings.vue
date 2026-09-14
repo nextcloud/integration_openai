@@ -96,9 +96,6 @@
 				<NcNoteCard v-if="poolUsed" type="info">
 					{{ t('integration_openai', 'If you see a shared quota usage of 50% and a usage of 10% that means that you have used 10% of the total shared quota, and the sum of all other users affected by this quota is 40%.') }}
 				</NcNoteCard>
-				<NcNoteCard v-if="instanceWideUsed" type="info">
-					{{ t('integration_openai', 'Quota types marked with an asterisk (*) are limited by an instance-wide quota rule. That is a single budget spanning every service, so the same usage is shown for all of them.') }}
-				</NcNoteCard>
 				<div v-for="service in quotaInfo.services" :key="service.id" class="service">
 					<h5 class="service__title">
 						{{ service.name }}
@@ -120,7 +117,7 @@
 						</thead>
 						<tbody>
 							<tr v-for="quota in service.quota_usage" :key="quota.type">
-								<td>{{ quota.instance_wide ? quota.type + ' *' : quota.type }}</td>
+								<td>{{ quota.type }}</td>
 								<td v-if="quota.limit > 0">
 									{{ Math.round(quota.used / quota.limit * 100) + ' %' }}
 								</td>
@@ -204,12 +201,6 @@ export default {
 		poolUsed() {
 			return (this.quotaInfo?.services ?? []).some(
 				service => Object.values(service.quota_usage).some(quota => quota.used_pool),
-			)
-		},
-		/** Whether any quota type is governed by an instance-wide quota rule */
-		instanceWideUsed() {
-			return (this.quotaInfo?.services ?? []).some(
-				service => Object.values(service.quota_usage).some(quota => quota.instance_wide),
 			)
 		},
 	},

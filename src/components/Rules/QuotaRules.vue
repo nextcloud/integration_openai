@@ -5,15 +5,19 @@
 <template>
 	<div>
 		<NcNoteCard type="info">
-			{{ t('integration_openai', 'Rules can be set for specific groups or users. These rules will override the global quota settings.') }}
-			{{ t('integration_openai', 'Only the rule with the highest priority is active if multiple rules match.') }}
+			{{ t('integration_openai', 'Rules can be set for specific groups or users. Each rule applies to a single service and overrides the quota configured on that service.') }}
+			{{ t('integration_openai', 'Only the rule with the highest priority is active if multiple rules of the same service match.') }}
+		</NcNoteCard>
+		<NcNoteCard v-if="services.length === 0" type="warning">
+			{{ t('integration_openai', 'Connect a service to set quota rules for it.') }}
 		</NcNoteCard>
 		<Rule v-for="(rule, index) in state"
 			:key="index"
 			v-model:rule-data="state[index]"
 			:quota-info="quotaInfo ?? []"
+			:services="services"
 			@delete="removeRule(index)" />
-		<NcButton @click="addRule">
+		<NcButton :disabled="services.length === 0" @click="addRule">
 			{{ t('integration_openai', 'Add Quota rule') }}
 		</NcButton>
 	</div>
@@ -42,6 +46,10 @@ export default {
 			type: Object,
 			required: true,
 		},
+		services: {
+			type: Array,
+			required: true,
+		},
 	},
 
 	data() {
@@ -54,6 +62,12 @@ export default {
 	},
 
 	watch: {
+		// the backend deletes the rules of a service along with the service,
+		// so a removed service takes its rules out of the list as well
+		services(services) {
+			const ids = services.map((service) => service.id)
+			this.state = this.state.filter((rule) => ids.includes(rule.service_id))
+		},
 	},
 
 	mounted() {

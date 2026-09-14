@@ -11,6 +11,8 @@ namespace OCA\OpenAi\Service;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Db\QuotaRuleMapper;
+use OCA\OpenAi\Db\QuotaUserMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
@@ -40,6 +42,8 @@ class ServicesService {
 		private ICrypto $crypto,
 		private IDBConnection $db,
 		private LoggerInterface $logger,
+		private QuotaRuleMapper $quotaRuleMapper,
+		private QuotaUserMapper $quotaUserMapper,
 	) {
 	}
 
@@ -186,6 +190,25 @@ class ServicesService {
 			$this->appConfig->deleteKey(Application::APP_ID, $key . '_' . $id);
 		}
 		$this->deleteAllUserCredentials($id);
+		$this->deleteQuotaRules($id);
+	}
+
+	/**
+	 * Drop the quota rules of a service that is gone: they govern that service
+	 * alone, so there is nothing left for them to limit.
+	 */
+	private function deleteQuotaRules(string $id): void {
+		try {
+			foreach ($this->quotaRuleMapper->getRulesOfService($id) as $rule) {
+				$this->quotaUserMapper->deleteByRuleId($rule->getId());
+			}
+			$this->quotaRuleMapper->deleteRulesOfService($id);
+		} catch (Throwable $e) {
+			$this->logger->warning(
+				'Could not delete the quota rules of the removed service ' . $id,
+				['exception' => $e],
+			);
+		}
 	}
 
 	/**
@@ -193,8 +216,8 @@ class ServicesService {
 	 * that no secret material is left behind.
 	 *
 	 * The recorded quota usage of the service is deliberately kept: it is real
-	 * usage that still counts towards an instance-wide quota rule, and the
-	 * cleanup job prunes it with the rest of the usage history.
+	 * usage, it still shows up in the usage export of the period it happened
+	 * in, and the cleanup job prunes it with the rest of the usage history.
 	 */
 	private function deleteAllUserCredentials(string $id): void {
 		$keys = array_map(

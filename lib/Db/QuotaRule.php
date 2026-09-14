@@ -22,6 +22,8 @@ use OCP\DB\Types;
  * @method void setPriority(int $priority)
  * @method int getPool()
  * @method void setPool(int $pool)
+ * @method string getServiceId()
+ * @method void setServiceId(string $serviceId)
  */
 class QuotaRule extends Entity implements JsonSerializable {
 	/** @var int */
@@ -32,12 +34,15 @@ class QuotaRule extends Entity implements JsonSerializable {
 	protected $priority;
 	/** @var int */
 	protected $pool;
+	/** @var string */
+	protected $serviceId;
 
 	public function __construct() {
 		$this->addType('type', Types::INTEGER);
 		$this->addType('amount', Types::INTEGER);
 		$this->addType('priority', Types::INTEGER);
 		$this->addType('pool', Types::INTEGER);
+		$this->addType('serviceId', Types::STRING);
 	}
 
 	public function jsonSerialize(): array {
@@ -46,7 +51,8 @@ class QuotaRule extends Entity implements JsonSerializable {
 			'type' => $this->getType(),
 			'amount' => $this->getAmount(),
 			'priority' => $this->getPriority(),
-			'pool' => $this->getPool()
+			'pool' => $this->getPool(),
+			'service_id' => $this->getServiceId(),
 		];
 	}
 }

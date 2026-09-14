@@ -157,8 +157,8 @@ class OpenAiAPIService {
 		$rule = $this->quotaRuleService->getRule($type, $userId, $service);
 		$quota = $rule['amount'];
 		$pool = $rule['pool'] ? $rule['id'] : null;
-		// a matching quota rule is a global budget, the fallback quota is the one of the service
-		$serviceId = $rule['id'] === null ? $service->getId() : null;
+		// quota rules belong to a service, so a budget is always spent on one
+		$serviceId = $service->getId();
 
 		if ($quota === 0) {
 			//  Unlimited quota:
@@ -249,25 +249,18 @@ class OpenAiAPIService {
 			$quotaInfo = [];
 			foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
 				$rule = $ownCredentials ? null : $this->quotaRuleService->getRule($quotaType, $userId, $service);
-				// a matching quota rule is a global budget, the fallback quota is the one of the service
-				$instanceWide = $rule !== null && $rule['id'] !== null;
-				$serviceId = $instanceWide ? null : $service->getId();
 				$quotaInfo[$quotaType] = [
 					'type' => $this->translatedQuotaType($quotaType),
 					'unit' => $this->translatedQuotaUnit($quotaType),
 					'limit' => $rule === null ? 0 : $rule['amount'],
-					// the usage of an instance-wide budget is the same number
-					// under every service, so the frontend can say so instead
-					// of looking like the quota applies several times over
-					'instance_wide' => $instanceWide,
 				];
 				try {
 					$quotaInfo[$quotaType]['used'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod(
-						$userId, $quotaType, $quotaStart, null, $serviceId,
+						$userId, $quotaType, $quotaStart, null, $service->getId(),
 					);
 					if ($rule !== null && $rule['pool']) {
 						$quotaInfo[$quotaType]['used_pool'] = $this->quotaUsageMapper->getQuotaUnitsOfUserInTimePeriod(
-							$userId, $quotaType, $quotaStart, $rule['id'], $serviceId,
+							$userId, $quotaType, $quotaStart, $rule['id'], $service->getId(),
 						);
 					}
 				} catch (DoesNotExistException|MultipleObjectsReturnedException|DBException|RuntimeException $e) {

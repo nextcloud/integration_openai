@@ -65,7 +65,7 @@
 					@update:value="onInput()" />
 			</div>
 			<NcNoteCard type="info">
-				{{ t('integration_openai', 'The quota amounts themselves are configured per service. Quota rules apply across all services.') }}
+				{{ t('integration_openai', 'The quota amounts themselves are configured per service. Quota rules override them for the service they apply to.') }}
 			</NcNoteCard>
 			<div class="line">
 				<NcInputField
@@ -97,7 +97,7 @@
 			</div>
 
 			<h3>{{ t('integration_openai', 'Quota Rules') }}</h3>
-			<QuotaRules :quota-info="quotaRuleTypes" />
+			<QuotaRules :quota-info="quotaRuleTypes" :services="services" />
 		</div>
 	</div>
 </template>
@@ -283,7 +283,7 @@ export default {
 			}
 		},
 		async deleteService(service) {
-			if (!window.confirm(t('integration_openai', 'Remove {service}? The providers it exposes will stop working.', { service: service.display_name }))) {
+			if (!window.confirm(t('integration_openai', 'Remove {service}? The providers it exposes will stop working and its quota rules are deleted.', { service: service.display_name }))) {
 				return
 			}
 			if (!await this.confirmPasswordOrCancel()) {
