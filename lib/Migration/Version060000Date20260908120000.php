@@ -58,6 +58,44 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 		'openai_image_generation_time', 'localai_image_generation_time',
 	];
 
+	/** Where the server stores the preferred provider of each task type */
+	private const PROVIDER_PREFERENCES_KEY = 'ai.taskprocessing_provider_preferences';
+
+	/**
+	 * The task processing providers of the old configuration, by the modality
+	 * whose service and model they were served by.
+	 *
+	 * There was one provider per task type, so their IDs carried nothing but
+	 * the task they performed. The new IDs name the service and the model as
+	 * well, but end in the very same task slug, which makes the rewrite below
+	 * a rename.
+	 *
+	 * The two providers that chain a second modality on top of their own are
+	 * listed under the modality of the ID they were derived from: the
+	 * audio-in/audio-out chat was built on the text provider, the audio
+	 * translation on the transcription one.
+	 */
+	private const OLD_PROVIDER_SLUGS = [
+		Application::MODALITY_TEXT => [
+			'text2text', 'text2text:chat', 'text2text:chatwithtools',
+			'text2text:multimodal-chatwithtools', 'text2text:summary',
+			'text2text:headline', 'text2text:topics', 'text2text:emoji',
+			'text2text:proofread', 'text2text:reformatparagraphs',
+			'contextwrite', 'reformulate', 'improve', 'changetone', 'translate',
+			'image2text-ocr', 'analyze-images', 'audio2audio:chat',
+		],
+		Application::MODALITY_IMAGE => [
+			'text2image', 'text2image-improved-prompt',
+		],
+		Application::MODALITY_STT => [
+			'audio2text', 'audio2text-subtitles', 'audio2text-enhanced',
+			'audio2audio:translate',
+		],
+		Application::MODALITY_TTS => [
+			'text2speech',
+		],
+	];
+
 	public function __construct(
 		private IAppConfig $appConfig,
 		private IConfig $config,
@@ -121,6 +159,13 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 			Application::QUOTA_TYPE_TRANSCRIPTION => $mainService->getId(),
 			Application::QUOTA_TYPE_SPEECH => $mainService->getId(),
 		];
+		/** @var array<string, ServiceConfig> $serviceByModality */
+		$serviceByModality = [
+			Application::MODALITY_TEXT => $mainService,
+			Application::MODALITY_IMAGE => $mainService,
+			Application::MODALITY_STT => $mainService,
+			Application::MODALITY_TTS => $mainService,
+		];
 
 		foreach ($this->getOverrides() as $prefix => [$modality, $quotaType]) {
 			$service = $this->buildOverrideService($prefix, $modality, 's' . (count($services) + 1));
@@ -129,13 +174,16 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 			}
 			$services[] = $service;
 			$serviceIdByQuotaType[$quotaType] = $service->getId();
+			$serviceByModality[$modality] = $service;
 		}
 
-		// Both of these are re-runnable: the credential migration moves one
-		// preference at a time, and the usage attribution only touches rows
-		// that have no service yet.
+		// All three of these are re-runnable: the credential migration moves one
+		// preference at a time, the usage attribution only touches rows that
+		// have no service yet, and the provider preferences are rewritten from
+		// IDs that the new configuration cannot produce again.
 		$this->migrateUserCredentials($mainService->getId());
 		$this->attributeQuotaUsage($serviceIdByQuotaType);
+		$this->migrateProviderPreferences($serviceByModality, $output);
 
 		// The ID generator is brought in sync with the IDs handed out above
 		// before the service list is written, so that an upgrade aborting
@@ -293,6 +341,77 @@ class Version060000Date20260908120000 extends SimpleMigrationStep {
 			$this->config->deleteUserValue((string)$row['userid'], Application::APP_ID, (string)$row['configkey']);
 		}
 		$result->closeCursor();
+	}
+
+	/**
+	 * The providers this app registers are now one per service and model, so
+	 * all of their IDs changed. Rewrite the ones the admin picked in the AI
+	 * admin settings, so that a task type stays on this app instead of
+	 * silently falling back to whichever provider the server finds first.
+	 *
+	 * Preferences naming a provider of another app are left untouched, and so
+	 * is one naming a modality that the old configuration had switched off:
+	 * that one did not resolve before the upgrade either.
+	 *
+	 * @param array<string, ServiceConfig> $serviceByModality
+	 */
+	private function migrateProviderPreferences(array $serviceByModality, IOutput $output): void {
+		try {
+			$stored = $this->appConfig->getValueString('core', self::PROVIDER_PREFERENCES_KEY, '', lazy: true);
+			$preferences = $stored === '' ? null : json_decode($stored, true, flags: JSON_THROW_ON_ERROR);
+		} catch (Throwable) {
+			// A list that cannot be read here cannot be read by the server
+			// either, so it is already falling back to the first available
+			// provider. Not worth failing the upgrade over.
+			return;
+		}
+		if (!is_array($preferences)) {
+			return;
+		}
+
+		/** @var array<string, string> $newIdByOldId */
+		$newIdByOldId = [];
+		foreach (self::OLD_PROVIDER_SLUGS as $modality => $slugs) {
+			$service = $serviceByModality[$modality];
+			$model = $service->getFirstModel($modality);
+			if ($model === null) {
+				continue;
+			}
+			$prefix = Application::APP_ID . '-' . $service->getId() . '-' . self::slugifyModel($model) . '-';
+			foreach ($slugs as $slug) {
+				$newIdByOldId[Application::APP_ID . '-' . $slug] = $prefix . $slug;
+			}
+		}
+
+		$migrated = 0;
+		foreach ($preferences as $taskTypeId => $providerId) {
+			if (is_string($providerId) && isset($newIdByOldId[$providerId])) {
+				$preferences[$taskTypeId] = $newIdByOldId[$providerId];
+				$migrated++;
+			}
+		}
+		if ($migrated === 0) {
+			return;
+		}
+
+		$this->appConfig->setValueString(
+			'core',
+			self::PROVIDER_PREFERENCES_KEY,
+			json_encode($preferences, JSON_THROW_ON_ERROR),
+			lazy: true,
+		);
+		$output->info('Migrated ' . $migrated . ' preferred task processing provider(s) to the new provider IDs');
+	}
+
+	/**
+	 * Model names can contain characters that don't belong in an ID.
+	 *
+	 * Kept in step with {@see \OCA\OpenAi\TaskProcessing\ProviderIdentity::slugifyModel()}
+	 * rather than calling it, so that this migration keeps producing the IDs
+	 * that were current when it ran, whatever the providers do later.
+	 */
+	private static function slugifyModel(string $model): string {
+		return preg_replace('/[^A-Za-z0-9._-]/', '_', $model) ?? $model;
 	}
 
 	/**
