@@ -70,7 +70,7 @@ class EmojiProvider implements ISynchronousProvider {
 
 	public function getOptionalInputShapeDefaults(): array {
 		return [
-			'max_tokens' => 100,
+			'max_tokens' => $this->service->getMaxTokens(),
 		];
 	}
 

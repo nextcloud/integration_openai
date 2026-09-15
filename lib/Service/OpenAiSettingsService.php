@@ -122,6 +122,12 @@ class OpenAiSettingsService {
 				$value[$key] = $defaultValue;
 			}
 		}
+		$maxLength = $value['unit'] === 'month'
+			? Application::MAX_QUOTA_PERIOD_MONTHS
+			: Application::MAX_QUOTA_PERIOD_DAYS;
+		if ($value['length'] > $maxLength) {
+			$value['length'] = $maxLength;
+		}
 		return $value;
 	}
 
@@ -193,6 +199,12 @@ class OpenAiSettingsService {
 			}
 		} elseif ($quotaPeriod['unit'] !== 'day') {
 			throw new Exception('Invalid quota period unit');
+		}
+		$maxLength = $quotaPeriod['unit'] === 'month'
+			? Application::MAX_QUOTA_PERIOD_MONTHS
+			: Application::MAX_QUOTA_PERIOD_DAYS;
+		if ($quotaPeriod['length'] > $maxLength) {
+			throw new Exception('Invalid quota period length');
 		}
 		$this->appConfig->setValueString(Application::APP_ID, 'quota_period', json_encode($quotaPeriod), lazy: true);
 	}
