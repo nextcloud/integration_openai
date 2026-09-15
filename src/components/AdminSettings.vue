@@ -9,24 +9,481 @@
 			{{ t('integration_openai', 'OpenAI and LocalAI integration') }}
 		</h2>
 		<div id="openai-content">
-			<NcNoteCard v-if="!state.assistant_enabled" type="warning">
-				{{ t('integration_openai', 'The Assistant app is not enabled. You need it to use the features provided by the OpenAI/LocalAI integration app.') }}
-				<a class="external" :href="appSettingsAssistantUrl" target="_blank">
-					{{ t('integration_openai', 'Assistant app') }}
-				</a>
-			</NcNoteCard>
-
-			<h3>{{ t('integration_openai', 'Connected services') }}</h3>
-			<NcNoteCard type="info">
-				{{ t('integration_openai', 'Connect as many OpenAI-compatible services as you need. For each of them, select the models you want to expose per modality: every selected model becomes a provider you can pick in the AI admin settings.') }}
-				<div class="services">
-					<a class="external" href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>
-					<a class="external" href="https://docs.ionos.com/cloud/ai/ai-model-hub" target="_blank">IONOS AI Model Hub</a>
-					<a class="external" href="https://console.groq.com" target="_blank">Groqcloud</a>
-					<a class="external" href="https://localai.io/" target="_blank">LocalAI</a>
-					<a class="external" href="https://ollama.com/" target="_blank">Ollama</a>
-					<a class="external" href="https://mistral.ai" target="_blank">MistralAI</a>
-					<a class="external" href="https://www.plusserver.com/en/ai-platform/" target="_blank">Plusserver</a>
+			<div>
+				<NcNoteCard v-if="!state.assistant_enabled" type="warning">
+					{{ t('integration_openai', 'The Assistant app is not enabled. You need it to use the features provided by the OpenAI/LocalAI integration app.') }}
+					<a class="external" :href="appSettingsAssistantUrl" target="_blank">
+						{{ t('integration_openai', 'Assistant app') }}
+					</a>
+				</NcNoteCard>
+				<NcNoteCard type="info">
+					{{ t('integration_openai', 'Services with an OpenAI-compatible API:') }}
+					<div class="services">
+						<a class="external" href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>
+						<a class="external" href="https://docs.ionos.com/cloud/ai/ai-model-hub" target="_blank">IONOS AI Model Hub</a>
+						<a class="external" href="https://console.groq.com" target="_blank">Groqcloud</a>
+						<a class="external" href="https://localai.io/" target="_blank">LocalAI</a>
+						<a class="external" href="https://ollama.com/" target="_blank">Ollama</a>
+						<a class="external" href="https://mistral.ai" target="_blank">MistralAI</a>
+						<a class="external" href="https://www.plusserver.com/en/ai-platform/" target="_blank">Plusserver</a>
+					</div>
+				</NcNoteCard>
+				<div class="line">
+					<NcTextField
+						id="openai-url"
+						v-model="state.url"
+						class="input"
+						:label="t('integration_openai', 'Service URL')"
+						:placeholder="t('integration_openai', 'Example: {example}', { example: 'http://localhost:8080/v1' })"
+						:show-trailing-button="!!state.url"
+						@update:model-value="onSensitiveInput(true)"
+						@trailing-button-click="state.url = '' ; onSensitiveInput(true)">
+						<template #icon>
+							<EarthIcon :size="20" />
+						</template>
+					</NcTextField>
+					<NcButton variant="tertiary"
+						:title="t('integration_openai', 'Leave empty to use {openaiApiUrl}', { openaiApiUrl: 'https://api.openai.com/v1' })">
+						<template #icon>
+							<HelpCircleOutlineIcon />
+						</template>
+					</NcButton>
+				</div>
+				<NcNoteCard type="info">
+					{{ t('integration_openai', 'With the current configuration, the target URL used to get the models is:') }}
+					<br>
+					<strong>{{ modelEndpointUrl }}</strong>
+				</NcNoteCard>
+				<NcNoteCard type="info">
+					{{ t('integration_openai', 'This should include the address of your LocalAI instance (or any service implementing an API similar to OpenAI) along with the root path of the API. More often than not "/v1" at the end is required even if the model list loads without it. This URL will be accessed by your Nextcloud server.') }}
+					<br>
+					{{ t('integration_openai', 'This can be a local address with a port like {example}. In this case, make sure \'allow_local_remote_servers\' is set to true in config.php.', { example: 'http://localhost:8080/v1' }) }}
+				</NcNoteCard>
+				<div v-if="state.url !== ''" class="line">
+					<NcTextField
+						id="openai-service-name"
+						v-model="state.service_name"
+						class="input"
+						:label="t('integration_openai', 'Service name (optional)')"
+						:placeholder="t('integration_openai', 'Example: LocalAI of university ABC')"
+						:show-trailing-button="!!state.service_name"
+						@update:model-value="onInput()"
+						@trailing-button-click="state.service_name = '' ; onInput()" />
+					<NcButton variant="tertiary"
+						:title="t('integration_openai', 'This name will be displayed as provider name in the AI admin settings')">
+						<template #icon>
+							<HelpCircleOutlineIcon />
+						</template>
+					</NcButton>
+				</div>
+				<div class="line">
+					<NcInputField
+						id="openai-api-timeout"
+						v-model="state.request_timeout"
+						class="input"
+						type="number"
+						:label="t('integration_openai', 'Request timeout (seconds)')"
+						:placeholder="t('integration_openai', 'Example: {example}', { example: '240' })"
+						:show-trailing-button="!!state.request_timeout"
+						@update:model-value="onInput()"
+						@trailing-button-click="state.request_timeout = '' ; onInput()">
+						<template #icon>
+							<TimerAlertOutlineIcon :size="20" />
+						</template>
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
+					<NcButton variant="tertiary"
+						:title="t('integration_openai', 'Timeout for the request to the external API')">
+						<template #icon>
+							<HelpCircleOutlineIcon />
+						</template>
+					</NcButton>
+				</div>
+			</div>
+			<div>
+				<h2>
+					{{ t('integration_openai', 'Authentication') }}
+				</h2>
+				<div v-show="state.url !== ''" class="line column">
+					<label>
+						{{ t('integration_openai', 'Authentication method') }}
+					</label>
+					<div class="radios">
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:model-value="!state.use_basic_auth"
+							type="radio"
+							button-variant-grouped="horizontal"
+							name="auth_method"
+							@update:model-value="onCheckboxChanged(false, 'use_basic_auth')">
+							{{ t('assistant', 'API key') }}
+						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:model-value="state.use_basic_auth"
+							type="radio"
+							button-variant-grouped="horizontal"
+							name="auth_method"
+							@update:model-value="onCheckboxChanged(true, 'use_basic_auth')">
+							{{ t('assistant', 'Basic Authentication') }}
+						</NcCheckboxRadioSwitch>
+					</div>
+				</div>
+				<div v-show="state.url === '' || !state.use_basic_auth" class="line">
+					<NcTextField
+						id="openai-api-key"
+						v-model="state.api_key"
+						class="input"
+						type="password"
+						:readonly="readonly"
+						:label="t('integration_openai', 'API key (mandatory with OpenAI)')"
+						:show-trailing-button="!!state.api_key"
+						@update:model-value="onSensitiveInput(true)"
+						@trailing-button-click="state.api_key = '' ; onSensitiveInput(true)"
+						@focus="readonly = false">
+						<template #icon>
+							<KeyOutlineIcon :size="20" />
+						</template>
+					</NcTextField>
+				</div>
+				<NcNoteCard v-show="state.url === ''" type="info">
+					{{ t('integration_openai', 'You can create an API key in your OpenAI account settings') }}:
+					&nbsp;
+					<a :href="apiKeyUrl" target="_blank" class="external">
+						{{ apiKeyUrl }}
+					</a>
+				</NcNoteCard>
+				<div v-show="state.url !== '' && state.use_basic_auth">
+					<div class="line">
+						<NcTextField
+							id="openai-basic-user"
+							v-model="state.basic_user"
+							class="input"
+							:readonly="readonly"
+							:label="t('integration_openai', 'Basic Auth user')"
+							:show-trailing-button="!!state.basic_user"
+							@update:model-value="onSensitiveInput(true)"
+							@trailing-button-click="state.basic_user = '' ; onSensitiveInput(true)"
+							@focus="readonly = false">
+							<template #icon>
+								<AccountOutlineIcon :size="20" />
+							</template>
+						</NcTextField>
+					</div>
+					<div class="line">
+						<NcTextField
+							id="openai-basic-password"
+							v-model="state.basic_password"
+							class="input"
+							type="password"
+							:readonly="readonly"
+							:label="t('integration_openai', 'Basic Auth password')"
+							:show-trailing-button="!!state.basic_password"
+							@update:model-value="onSensitiveInput(true)"
+							@trailing-button-click="state.basic_password = '' ; onSensitiveInput(true)"
+							@focus="readonly = false">
+							<template #icon>
+								<KeyOutlineIcon :size="20" />
+							</template>
+						</NcTextField>
+					</div>
+				</div>
+			</div>
+			<div>
+				<h2>
+					{{ t('integration_openai', 'Text generation') }}
+				</h2>
+				<div v-if="state.url !== ''" class="line column">
+					<label>
+						<EarthIcon :size="20" class="icon" />
+						{{ t('integration_openai', 'Text completion endpoint') }}
+					</label>
+					<div class="radios">
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:model-value="state.chat_endpoint_enabled"
+							type="radio"
+							button-variant-grouped="horizontal"
+							name="chat_endpoint"
+							@update:model-value="onCheckboxChanged(true, 'chat_endpoint_enabled', false)">
+							{{ t('assistant', 'Chat completions') }}
+						</NcCheckboxRadioSwitch>
+						<NcCheckboxRadioSwitch
+							:button-variant="true"
+							:model-value="!state.chat_endpoint_enabled"
+							type="radio"
+							button-variant-grouped="horizontal"
+							name="chat_endpoint"
+							@update:model-value="onCheckboxChanged(false, 'chat_endpoint_enabled', false)">
+							{{ t('assistant', 'Completions') }}
+						</NcCheckboxRadioSwitch>
+					</div>
+				</div>
+				<NcNoteCard type="info">
+					{{ state.url === ''
+						? t('integration_openai', 'Selection of chat/completion endpoint is not available for OpenAI since it implicitly uses chat completions for "instruction following" fine-tuned models.')
+						: t('integration_openai', 'Using the chat endpoint may improve text generation quality for "instruction following" fine-tuned models.') }}
+				</NcNoteCard>
+				<div v-if="models"
+					class="line line-select">
+					<NcSelect
+						v-model="selectedModel.text"
+						class="model-select"
+						:clearable="state.default_completion_model_id !== DEFAULT_MODEL_ITEM.id"
+						:options="formattedModels(models)"
+						:input-label="t('integration_openai', 'Default completion model to use')"
+						:no-wrap="true"
+						input-id="openai-model-select"
+						@update:model-value="onModelSelected('text', $event)" />
+					<a v-if="state.url === ''"
+						:title="t('integration_openai', 'More information about OpenAI models')"
+						href="https://beta.openai.com/docs/models"
+						target="_blank">
+						<NcButton variant="tertiary" aria-label="openai-info">
+							<template #icon>
+								<HelpCircleOutlineIcon />
+							</template>
+						</NcButton>
+					</a>
+					<a v-else
+						:title="t('integration_openai', 'More information about LocalAI models')"
+						href="https://localai.io/model-compatibility/index.html"
+						target="_blank">
+						<NcButton variant="tertiary" aria-label="localai-info">
+							<template #icon>
+								<HelpCircleOutlineIcon />
+							</template>
+						</NcButton>
+					</a>
+				</div>
+				<div class="line">
+					<NcTextField
+						id="llm-extra-params"
+						v-model="state.llm_extra_params"
+						class="input"
+						:label="t('integration_openai', 'Extra completion model parameters')"
+						:show-trailing-button="!!state.llm_extra_params"
+						@update:model-value="onInput()"
+						@trailing-button-click="state.llm_extra_params = '' ; onInput()" />
+					<NcButton variant="tertiary"
+						:title="llmExtraParamHint">
+						<template #icon>
+							<HelpCircleOutlineIcon />
+						</template>
+					</NcButton>
+				</div>
+				<div class="line">
+					<NcTextArea
+						id="summary-system-prompt"
+						v-model="state.summary_system_prompt"
+						class="input"
+						:label="t('integration_openai', 'Summary system prompt')"
+						:helper-text="t('integration_openai', 'System prompt used when generating text summaries. Leave empty to use the default prompt.')"
+						:rows="5"
+						resize="vertical"
+						@update:model-value="onInput()" />
+				</div>
+				<div class="line">
+					<!--Input for max chunk size (prompt length) for a single request-->
+					<NcInputField
+						id="openai-chunk-size"
+						v-model="state.chunk_size"
+						class="input"
+						type="number"
+						:label="t('integration_openai', 'Max input tokens per request')"
+						:show-trailing-button="!!state.chunk_size"
+						@update:model-value="onInput()"
+						@trailing-button-click="state.chunk_size = '' ; onInput()">
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
+					<NcButton variant="tertiary"
+						:title="t('integration_openai', 'Split the prompt into chunks with each chunk being no more than the specified number of tokens (0 disables chunking)')">
+						<template #icon>
+							<HelpCircleOutlineIcon />
+						</template>
+					</NcButton>
+				</div>
+				<div class="line">
+					<!--Input for max number of tokens to generate for a single request-->
+					<!--Only enforced if the user has not provided an own API key (in the case of OpenAI)-->
+					<NcInputField
+						id="openai-api-max-tokens"
+						v-model="state.max_tokens"
+						class="input"
+						type="number"
+						:label="t('integration_openai', 'Max output tokens per request')"
+						:show-trailing-button="!!state.max_tokens"
+						@update:model-value="onInput()"
+						@trailing-button-click="state.max_tokens = '' ; onInput()">
+						<template #trailing-button-icon>
+							<CloseIcon :size="20" />
+						</template>
+					</NcInputField>
+					<NcButton variant="tertiary"
+						:title="t('integration_openai', 'Maximum number of output tokens generated for a single text generation prompt. This also applies to the Speech-to-Text tasks.')">
+						<template #icon>
+							<HelpCircleOutlineIcon />
+						</template>
+					</NcButton>
+				</div>
+				<div class="line">
+					<NcFormBoxSwitch
+						:model-value="state.use_max_completion_tokens_param"
+						@update:model-value="onCheckboxChanged($event, 'use_max_completion_tokens_param', false)">
+						{{ t('integration_openai', 'Use "{newParam}" parameter instead of the deprecated "{deprecatedParam}"', { newParam: 'max_completion_tokens', deprecatedParam: 'max_tokens' }) }}
+					</NcFormBoxSwitch>
+				</div>
+				<h3>
+					{{ t('integration_openai', 'Multimodal LLM Support') }}
+				</h3>
+				<NcNoteCard type="info">
+					{{ t('integration_openai', 'Multimodal LLM Support allows you to enable or disable the use of images, audio, video and document attachments in the LLM.') }}
+				</NcNoteCard>
+				<NcFormBox class="features-form-box">
+					<NcFormBoxSwitch
+						:model-value="state.multimodal_image_enabled"
+						@update:model-value="onCheckboxChanged($event, 'multimodal_image_enabled', false)">
+						{{ t('integration_openai', 'Image attachments') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.multimodal_audio_enabled"
+						@update:model-value="onCheckboxChanged($event, 'multimodal_audio_enabled', false)">
+						{{ t('integration_openai', 'Audio attachments') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.multimodal_video_enabled"
+						@update:model-value="onCheckboxChanged($event, 'multimodal_video_enabled', false)">
+						{{ t('integration_openai', 'Video attachments') }}
+					</NcFormBoxSwitch>
+					<NcFormBoxSwitch
+						:model-value="state.multimodal_document_enabled"
+						@update:model-value="onCheckboxChanged($event, 'multimodal_document_enabled', false)">
+						{{ t('integration_openai', 'Document attachments') }}
+					</NcFormBoxSwitch>
+				</NcFormBox>
+			</div>
+			<div>
+				<h2>
+					{{ t('integration_openai', 'Image generation') }}
+				</h2>
+				<ServiceOverridePanel
+					context-prefix="image"
+					:state="state"
+					:readonly="readonly"
+					:ai-task="t('integration_openai', 'image generation')"
+					:default-url="modelEndpointUrl"
+					@focus="readonly = false"
+					@input="handleOverrideInput"
+					@sensitive-input="handleOverrideSensitiveInput"
+					@checkbox-changed="onCheckboxChanged" />
+				<div v-if="imageModels"
+					class="line line-select">
+					<NcSelect
+						v-model="selectedModel.image"
+						class="model-select"
+						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
+						:options="formattedModels(imageModels)"
+						:input-label="t('integration_openai', 'Default image generation model to use')"
+						:no-wrap="true"
+						input-id="openai-model-select"
+						@update:model-value="onModelSelected('image', $event)" />
+					<a v-if="state.url === ''"
+						:title="t('integration_openai', 'More information about OpenAI models')"
+						href="https://beta.openai.com/docs/models"
+						target="_blank">
+						<NcButton variant="tertiary" aria-label="openai-info">
+							<template #icon>
+								<HelpCircleOutlineIcon />
+							</template>
+						</NcButton>
+					</a>
+					<a v-else
+						:title="t('integration_openai', 'More information about LocalAI models')"
+						href="https://localai.io/model-compatibility/index.html"
+						target="_blank">
+						<NcButton variant="tertiary" aria-label="localai-info">
+							<template #icon>
+								<HelpCircleOutlineIcon />
+							</template>
+						</NcButton>
+					</a>
+				</div>
+				<NcNoteCard v-else type="info">
+					{{ t('integration_openai', 'No models to list') }}
+				</NcNoteCard>
+				<div class="line">
+					<NcTextField
+						id="default-image-size"
+						v-model="state.default_image_size"
+						class="input"
+						:label="t('integration_openai', 'Default image size')"
+						:show-trailing-button="!!state.default_image_size"
+						@update:model-value="onInput()"
+						@trailing-button-click="state.default_image_size = '' ; onInput()" />
+					<NcButton variant="tertiary"
+						:title="defaultImageSizeParamHint">
+						<template #icon>
+							<HelpCircleOutlineIcon />
+						</template>
+					</NcButton>
+				</div>
+				<div class="line">
+					<NcFormBoxSwitch
+						:model-value="state.image_request_auth"
+						@update:model-value="onCheckboxChanged($event, 'image_request_auth', false)">
+						{{ t('integration_openai', 'Use authentication for image retrieval request') }}
+					</NcFormBoxSwitch>
+				</div>
+			</div>
+			<div>
+				<h2>
+					{{ t('integration_openai', 'Audio transcription') }}
+				</h2>
+				<ServiceOverridePanel
+					context-prefix="stt"
+					:state="state"
+					:readonly="readonly"
+					:ai-task="t('integration_openai', 'audio transcription')"
+					:default-url="modelEndpointUrl"
+					@focus="readonly = false"
+					@input="handleOverrideInput"
+					@sensitive-input="handleOverrideSensitiveInput"
+					@checkbox-changed="onCheckboxChanged" />
+				<div v-if="sttModels"
+					class="line line-select">
+					<NcSelect
+						v-model="selectedModel.stt"
+						class="model-select"
+						:clearable="state.default_image_model_id !== DEFAULT_MODEL_ITEM.id"
+						:options="formattedModels(sttModels)"
+						:input-label="t('integration_openai', 'Default transcription model to use')"
+						:no-wrap="true"
+						input-id="openai-stt-model-select"
+						@update:model-value="onModelSelected('stt', $event)" />
+					<a v-if="state.url === ''"
+						:title="t('integration_openai', 'More information about OpenAI models')"
+						href="https://beta.openai.com/docs/models"
+						target="_blank">
+						<NcButton variant="tertiary" aria-label="openai-info">
+							<template #icon>
+								<HelpCircleOutlineIcon />
+							</template>
+						</NcButton>
+					</a>
+					<a v-else
+						:title="t('integration_openai', 'More information about LocalAI models')"
+						href="https://localai.io/model-compatibility/index.html"
+						target="_blank">
+						<NcButton variant="tertiary" aria-label="localai-info">
+							<template #icon>
+								<HelpCircleOutlineIcon />
+							</template>
+						</NcButton>
+					</a>
 				</div>
 			</NcNoteCard>
 
@@ -115,6 +572,8 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
@@ -135,8 +594,12 @@ export default {
 		QuotaRules,
 		ServiceForm,
 		NcButton,
-		NcDateTimePickerNative,
-		NcEmptyContent,
+		NcSelect,
+		NcCheckboxRadioSwitch,
+		NcFormBox,
+		NcFormBoxSwitch,
+		NcTextField,
+		NcTextArea,
 		NcInputField,
 		NcLoadingIcon,
 		NcNoteCard,
@@ -412,7 +875,16 @@ export default {
 			}
 		},
 		onInput: debounce(async function() {
-			await this.saveAdminConfig({
+			// sanitize quotas
+			this.state.quotas = this.state.quotas.map(e => parseInt(e)).map(e => isNaN(e) || e < 0 ? 0 : e)
+			const values = {
+				service_name: this.state.service_name,
+				request_timeout: parseInt(this.state.request_timeout),
+				chunk_size: parseInt(this.state.chunk_size),
+				max_tokens: parseInt(this.state.max_tokens),
+				llm_extra_params: this.state.llm_extra_params,
+				summary_system_prompt: this.state.summary_system_prompt,
+				default_image_size: this.state.default_image_size,
 				quota_period: this.state.quota_period,
 				usage_storage_time: parseInt(this.state.usage_storage_time) || 1,
 			})
