@@ -10,16 +10,10 @@ declare(strict_types=1);
 namespace OCA\OpenAi\Migration;
 
 use Closure;
-use OCA\OpenAi\Service\OpenAiAPIService;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 class Version030900Date20251006152735 extends SimpleMigrationStep {
-
-	public function __construct(
-		private OpenAIAPIService $openAIAPIService,
-	) {
-	}
 
 	/**
 	 * @param IOutput $output
@@ -27,11 +21,9 @@ class Version030900Date20251006152735 extends SimpleMigrationStep {
 	 * @param array $options
 	 */
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
-		// we refresh the model list to make sure they are stored in oc_appconfig
-		// so they are available immediately after the app upgrade to populate the task types enum values
-		try {
-			$this->openAIAPIService->getModels(null, true);
-		} catch (\Exception) {
-		}
+		// This used to refresh the model list into oc_appconfig, so that the
+		// task types had enum values right after the upgrade. The models a
+		// service exposes are configured explicitly now and the list is only
+		// fetched when the admin asks for it, so there is nothing left to do.
 	}
 }

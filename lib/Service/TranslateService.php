@@ -38,7 +38,6 @@ class TranslateService {
 	];
 
 	public function __construct(
-		private OpenAiSettingsService $openAiSettingsService,
 		private LoggerInterface $logger,
 		private OpenAiAPIService $openAiAPIService,
 		private ChunkService $chunkService,
@@ -66,10 +65,10 @@ class TranslateService {
 	}
 
 	public function translate(
-		string $inputText, string $sourceLanguageCode, string $targetLanguageCode, string $model, ?int $maxTokens,
+		ServiceConfig $service, string $inputText, string $sourceLanguageCode, string $targetLanguageCode, string $model, ?int $maxTokens,
 		?string $userId, ?callable $reportProgress = null, bool $preferStreaming = false, ?callable $reportOutput = null,
 	): string {
-		$chunks = $this->chunkService->chunkSplitPrompt($inputText, true, $maxTokens);
+		$chunks = $this->chunkService->chunkSplitPrompt($service, $inputText, true, $maxTokens);
 		$translation = '';
 		$increase = 1.0 / (float)count($chunks);
 		$progress = 0.0;
@@ -104,14 +103,14 @@ class TranslateService {
 			}
 			$prompt = $promptStart . PHP_EOL . PHP_EOL . $chunk;
 
-			if ($this->openAiAPIService->isUsingOpenAi() || $this->openAiSettingsService->getChatEndpointEnabled()) {
+			if ($service->isUsingOpenAi() || $service->getChatEndpointEnabled()) {
 				$completionsObj = $this->openAiAPIService->createChatCompletion(
-					$userId, $model, $prompt, TranslateService::SYSTEM_PROMPT, null, 1, $maxTokens, TranslateService::JSON_RESPONSE_FORMAT
+					$userId, $service, $model, $prompt, TranslateService::SYSTEM_PROMPT, null, 1, $maxTokens, TranslateService::JSON_RESPONSE_FORMAT
 				);
 				$completions = $completionsObj['messages'];
 			} else {
 				$completions = $this->openAiAPIService->createCompletion(
-					$userId, $prompt . PHP_EOL . TranslateService::SYSTEM_PROMPT . PHP_EOL . PHP_EOL, 1, $model, $maxTokens
+					$userId, $service, $prompt . PHP_EOL . TranslateService::SYSTEM_PROMPT . PHP_EOL . PHP_EOL, 1, $model, $maxTokens
 				);
 			}
 

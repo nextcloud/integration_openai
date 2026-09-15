@@ -8,12 +8,18 @@
 return [
 	'routes' => [
 		['name' => 'config#setUserConfig', 'url' => '/config', 'verb' => 'PUT'],
-		['name' => 'config#setSensitiveUserConfig', 'url' => '/config/sensitive', 'verb' => 'PUT'],
 		['name' => 'config#setAdminConfig', 'url' => '/admin-config', 'verb' => 'PUT'],
-		['name' => 'config#setSensitiveAdminConfig', 'url' => '/admin-config/sensitive', 'verb' => 'PUT'],
-		['name' => 'config#autoDetectFeatures', 'url' => '/admin-config/auto-detect-features', 'verb' => 'POST'],
 
-		['name' => 'openAiAPI#getModels', 'url' => '/models', 'verb' => 'GET'],
+		['name' => 'service#index', 'url' => '/services', 'verb' => 'GET'],
+		['name' => 'service#create', 'url' => '/services', 'verb' => 'POST'],
+		['name' => 'service#update', 'url' => '/services/{id}', 'verb' => 'PUT'],
+		['name' => 'service#updateSensitive', 'url' => '/services/{id}/sensitive', 'verb' => 'PUT'],
+		['name' => 'service#destroy', 'url' => '/services/{id}', 'verb' => 'DELETE'],
+		['name' => 'service#models', 'url' => '/services/{id}/models', 'verb' => 'GET'],
+		['name' => 'service#autoDetectModalities', 'url' => '/services/{id}/auto-detect-modalities', 'verb' => 'POST'],
+		['name' => 'service#userCredentials', 'url' => '/services/user-credentials', 'verb' => 'GET'],
+		['name' => 'service#setUserCredentials', 'url' => '/services/{id}/user-credentials', 'verb' => 'PUT'],
+
 		['name' => 'openAiAPI#getUserQuotaInfo', 'url' => '/quota-info', 'verb' => 'GET'],
 		['name' => 'openAiAPI#getAdminQuotaInfo', 'url' => '/admin-quota-info', 'verb' => 'GET'],
 

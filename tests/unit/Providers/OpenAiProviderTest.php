@@ -19,6 +19,8 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\ServiceConfig;
+use OCA\OpenAi\Service\ServicesService;
 use OCA\OpenAi\Service\StreamingService;
 use OCA\OpenAi\Service\TranslateService;
 use OCA\OpenAi\Service\WatermarkingService;
@@ -52,9 +54,16 @@ class OpenAiProviderTest extends TestCase {
 	public const TEST_USER1 = 'testuser';
 	public const OPENAI_API_BASE = 'https://api.openai.com/v1/';
 	public const AUTHORIZATION_HEADER = 'Bearer This is a PHPUnit test API key';
+	public const TEXT_MODEL = Application::DEFAULT_COMPLETION_MODEL_ID;
+	public const IMAGE_MODEL = Application::DEFAULT_IMAGE_MODEL_ID;
+	public const STT_MODEL = Application::DEFAULT_TRANSCRIPTION_MODEL_ID;
+	public const TTS_MODEL = Application::DEFAULT_SPEECH_MODEL_ID;
 
 	private OpenAiAPIService $openAiApiService;
 	private OpenAiSettingsService $openAiSettingsService;
+	private ServicesService $servicesService;
+	/** The service all providers of this test belong to */
+	private ServiceConfig $service;
 	private ChunkService $chunkService;
 	private StreamingService $streamingService;
 	private TranslateService $translateService;
@@ -90,6 +99,16 @@ class OpenAiProviderTest extends TestCase {
 		$this->iClient = $this->createMock(IClient::class);
 		$clientService->method('newClient')->willReturn($this->iClient);
 
+		$this->servicesService = \OCP\Server::get(ServicesService::class);
+		// the OpenAI API, exposing one model per modality
+		$this->service = $this->servicesService->addService([
+			'text_models' => [self::TEXT_MODEL],
+			'image_models' => [self::IMAGE_MODEL],
+			'stt_models' => [self::STT_MODEL],
+			'tts_models' => [self::TTS_MODEL],
+			'multimodal_image_enabled' => true,
+		]);
+
 		$this->openAiApiService = new OpenAiAPIService(
 			\OCP\Server::get(\Psr\Log\LoggerInterface::class),
 			$this->createMock(\OCP\IL10N::class),
@@ -100,27 +119,38 @@ class OpenAiProviderTest extends TestCase {
 			$this->streamingService,
 			new OpenAiFileService(
 				$this->createMock(\OCP\IL10N::class),
-				$this->openAiSettingsService,
 				$this->createMock(\OCP\Files\IRootFolder::class),
 				$this->createMock(\OCP\TaskProcessing\IManager::class),
 				$this->createMock(\Psr\Log\LoggerInterface::class),
 			),
 			$this->createMock(\OCP\Notification\IManager::class),
 			\OCP\Server::get(QuotaRuleService::class),
+			$this->servicesService,
 			$clientService,
 			true,
 		);
 
-		$this->translateService = \OCP\Server::get(TranslateService::class);
 		$this->translateService = new TranslateService(
-			$this->openAiSettingsService,
 			\OCP\Server::get(\Psr\Log\LoggerInterface::class),
 			$this->openAiApiService,
 			$this->chunkService,
 			\OCP\Server::get(ICacheFactory::class),
 		);
 
-		$this->openAiSettingsService->setUserApiKey(self::TEST_USER1, 'This is a PHPUnit test API key');
+		// the user's own API key is used for the requests of this service
+		$this->servicesService->setUserCredentials(self::TEST_USER1, $this->service->getId(), [
+			'api_key' => 'This is a PHPUnit test API key',
+		]);
+	}
+
+	protected function tearDown(): void {
+		$this->servicesService->setUserCredentials(self::TEST_USER1, $this->service->getId(), [
+			'api_key' => '',
+			'basic_user' => '',
+			'basic_password' => '',
+		]);
+		$this->servicesService->deleteService($this->service->getId());
+		parent::tearDown();
 	}
 
 	public static function tearDownAfterClass(): void {
@@ -142,9 +172,9 @@ class OpenAiProviderTest extends TestCase {
 	public function testFreePromptProvider(): void {
 		$freePromptProvider = new TextToTextProvider(
 			$this->openAiApiService,
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
-			self::TEST_USER1,
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$prompt = 'This is a test prompt';
@@ -233,7 +263,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
-		$generator = $this->openAiApiService->createStreamedChatCompletion(self::TEST_USER1, Application::DEFAULT_MODEL_ID, 'This is a test prompt');
+		$generator = $this->openAiApiService->createStreamedChatCompletion(self::TEST_USER1, $this->service, Application::DEFAULT_MODEL_ID, 'This is a test prompt');
 		$chunks = iterator_to_array($generator, false);
 
 		$this->assertSame([
@@ -288,6 +318,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$generator = $this->openAiApiService->createStreamedChatCompletion(
 			self::TEST_USER1,
+			$this->service,
 			Application::DEFAULT_MODEL_ID,
 			'This is a test prompt',
 		);
@@ -315,9 +346,9 @@ class OpenAiProviderTest extends TestCase {
 	public function testEmojiProvider(): void {
 		$emojiProvider = new EmojiProvider(
 			$this->openAiApiService,
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
-			self::TEST_USER1,
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$prompt = 'This is a test prompt';
@@ -379,9 +410,9 @@ class OpenAiProviderTest extends TestCase {
 	public function testHeadlineProvider(): void {
 		$headlineProvider = new HeadlineProvider(
 			$this->openAiApiService,
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
-			self::TEST_USER1,
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$prompt = 'This is a test prompt';
@@ -443,10 +474,10 @@ class OpenAiProviderTest extends TestCase {
 	public function testChangeToneProvider(): void {
 		$changeToneProvider = new ChangeToneProvider(
 			$this->openAiApiService,
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
-			self::TEST_USER1,
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$textInput = 'This is a test prompt';
@@ -509,10 +540,10 @@ class OpenAiProviderTest extends TestCase {
 	public function testSummaryProvider(): void {
 		$summaryProvider = new SummaryProvider(
 			$this->openAiApiService,
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
-			self::TEST_USER1,
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$prompt = 'This is a test prompt';
@@ -578,10 +609,10 @@ class OpenAiProviderTest extends TestCase {
 	public function testProofreadProvider(): void {
 		$proofreadProvider = new ProofreadProvider(
 			$this->openAiApiService,
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
-			self::TEST_USER1,
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$prompt = 'This is a test prompt';
@@ -646,10 +677,10 @@ class OpenAiProviderTest extends TestCase {
 	public function testTranslationProvider(): void {
 		$translationProvider = new TranslateProvider(
 			$this->openAiApiService,
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->translateService,
-			self::TEST_USER1,
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$inputText = 'This is a test prompt';
@@ -736,14 +767,15 @@ class OpenAiProviderTest extends TestCase {
 		$audioToAudioTranslateProvider = new AudioToAudioTranslateProvider(
 			$this->openAiApiService,
 			$this->translateService,
-			$this->openAiSettingsService,
 			\OCP\Server::get(WatermarkingService::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			$l10nFactory,
 			$l10n,
-			\OCP\Server::get(IAppConfig::class),
 			$userManager,
-			self::TEST_USER1,
+			$this->service,
+			self::STT_MODEL,
+			self::TEXT_MODEL,
+			self::TTS_MODEL,
 		);
 
 		$inputSpeech = file_get_contents(__DIR__ . '/../../res/speech.mp3');
@@ -841,9 +873,9 @@ class OpenAiProviderTest extends TestCase {
 			$this->openAiApiService,
 			$l10n = $this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
-			\OCP\Server::get(IAppConfig::class),
-			self::TEST_USER1,
 			\OCP\Server::get(WatermarkingService::class),
+			$this->service,
+			self::TTS_MODEL,
 		);
 
 		$l10n->method('t')->willReturn('This was generated using Artificial Intelligence.');
@@ -889,9 +921,9 @@ class OpenAiProviderTest extends TestCase {
 			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			\OCP\Server::get(IClientService::class),
-			\OCP\Server::get(IAppConfig::class),
-			self::TEST_USER1,
 			\OCP\Server::get(WatermarkingService::class),
+			$this->service,
+			self::IMAGE_MODEL,
 		);
 
 		$inputText = 'This is a test prompt';
@@ -945,11 +977,10 @@ class OpenAiProviderTest extends TestCase {
 
 		$provider = new ReformatParagraphsProvider(
 			$this->openAiApiService,
-			\OCP\Server::get(IAppConfig::class),
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
-			self::TEST_USER1,
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$inputText = 'Alpha part. Beta part.';
@@ -1093,6 +1124,7 @@ TEXT;
 
 		$result = $this->openAiApiService->createChatCompletion(
 			self::TEST_USER1,
+			$this->service,
 			Application::DEFAULT_MODEL_ID,
 			'Tell me more about Amsterdam',
 		);
@@ -1110,10 +1142,11 @@ TEXT;
 	public function testMultimodalChatWithToolsProvider(): void {
 		$provider = new MultimodalChatWithToolsProvider(
 			$this->openAiApiService,
-			$this->openAiSettingsService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->createMock(\Psr\Log\LoggerInterface::class),
 			\OCP\Server::get(WatermarkingService::class),
+			$this->service,
+			self::TEXT_MODEL,
 		);
 
 		$prompt = 'What is in this image?';

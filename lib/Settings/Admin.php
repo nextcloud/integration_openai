@@ -10,6 +10,7 @@ namespace OCA\OpenAi\Settings;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\ServicesService;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Services\IInitialState;
@@ -19,6 +20,7 @@ class Admin implements ISettings {
 	public function __construct(
 		private IInitialState $initialStateService,
 		private OpenAiSettingsService $openAiSettingsService,
+		private ServicesService $servicesService,
 		private QuotaRuleService $quotaRuleService,
 		private IAppManager $appManager,
 	) {
@@ -29,21 +31,12 @@ class Admin implements ISettings {
 	 */
 	public function getForm(): TemplateResponse {
 		$adminConfig = $this->openAiSettingsService->getAdminConfig();
-		$adminConfig['api_key'] = $adminConfig['api_key'] === '' ? '' : 'dummyApiKey';
-		$adminConfig['basic_password'] = $adminConfig['basic_password'] === '' ? '' : 'dummyPassword';
-		$adminConfig['image_api_key'] = $adminConfig['image_api_key'] === '' ? '' : 'dummyApiKey';
-		$adminConfig['image_basic_password'] = $adminConfig['image_basic_password'] === '' ? '' : 'dummyPassword';
-		$adminConfig['stt_api_key'] = $adminConfig['stt_api_key'] === '' ? '' : 'dummyApiKey';
-		$adminConfig['stt_basic_password'] = $adminConfig['stt_basic_password'] === '' ? '' : 'dummyPassword';
-		$adminConfig['tts_api_key'] = $adminConfig['tts_api_key'] === '' ? '' : 'dummyApiKey';
-		$adminConfig['tts_basic_password'] = $adminConfig['tts_basic_password'] === '' ? '' : 'dummyPassword';
-		$isAssistantEnabled = $this->appManager->isEnabledForUser('assistant');
-		$adminConfig['assistant_enabled'] = $isAssistantEnabled;
+		$adminConfig['assistant_enabled'] = $this->appManager->isEnabledForUser('assistant');
 		$adminConfig['quota_start_date'] = $this->openAiSettingsService->getQuotaStart();
 		$adminConfig['quota_end_date'] = $this->openAiSettingsService->getQuotaEnd();
 		$this->initialStateService->provideInitialState('admin-config', $adminConfig);
-		$rules = $this->quotaRuleService->getRules();
-		$this->initialStateService->provideInitialState('rules', $rules);
+		$this->initialStateService->provideInitialState('services', $this->servicesService->getServicesForFrontend());
+		$this->initialStateService->provideInitialState('rules', $this->quotaRuleService->getRules());
 		return new TemplateResponse(Application::APP_ID, 'adminSettings');
 	}
 

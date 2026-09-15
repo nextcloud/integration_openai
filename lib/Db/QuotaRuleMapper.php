@@ -38,15 +38,36 @@ class QuotaRuleMapper extends QBMapper {
 	}
 
 	/**
+	 * The rules of one service, in the order they are displayed
+	 *
+	 * @return QuotaRule[]
+	 * @throws Exception
+	 */
+	public function getRulesOfService(string $serviceId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('service_id', $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR))
+			);
+
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * The rule of a service that applies to the given user, if there is one
+	 *
 	 * @param int $quotaType
 	 * @param string $userId
 	 * @param array $groups
+	 * @param string $serviceId the service the request is made to
 	 * @return QuotaRule
 	 * @throws DoesNotExistException
 	 * @throws Exception
 	 * @throws MultipleObjectsReturnedException
 	 */
-	public function getRule(int $quotaType, string $userId, array $groups): QuotaRule {
+	public function getRule(int $quotaType, string $userId, array $groups, string $serviceId): QuotaRule {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('r.*')
@@ -54,6 +75,8 @@ class QuotaRuleMapper extends QBMapper {
 			->leftJoin('r', 'openai_quota_user', 'u', 'r.id = u.rule_id')
 			->where(
 				$qb->expr()->eq('r.type', $qb->createNamedParameter($quotaType, IQueryBuilder::PARAM_INT))
+			)->andWhere(
+				$qb->expr()->eq('r.service_id', $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR))
 			)->andWhere(
 				$qb->expr()->orX(
 					$qb->expr()->andX(
@@ -76,10 +99,11 @@ class QuotaRuleMapper extends QBMapper {
 	 * @param int $amount
 	 * @param int $priority
 	 * @param int $pool
+	 * @param string $serviceId the service the rule applies to
 	 * @return int
 	 * @throws Exception
 	 */
-	public function addRule(int $quotaType, int $amount, int $priority, int $pool): int {
+	public function addRule(int $quotaType, int $amount, int $priority, int $pool, string $serviceId): int {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->insert($this->getTableName())
@@ -88,7 +112,8 @@ class QuotaRuleMapper extends QBMapper {
 					'type' => $qb->createNamedParameter($quotaType, IQueryBuilder::PARAM_INT),
 					'amount' => $qb->createNamedParameter($amount, IQueryBuilder::PARAM_INT),
 					'priority' => $qb->createNamedParameter($priority, IQueryBuilder::PARAM_INT),
-					'pool' => $qb->createNamedParameter($pool, IQueryBuilder::PARAM_INT)
+					'pool' => $qb->createNamedParameter($pool, IQueryBuilder::PARAM_INT),
+					'service_id' => $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR)
 				]
 			);
 		$qb->executeStatement();
@@ -100,10 +125,11 @@ class QuotaRuleMapper extends QBMapper {
 	 * @param int $amount
 	 * @param int $priority
 	 * @param int $pool
+	 * @param string $serviceId the service the rule applies to
 	 * @return void
 	 * @throws Exception
 	 */
-	public function updateRule(int $id, int $quotaType, int $amount, int $priority, int $pool): void {
+	public function updateRule(int $id, int $quotaType, int $amount, int $priority, int $pool, string $serviceId): void {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->update($this->getTableName())
@@ -111,6 +137,7 @@ class QuotaRuleMapper extends QBMapper {
 			->set('amount', $qb->createNamedParameter($amount, IQueryBuilder::PARAM_INT))
 			->set('priority', $qb->createNamedParameter($priority, IQueryBuilder::PARAM_INT))
 			->set('pool', $qb->createNamedParameter($pool, IQueryBuilder::PARAM_INT))
+			->set('service_id', $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR))
 			->where(
 				$qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT))
 			);
@@ -125,6 +152,19 @@ class QuotaRuleMapper extends QBMapper {
 
 		$qb->delete($this->getTableName())
 			->where($qb->expr()->eq('id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
+		$qb->executeStatement();
+	}
+
+	/**
+	 * Delete every rule of a service, used when the service itself is deleted
+	 *
+	 * @throws Exception
+	 */
+	public function deleteRulesOfService(string $serviceId): void {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->delete($this->getTableName())
+			->where($qb->expr()->eq('service_id', $qb->createNamedParameter($serviceId, IQueryBuilder::PARAM_STR)));
 		$qb->executeStatement();
 	}
 }

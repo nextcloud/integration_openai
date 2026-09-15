@@ -19,6 +19,8 @@ use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\QuotaRuleService;
+use OCA\OpenAi\Service\ServiceConfig;
+use OCA\OpenAi\Service\ServicesService;
 use OCA\OpenAi\Service\StreamingService;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
@@ -54,6 +56,8 @@ class QuotaTest extends TestCase {
 	private $cacheFactory;
 	private QuotaUsageMapper $quotaUsageMapper;
 	private QuotaRuleService $quotaRuleService;
+	private ServicesService $servicesService;
+	private ServiceConfig $service;
 
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
@@ -78,6 +82,9 @@ class QuotaTest extends TestCase {
 
 		$this->quotaRuleService = \OCP\Server::get(QuotaRuleService::class);
 
+		$this->servicesService = \OCP\Server::get(ServicesService::class);
+		$this->service = $this->servicesService->addService(['name' => 'Quota test service']);
+
 		$this->openAiApiService = new OpenAiAPIService(
 			\OCP\Server::get(LoggerInterface::class),
 			$this->createMock(IL10N::class),
@@ -90,16 +97,22 @@ class QuotaTest extends TestCase {
 			),
 			new OpenAiFileService(
 				$this->createMock(IL10N::class),
-				$this->openAiSettingsService,
 				$this->createMock(\OCP\Files\IRootFolder::class),
 				$this->createMock(\OCP\TaskProcessing\IManager::class),
 				$this->createMock(LoggerInterface::class),
 			),
 			$this->notificationManager,
 			\OCP\Server::get(QuotaRuleService::class),
+			$this->servicesService,
 			\OCP\Server::get(IClientService::class),
 			true
 		);
+	}
+
+	protected function tearDown(): void {
+		$this->servicesService->deleteService($this->service->getId());
+		$this->quotaRuleService->clearCache();
+		parent::tearDown();
 	}
 
 	public static function tearDownAfterClass(): void {
@@ -123,29 +136,48 @@ class QuotaTest extends TestCase {
 		parent::tearDownAfterClass();
 	}
 	public function testNotification(): void {
-		$this->openAiSettingsService->setQuotas([1, 1, 1, 1]);
+		// the quota amounts belong to the service
+		$this->service = $this->servicesService->updateService($this->service->getId(), ['quotas' => [1, 1, 1, 1]]);
+		$this->quotaRuleService->clearCache();
 		$cache = $this->createMock(ICache::class);
 		$this->cacheFactory->method('createLocal')->willReturn($cache);
-		$key = 'quota_exceeded_' . self::TEST_USER1 . '_' . Application::QUOTA_TYPE_TEXT;
+		$key = 'quota_exceeded_' . self::TEST_USER1 . '_' . Application::QUOTA_TYPE_TEXT . '_' . $this->service->getId();
 
 		$cache->expects($this->any())->method('get')->with($key)->willReturn($this->onConsecutiveCalls(null, true, true));
 		$cache->expects($this->once())->method('set')->with($key, true, 3600);
 
 		$this->notificationManager->expects($this->once())->method('notify');
-		$this->assertFalse($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT));
-		$this->quotaUsageMapper->createQuotaUsage(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, 100);
+		$this->assertFalse($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $this->service));
+		$this->quotaUsageMapper->createQuotaUsage(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, 100, -1, $this->service->getId());
 
 		// Send notification
-		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT));
+		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $this->service));
 		// Try again to make sure a notification is only sent once
-		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT));
+		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $this->service));
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
+
+	public function testQuotaIsCountedPerService(): void {
+		$this->service = $this->servicesService->updateService($this->service->getId(), ['quotas' => [10, 0, 0, 0]]);
+		$otherService = $this->servicesService->addService(['name' => 'Other quota test service', 'quotas' => [10, 0, 0, 0]]);
+		$this->quotaRuleService->clearCache();
+		$cache = $this->createMock(ICache::class);
+		$this->cacheFactory->method('createLocal')->willReturn($cache);
+
+		// usage on one service does not count against the quota of the other
+		$this->quotaUsageMapper->createQuotaUsage(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, 100, -1, $this->service->getId());
+		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $this->service));
+		$this->assertFalse($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $otherService));
+
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		$this->servicesService->deleteService($otherService->getId());
+	}
 	public function testQuotaPool(): void {
 		// Create a quota rule for both test users as a pool
-		$this->openAiSettingsService->setQuotas([1000, 1, 1, 1]);
-		$rule = $this->quotaRuleService->addRule();
+		$this->service = $this->servicesService->updateService($this->service->getId(), ['quotas' => [1000, 1, 1, 1]]);
+		$this->quotaRuleService->clearCache();
+		$rule = $this->quotaRuleService->addRule($this->service->getId());
 		$rule['type'] = Application::QUOTA_TYPE_TEXT;
 		$rule['amount'] = 10;
 		$rule['pool'] = true;
@@ -161,15 +193,67 @@ class QuotaTest extends TestCase {
 		];
 		$this->quotaRuleService->updateRule($rule['id'], $rule);
 
-		$this->assertFalse($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT));
-		$this->quotaUsageMapper->createQuotaUsage(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, 100, $rule['id']);
+		$this->assertFalse($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $this->service));
+		$this->quotaUsageMapper->createQuotaUsage(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, 100, $rule['id'], $this->service->getId());
 
-		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT));
+		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $this->service));
 		// Check other user
-		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER2, Application::QUOTA_TYPE_TEXT));
+		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER2, Application::QUOTA_TYPE_TEXT, $this->service));
 		// Clear quota usage
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER2);
+	}
+
+	public function testRuleOnlyAppliesToItsOwnService(): void {
+		// the rule raises the quota of its own service well above the one the
+		// other service allows, so which of the two applies is unambiguous
+		$this->service = $this->servicesService->updateService($this->service->getId(), ['quotas' => [10, 0, 0, 0]]);
+		$otherService = $this->servicesService->addService(['name' => 'Other quota rule test service', 'quotas' => [10, 0, 0, 0]]);
+		$this->quotaRuleService->clearCache();
+		$cache = $this->createMock(ICache::class);
+		$this->cacheFactory->method('createLocal')->willReturn($cache);
+
+		$rule = $this->quotaRuleService->addRule($this->service->getId());
+		$rule['type'] = Application::QUOTA_TYPE_TEXT;
+		$rule['amount'] = 1000;
+		$rule['entities'] = [
+			[
+				'entity_id' => self::TEST_USER1,
+				'entity_type' => EntityType::USER->value,
+			],
+		];
+		$this->quotaRuleService->updateRule($rule['id'], $rule);
+
+		$this->quotaUsageMapper->createQuotaUsage(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, 100, -1, $this->service->getId());
+		$this->quotaUsageMapper->createQuotaUsage(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, 100, -1, $otherService->getId());
+
+		// the rule grants 1000 units on its own service
+		$this->assertFalse($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $this->service));
+		// the other service is untouched by it and keeps its own quota of 10
+		$this->assertTrue($this->openAiApiService->isQuotaExceeded(self::TEST_USER1, Application::QUOTA_TYPE_TEXT, $otherService));
+
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+		$this->quotaRuleService->deleteRule($rule['id']);
+		$this->servicesService->deleteService($otherService->getId());
+	}
+
+	public function testRulesAreDeletedWithTheirService(): void {
+		$service = $this->servicesService->addService(['name' => 'Disposable quota rule test service']);
+		$rule = $this->quotaRuleService->addRule($service->getId());
+		$rule['type'] = Application::QUOTA_TYPE_TEXT;
+		$rule['amount'] = 10;
+		$rule['entities'] = [
+			[
+				'entity_id' => self::TEST_USER1,
+				'entity_type' => EntityType::USER->value,
+			],
+		];
+		$this->quotaRuleService->updateRule($rule['id'], $rule);
+
+		$this->servicesService->deleteService($service->getId());
+
+		$ruleIds = array_column($this->quotaRuleService->getRules(), 'id');
+		$this->assertNotContains($rule['id'], $ruleIds);
 	}
 
 }
