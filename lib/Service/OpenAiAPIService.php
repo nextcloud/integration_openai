@@ -937,6 +937,41 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * @param ServiceConfig $service
+	 * @return bool
+	 */
+	public function isLocalAIService(ServiceConfig $service): bool {
+		$serviceUrl = $service->getUrl();
+		$url = rtrim($serviceUrl, '/');
+		// LocalAI urls always have a v1
+		if (!str_ends_with($url, '/v1')) {
+			return false;
+		}
+		$cacheKey = 'localai_service_' . base64_encode($url);
+		$wellKnownUrl = substr($url, 0, -2) . '.well-known/localai.json';
+		$cache = $this->cacheFactory->createLocal();
+		$result = $cache->get($cacheKey);
+		if ($result !== null) {
+			return $result;
+		}
+		$this->logger->debug('Checking if service is a LocalAI service at URL: ' . $url, ['app' => Application::APP_ID]);
+		try {
+			$wellKnownService = $this->client->get($wellKnownUrl, ['http_errors' => false, 'nextcloud' => ['allow_local_address' => true]]);
+			if ($wellKnownService->getStatusCode() !== 200) {
+				$result = false;
+			} else {
+				$jsonResponse = json_decode($wellKnownService->getBody(), true);
+				$result = $jsonResponse !== null;
+			}
+		} catch (Exception $e) {
+			$this->logger->warning('Could not check if service is a LocalAI service at URL: ' . $url . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+			$result = false;
+		}
+		$cache->set($cacheKey, $result);
+		return $result;
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @param string $prompt
 	 * @param list<array{content: string, mimeType: string}> $images
@@ -958,16 +993,17 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Image generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
 		}
 
-		$apiModel = $this->modelParam($service, $model, Application::DEFAULT_IMAGE_MODEL_ID) ?? $model;
+		$modelParam = $this->modelParam($service, $model, Application::DEFAULT_IMAGE_MODEL_ID);
 
-		if ($service->isUsingOpenAi()) {
-			$apiResponse = $this->requestOpenAiImageEdit($userId, $service, $prompt, $images, $apiModel, $size);
-		} elseif ($service->isUsingOpenRouter()) {
-			$apiResponse = $this->requestOpenRouterImageEdit($userId, $service, $prompt, $images, $apiModel, $size);
+		if ($service->isUsingOpenRouter()) {
+			$apiResponse = $this->requestOpenRouterImageEdit($userId, $service, $prompt, $images, $modelParam, $size);
 		} elseif ($service->isUsingIonos()) {
-			$apiResponse = $this->requestIonosImageEdit($userId, $service, $prompt, $images, $apiModel, $size);
+			$apiResponse = $this->requestIonosImageEdit($userId, $service, $prompt, $images, $modelParam, $size);
+		} elseif ($this->isLocalAIService($service)) {
+			$apiResponse = $this->requestLocalAiImageEdit($userId, $service, $prompt, $images, $modelParam, $size);
 		} else {
-			$apiResponse = $this->requestLocalAiImageEdit($userId, $service, $prompt, $images, $apiModel, $size);
+			// Default to OpenAI
+			$apiResponse = $this->requestOpenAiImageEdit($userId, $service, $prompt, $images, $modelParam, $size);
 		}
 
 		if (!isset($apiResponse['data']) || !is_array($apiResponse['data'])) {
@@ -994,15 +1030,17 @@ class OpenAiAPIService {
 		ServiceConfig $service,
 		string $prompt,
 		array $images,
-		string $model,
+		?string $model,
 		string $size,
 	): array {
 		$params = [
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => 1,
-			'model' => $model,
 		];
+		if ($model !== null) {
+			$params['model'] = $model;
+		}
 		foreach ($images as $index => $image) {
 			$mimeType = $image['mimeType'];
 			$extension = match ($mimeType) {
@@ -1036,7 +1074,7 @@ class OpenAiAPIService {
 		ServiceConfig $service,
 		string $prompt,
 		array $images,
-		string $model,
+		?string $model,
 		string $size,
 	): array {
 		if (count($images) > 1) {
@@ -1053,9 +1091,11 @@ class OpenAiAPIService {
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => 1,
-			'model' => $model,
 			'url' => 'data:' . $image['mimeType'] . ';base64,' . base64_encode($image['content']),
 		];
+		if ($model !== null) {
+			$params['model'] = $model;
+		}
 
 		return $this->request($userId, $service, 'images/edits', $params, 'POST', 'multipart/form-data');
 	}
@@ -1072,7 +1112,7 @@ class OpenAiAPIService {
 		ServiceConfig $service,
 		string $prompt,
 		array $images,
-		string $model,
+		?string $model,
 		string $size,
 	): array {
 		$inputReferences = [];
@@ -1089,9 +1129,11 @@ class OpenAiAPIService {
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => 1,
-			'model' => $model,
 			'input_references' => $inputReferences,
 		];
+		if ($model !== null) {
+			$params['model'] = $model;
+		}
 
 		return $this->request($userId, $service, 'images', $params, 'POST');
 	}
@@ -1108,7 +1150,7 @@ class OpenAiAPIService {
 		ServiceConfig $service,
 		string $prompt,
 		array $images,
-		string $model,
+		?string $model,
 		string $size,
 	): array {
 		$refImages = [];
@@ -1120,9 +1162,11 @@ class OpenAiAPIService {
 			'prompt' => $prompt,
 			'size' => $size,
 			'n' => 1,
-			'model' => $model,
 			'ref_images' => $refImages,
 		];
+		if ($model !== null) {
+			$params['model'] = $model;
+		}
 
 		return $this->request($userId, $service, 'images/generations', $params, 'POST');
 	}

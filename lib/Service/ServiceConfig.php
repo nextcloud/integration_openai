@@ -278,7 +278,7 @@ class ServiceConfig implements JsonSerializable {
 	}
 
 	public function isUsingIonos(): bool {
-		return (bool)preg_match('#^https://([a-zA-Z0-9-]+\.)+ionos\.com#', strtolower($this->getRequestUrl()));
+		return str_starts_with(strtolower($this->url), 'https://openai.inference.de-txl.ionos.com');
 	}
 
 	public function getApiKey(): string {

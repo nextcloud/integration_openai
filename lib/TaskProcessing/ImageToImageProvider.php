@@ -133,6 +133,22 @@ class ImageToImageProvider implements ISynchronousOptionsAwareProvider {
 			);
 		}
 
+		$fileSizeTotal = array_reduce(
+			$input['input'],
+			function ($carry, $file) {
+				return $carry + (method_exists($file, 'getSize') ? $file->getSize() : 0);
+			},
+			0
+		);
+		if ($fileSizeTotal > 50 * 1000 * 1000) {
+			throw new UserFacingProcessingException(
+				'Filesize of input files too large. Max is 50MB',
+				0,
+				null,
+				$this->l->t('The total size of the input files is too large. A maximum of 50MB is allowed.'),
+			);
+		}
+
 		foreach ($input['input'] as $inputFile) {
 			if (!$inputFile instanceof File || !$inputFile->isReadable()) {
 				throw new ProcessingException('Invalid input file');

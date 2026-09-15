@@ -288,6 +288,16 @@ class MultiServiceTest extends TestCase {
 			]
 		]);
 
+		$wellKnownUrl = substr(self::IMAGE_BASE, 0, -2) . '.well-known/localai.json';
+		$wellKnownResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$wellKnownResponse->method('getBody')->willReturn('{"version":"1.0"}');
+		$wellKnownResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('get')->with(
+			$wellKnownUrl,
+			['http_errors' => false, 'nextcloud' => ['allow_local_address' => true]],
+		)->willReturn($wellKnownResponse);
+
 		$url = self::IMAGE_BASE . '/images/generations';
 		$options = [
 			'timeout' => self::REQUEST_TIMEOUT_IMAGE,
@@ -301,8 +311,8 @@ class MultiServiceTest extends TestCase {
 				'prompt' => $prompt,
 				'size' => '1024x1024',
 				'n' => 1,
-				'model' => self::IMAGE_MODEL,
 				'ref_images' => [base64_encode($inputImage)],
+				'model' => self::IMAGE_MODEL,
 			]),
 		];
 
@@ -372,7 +382,6 @@ class MultiServiceTest extends TestCase {
 				'prompt' => $prompt,
 				'size' => '1024x1024',
 				'n' => 1,
-				'model' => self::IMAGE_MODEL,
 				'input_references' => [
 					[
 						'type' => 'image_url',
@@ -381,6 +390,7 @@ class MultiServiceTest extends TestCase {
 						],
 					],
 				],
+				'model' => self::IMAGE_MODEL,
 			]),
 		];
 
