@@ -235,7 +235,7 @@ class OpenAiFileService {
 	}
 
 	/**
-	 * @return list<array{type: string, text: string}|array{type: string, file: array{filename: string, file_data: string}}>
+	 * @return list<array<string, mixed>>
 	 */
 	private function buildDocumentContent(File $file, string $fileType, ServiceConfig $service): array {
 		if (!$service->getMultimodalDocumentEnabled()) {
@@ -248,11 +248,22 @@ class OpenAiFileService {
 				'text' => 'Filename:' . $file->getName() . "\nContent:\n" . $text,
 			]];
 		}
+		$dataUri = 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb')));
+
+		if ($service->isUsingMistral()) {
+			// Mistral does not accept the default openai shape so we use a fallback for them
+			return [[
+				'type' => 'document_url',
+				'document_url' => $dataUri,
+				'document_name' => $file->getName(),
+			]];
+		}
+
 		return [[
 			'type' => 'file',
 			'file' => [
 				'filename' => $file->getName(),
-				'file_data' => 'data:' . $fileType . ';base64,' . base64_encode(stream_get_contents($file->fopen('rb'))),
+				'file_data' => $dataUri,
 			],
 		]];
 	}
