@@ -12,11 +12,17 @@ use DateTime;
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCP\IAppConfig;
-use OCP\ICacheFactory;
 use OCP\IConfig;
 use OCP\PreConditionNotMetException;
-use OCP\Security\ICrypto;
 
+/**
+ * Instance-wide settings of the app.
+ *
+ * Everything that belongs to one connected service (URL, credentials, request
+ * behaviour, selected models, quota amounts) lives in {@see ServicesService}
+ * instead. What remains here is global: the quota period, how long usage is
+ * stored and the user preferences that are not tied to a service.
+ */
 class OpenAiSettingsService {
 	private const ADMIN_CONFIG_TYPES = [
 		'request_timeout' => 'integer',
@@ -37,59 +43,16 @@ class OpenAiSettingsService {
 		'llm_extra_params' => 'string',
 		'summary_system_prompt' => 'string',
 		'quota_period' => 'array',
-		'quotas' => 'array',
 		'usage_storage_time' => 'integer',
-		'translation_provider_enabled' => 'boolean',
-		'llm_provider_enabled' => 'boolean',
-		't2i_provider_enabled' => 'boolean',
-		'stt_provider_enabled' => 'boolean',
-		'tts_provider_enabled' => 'boolean',
-		'multimodal_image_enabled' => 'boolean',
-		'multimodal_audio_enabled' => 'boolean',
-		'multimodal_video_enabled' => 'boolean',
-		'multimodal_document_enabled' => 'boolean',
-		'chat_endpoint_enabled' => 'boolean',
-		'basic_user' => 'string',
-		'basic_password' => 'string',
-		'use_basic_auth' => 'boolean',
-
-		'image_url' => 'string',
-		'image_service_name' => 'string',
-		'image_api_key' => 'string',
-		'image_basic_user' => 'string',
-		'image_basic_password' => 'string',
-		'image_use_basic_auth' => 'boolean',
-		'image_request_timeout' => 'integer',
-
-		'stt_url' => 'string',
-		'stt_service_name' => 'string',
-		'stt_api_key' => 'string',
-		'stt_basic_user' => 'string',
-		'stt_basic_password' => 'string',
-		'stt_use_basic_auth' => 'boolean',
-		'stt_request_timeout' => 'integer',
-
-		'tts_url' => 'string',
-		'tts_service_name' => 'string',
-		'tts_api_key' => 'string',
-		'tts_basic_user' => 'string',
-		'tts_basic_password' => 'string',
-		'tts_use_basic_auth' => 'boolean',
-		'tts_request_timeout' => 'integer',
 	];
 
 	private const USER_CONFIG_TYPES = [
-		'api_key' => 'string',
-		'basic_user' => 'string',
-		'basic_password' => 'string',
 		'stt_language' => 'string',
 	];
 
 	public function __construct(
 		private IConfig $config,
 		private IAppConfig $appConfig,
-		private ICrypto $crypto,
-		private ICacheFactory $cacheFactory,
 	) {
 	}
 
@@ -154,11 +117,6 @@ class OpenAiSettingsService {
 			}
 		}
 		return $periodEnd->getTimestamp();
-	}
-
-	public function invalidateModelsCache(): void {
-		$cache = $this->cacheFactory->createDistributed(Application::APP_ID);
-		$cache->clear(Application::MODELS_CACHE_KEY);
 	}
 
 	////////////////////////////////////////////
@@ -327,205 +285,151 @@ class OpenAiSettingsService {
 				$value[$key] = $defaultValue;
 			}
 		}
+		$maxLength = $value['unit'] === 'month'
+			? Application::MAX_QUOTA_PERIOD_MONTHS
+			: Application::MAX_QUOTA_PERIOD_DAYS;
+		if ($value['length'] > $maxLength) {
+			$value['length'] = $maxLength;
+		}
 		return $value;
 	}
 
-	/**
-	 * @return int[]
-	 */
-	public function getQuotas(): array {
-		$quotas = json_decode(
-			$this->appConfig->getValueString(
-				Application::APP_ID, 'quotas',
-				json_encode(Application::DEFAULT_QUOTAS),
-				lazy: true,
-			) ?: json_encode(Application::DEFAULT_QUOTAS),
-			true,
-		);
-		if ($quotas === null) {
-			$quotas = Application::DEFAULT_QUOTAS;
-		}
-		// Make sure all quota types are set in the json encoded app value (in case new quota types are added in the future)
-		if (count($quotas) !== count(Application::DEFAULT_QUOTAS)) {
-			foreach (Application::DEFAULT_QUOTAS as $quotaType => $_) {
-				if (!isset($quotas[$quotaType]) || !is_int($quotas[$quotaType]) || $quotas[$quotaType] < 0) {
-					$quotas[$quotaType] = Application::DEFAULT_QUOTAS[$quotaType];
-				}
-			}
-			$this->appConfig->setValueString(Application::APP_ID, 'quotas', json_encode($quotas), lazy: true);
-		}
-
-		return $quotas;
-	}
-
-	public function getUsageStorageTime() : int {
+	public function getUsageStorageTime(): int {
 		return $this->appConfig->getValueInt(Application::APP_ID, 'usage_storage_time', Application::DEFAULT_QUOTA_PERIOD, lazy: true);
 	}
 
 	/**
-	 * @return boolean
+	 * @param string|null $userId
+	 * @return string
 	 */
-	public function getChatEndpointEnabled(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'chat_endpoint_enabled', '1', lazy: true) === '1';
+	public function getUserSTTLanguage(?string $userId): string {
+		return $this->config->getUserValue($userId, Application::APP_ID, 'stt_language', 'detect_language');
 	}
 
 	/**
-	 * @param string|null $userId
-	 * @param bool $fallBackOnAdminValue
-	 * @return string
+	 * Get the instance-wide admin config for the settings page
+	 *
+	 * @return array{quota_period: array, usage_storage_time: int}
 	 */
-	public function getUserBasicUser(?string $userId, bool $fallBackOnAdminValue = true): string {
-		$fallBackBasicUser = $fallBackOnAdminValue ? $this->getAdminBasicUser() : '';
-		$basicUser = $userId === null
-			? $fallBackBasicUser
-			: ($this->config->getUserValue($userId, Application::APP_ID, 'basic_user', $fallBackBasicUser) ?: $fallBackBasicUser);
-		return $basicUser;
+	public function getAdminConfig(): array {
+		return [
+			'quota_period' => $this->getQuotaPeriod(),
+			'usage_storage_time' => $this->getUsageStorageTime(),
+		];
 	}
 
 	/**
-	 * @param string|null $userId
-	 * @param bool $fallBackOnAdminValue
-	 * @return string
+	 * Get the user config for the settings page
+	 *
+	 * @return array{stt_language: string}
+	 */
+	public function getUserConfig(string $userId): array {
+		return [
+			'stt_language' => $this->getUserSTTLanguage($userId),
+		];
+	}
+
+	////////////////////////////////////////////
+	//////////// Setters for settings //////////
+
+	/**
+	 * Setter for quotaPeriod; minimum is 1 day.
+	 * Days are floating, and months are set dates
+	 * @param array $quotaPeriod
+	 * @return void
 	 * @throws Exception
 	 */
-	public function getUserBasicPassword(?string $userId, bool $fallBackOnAdminValue = true): string {
-		$fallBackBasicPassword = $fallBackOnAdminValue ? $this->getAdminBasicPassword() : '';
-		if ($userId === null) {
-			return $fallBackBasicPassword;
+	public function setQuotaPeriod(array $quotaPeriod): void {
+		if (!isset($quotaPeriod['length']) || !is_int($quotaPeriod['length'])) {
+			throw new Exception('Invalid quota period length');
 		}
-		$encryptedUserBasicPassword = $this->config->getUserValue($userId, Application::APP_ID, 'basic_password');
-		$userBasicPassword = $encryptedUserBasicPassword === '' ? '' : $this->crypto->decrypt($encryptedUserBasicPassword);
-		return $userBasicPassword ?: $fallBackBasicPassword;
+		if ($quotaPeriod['length'] < 1) {
+			throw new Exception('Invalid quota period length');
+		}
+		if (!isset($quotaPeriod['unit']) || !is_string($quotaPeriod['unit'])) {
+			throw new Exception('Invalid quota period unit');
+		}
+		// Checks month period
+		if ($quotaPeriod['unit'] === 'month') {
+			if (!isset($quotaPeriod['day']) || !is_int($quotaPeriod['day'])) {
+				throw new Exception('Invalid quota period day');
+			}
+			if ($quotaPeriod['day'] < 1) {
+				throw new Exception('Invalid quota period day');
+			}
+			if ($quotaPeriod['day'] > 28) {
+				throw new Exception('Invalid quota period day');
+			}
+		} elseif ($quotaPeriod['unit'] !== 'day') {
+			throw new Exception('Invalid quota period unit');
+		}
+		$maxLength = $quotaPeriod['unit'] === 'month'
+			? Application::MAX_QUOTA_PERIOD_MONTHS
+			: Application::MAX_QUOTA_PERIOD_DAYS;
+		if ($quotaPeriod['length'] > $maxLength) {
+			throw new Exception('Invalid quota period length');
+		}
+		$this->appConfig->setValueString(Application::APP_ID, 'quota_period', json_encode($quotaPeriod), lazy: true);
 	}
 
 	/**
-	 * Get admin basic user
-	 * @return string
+	 * @param int $usageStorageTime
+	 * @return void
 	 */
-	public function getAdminBasicUser(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'basic_user', lazy: true);
+	public function setUsageStorageTime(int $usageStorageTime): void {
+		$usageStorageTime = max(1, $usageStorageTime);
+		$this->appConfig->setValueInt(Application::APP_ID, 'usage_storage_time', $usageStorageTime, lazy: true);
 	}
 
 	/**
-	 * Get admin basic password
-	 * @return string
+	 * @param string $userId
+	 * @param string $language
+	 * @throws PreConditionNotMetException
+	 */
+	public function setUserSTTLanguage(string $userId, string $language): void {
+		$this->config->setUserValue($userId, Application::APP_ID, 'stt_language', $language);
+	}
+
+	/**
+	 * Set the instance-wide admin config
+	 *
+	 * @param array<string, mixed> $adminConfig
 	 * @throws Exception
 	 */
-	public function getAdminBasicPassword(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'basic_password', lazy: true);
+	public function setAdminConfig(array $adminConfig): void {
+		foreach ($adminConfig as $key => $value) {
+			if (!isset(self::ADMIN_CONFIG_TYPES[$key])) {
+				throw new Exception('Invalid config key: ' . $key);
+			}
+			if (gettype($value) !== self::ADMIN_CONFIG_TYPES[$key]) {
+				throw new Exception('Invalid type for key: ' . $key . '. Expected ' . self::ADMIN_CONFIG_TYPES[$key] . ', got ' . gettype($value));
+			}
+		}
+
+		// Validation of the input values is done in the individual setters
+		if (isset($adminConfig['quota_period'])) {
+			$this->setQuotaPeriod($adminConfig['quota_period']);
+		}
+		if (isset($adminConfig['usage_storage_time'])) {
+			$this->setUsageStorageTime($adminConfig['usage_storage_time']);
+		}
 	}
 
 	/**
-	 * @return boolean
+	 * Set the user config for the settings page
+	 *
+	 * @param array<string, mixed> $userConfig
+	 * @throws Exception
 	 */
-	public function getUseBasicAuth(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'use_basic_auth', '0', lazy: true) === '1';
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getImageServiceUrl(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_url', '', lazy: true);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getImageServiceName(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_service_name', '', lazy: true);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminImageApiKey(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_api_key', '', true);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminImageBasicUser(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_basic_user', '', lazy: true);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminImageBasicPassword(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_basic_password', '', true);
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getAdminImageUseBasicAuth(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'image_use_basic_auth', '0', lazy: true) === '1';
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getImageRequestTimeout(): int {
-		return intval($this->appConfig->getValueString(Application::APP_ID, 'image_request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT), lazy: true)) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getSttServiceUrl(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'stt_url', '', lazy: true);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getSttServiceName(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'stt_service_name', '', lazy: true);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminSttApiKey(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'stt_api_key', '', true);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminSttBasicUser(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'stt_basic_user', '', lazy: true);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getAdminSttBasicPassword(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'stt_basic_password', '', true);
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getAdminSttUseBasicAuth(): bool {
-		return $this->appConfig->getValueString(Application::APP_ID, 'stt_use_basic_auth', '0', lazy: true) === '1';
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getSttRequestTimeout(): int {
-		return intval($this->appConfig->getValueString(Application::APP_ID, 'stt_request_timeout', strval(Application::OPENAI_DEFAULT_REQUEST_TIMEOUT), lazy: true)) ?: Application::OPENAI_DEFAULT_REQUEST_TIMEOUT;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getTtsServiceUrl(): string {
-		return $this->appConfig->getValueString(Application::APP_ID, 'tts_url', '', lazy: true);
-	}
+	public function setUserConfig(string $userId, array $userConfig): void {
+		foreach ($userConfig as $key => $value) {
+			if (!isset(self::USER_CONFIG_TYPES[$key])) {
+				throw new Exception('Invalid config key: ' . $key);
+			}
+			if (gettype($value) !== self::USER_CONFIG_TYPES[$key]) {
+				throw new Exception('Invalid type for key: ' . $key . '. Expected ' . self::USER_CONFIG_TYPES[$key] . ', got ' . gettype($value));
+			}
+		}
 
 	/**
 	 * @return string
@@ -1436,119 +1340,7 @@ class OpenAiSettingsService {
 			$this->setUserBasicPassword($userId, $userConfig['basic_password']);
 		}
 		if (isset($userConfig['stt_language'])) {
-			$this->setUserSttLanguage($userId, $userConfig['stt_language']);
+			$this->setUserSTTLanguage($userId, $userConfig['stt_language']);
 		}
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setUseMaxCompletionParam(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'use_max_completion_tokens_param', $enabled ? '1' : '0', lazy: true);
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setTranslationProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'translation_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setIsImageRetrievalAuthenticated(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'image_request_auth', $enabled ? '1' : '0', lazy: true);
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setLlmProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'llm_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setT2iProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 't2i_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setSttProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'stt_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 * @return void
-	 */
-	public function setTtsProviderEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'tts_provider_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 */
-	public function setMultimodalImageEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'multimodal_image_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 */
-	public function setMultimodalAudioEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'multimodal_audio_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 */
-	public function setMultimodalVideoEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'multimodal_video_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 */
-	public function setMultimodalDocumentEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'multimodal_document_enabled', $enabled ? '1' : '0');
-	}
-
-	/**
-	 * @param bool $enabled
-	 */
-	public function setChatEndpointEnabled(bool $enabled): void {
-		$this->appConfig->setValueString(Application::APP_ID, 'chat_endpoint_enabled', $enabled ? '1' : '0', lazy: true);
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function imageOverrideEnabled(): bool {
-		return !empty($this->getImageServiceUrl());
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function sttOverrideEnabled(): bool {
-		return !empty($this->getSttServiceUrl());
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function ttsOverrideEnabled(): bool {
-		return !empty($this->getTtsServiceUrl());
 	}
 }

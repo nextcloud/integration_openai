@@ -11,21 +11,16 @@ namespace OCA\OpenAi\Service;
  * Helper Service to help with chunking
  */
 class ChunkService {
-	public function __construct(
-		private OpenAiSettingsService $openAiSettingsService,
-	) {
-	}
-
 	/**
-	 * @param string $prompt
+	 * @param ServiceConfig $service the service the prompt is sent to
 	 * @param bool $outputChunking If the output is about the same size as the input so output tokens matter. Ex: translate
 	 * @param int|null $maxTokens The maximum number of output tokens if specified by the user
 	 * @return array
 	 */
-	public function chunkSplitPrompt(string $prompt, bool $outputChunking = false, ?int $maxTokens = null): array {
-		$chunkSize = $this->openAiSettingsService->getChunkSize();
+	public function chunkSplitPrompt(ServiceConfig $service, string $prompt, bool $outputChunking = false, ?int $maxTokens = null): array {
+		$chunkSize = $service->getChunkSize();
 		if ($outputChunking) {
-			$maxTokens = $maxTokens ?? $this->openAiSettingsService->getMaxTokens();
+			$maxTokens = $maxTokens ?? $service->getMaxTokens();
 			$chunkSize = min($chunkSize, $maxTokens);
 		}
 

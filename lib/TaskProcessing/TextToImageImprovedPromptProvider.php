@@ -9,26 +9,34 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
-use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
-use OCP\TaskProcessing\IManager;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
-use OCP\TaskProcessing\Task;
 use OCP\TaskProcessing\TaskTypes\TextToImage;
-use OCP\TaskProcessing\TaskTypes\TextToText;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+/**
+ * Generates an image from a prompt that an LLM improved first.
+ *
+ * Both steps run on the same service: the image with the model this provider
+ * is registered for, the prompt improvement with the first text model selected
+ * for that service.
+ */
 class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvider {
+	// No ProviderIdentity: this provider derives its ID and name from the
+	// image provider it wraps rather than from a model of its own.
+
 	public function __construct(
 		private TextToImageProvider $textToImageProvider,
-		private IManager $taskProcessingManager,
+		private TextToTextProvider $textToTextProvider,
 		private LoggerInterface $logger,
 		private IL10N $l10n,
 		private OpenAiAPIService $openAiAPIService,
+		private ServiceConfig $service,
 	) {
 	}
 
@@ -46,7 +54,7 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 
 	public function getExpectedRuntime(): int {
 		// The text to image provider may not be openai and this assumes it is
-		return $this->textToImageProvider->getExpectedRuntime() + $this->openAiAPIService->getExpTextProcessingTime();
+		return $this->textToImageProvider->getExpectedRuntime() + $this->openAiAPIService->getExpTextProcessingTime($this->service);
 	}
 
 	public function getInputShapeEnumValues(): array {
@@ -98,25 +106,16 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 			. 'Add concrete visual details (subject, composition, lighting, style) only when they are reasonable. '
 			. 'Keep the original intent. Return ONLY the improved prompt as a single line, no preface, no quotes, no explanations.' . "\n\n"
 			. 'Original prompt:' . "\n" . $originalPrompt;
-		$improveTask = new Task(
-			TextToText::ID,
-			['input' => $instruction],
-			Application::APP_ID,
-			$userId,
-			'text2image_improved_prompt',
-		);
-
 		$improvedPrompt = $originalPrompt;
 		try {
-			$finished = $this->taskProcessingManager->runTask($improveTask);
-			$output = $finished->getOutput();
-			if (is_array($output) && isset($output['output']) && is_string($output['output']) && trim($output['output']) !== '') {
+			$output = $this->textToTextProvider->process($userId, ['input' => $instruction], $reportProgress);
+			if (isset($output['output']) && is_string($output['output']) && trim($output['output']) !== '') {
 				$improvedPrompt = trim($output['output']);
 			} else {
-				$this->logger->warning('Prompt improvement task returned no usable output, falling back to original prompt');
+				$this->logger->warning('Prompt improvement returned no usable output, falling back to original prompt');
 			}
 		} catch (Throwable $e) {
-			$this->logger->warning('Prompt improvement task failed, falling back to original prompt: ' . $e->getMessage(), ['exception' => $e]);
+			$this->logger->warning('Prompt improvement failed, falling back to original prompt: ' . $e->getMessage(), ['exception' => $e]);
 		}
 		$reportProgress(0.5);
 
