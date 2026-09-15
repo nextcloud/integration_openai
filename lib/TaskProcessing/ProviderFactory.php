@@ -143,6 +143,10 @@ class ProviderFactory {
 				$this->logger, $this->l, $this->openAiAPIService, $service,
 			);
 		}
+		$providers[] = new ImageToImageProvider(
+			$this->openAiAPIService, $this->l, $this->logger, $this->clientService,
+			$this->watermarkingService, $service, $model,
+		);
 		return $providers;
 	}
 

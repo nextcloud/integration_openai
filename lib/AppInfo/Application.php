@@ -10,6 +10,7 @@ namespace OCA\OpenAi\AppInfo;
 use OCA\OpenAi\Capabilities;
 use OCA\OpenAi\Listener\TaskProcessingProviderListener;
 use OCA\OpenAi\Notification\Notifier;
+use OCA\OpenAi\TaskProcessing\ImageToImageTaskType;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -102,6 +103,10 @@ class Application extends App implements IBootstrap {
 		// service and model selection, so they cannot be registered as
 		// classes. They are built per (service, model, task type) instead.
 		$context->registerEventListener(GetTaskProcessingProvidersEvent::class, TaskProcessingProviderListener::class);
+
+		if (!class_exists('OCP\\TaskProcessing\\TaskTypes\\ImageToImage')) {
+			$context->registerTaskProcessingTaskType(ImageToImageTaskType::class);
+		}
 
 		$context->registerCapability(Capabilities::class);
 		$context->registerNotifierService(Notifier::class);
