@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Default" : "Predefinidu",
     "Image generation" : "Generatzione de immàgines",
     "Unknown" : "Disconnotu",
     "seconds" : "segundos",
@@ -10,15 +9,14 @@ OC.L10N.register(
     "Name" : "Nùmene",
     "Speed" : "Lestresa",
     "Language" : "Limba",
+    "Default" : "Predefinidu",
     "Auto" : "Auto",
     "Medium" : "Mesanu",
     "Size" : "Mannària",
-    "Request timeout (seconds)" : "Tempus màssimu de sa rechesta (segundos)",
-    "Authentication" : "Autenticatzione",
-    "Authentication method" : "Mètodu de autenticatzione",
-    "API key" : "Crae API",
     "Start date" : "Data de cumintzu",
+    "Service" : "su servìtziu",
     "Default language" : "Limba predefinida",
+    "API key" : "Crae API",
     "Months" : "Meses",
     "Who?" : "Chie?",
     "No recommendations. Start typing." : "Peruna racumandatzione. Cumintza a iscrìere.",
@@ -26,6 +24,9 @@ OC.L10N.register(
     "Category" : "Categorias",
     "Save" : "Sarva",
     "Delete" : "Cantzella",
+    "Request timeout (seconds)" : "Tempus màssimu de sa rechesta (segundos)",
+    "Authentication" : "Autenticatzione",
+    "Authentication method" : "Mètodu de autenticatzione",
     "Images" : "Immàgines"
 },
 "nplurals=2; plural=(n != 1);");
