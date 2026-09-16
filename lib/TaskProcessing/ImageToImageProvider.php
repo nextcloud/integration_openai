@@ -178,17 +178,7 @@ class ImageToImageProvider implements ISynchronousOptionsAwareProvider {
 			];
 		}
 
-		$size = $this->service->getDefaultImageSize();
-		if (isset($input['size']) && is_string($input['size']) && preg_match('/^\d+x\d+$/', $input['size'])) {
-			$size = trim($input['size']);
-		}
-		if (preg_match('/^\d+x\d+$/', $size) !== 1) {
-			$size = Application::DEFAULT_DEFAULT_IMAGE_SIZE;
-		}
-		[$x, $y] = explode('x', $size, 2);
-		if ((int)$x > 4096 || (int)$y > 4096) {
-			throw new UserFacingProcessingException('size is out of bounds', userFacingMessage: $this->l->t('Cannot generate images larger than 4096x4096'));
-		}
+		$size = $this->resolveSize($input);
 
 		try {
 			$apiResponse = $this->openAiAPIService->requestImageEdit(
@@ -237,6 +227,89 @@ class ImageToImageProvider implements ISynchronousOptionsAwareProvider {
 		} catch (\Throwable $e) {
 			$this->logger->warning('OpenAI/LocalAI\'s image to image generation failed with: ' . $e->getMessage(), ['exception' => $e]);
 			throw new ProcessingException('OpenAI/LocalAI\'s image to image generation failed with: ' . $e->getMessage());
+		}
+	}
+
+	/**
+	 * @param array<string, mixed> $input
+	 */
+	private function resolveSize(array $input): string {
+		$size = $this->service->getDefaultImageSize();
+		if (isset($input['size']) && is_string($input['size']) && preg_match('/^\d+x\d+$/', $input['size']) === 1) {
+			$size = trim($input['size']);
+		}
+		if (preg_match('/^\d+x\d+$/', $size) !== 1) {
+			$size = Application::DEFAULT_DEFAULT_IMAGE_SIZE;
+		}
+
+		[$widthStr, $heightStr] = explode('x', $size, 2);
+		$width = (int)$widthStr;
+		$height = (int)$heightStr;
+		$this->validateSize($size, $width, $height);
+
+		return $size;
+	}
+
+	private function validateSize(string $size, int $width, int $height): void {
+		// https://api.ionos.com/docs/inference-openai/v1/
+		$ionosMinDimension = 64;
+		$ionosMaxDimension = 2048;
+		$ionosDimensionMultiple = 16;
+		// https://platform.openai.com/docs/api-reference/images/createEdit
+		$openAiImageSizes = [
+			'1024x1024',
+			'1024x1536',
+			'1536x1024'
+		];
+		$maxDimension = 4096;
+
+		if ($this->service->isUsingIonos()) {
+			$valid = $width >= $ionosMinDimension
+				&& $height >= $ionosMinDimension
+				&& $width <= $ionosMaxDimension
+				&& $height <= $ionosMaxDimension
+				&& $width % $ionosDimensionMultiple === 0
+				&& $height % $ionosDimensionMultiple === 0;
+			if (!$valid) {
+				throw new UserFacingProcessingException(
+					'size is out of bounds',
+					0,
+					null,
+					$this->l->t(
+						'Image size must use dimensions that are multiples of %1$d and between %2$d and %3$d.',
+						[
+							$ionosDimensionMultiple,
+							$ionosMinDimension,
+							$ionosMaxDimension,
+						],
+					),
+				);
+			}
+			return;
+		}
+
+		if ($this->service->isUsingOpenAi()) {
+			if (!in_array($size, $openAiImageSizes, true)) {
+				throw new UserFacingProcessingException(
+					'size is out of bounds',
+					0,
+					null,
+					$this->l->t(
+						'Image size must be one of: %s',
+						[implode(', ', $openAiImageSizes)],
+					),
+				);
+			}
+			return;
+		}
+
+		if ($width > $maxDimension || $height > $maxDimension) {
+			throw new UserFacingProcessingException(
+				'size is out of bounds',
+				0,
+				null,
+				$this->l->t('Cannot generate images larger than %1$dx%2$d', [$maxDimension, $maxDimension]),
+			);
 		}
 	}
 }
