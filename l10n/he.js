@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Default" : "ברירת מחדל",
     "Unknown" : "לא ידוע",
     "seconds" : "שניות",
     "Bad HTTP method" : "שגיאה במתודת HTTP",
@@ -9,15 +8,14 @@ OC.L10N.register(
     "Name" : "שם",
     "Speed" : "מהירות",
     "Language" : "שפה",
+    "Default" : "ברירת מחדל",
     "Auto" : "אוטומטי",
     "Medium" : "בינוני",
     "Size" : "גודל",
-    "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
-    "Authentication" : "אימות",
-    "Authentication method" : "שיטת אימות",
-    "API key" : "מפתח API",
     "Start date" : "תאריך התחלה",
+    "Service" : "שירות",
     "Default language" : "שפת בררת מחדל",
+    "API key" : "מפתח API",
     "Days" : "ימים",
     "Months" : "חודשים",
     "No recommendations. Start typing." : "אין המלצות. נא להתחיל להקליד.",
@@ -25,6 +23,9 @@ OC.L10N.register(
     "Category" : "קטגוריה",
     "Save" : "שמירה",
     "Delete" : "מחיקה",
+    "Request timeout (seconds)" : "פסק זמן מבוקש (שניות)",
+    "Authentication" : "אימות",
+    "Authentication method" : "שיטת אימות",
     "Images" : "תמונות"
 },
 "nplurals=3; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: 2;");
