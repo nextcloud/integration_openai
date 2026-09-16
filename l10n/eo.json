@@ -6,17 +6,17 @@
     "Language" : "Lingvo",
     "Auto" : "Aŭtomate",
     "Size" : "Grando",
-    "Request timeout (seconds)" : "Eltempiĝo (sekundoj)",
-    "Authentication" : "Aŭtentigo",
-    "Authentication method" : "Aŭtentiga metodo",
-    "API key" : "API-ŝlosilo",
     "Start date" : "Komencdato",
     "Default language" : "Defaŭlta lingvo",
+    "API key" : "API-ŝlosilo",
     "No recommendations. Start typing." : "Neniu propono. Ektajpu.",
     "No result." : "Nenia rezulto.",
     "Category" : "Kategorio",
     "Save" : "Konservi",
     "Delete" : "Forigi",
+    "Request timeout (seconds)" : "Eltempiĝo (sekundoj)",
+    "Authentication" : "Aŭtentigo",
+    "Authentication method" : "Aŭtentiga metodo",
     "Images" : "Bildoj"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

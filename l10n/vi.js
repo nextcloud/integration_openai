@@ -11,8 +11,6 @@ OC.L10N.register(
     "Auto" : "Tự động",
     "Medium" : "Trung bình",
     "Size" : "Kích cỡ",
-    "Authentication" : "Xác thực",
-    "Authentication method" : "Phương thức xác thực",
     "Default language" : "Ngôn ngữ mặc định",
     "Days" : "Ngày",
     "Months" : "Tháng",
@@ -21,6 +19,8 @@ OC.L10N.register(
     "Category" : "Hạng mục",
     "Save" : "Lưu",
     "Delete" : "Xóa",
+    "Authentication" : "Xác thực",
+    "Authentication method" : "Phương thức xác thực",
     "Images" : "Hình ảnh"
 },
 "nplurals=1; plural=0;");

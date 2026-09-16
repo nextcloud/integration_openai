@@ -4,13 +4,14 @@
     "Bad credentials" : "Marrits identificants",
     "Name" : "Nom",
     "Language" : "Lenga",
-    "Authentication" : "Autentificacion",
+    "Service" : "Servici",
     "Default language" : "Lenga per defaut",
     "Who?" : "Qual ?",
     "No result." : "Cap de resultat.",
     "Category" : "Categoria",
     "Save" : "Enregistrar",
     "Delete" : "Suprimir",
+    "Authentication" : "Autentificacion",
     "Images" : "Imatges",
     "Question" : "Question"
 },"pluralForm" :"nplurals=2; plural=(n > 1);"

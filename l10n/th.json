@@ -6,16 +6,16 @@
     "Simple" : "เรียบง่าย",
     "Medium" : "ปานกลาง",
     "Size" : "ขนาด",
-    "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
-    "Authentication" : "การตรวจสอบสิทธิ์",
-    "Authentication method" : "วิธีการตรวจสอบความถูกต้อง",
-    "API key" : "รหัส API",
     "Start date" : "วันที่เริ่มต้น",
     "Default language" : "ภาษาค่าเริ่มต้น",
+    "API key" : "รหัส API",
     "No recommendations. Start typing." : "ไม่มีคำแนะนำ เริ่มพิมพ์เลย",
     "Category" : "หมวดหมู่",
     "Save" : "บันทึก",
     "Delete" : "ลบ",
+    "Request timeout (seconds)" : "หมดเวลาคำขอ (วินาที)",
+    "Authentication" : "การตรวจสอบสิทธิ์",
+    "Authentication method" : "วิธีการตรวจสอบความถูกต้อง",
     "Images" : "รูปภาพ"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

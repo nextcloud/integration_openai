@@ -1,7 +1,6 @@
 OC.L10N.register(
     "integration_openai",
     {
-    "Default" : "Por defeutu",
     "Image generation" : "Xeneración d'imáxenes",
     "Audio transcription" : "Trescripción del audiu",
     "Unknown" : "Desconocí­u",
@@ -12,14 +11,13 @@ OC.L10N.register(
     "Memories" : "Recuerdos",
     "Voice" : "Voz",
     "Language" : "Llingua",
+    "Default" : "Por defeutu",
     "Minimal" : "Mínimu",
     "Size" : "Tamañu",
-    "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
-    "Authentication" : "Autenticación",
-    "API key" : "Clave de l'API",
     "Start date" : "Data de comienzu",
     "OpenAI options saved" : "Guardáronse les opciones d'OpenAI",
     "Default language" : "Llingua predeterminada",
+    "API key" : "Clave de l'API",
     "Days" : "Díes",
     "Months" : "Meses",
     "Who?" : "¿Quién?",
@@ -28,6 +26,8 @@ OC.L10N.register(
     "Category" : "Categoría",
     "Save" : "Guardar",
     "Delete" : "Desaniciar",
+    "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
+    "Authentication" : "Autenticación",
     "Images" : "Imáxenes",
     "Question" : "Entruga"
 },

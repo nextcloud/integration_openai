@@ -1,5 +1,4 @@
 { "translations": {
-    "Default" : "Por defeutu",
     "Image generation" : "Xeneración d'imáxenes",
     "Audio transcription" : "Trescripción del audiu",
     "Unknown" : "Desconocí­u",
@@ -10,14 +9,13 @@
     "Memories" : "Recuerdos",
     "Voice" : "Voz",
     "Language" : "Llingua",
+    "Default" : "Por defeutu",
     "Minimal" : "Mínimu",
     "Size" : "Tamañu",
-    "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
-    "Authentication" : "Autenticación",
-    "API key" : "Clave de l'API",
     "Start date" : "Data de comienzu",
     "OpenAI options saved" : "Guardáronse les opciones d'OpenAI",
     "Default language" : "Llingua predeterminada",
+    "API key" : "Clave de l'API",
     "Days" : "Díes",
     "Months" : "Meses",
     "Who?" : "¿Quién?",
@@ -26,6 +24,8 @@
     "Category" : "Categoría",
     "Save" : "Guardar",
     "Delete" : "Desaniciar",
+    "Request timeout (seconds)" : "Tiempu d'espera de les solicitúes (segundos)",
+    "Authentication" : "Autenticación",
     "Images" : "Imáxenes",
     "Question" : "Entruga"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
