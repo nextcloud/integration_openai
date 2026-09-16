@@ -54,12 +54,18 @@ trait ProviderIdentity {
 	}
 
 	/**
-	 * The task type ID as it appears in a provider ID: the `core:` prefix of
-	 * the task types the server ships is dropped, because every provider ID
-	 * already says which app it belongs to. The prefix of a task type defined
-	 * by another app is kept, so that two of them cannot collide.
+	 * Formats the task type ID for inclusion in a provider ID.
+	 * The `core:` prefix (for server-shipped task types) and this app's prefix are removed,
+	 * since the provider ID already includes the app context. Prefixes from other apps are retained
+	 * to avoid ID collisions in case of similarly named task types across apps.
 	 */
 	public static function slugifyTaskType(string $taskTypeId): string {
-		return str_starts_with($taskTypeId, 'core:') ? substr($taskTypeId, 5) : $taskTypeId;
+		if (str_starts_with($taskTypeId, Application::APP_ID . ':')) {
+			return substr($taskTypeId, strlen(Application::APP_ID . ':'));
+		}
+		if (str_starts_with($taskTypeId, 'core:')) {
+			return substr($taskTypeId, 5);
+		}
+		return $taskTypeId;
 	}
 }
