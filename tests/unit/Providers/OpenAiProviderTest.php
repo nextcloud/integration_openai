@@ -548,6 +548,7 @@ class OpenAiProviderTest extends TestCase {
 
 		$prompt = 'This is a test prompt';
 		$n = 1;
+		$this->openAiSettingsService->setSummarySystemPrompt('This is a custom summary system prompt');
 
 		$response = '{
             "id": "chatcmpl-123",
@@ -575,8 +576,7 @@ class OpenAiProviderTest extends TestCase {
 		$url = self::OPENAI_API_BASE . 'chat/completions';
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
-		$systemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
-			. 'You should only return the summary without any additional information. ';
+		$systemPrompt = 'This is a custom summary system prompt ';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
