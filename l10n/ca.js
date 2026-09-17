@@ -13,13 +13,15 @@ OC.L10N.register(
     "Speed" : "Velocitat",
     "Language" : "Llengua",
     "Default" : "Per defecte",
+    "Size" : "Tamany",
+    "Prompt" : "Indicador",
     "Minimal" : "Mínim",
     "Format" : "Format",
     "Auto" : "Automàtic",
     "Medium" : "Mig",
-    "Size" : "Tamany",
     "Cannot generate less than 1 image" : "No es pot generar menys d'una imatge",
     "Start date" : "Data d'inici",
+    "Service" : "Servei",
     "Default language" : "Llengua per defecte",
     "API key" : "Clau de l'API",
     "Days" : "Dies",
@@ -41,7 +43,6 @@ OC.L10N.register(
     "Write a text that you want the assistant to rewrite in another tone." : "Escriu un text que vols que l'assistent torni a escriure en un altre to.",
     "Desired tone" : "To desitjat",
     "In which tone should your text be rewritten?" : "En quin to s'ha de reescriure el teu text?",
-    "The rewritten text in the desired tone, written by the assistant:" : "El text reescrit en el to desitjat, escrit per l'assistent:",
-    "Prompt" : "Indicador"
+    "The rewritten text in the desired tone, written by the assistant:" : "El text reescrit en el to desitjat, escrit per l'assistent:"
 },
 "nplurals=2; plural=(n != 1);");

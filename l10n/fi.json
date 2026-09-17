@@ -10,6 +10,7 @@
     "Speed" : "Nopeus",
     "Language" : "Kieli",
     "Default" : "Oletus",
+    "Prompt" : "Kehote",
     "Minimal" : "Minimaalinen",
     "Format" : "Muoto",
     "Auto" : "Automaattinen",
@@ -33,7 +34,6 @@
     "Images" : "Kuvat",
     "Question" : "Kysymys",
     "Generated response" : "Luotu vastaus",
-    "The answer to the question" : "Vastaus kysymykseen",
-    "Prompt" : "Kehote"
+    "The answer to the question" : "Vastaus kysymykseen"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

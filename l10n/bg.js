@@ -12,6 +12,7 @@ OC.L10N.register(
     "Speed" : "Скорост",
     "Language" : "Език",
     "Default" : "По подразбиране",
+    "Prompt" : "Подкана",
     "Minimal" : "Минимална",
     "Auto" : "Автоматично",
     "Simple" : "Обикновен",
@@ -19,6 +20,7 @@ OC.L10N.register(
     "OpenAI admin options saved" : "Опциите за администратор на OpenAI са записани",
     "Failed to save OpenAI admin options" : "Неуспешно записване на опциите за администратор на OpenAI",
     "Start date" : "Начална дата",
+    "Service" : "Услуга",
     "OpenAI options saved" : "Опциите на OpenAI са записани",
     "Failed to save OpenAI options" : "Неуспешно записване на опциите на OpenAI",
     "Default language" : "Стандартен език",
@@ -35,7 +37,6 @@ OC.L10N.register(
     "Authentication method" : "Метод за удостоверяване",
     "Images" : "Изображения",
     "Question" : "Въпрос",
-    "Prompt" : "Подкана",
     "Default completion model to use" : "Модел на изпълнение по подразбиране, който да използвате",
     "More information about OpenAI models" : "Повече информация за моделите на OpenAI",
     "Leave the API key empty to use the one defined by administrators" : "Оставяне на празен API ключ, за да се използва този, определен от администраторите"
