@@ -8,9 +8,10 @@ OC.L10N.register(
     "Name" : "Nomi",
     "Language" : "Language",
     "Default" : "Standart",
+    "Size" : "Size",
+    "Prompt" : "Tezkor",
     "Format" : "Formatlash",
     "Medium" : "O'rta",
-    "Size" : "Size",
     "Service" : "Xizmat",
     "API key" : "API kaliti",
     "Days" : "Kunlar",
@@ -23,7 +24,6 @@ OC.L10N.register(
     "Authentication" : "Autentifikatsiya",
     "Images" : "Tasvirlar",
     "Generated response" : "Yaratilgan javob",
-    "Ask a question about your data." : "Ma'lumotlaringiz haqida savol bering.",
-    "Prompt" : "Tezkor"
+    "Ask a question about your data." : "Ma'lumotlaringiz haqida savol bering."
 },
 "nplurals=1; plural=0;");

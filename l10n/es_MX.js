@@ -9,9 +9,10 @@ OC.L10N.register(
     "Memories" : "Recuerdos",
     "Language" : "Idioma",
     "Default" : "Por omisión",
+    "Size" : "Tamaño",
+    "Prompt" : "Prompt",
     "Auto" : "Auto",
     "Medium" : "Medio",
-    "Size" : "Tamaño",
     "Start date" : "Fecha de inicio",
     "Default language" : "Idioma predeterminado",
     "API key" : "Llave de API",
@@ -26,7 +27,6 @@ OC.L10N.register(
     "Authentication" : "Autenticación",
     "Authentication method" : "Método de autenticación",
     "Images" : "Imágenes",
-    "Input text" : "Ingresar texto",
-    "Prompt" : "Prompt"
+    "Input text" : "Ingresar texto"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

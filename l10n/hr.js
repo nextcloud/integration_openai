@@ -10,6 +10,7 @@ OC.L10N.register(
     "Speed" : "Brzina",
     "Language" : "Jezik",
     "Default" : "Zadani",
+    "Prompt" : "Upit",
     "Format" : "Format",
     "Auto" : "Auto",
     "Medium" : "Srednji",
@@ -44,7 +45,6 @@ OC.L10N.register(
     "The rewritten text in the desired tone, written by the assistant:" : "Preoblikovani tekst u željenom tonu, koji je napisao asistent:",
     "Generate speech" : "Generiraj govor",
     "Generate speech from a transcript" : "Generiraj govor iz transkripta",
-    "Prompt" : "Upit",
     "Write transcript that you want the assistant to generate speech from" : "Napišite transkript iz kojeg želite da asistent generira govor",
     "Output speech" : "Izlazni govor",
     "The generated speech" : "Generirani govor"

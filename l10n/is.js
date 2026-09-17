@@ -11,10 +11,11 @@ OC.L10N.register(
     "Speed" : "Hraði",
     "Language" : "Tungumál",
     "Default" : "Sjálfgefið",
+    "Size" : "Stærð",
+    "Prompt" : "Kvaðning",
     "Format" : "Snið",
     "Auto" : "Sjálfvirkt",
     "Medium" : "miðlungs",
-    "Size" : "Stærð",
     "Cannot generate less than 1 image" : "Get ekki útbúið minna en 1 mynd",
     "Start date" : "Upphafsdagur",
     "End date" : "Lokadagsetning",
@@ -35,7 +36,6 @@ OC.L10N.register(
     "Images" : "Myndir",
     "Question" : "Spurning",
     "Generated response" : "Framkallað svar",
-    "Input text" : "Inntakstexti",
-    "Prompt" : "Kvaðning"
+    "Input text" : "Inntakstexti"
 },
 "nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);");

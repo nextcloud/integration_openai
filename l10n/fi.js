@@ -12,6 +12,7 @@ OC.L10N.register(
     "Speed" : "Nopeus",
     "Language" : "Kieli",
     "Default" : "Oletus",
+    "Prompt" : "Kehote",
     "Minimal" : "Minimaalinen",
     "Format" : "Muoto",
     "Auto" : "Automaattinen",
@@ -35,7 +36,6 @@ OC.L10N.register(
     "Images" : "Kuvat",
     "Question" : "Kysymys",
     "Generated response" : "Luotu vastaus",
-    "The answer to the question" : "Vastaus kysymykseen",
-    "Prompt" : "Kehote"
+    "The answer to the question" : "Vastaus kysymykseen"
 },
 "nplurals=2; plural=(n != 1);");
