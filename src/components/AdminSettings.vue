@@ -58,6 +58,19 @@
 				</NcButton>
 			</div>
 
+			<h3>{{ t('integration_openai', 'Text generation') }}</h3>
+			<div class="line line--full">
+				<NcTextArea
+					id="summary-system-prompt"
+					v-model="state.summary_system_prompt"
+					class="input input--full"
+					:label="t('integration_openai', 'Summary system prompt')"
+					:helper-text="t('integration_openai', 'System prompt used when generating text summaries. Leave empty to use the default prompt.')"
+					:rows="5"
+					resize="vertical"
+					@update:model-value="onInput()" />
+			</div>
+
 			<h3>{{ t('integration_openai', 'Usage limits') }}</h3>
 			<div class="line">
 				<QuotaPeriodPicker
@@ -115,6 +128,7 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 
 import axios from '@nextcloud/axios'
 import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
@@ -141,6 +155,7 @@ export default {
 		NcLoadingIcon,
 		NcNoteCard,
 		NcSelect,
+		NcTextArea,
 	},
 
 	data() {
@@ -415,6 +430,7 @@ export default {
 			await this.saveAdminConfig({
 				quota_period: this.state.quota_period,
 				usage_storage_time: parseInt(this.state.usage_storage_time) || 1,
+				summary_system_prompt: this.state.summary_system_prompt,
 			})
 		}, 2000),
 		async saveAdminConfig(values) {
@@ -473,6 +489,14 @@ export default {
 
 	.line .input {
 		width: 300px;
+	}
+
+	.line--full {
+		width: 100%;
+	}
+
+	.line .input--full {
+		width: 100%;
 	}
 
 	.services {
