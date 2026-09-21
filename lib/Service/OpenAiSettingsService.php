@@ -27,6 +27,7 @@ class OpenAiSettingsService {
 	private const ADMIN_CONFIG_TYPES = [
 		'quota_period' => 'array',
 		'usage_storage_time' => 'integer',
+		'summary_system_prompt' => 'string',
 	];
 
 	private const USER_CONFIG_TYPES = [
@@ -136,6 +137,19 @@ class OpenAiSettingsService {
 	}
 
 	/**
+	 * System prompt for the summary provider. Empty falls back to the default unless $raw is true.
+	 */
+	public function getSummarySystemPrompt(bool $raw = false): string {
+		$default = $raw ? '' : Application::DEFAULT_SUMMARY_SYSTEM_PROMPT;
+		return $this->appConfig->getValueString(
+			Application::APP_ID,
+			'summary_system_prompt',
+			$default,
+			lazy: true
+		) ?: $default;
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @return string
 	 */
@@ -146,12 +160,13 @@ class OpenAiSettingsService {
 	/**
 	 * Get the instance-wide admin config for the settings page
 	 *
-	 * @return array{quota_period: array, usage_storage_time: int}
+	 * @return array{quota_period: array, usage_storage_time: int, summary_system_prompt: string}
 	 */
 	public function getAdminConfig(): array {
 		return [
 			'quota_period' => $this->getQuotaPeriod(),
 			'usage_storage_time' => $this->getUsageStorageTime(),
+			'summary_system_prompt' => $this->getSummarySystemPrompt(true),
 		];
 	}
 
@@ -218,6 +233,15 @@ class OpenAiSettingsService {
 		$this->appConfig->setValueInt(Application::APP_ID, 'usage_storage_time', $usageStorageTime, lazy: true);
 	}
 
+	public function setSummarySystemPrompt(string $summarySystemPrompt): void {
+		$this->appConfig->setValueString(
+			Application::APP_ID,
+			'summary_system_prompt',
+			$summarySystemPrompt,
+			lazy: true
+		);
+	}
+
 	/**
 	 * @param string $userId
 	 * @param string $language
@@ -249,6 +273,9 @@ class OpenAiSettingsService {
 		}
 		if (isset($adminConfig['usage_storage_time'])) {
 			$this->setUsageStorageTime($adminConfig['usage_storage_time']);
+		}
+		if (isset($adminConfig['summary_system_prompt'])) {
+			$this->setSummarySystemPrompt($adminConfig['summary_system_prompt']);
 		}
 	}
 

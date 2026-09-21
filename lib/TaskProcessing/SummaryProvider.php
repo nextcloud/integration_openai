@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
+use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -28,6 +29,7 @@ class SummaryProvider implements ISynchronousProvider {
 		private OpenAiAPIService $openAiAPIService,
 		private IL10N $l,
 		private ChunkService $chunkService,
+		private OpenAiSettingsService $openAiSettingsService,
 		private ServiceConfig $service,
 		private string $model,
 	) {
@@ -142,8 +144,7 @@ class SummaryProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
-				$summarySystemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
-					. 'You should only return the summary without any additional information. ';
+				$summarySystemPrompt = $this->openAiSettingsService->getSummarySystemPrompt() . ' ';
 				if (isset($input['format'])) {
 					if ($input['format'] === 'paragraph') {
 						$summarySystemPrompt .= 'Return the summary as a paragraph. ';
