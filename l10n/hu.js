@@ -20,6 +20,7 @@ OC.L10N.register(
     "Size" : "?éret",
     "Prompt" : "Prompt",
     "Minimal" : "Minimális",
+    "Format" : "Formátum",
     "Auto" : "Automatikus",
     "Medium" : "Közepes",
     "Cannot generate less than 1 image" : "Nem lehet 1-nél kevesebb képet előállítani",
