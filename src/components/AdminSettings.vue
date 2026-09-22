@@ -370,6 +370,7 @@ export default {
 					llm_extra_params: service.llm_extra_params,
 					max_tokens: parseInt(service.max_tokens) || 1,
 					chunk_size: parseInt(service.chunk_size) || 0,
+					system_prompt_summary: service.system_prompt_summary,
 					multimodal_image_enabled: service.multimodal_image_enabled,
 					multimodal_audio_enabled: service.multimodal_audio_enabled,
 					multimodal_video_enabled: service.multimodal_video_enabled,
