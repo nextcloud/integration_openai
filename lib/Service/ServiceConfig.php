@@ -38,6 +38,7 @@ class ServiceConfig implements JsonSerializable {
 		'llm_extra_params' => 'string',
 		'max_tokens' => 'integer',
 		'chunk_size' => 'integer',
+		'system_prompt_summary' => 'string',
 		'multimodal_image_enabled' => 'boolean',
 		'multimodal_audio_enabled' => 'boolean',
 		'multimodal_video_enabled' => 'boolean',
@@ -83,6 +84,7 @@ class ServiceConfig implements JsonSerializable {
 		private string $llmExtraParams = '',
 		private int $maxTokens = Application::DEFAULT_MAX_NUM_OF_TOKENS,
 		private int $chunkSize = Application::DEFAULT_CHUNK_SIZE,
+		private string $systemPromptSummary = '',
 		// these mirror the defaults of the single-service configuration, so
 		// that a migrated service and a newly connected one accept the same
 		// kinds of attachment
@@ -149,6 +151,8 @@ class ServiceConfig implements JsonSerializable {
 				case 'max_tokens': $new->maxTokens = max(1, (int)$value);
 					break;
 				case 'chunk_size': $new->chunkSize = (int)$value === 0 ? 0 : max(Application::MIN_CHUNK_SIZE, (int)$value);
+					break;
+				case 'system_prompt_summary': $new->systemPromptSummary = (string)$value;
 					break;
 				case 'multimodal_image_enabled': $new->multimodalImageEnabled = (bool)$value;
 					break;
@@ -349,6 +353,14 @@ class ServiceConfig implements JsonSerializable {
 		return $this->chunkSize;
 	}
 
+	/**
+	 * The admin-configured fallback system prompt for the summary task type.
+	 * An empty string means the built-in default prompt is used.
+	 */
+	public function getSystemPromptSummary(): string {
+		return $this->systemPromptSummary;
+	}
+
 	public function getMultimodalImageEnabled(): bool {
 		return $this->multimodalImageEnabled;
 	}
@@ -466,6 +478,7 @@ class ServiceConfig implements JsonSerializable {
 			'llm_extra_params' => $this->llmExtraParams,
 			'max_tokens' => $this->maxTokens,
 			'chunk_size' => $this->chunkSize,
+			'system_prompt_summary' => $this->systemPromptSummary,
 			'multimodal_image_enabled' => $this->multimodalImageEnabled,
 			'multimodal_audio_enabled' => $this->multimodalAudioEnabled,
 			'multimodal_video_enabled' => $this->multimodalVideoEnabled,
