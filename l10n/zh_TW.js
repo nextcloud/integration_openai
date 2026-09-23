@@ -149,6 +149,8 @@ OC.L10N.register(
     "No service connected yet" : "尚未連結服務",
     "Connect a service to expose its models as providers." : "連結服務以將其模型作為提供者公開。",
     "Connect a service" : "連結服務",
+    "Summary system prompt" : "摘要系統提示詞",
+    "System prompt used when generating text summaries. Leave empty to use the default prompt." : "產生文字摘要時使用的系統提示。若留空，則使用預設提示。",
     "Usage limits" : "使用量限制",
     "The quota amounts themselves are configured per service. Quota rules override them for the service they apply to." : "配額數值本身是針對每項服務進行設定的。配額規則會對其適用的服務覆寫這些數值。",
     "Time period (days) for usage storage" : "使用量儲存期限（天）",
