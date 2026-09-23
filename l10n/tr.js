@@ -149,6 +149,8 @@ OC.L10N.register(
     "No service connected yet" : "Henüz bir hizmet bağlanmamış",
     "Connect a service to expose its models as providers." : "Modellerinin hizmet sağlayıcısı olarak sunulacağı hizmeti bağlayın.",
     "Connect a service" : "Bir hizmet bağlayın",
+    "Summary system prompt" : "Özet sistem istemi",
+    "System prompt used when generating text summaries. Leave empty to use the default prompt." : "Yazı özetlerini oluştururken kullanılacak sistem istemi. Varsayılan istemin kullanılması için boş bırakın.",
     "Usage limits" : "Kullanım sınırları",
     "The quota amounts themselves are configured per service. Quota rules override them for the service they apply to." : "Kota miktarları hizmet başına yapılandırılır. Kota kuralları, başvurdukları hizmet için bunları değiştirir.",
     "Time period (days) for usage storage" : "Kullanım kotası için zaman aralığı (gün)",
