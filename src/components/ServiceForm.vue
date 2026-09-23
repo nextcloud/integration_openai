@@ -285,6 +285,21 @@
 								</template>
 							</NcButton>
 						</div>
+						<div class="line">
+							<NcTextArea
+								:id="'openai-translate-system-prompt-' + service.id"
+								:model-value="service.system_prompt_translate"
+								class="input"
+								:label="t('integration_openai', 'Translation system prompt')"
+								:placeholder="t('integration_openai', 'Leave empty to use the default translation prompt')"
+								@update:model-value="onInput({ system_prompt_translate: $event })" />
+							<NcButton variant="tertiary"
+								:title="t('integration_openai', 'Additional instructions for translations.')">
+								<template #icon>
+									<HelpCircleOutlineIcon />
+								</template>
+							</NcButton>
+						</div>
 						<h5>{{ t('integration_openai', 'Multimodal LLM Support') }}</h5>
 						<NcNoteCard type="info">
 							{{ t('integration_openai', 'Which kinds of attachments the models of this service accept.') }}
