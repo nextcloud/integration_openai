@@ -85,6 +85,12 @@ class TranslateService {
 			$promptStart = 'Translate the following text to ' . $toLanguage . ': ';
 		}
 
+		$systemPrompt = self::SYSTEM_PROMPT;
+		$adminSystemPrompt = $service->getSystemPromptTranslate();
+		if ($adminSystemPrompt !== '') {
+			$systemPrompt .= PHP_EOL . $adminSystemPrompt;
+		}
+
 		$cache = $this->cacheFactory->createDistributed('integration_openai');
 		foreach ($chunks as $chunk) {
 			$progress += $increase;
@@ -105,12 +111,12 @@ class TranslateService {
 
 			if ($service->isUsingOpenAi() || $service->getChatEndpointEnabled()) {
 				$completionsObj = $this->openAiAPIService->createChatCompletion(
-					$userId, $service, $model, $prompt, TranslateService::SYSTEM_PROMPT, null, 1, $maxTokens, TranslateService::JSON_RESPONSE_FORMAT
+					$userId, $service, $model, $prompt, $systemPrompt, null, 1, $maxTokens, TranslateService::JSON_RESPONSE_FORMAT
 				);
 				$completions = $completionsObj['messages'];
 			} else {
 				$completions = $this->openAiAPIService->createCompletion(
-					$userId, $service, $prompt . PHP_EOL . TranslateService::SYSTEM_PROMPT . PHP_EOL . PHP_EOL, 1, $model, $maxTokens
+					$userId, $service, $prompt . PHP_EOL . $systemPrompt . PHP_EOL . PHP_EOL, 1, $model, $maxTokens
 				);
 			}
 
