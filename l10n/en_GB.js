@@ -149,6 +149,8 @@ OC.L10N.register(
     "No service connected yet" : "No service connected yet",
     "Connect a service to expose its models as providers." : "Connect a service to expose its models as providers.",
     "Connect a service" : "Connect a service",
+    "Summary system prompt" : "Summary system prompt",
+    "System prompt used when generating text summaries. Leave empty to use the default prompt." : "System prompt used when generating text summaries. Leave empty to use the default prompt.",
     "Usage limits" : "Usage limits",
     "The quota amounts themselves are configured per service. Quota rules override them for the service they apply to." : "The quota amounts themselves are configured per service. Quota rules override them for the service they apply to.",
     "Time period (days) for usage storage" : "Time period (days) for usage storage",
