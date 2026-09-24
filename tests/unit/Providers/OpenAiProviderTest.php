@@ -576,12 +576,10 @@ class OpenAiProviderTest extends TestCase {
 		$url = self::OPENAI_API_BASE . 'chat/completions';
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
-		$systemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
-			. 'You should only return the summary without any additional information. ';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
-				['role' => 'system', 'content' => $systemPrompt],
+				['role' => 'system', 'content' => SummaryProvider::DEFAULT_SYSTEM_PROMPT],
 				['role' => 'user', 'content' => $prompt],
 			],
 			'n' => $n,
@@ -598,6 +596,158 @@ class OpenAiProviderTest extends TestCase {
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
 		$result = $summaryProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => true);
+		$this->assertEquals('This is a test response.', $result['output']);
+
+		// Check that token usage is logged properly
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testSummaryProviderWithAdminSystemPrompt(): void {
+		$adminSystemPrompt = 'You are a helpful assistant that summarizes text in Polish.';
+		$service = $this->service->with(['system_prompt_summary' => $adminSystemPrompt]);
+
+		$summaryProvider = new SummaryProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->chunkService,
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		$prompt = 'This is a test prompt';
+		$n = 1;
+
+		$response = '{
+            "id": "chatcmpl-123",
+            "object": "chat.completion",
+            "created": 1677652288,
+            "model": "gpt-3.5-turbo-0613",
+            "system_fingerprint": "fp_44709d6fcb",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "This is a test response."
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 9,
+              "completion_tokens": 12,
+              "total_tokens": 21
+            }
+        }';
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				['role' => 'system', 'content' => $adminSystemPrompt . ' '],
+				['role' => 'user', 'content' => $prompt],
+			],
+			'n' => $n,
+			'stream' => false,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $summaryProvider->process(self::TEST_USER1, ['input' => $prompt], fn () => true);
+		$this->assertEquals('This is a test response.', $result['output']);
+
+		// Check that token usage is logged properly
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	public function testSummaryProviderWithUserSystemPrompt(): void {
+		// Define admin system prompt to ensure it is overwritten by user system prompt
+		$adminSystemPrompt = 'This is an admin system prompt for summarization.';
+		$service = $this->service->with(['system_prompt_summary' => $adminSystemPrompt]);
+
+		$summaryProvider = new SummaryProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->chunkService,
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		// Ensure that complexity and format are ignored when user system prompt is set
+		$userSystemPrompt = 'This is a user system prompt for summarization.';
+		$complexity = 'complex';
+		$format = 'bullet_points';
+		$prompt = 'This is a test prompt';
+		$input = [
+			'input' => $prompt,
+			'system_prompt_summary' => $userSystemPrompt,
+			'format' => $format,
+			'complexity' => $complexity,
+		];
+
+		$n = 1;
+
+		$response = '{
+            "id": "chatcmpl-123",
+            "object": "chat.completion",
+            "created": 1677652288,
+            "model": "gpt-3.5-turbo-0613",
+            "system_fingerprint": "fp_44709d6fcb",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "This is a test response."
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 9,
+              "completion_tokens": 12,
+              "total_tokens": 21
+            }
+        }';
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				['role' => 'system', 'content' => $userSystemPrompt . ' '],
+				['role' => 'user', 'content' => $prompt],
+			],
+			'n' => $n,
+			'stream' => false,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $summaryProvider->process(self::TEST_USER1, $input, fn () => true);
 		$this->assertEquals('This is a test response.', $result['output']);
 
 		// Check that token usage is logged properly

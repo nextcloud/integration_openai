@@ -24,7 +24,7 @@ use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
 class SummaryProvider implements ISynchronousProvider {
 	use ProviderIdentity;
 
-	private const DEFAULT_SUMMARY_SYSTEM_PROMPT = 'You are a helpful assistant that summarizes text in the same language as the text. '
+	public const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant that summarizes text in the same language as the text. '
 		. 'You should only return the summary without any additional information. ';
 
 	public function __construct(
@@ -161,7 +161,7 @@ class SummaryProvider implements ISynchronousProvider {
 					// Fallback to the admin-configured prompt, then to default. Format and complexity appended
 					$summarySystemPrompt = $this->service->getSystemPromptSummary();
 					if ($summarySystemPrompt === '') {
-						$summarySystemPrompt = self::DEFAULT_SUMMARY_SYSTEM_PROMPT;
+						$summarySystemPrompt = self::DEFAULT_SYSTEM_PROMPT;
 					} else {
 						$summarySystemPrompt .= ' ';
 					}
