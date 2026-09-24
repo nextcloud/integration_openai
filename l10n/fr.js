@@ -39,6 +39,7 @@ OC.L10N.register(
     "Image attachments are unsupported." : "Les images en pièces jointes ne sont pas prises en charge.",
     "Invalid input file type \"%1$s\"." : "Le type de fichier fourni « %1$s » n’est pas valide.",
     "Audio attachments are unsupported." : "Les fichiers audio en pièces jointes ne sont pas pris en charge.",
+    "Failed to transcribe audio." : "Échec de la transcription audio.",
     "Video attachments are unsupported." : "Les vidéos en pièces jointes ne sont pas prises en charge.",
     "Invalid input file type: \"%1$s\"." : "Type de fichier fourni non valide : « %1$s ».",
     "Name" : "Nom",
