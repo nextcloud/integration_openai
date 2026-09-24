@@ -39,6 +39,7 @@ OC.L10N.register(
     "Image attachments are unsupported." : "Görsel ek dosyaları desteklenmiyor.",
     "Invalid input file type \"%1$s\"." : "\"%1$s\" giriş dosyası türü geçersiz.",
     "Audio attachments are unsupported." : "Ses ek dosyaları desteklenmiyor.",
+    "Failed to transcribe audio." : "Ses yazıya dönüştürülemedi",
     "Video attachments are unsupported." : "Görüntü ek dosyaları desteklenmiyor.",
     "Invalid input file type: \"%1$s\"." : "Giriş dosyası türü geçersiz: \"%1$s\".",
     "Name" : "Ad",

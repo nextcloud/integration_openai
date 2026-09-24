@@ -39,6 +39,7 @@ OC.L10N.register(
     "Image attachments are unsupported." : "Prílohy s obrázkami nie sú podporované.",
     "Invalid input file type \"%1$s\"." : "Neplatný typ vstupného súboru „%1$s“.",
     "Audio attachments are unsupported." : "Prílohy so zvukom nie sú podporované.",
+    "Failed to transcribe audio." : "Nepodarilo sa prepísať zvuk.",
     "Video attachments are unsupported." : "Prílohy s videom nie sú podporované.",
     "Invalid input file type: \"%1$s\"." : "Neplatný typ vstupného súboru: „%1$s“.",
     "Name" : "Názov",
