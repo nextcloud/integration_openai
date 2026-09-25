@@ -539,12 +539,10 @@ class OpenAiProviderTest extends TestCase {
 	}
 
 	public function testSummaryProvider(): void {
-		$this->openAiSettingsService->setSummarySystemPrompt('This is a custom summary system prompt');
 		$summaryProvider = new SummaryProvider(
 			$this->openAiApiService,
 			$this->createMock(\OCP\IL10N::class),
 			$this->chunkService,
-			$this->openAiSettingsService,
 			$this->service,
 			self::TEXT_MODEL,
 		);
@@ -578,7 +576,8 @@ class OpenAiProviderTest extends TestCase {
 		$url = self::OPENAI_API_BASE . 'chat/completions';
 
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
-		$systemPrompt = 'This is a custom summary system prompt ';
+		$systemPrompt = 'You are a helpful assistant that summarizes text in the same language as the text. '
+			. 'You should only return the summary without any additional information. ';
 		$options['body'] = json_encode([
 			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
 			'messages' => [
