@@ -11,7 +11,6 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -25,11 +24,13 @@ use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
 class SummaryProvider implements ISynchronousProvider {
 	use ProviderIdentity;
 
+	public const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant that summarizes text in the same language as the text. '
+		. 'You should only return the summary without any additional information. ';
+
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IL10N $l,
 		private ChunkService $chunkService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private ServiceConfig $service,
 		private string $model,
 	) {
@@ -76,6 +77,11 @@ class SummaryProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'system_prompt_summary' => new ShapeDescriptor(
+				$this->l->t('Summary system prompt'),
+				$this->l->t('Summary system prompt. When set, it overrides the default prompt and the Format and Complexity options are ignored.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -100,6 +106,7 @@ class SummaryProvider implements ISynchronousProvider {
 			'max_tokens' => $this->service->getMaxTokens(),
 			'format' => 'auto',
 			'complexity' => 'medium',
+			'system_prompt_summary' => '',
 		];
 	}
 
@@ -144,21 +151,36 @@ class SummaryProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
-				$summarySystemPrompt = $this->openAiSettingsService->getSummarySystemPrompt() . ' ';
-				if (isset($input['format'])) {
-					if ($input['format'] === 'paragraph') {
-						$summarySystemPrompt .= 'Return the summary as a paragraph. ';
-					} elseif ($input['format'] === 'bullet_points') {
-						$summarySystemPrompt .= 'Return the summary as a list of bullet points. ';
-					} elseif ($input['format'] === 'sentence') {
-						$summarySystemPrompt .= 'Return the summary as a single sentence. Do not include more than one sentence. ';
+				$customSystemPrompt = isset($input['system_prompt_summary']) && is_string($input['system_prompt_summary'])
+					? trim($input['system_prompt_summary'])
+					: '';
+				if ($customSystemPrompt !== '') {
+					// A user provided prompt overrides the others; format and complexity are ignored
+					$summarySystemPrompt = $customSystemPrompt . ' ';
+				} else {
+					// Fallback to the admin-configured prompt, then to default. Format and complexity appended
+					$summarySystemPrompt = $this->service->getSystemPromptSummary();
+					if ($summarySystemPrompt === '') {
+						$summarySystemPrompt = self::DEFAULT_SYSTEM_PROMPT;
+					} else {
+						$summarySystemPrompt .= ' ';
 					}
-				}
-				if (isset($input['complexity'])) {
-					if ($input['complexity'] === 'complex') {
-						$summarySystemPrompt .= 'Use complex language and vocabulary appropriate for an expert in the subject. ';
-					} elseif ($input['complexity'] === 'simple') {
-						$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
+
+					if (isset($input['format'])) {
+						if ($input['format'] === 'paragraph') {
+							$summarySystemPrompt .= 'Return the summary as a paragraph. ';
+						} elseif ($input['format'] === 'bullet_points') {
+							$summarySystemPrompt .= 'Return the summary as a list of bullet points. ';
+						} elseif ($input['format'] === 'sentence') {
+							$summarySystemPrompt .= 'Return the summary as a single sentence. Do not include more than one sentence. ';
+						}
+					}
+					if (isset($input['complexity'])) {
+						if ($input['complexity'] === 'complex') {
+							$summarySystemPrompt .= 'Use complex language and vocabulary appropriate for an expert in the subject. ';
+						} elseif ($input['complexity'] === 'simple') {
+							$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
+						}
 					}
 				}
 				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {

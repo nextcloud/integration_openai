@@ -269,6 +269,37 @@
 							@update:model-value="onInput({ translation_enabled: $event })">
 							{{ t('integration_openai', 'Offer translation') }}
 						</NcCheckboxRadioSwitch>
+						<h5>{{ t('integration_openai', 'System prompts') }}</h5>
+						<div class="line">
+							<NcTextArea
+								:id="'openai-summary-system-prompt-' + service.id"
+								:model-value="service.system_prompt_summary"
+								class="input"
+								:label="t('integration_openai', 'Summary system prompt')"
+								:placeholder="t('integration_openai', 'Leave empty to use the default summary prompt')"
+								@update:model-value="onInput({ system_prompt_summary: $event })" />
+							<NcButton variant="tertiary"
+								:title="t('integration_openai', 'Used when a user does not provide their own summary prompt. The Format and Complexity options are still appended to it.')">
+								<template #icon>
+									<HelpCircleOutlineIcon />
+								</template>
+							</NcButton>
+						</div>
+						<div class="line">
+							<NcTextArea
+								:id="'openai-translate-system-prompt-' + service.id"
+								:model-value="service.system_prompt_translate"
+								class="input"
+								:label="t('integration_openai', 'Translation system prompt')"
+								:placeholder="t('integration_openai', 'Leave empty to use the default translation prompt')"
+								@update:model-value="onInput({ system_prompt_translate: $event })" />
+							<NcButton variant="tertiary"
+								:title="t('integration_openai', 'Additional instructions for translations.')">
+								<template #icon>
+									<HelpCircleOutlineIcon />
+								</template>
+							</NcButton>
+						</div>
 						<h5>{{ t('integration_openai', 'Multimodal LLM Support') }}</h5>
 						<NcNoteCard type="info">
 							{{ t('integration_openai', 'Which kinds of attachments the models of this service accept.') }}
@@ -412,6 +443,7 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 
 import axios from '@nextcloud/axios'
@@ -439,6 +471,7 @@ export default {
 		NcLoadingIcon,
 		NcNoteCard,
 		NcSelect,
+		NcTextArea,
 		NcTextField,
 	},
 
