@@ -39,6 +39,7 @@ OC.L10N.register(
     "Image attachments are unsupported." : "Image attachments are unsupported.",
     "Invalid input file type \"%1$s\"." : "Invalid input file type \"%1$s\".",
     "Audio attachments are unsupported." : "Audio attachments are unsupported.",
+    "Failed to transcribe audio." : "Failed to transcribe audio.",
     "Video attachments are unsupported." : "Video attachments are unsupported.",
     "Invalid input file type: \"%1$s\"." : "Invalid input file type: \"%1$s\".",
     "Name" : "Surname",
