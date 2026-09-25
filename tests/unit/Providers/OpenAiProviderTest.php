@@ -905,6 +905,89 @@ class OpenAiProviderTest extends TestCase {
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
+	public function testTranslationProviderWithAdminSystemPrompt(): void {
+		$adminSystemPrompt = 'This is an admin system prompt for translation.';
+		$service = $this->service->with(['system_prompt_translate' => $adminSystemPrompt]);
+
+		$translationProvider = new TranslateProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->translateService,
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		$inputText = 'This is a test prompt';
+		$n = 1;
+		$fromLang = 'English';
+		$toLang = 'Polish';
+		$aiContent = ['translation' => 'This is a test response.'];
+
+		$response = '{
+			"id": "chatcmpl-123",
+			"object": "chat.completion",
+			"created": 1677652288,
+			"model": "gpt-4.1-mini",
+			"system_fingerprint": "fp_44709d6fcb",
+			"choices": [
+				{
+					"index": 0,
+					"message": {
+						"role": "assistant",
+						"content": ' . json_encode(json_encode($aiContent)) . '
+					},
+					"finish_reason": "stop"
+				}
+			],
+			"usage": {
+				"prompt_tokens": 9,
+				"completion_tokens": 12,
+				"total_tokens": 21
+			}
+		}';
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$prompt = 'Translate the following text from ' . $fromLang . ' to ' . $toLang . ': ' . PHP_EOL . PHP_EOL . $inputText;
+
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				['role' => 'system', 'content' => TranslateService::SYSTEM_PROMPT . PHP_EOL . $adminSystemPrompt],
+				['role' => 'user', 'content' => $prompt],
+			],
+			'n' => $n,
+			'stream' => false,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+			...TranslateService::JSON_RESPONSE_FORMAT,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$this->iClient->expects($this->once())->method('post')->with(
+			$this->equalTo($url),
+			$this->callback(function ($revdOptions) use ($options) {
+				$body = json_decode($revdOptions['body'], true);
+				$expectedBody = json_decode($options['body'], true);
+				$this->assertEquals($expectedBody, $body);
+				return true;
+			}),
+		)->willReturn($iResponse);
+
+		$result = $translationProvider->process(self::TEST_USER1, ['input' => $inputText, 'origin_language' => $fromLang, 'target_language' => $toLang], fn () => true, new SynchronousProviderOptions(preferStreaming: false));
+		$this->assertEquals(['output' => $aiContent['translation']], $result);
+
+		// Check that token usage is logged properly
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		// Clear quota usage
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
 	public function testAudioToAudioTranslateProvider(): void {
 		$l10n = $this->createMock(\OCP\IL10N::class);
 		$l10n->method('t')->willReturnCallback(fn ($text) => $text);
