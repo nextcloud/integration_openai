@@ -12,7 +12,6 @@ namespace OCA\OpenAi\TaskProcessing;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\ServicesService;
 use OCA\OpenAi\Service\TranslateService;
@@ -36,7 +35,6 @@ class ProviderFactory {
 	public function __construct(
 		private ServicesService $servicesService,
 		private OpenAiAPIService $openAiAPIService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private ChunkService $chunkService,
 		private TranslateService $translateService,
 		private WatermarkingService $watermarkingService,
@@ -82,7 +80,7 @@ class ProviderFactory {
 			new TextToTextProvider($this->openAiAPIService, $this->l, $service, $model),
 			new TextToTextChatProvider($this->openAiAPIService, $this->l, $service, $model),
 			new TextToTextChatWithToolsProvider($this->openAiAPIService, $this->l, $service, $model),
-			new SummaryProvider($this->openAiAPIService, $this->l, $this->chunkService, $this->openAiSettingsService, $service, $model),
+			new SummaryProvider($this->openAiAPIService, $this->l, $this->chunkService, $service, $model),
 			new HeadlineProvider($this->openAiAPIService, $this->l, $service, $model),
 			new TopicsProvider($this->openAiAPIService, $this->l, $this->chunkService, $this->logger, $service, $model),
 			new ContextWriteProvider($this->openAiAPIService, $this->chunkService, $this->l, $service, $model),
