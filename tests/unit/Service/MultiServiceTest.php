@@ -509,4 +509,20 @@ class MultiServiceTest extends TestCase {
 		}
 		$this->assertGreaterThan(15, $checked, 'the factory should have built a provider per task type');
 	}
+
+	public function testEdenAiServiceIsRecognisedOnBothEndpoints(): void {
+		$global = $this->addService(['url' => 'https://api.edenai.run/v3']);
+		$this->assertTrue($global->isUsingEdenAi());
+		$this->assertFalse($global->isUsingOpenAi());
+
+		// the European endpoint only exposes models cleared for EU processing
+		$european = $this->addService(['url' => 'https://api.eu.edenai.run/v3']);
+		$this->assertTrue($european->isUsingEdenAi());
+
+		$mixedCase = $this->addService(['url' => 'HTTPS://API.EDENAI.RUN/v3']);
+		$this->assertTrue($mixedCase->isUsingEdenAi());
+
+		$other = $this->addService(['url' => self::IMAGE_BASE]);
+		$this->assertFalse($other->isUsingEdenAi());
+	}
 }
