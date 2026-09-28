@@ -281,6 +281,16 @@ class ServiceConfig implements JsonSerializable {
 		return str_starts_with(strtolower($this->url), 'https://openai.inference.de-txl.ionos.com');
 	}
 
+	/**
+	 * Eden AI serves the global endpoint and an EU one that only exposes
+	 * models cleared for European processing. Both behave the same way here.
+	 */
+	public function isUsingEdenAi(): bool {
+		$url = strtolower($this->url);
+		return str_starts_with($url, 'https://api.edenai.run')
+			|| str_starts_with($url, 'https://api.eu.edenai.run');
+	}
+
 	public function getApiKey(): string {
 		return $this->apiKey;
 	}
