@@ -604,6 +604,7 @@ class MultiServiceTest extends TestCase {
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
 
@@ -662,6 +663,7 @@ class MultiServiceTest extends TestCase {
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
 
