@@ -160,7 +160,7 @@
 				<br>
 				{{ t('integration_openai', 'The only supported variable is {example}: it is replaced with the ID of the current assistant conversation, and such a header is only sent with the chat requests that know that ID.', { example: '{$conversation_id}' }) }}
 			</NcNoteCard>
-			<div v-for="(header, index) in extraHeaders" :key="index" class="line">
+			<div v-for="(header, index) in extraHeaders" :key="index" class="line align-bottom">
 				<NcTextField
 					:id="'openai-extra-header-name-' + service.id + '-' + index"
 					v-model="header.name"
@@ -797,6 +797,10 @@ export default {
 	&.column {
 		flex-direction: column;
 		align-items: start;
+	}
+
+	&.align-bottom {
+		align-items: flex-end;
 	}
 
 	.input {
