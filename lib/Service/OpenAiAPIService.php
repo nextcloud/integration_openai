@@ -408,6 +408,7 @@ class OpenAiAPIService {
 		?string $toolMessage = null,
 		?array $tools = null,
 		?array $files = null,
+		?string $conversationId = null,
 	): \Generator {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT, $service)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -439,6 +440,7 @@ class OpenAiAPIService {
 			true,
 			0,
 			true,
+			$conversationId,
 		);
 
 		$streamResult = yield from $this->streamingService->parseStreamChatResponse($response);
@@ -468,11 +470,12 @@ class OpenAiAPIService {
 		?string $toolMessage = null,
 		?array $tools = null,
 		?array $files = null,
+		?string $conversationId = null,
 	): array {
 		$response = $this->requestChatCompletion(
 			$userId, $service, $model, $userPrompt, $systemPrompt, $history,
 			$n, $maxTokens, $extraParams, $toolMessage, $tools, $files,
-			false,
+			false, $conversationId,
 		);
 
 		if (isset($response['usage'], $response['usage']['total_tokens'])) {
@@ -517,6 +520,7 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?array $files = null,
 		bool $stream = false,
+		?string $conversationId = null,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT, $service)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -538,7 +542,7 @@ class OpenAiAPIService {
 			$stream,
 		);
 
-		return $this->request($userId, $service, 'chat/completions', $params, 'POST');
+		return $this->request($userId, $service, 'chat/completions', $params, 'POST', conversationId: $conversationId);
 	}
 
 	/**
@@ -1177,12 +1181,20 @@ class OpenAiAPIService {
 	 * headers, so the service's own credentials always win over a configured
 	 * Authorization header.
 	 *
+	 * Headers using the {$conversation_id} variable are dropped when the
+	 * request has no conversation ID, see {@see ServiceConfig::expandHeaderValue()}.
+	 *
+	 * @param string|null $conversationId
 	 * @param array<mixed> $options
 	 * @return array<mixed>
 	 */
-	private function addExtraHeaders(ServiceConfig $service, array $options): array {
+	private function addExtraHeaders(ServiceConfig $service, array $options, ?string $conversationId = null): array {
 		foreach ($service->getExtraHeaders() as $header) {
-			$options['headers'][$header['name']] = $header['value'];
+			$value = ServiceConfig::expandHeaderValue($header['value'], $conversationId);
+			if ($value === null) {
+				continue;
+			}
+			$options['headers'][$header['name']] = $value;
 		}
 		return $options;
 	}
@@ -1334,6 +1346,7 @@ class OpenAiAPIService {
 	 * @param string|null $contentType
 	 * @param bool $logErrors if set to false error logs will be suppressed
 	 * @param int $retryCount number of retries that have been attempted so far
+	 * @param string|null $conversationId the assistant conversation ID used to expand the {$conversation_id} token of the extra headers
 	 * @return array decoded request result or error
 	 * @throws Exception|UserFacingProcessingException
 	 */
@@ -1342,6 +1355,7 @@ class OpenAiAPIService {
 		?string $contentType = null, bool $logErrors = true,
 		int $retryCount = 0,
 		bool $stream = false,
+		?string $conversationId = null,
 	): array {
 		try {
 			// the user's own credentials take precedence over the admin ones
@@ -1359,7 +1373,7 @@ class OpenAiAPIService {
 					'User-Agent' => Application::USER_AGENT,
 				],
 			];
-			$options = $this->addExtraHeaders($service, $options);
+			$options = $this->addExtraHeaders($service, $options, $conversationId);
 
 			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
 				return ['error' => 'An API key is required for api.openai.com'];
@@ -1492,7 +1506,7 @@ class OpenAiAPIService {
 					}
 					$this->logger->warning("Rate limit exceeded, retrying in $sleep seconds", ['retry_count' => $retryCount]);
 					sleep($sleep);
-					return $this->request($userId, $service, $endPoint, $params, $method, $contentType, $logErrors, $retryCount + 1, $stream);
+					return $this->request($userId, $service, $endPoint, $params, $method, $contentType, $logErrors, $retryCount + 1, $stream, $conversationId);
 				} else {
 					$this->logger->warning('Rate limit exceeded, maximum retries reached', ['retry_count' => $retryCount]);
 				}

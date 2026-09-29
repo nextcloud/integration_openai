@@ -157,6 +157,8 @@
 			<h4>{{ t('integration_openai', 'Extra request headers') }}</h4>
 			<NcNoteCard type="info">
 				{{ t('integration_openai', 'Headers sent with every request to this service. The service\'s own authentication always takes precedence over a configured Authorization header.') }}
+				<br>
+				{{ t('integration_openai', 'The only supported variable is {example}: it is replaced with the ID of the current assistant conversation, and such a header is only sent with the chat requests that know that ID.', { example: '{$conversation_id}' }) }}
 			</NcNoteCard>
 			<div v-for="(header, index) in extraHeaders" :key="index" class="line">
 				<NcTextField
@@ -173,6 +175,8 @@
 					v-model="header.value"
 					class="input"
 					:label="t('integration_openai', 'Header value')"
+					:error="headerValueInvalid(header.value)"
+					:helper-text="headerValueInvalid(header.value) ? t('integration_openai', 'Not a supported variable yet, so it is not saved') : ''"
 					@update:model-value="onExtraHeadersInput" />
 				<NcButton variant="tertiary" :aria-label="t('integration_openai', 'Remove this header')" @click="removeExtraHeader(index)">
 					<template #icon>
@@ -677,10 +681,19 @@ export default {
 			const trimmed = name.trim()
 			return trimmed !== '' && !/^[a-zA-Z0-9!#$%&'*+.^_`|~-]+$/.test(trimmed)
 		},
+		headerValueInvalid(value) {
+			for (const variable of value.matchAll(/\{\$[^}]*\}/g)) {
+				if (variable[0] !== '{$conversation_id}') {
+					return true
+				}
+			}
+			return false
+		},
 		headerDirty(header) {
 			return header.name !== header.name.trim()
 				|| header.value !== header.value.trim()
 				|| this.headerNameInvalid(header.name)
+				|| this.headerValueInvalid(header.value)
 		},
 		addExtraHeader() {
 			this.extraHeaders.push({ name: '', value: '' })

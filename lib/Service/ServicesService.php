@@ -436,11 +436,18 @@ class ServicesService {
 					throw new Exception('Invalid extra header. Expected a name and a value');
 				}
 				$name = trim($header['name']);
-				if ($name !== '' && preg_match('/^[a-zA-Z0-9!#$%&\'*+.^_`|~-]+$/', $name) !== 1) {
+				if ($name !== '' && preg_match(ServiceConfig::HEADER_NAME_PATTERN, $name) !== 1) {
 					throw new Exception('Invalid extra header name. Only the characters allowed in an HTTP header name are accepted: ' . $name);
 				}
 				if (preg_match('/[\r\n]/', $header['value']) === 1) {
 					throw new Exception('Invalid extra header value. Line breaks are not allowed: ' . $name);
+				}
+				if (preg_match_all('/\{\$[^}]*\}/', $header['value'], $variables) > 0) {
+					foreach ($variables[0] as $variable) {
+						if (!in_array($variable, ServiceConfig::SUPPORTED_HEADER_VARIABLES, true)) {
+							throw new Exception('Unknown variable in an extra header value: ' . $variable . '. Supported variables: ' . implode(', ', ServiceConfig::SUPPORTED_HEADER_VARIABLES));
+						}
+					}
 				}
 			}
 		}
