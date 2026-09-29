@@ -456,6 +456,107 @@ class MultiServiceTest extends TestCase {
 		$audioToTextProvider->process(self::TEST_USER1, ['input' => $file], fn () => null);
 	}
 
+	public function testExtraHeadersAreStoredNormalized(): void {
+		$service = $this->addService([
+			'url' => self::SPEECH_BASE,
+			'extra_headers' => [
+				['name' => ' X-Tenant ', 'value' => ' acme '],
+				['name' => '', 'value' => 'dropped along with its name'],
+			],
+		]);
+
+		$this->assertSame(
+			[['name' => 'X-Tenant', 'value' => 'acme']],
+			$service->getExtraHeaders(),
+		);
+	}
+
+	/**
+	 * @dataProvider invalidExtraHeadersProvider
+	 */
+	public function testInvalidExtraHeadersAreRejected(array $extraHeaders): void {
+		$this->expectException(\Exception::class);
+		$this->servicesService->addService([
+			'url' => self::SPEECH_BASE,
+			'extra_headers' => $extraHeaders,
+		]);
+	}
+
+	public function invalidExtraHeadersProvider(): array {
+		return [
+			'a name that is not an HTTP token' => [[['name' => 'X Api Key', 'value' => 'secret']]],
+			'a name with an injected line break' => [[['name' => "X-Tenant\r\nX-Evil", 'value' => 'a']]],
+			'a value with an injected line break' => [[['name' => 'X-Tenant', 'value' => "a\r\nb"]]],
+			'a row without a value' => [[['name' => 'X-Tenant']]],
+			'a row that is not a pair' => [[['nope']]],
+		];
+	}
+
+	public function testExtraHeadersAreSentAndCannotOverrideTheApiKey(): void {
+		$service = $this->addService([
+			'url' => self::SPEECH_BASE,
+			'api_key' => self::APIKEY_SPEECH,
+			'request_timeout' => self::REQUEST_TIMEOUT_SPEECH,
+			'tts_models' => [self::SPEECH_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'Authorization', 'value' => 'Bearer injected'],
+			],
+		]);
+
+		$ttsProvider = new TextToSpeechProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(WatermarkingService::class),
+			$service,
+			self::SPEECH_MODEL,
+		);
+
+		$inputText = 'This is a test prompt';
+
+		$response = file_get_contents(__DIR__ . '/../../res/speech.mp3');
+
+		if (!$response) {
+			throw new \RuntimeException('Could not read test resourcce `speech.mp3`');
+		}
+
+		$url = self::SPEECH_BASE . '/audio/speech';
+
+		$options = ['timeout' => self::REQUEST_TIMEOUT_SPEECH, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'Authorization' => 'Bearer ' . self::APIKEY_SPEECH, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'input' => $inputText,
+			'voice' => Application::DEFAULT_SPEECH_VOICE,
+			'model' => self::SPEECH_MODEL,
+			'response_format' => 'mp3',
+			'speed' => 1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$ttsProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null, includeWatermark: false);
+	}
+
+	public function testExtraHeadersInImageRequestOptions(): void {
+		$service = $this->addService([
+			'url' => self::IMAGE_BASE,
+			'api_key' => self::APIKEY_IMAGE,
+			'image_request_auth' => false,
+			'extra_headers' => [['name' => 'X-Tenant', 'value' => 'acme']],
+		]);
+
+		$options = $this->openAiApiService->getImageRequestOptions(self::TEST_USER1, $service);
+
+		$this->assertSame([
+			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
+			'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme'],
+		], $options);
+	}
+
 	public function testProvidersOfDifferentServicesHaveDifferentIds(): void {
 		$first = $this->addService(['url' => self::IMAGE_BASE, 'image_models' => [self::IMAGE_MODEL]]);
 		$second = $this->addService(['url' => self::SPEECH_BASE, 'image_models' => [self::IMAGE_MODEL]]);
