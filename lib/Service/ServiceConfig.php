@@ -56,6 +56,7 @@ class ServiceConfig implements JsonSerializable {
 		'stt_models' => 'array',
 		'tts_models' => 'array',
 		'quotas' => 'array',
+		'extra_headers' => 'array',
 	];
 
 	/** Properties that are stored encrypted and never sent to the frontend */
@@ -68,6 +69,7 @@ class ServiceConfig implements JsonSerializable {
 	 * @param list<string> $imageModels
 	 * @param list<string> $sttModels
 	 * @param list<string> $ttsModels
+	 * @param list<array{name: string, value: string}> $extraHeaders
 	 */
 	public function __construct(
 		private string $id,
@@ -104,6 +106,7 @@ class ServiceConfig implements JsonSerializable {
 		private array $sttModels = [],
 		private array $ttsModels = [],
 		private array $quotas = Application::DEFAULT_QUOTAS,
+		private array $extraHeaders = [],
 	) {
 	}
 
@@ -186,6 +189,8 @@ class ServiceConfig implements JsonSerializable {
 					break;
 				case 'quotas': $new->quotas = self::normalizeQuotas($value, $new->quotas);
 					break;
+				case 'extra_headers': $new->extraHeaders = self::normalizeHeaders($value);
+					break;
 			}
 		}
 		return $new;
@@ -222,6 +227,32 @@ class ServiceConfig implements JsonSerializable {
 			if (isset($quotas[$type])) {
 				$normalized[$type] = max(0, (int)$quotas[$type]);
 			}
+		}
+		return $normalized;
+	}
+
+	/**
+	 * Keep the name/value pairs that have a name, trim the rest. A row
+	 * without a name is one the admin has not filled in yet, and sending it
+	 * along in requests would only be confusing.
+	 *
+	 * @param mixed $headers
+	 * @return list<array{name: string, value: string}>
+	 */
+	private static function normalizeHeaders(mixed $headers): array {
+		if (!is_array($headers)) {
+			return [];
+		}
+		$normalized = [];
+		foreach ($headers as $header) {
+			if (!is_array($header)) {
+				continue;
+			}
+			$name = trim((string)($header['name'] ?? ''));
+			if ($name === '') {
+				continue;
+			}
+			$normalized[] = ['name' => $name, 'value' => trim((string)($header['value'] ?? ''))];
 		}
 		return $normalized;
 	}
@@ -447,6 +478,15 @@ class ServiceConfig implements JsonSerializable {
 	}
 
 	/**
+	 * The extra headers to send with every request to this service
+	 *
+	 * @return list<array{name: string, value: string}>
+	 */
+	public function getExtraHeaders(): array {
+		return $this->extraHeaders;
+	}
+
+	/**
 	 * Full representation, including secrets, as stored in app config
 	 *
 	 * @return array<string, mixed>
@@ -484,6 +524,7 @@ class ServiceConfig implements JsonSerializable {
 			'stt_models' => $this->sttModels,
 			'tts_models' => $this->ttsModels,
 			'quotas' => $this->quotas,
+			'extra_headers' => $this->extraHeaders,
 		];
 	}
 

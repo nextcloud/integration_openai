@@ -1172,6 +1172,22 @@ class OpenAiAPIService {
 	}
 
 	/**
+	 * Merge the extra headers configured on the service into the request
+	 * options. They are applied before the authentication and content-type
+	 * headers, so the service's own credentials always win over a configured
+	 * Authorization header.
+	 *
+	 * @param array<mixed> $options
+	 * @return array<mixed>
+	 */
+	private function addExtraHeaders(ServiceConfig $service, array $options): array {
+		foreach ($service->getExtraHeaders() as $header) {
+			$options['headers'][$header['name']] = $header['value'];
+		}
+		return $options;
+	}
+
+	/**
 	 * @param string|null $userId
 	 * @return array
 	 */
@@ -1183,6 +1199,7 @@ class OpenAiAPIService {
 				'User-Agent' => Application::USER_AGENT,
 			],
 		];
+		$requestOptions = $this->addExtraHeaders($service, $requestOptions);
 
 		if ($service->getImageRequestAuth()) {
 			if ($service->usesBasicAuth()) {
@@ -1342,6 +1359,7 @@ class OpenAiAPIService {
 					'User-Agent' => Application::USER_AGENT,
 				],
 			];
+			$options = $this->addExtraHeaders($service, $options);
 
 			if ($serviceUrl === Application::OPENAI_API_BASE_URL && $apiKey === '') {
 				return ['error' => 'An API key is required for api.openai.com'];
