@@ -159,7 +159,7 @@ OC.L10N.register(
     "End date" : "Dátum ukončenia",
     "Quota type" : "Typ kvóty",
     "Service" : "Služba",
-    "Download quota usage" : "Kvóty použitia na stiahnutie",
+    "Download quota usage" : "Spotreba kvóty sťahovania",
     "Quota Rules" : "Pravidlá kvót",
     "Type a model name" : "Zadajte názov modelu",
     "Select or type a model name" : "Vyberte alebo zadajte názov modelu",
