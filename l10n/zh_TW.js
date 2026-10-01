@@ -39,6 +39,7 @@ OC.L10N.register(
     "Image attachments are unsupported." : "不支援影像附件。",
     "Invalid input file type \"%1$s\"." : "無效輸入檔案類型「%1$s」。",
     "Audio attachments are unsupported." : "不支援音訊附件。",
+    "Failed to transcribe audio." : "轉錄音訊失敗。",
     "Video attachments are unsupported." : "不支援視訊附件。",
     "Invalid input file type: \"%1$s\"." : "無效的輸入檔案類型：「%1$s」。",
     "Name" : "名稱",
