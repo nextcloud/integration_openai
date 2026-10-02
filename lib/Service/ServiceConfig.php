@@ -56,10 +56,20 @@ class ServiceConfig implements JsonSerializable {
 		'stt_models' => 'array',
 		'tts_models' => 'array',
 		'quotas' => 'array',
+		'extra_headers' => 'array',
 	];
 
 	/** Properties that are stored encrypted and never sent to the frontend */
 	public const SECRET_PROPERTIES = ['api_key', 'basic_password'];
+
+	/** Characters an HTTP header name is made of (the RFC 7230 token) */
+	public const HEADER_NAME_PATTERN = '/^[a-zA-Z0-9!#$%&\'*+.^_`|~-]+$/';
+
+	/** The extra header value variable holding the assistant conversation ID of a chat request */
+	public const CONVERSATION_ID_VARIABLE = '{$conversation_id}';
+
+	/** The variables extra header values may use */
+	public const SUPPORTED_HEADER_VARIABLES = [self::CONVERSATION_ID_VARIABLE];
 
 	/**
 	 * @param array<int, int> $quotas
@@ -68,6 +78,7 @@ class ServiceConfig implements JsonSerializable {
 	 * @param list<string> $imageModels
 	 * @param list<string> $sttModels
 	 * @param list<string> $ttsModels
+	 * @param list<array{name: string, value: string}> $extraHeaders
 	 */
 	public function __construct(
 		private string $id,
@@ -104,6 +115,7 @@ class ServiceConfig implements JsonSerializable {
 		private array $sttModels = [],
 		private array $ttsModels = [],
 		private array $quotas = Application::DEFAULT_QUOTAS,
+		private array $extraHeaders = [],
 	) {
 	}
 
@@ -186,6 +198,8 @@ class ServiceConfig implements JsonSerializable {
 					break;
 				case 'quotas': $new->quotas = self::normalizeQuotas($value, $new->quotas);
 					break;
+				case 'extra_headers': $new->extraHeaders = self::normalizeHeaders($value);
+					break;
 			}
 		}
 		return $new;
@@ -222,6 +236,32 @@ class ServiceConfig implements JsonSerializable {
 			if (isset($quotas[$type])) {
 				$normalized[$type] = max(0, (int)$quotas[$type]);
 			}
+		}
+		return $normalized;
+	}
+
+	/**
+	 * Keep the name/value pairs that have a name, trim the rest. A row
+	 * without a name is one the admin has not filled in yet, and sending it
+	 * along in requests would only be confusing.
+	 *
+	 * @param mixed $headers
+	 * @return list<array{name: string, value: string}>
+	 */
+	private static function normalizeHeaders(mixed $headers): array {
+		if (!is_array($headers)) {
+			return [];
+		}
+		$normalized = [];
+		foreach ($headers as $header) {
+			if (!is_array($header)) {
+				continue;
+			}
+			$name = trim((string)($header['name'] ?? ''));
+			if ($name === '') {
+				continue;
+			}
+			$normalized[] = ['name' => $name, 'value' => trim((string)($header['value'] ?? ''))];
 		}
 		return $normalized;
 	}
@@ -447,6 +487,38 @@ class ServiceConfig implements JsonSerializable {
 	}
 
 	/**
+	 * The extra headers to send with every request to this service
+	 *
+	 * @return list<array{name: string, value: string}>
+	 */
+	public function getExtraHeaders(): array {
+		return $this->extraHeaders;
+	}
+
+	/**
+	 * Replace the {$conversation_id} variable of an extra header value with
+	 * the ID of the conversation of the request being sent.
+	 *
+	 * A value using the variable of a request that has no conversation is not
+	 * meant to be sent at all: only chat requests know the conversation, so
+	 * the header is dropped for the other requests, which is signalled by
+	 * returning null. Anything else in the value, including text that merely
+	 * looks like a variable, travels literally.
+	 */
+	public static function expandHeaderValue(string $value, ?string $conversationId): ?string {
+		if (!str_contains($value, self::CONVERSATION_ID_VARIABLE)) {
+			return $value;
+		}
+		if ($conversationId === null || $conversationId === '') {
+			return null;
+		}
+		$expanded = str_replace(self::CONVERSATION_ID_VARIABLE, $conversationId, $value);
+		// the ID comes from the task input of another app, so line breaks in
+		// it must not be able to forge headers
+		return preg_match('/[\r\n]/', $expanded) === 1 ? null : $expanded;
+	}
+
+	/**
 	 * Full representation, including secrets, as stored in app config
 	 *
 	 * @return array<string, mixed>
@@ -484,6 +556,7 @@ class ServiceConfig implements JsonSerializable {
 			'stt_models' => $this->sttModels,
 			'tts_models' => $this->ttsModels,
 			'quotas' => $this->quotas,
+			'extra_headers' => $this->extraHeaders,
 		];
 	}
 

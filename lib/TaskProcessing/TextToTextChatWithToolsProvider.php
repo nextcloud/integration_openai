@@ -63,6 +63,11 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -138,10 +143,15 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		try {
 			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
-					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
+					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools,
+					conversationId: $conversationId,
 				);
 				$time = microtime(true);
 				$streamedOutput = '';
@@ -179,7 +189,8 @@ class TextToTextChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 				$returnValue = $chunks->getReturn();
 			} else {
 				$returnValue = $this->openAiAPIService->createChatCompletion(
-					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools
+					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools,
+					conversationId: $conversationId,
 				);
 			}
 		} catch (UserFacingProcessingException $e) {

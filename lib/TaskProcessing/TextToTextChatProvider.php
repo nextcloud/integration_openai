@@ -68,6 +68,11 @@ class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvi
 				$this->l->t('The memories to be injected into the chat session.'),
 				EShapeType::ListOfTexts
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -129,9 +134,13 @@ class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvi
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		try {
 			if ($preferStreaming) {
-				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, conversationId: $conversationId);
 				$time = microtime(true);
 				$streamedOutput = '';
 				$streamedReasoning = '';
@@ -169,7 +178,7 @@ class TextToTextChatProvider implements IProvider, ISynchronousOptionsAwareProvi
 				$completion = $returnValue['messages'];
 				$reasoning = $returnValue['reasoning_messages'];
 			} else {
-				$returnValue = $this->openAiAPIService->createChatCompletion($userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens);
+				$returnValue = $this->openAiAPIService->createChatCompletion($userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, conversationId: $conversationId);
 				$completion = $returnValue['messages'];
 				$reasoning = $returnValue['reasoning_messages'];
 			}
