@@ -128,7 +128,50 @@ class OpenAiAPIService {
 			throw new Exception($this->l10n->t('Invalid models response received'), Http::STATUS_INTERNAL_SERVER_ERROR);
 		}
 
+		if ($service->isUsingEdenAi()) {
+			$modelsResponse['data'] = array_merge(
+				$modelsResponse['data'],
+				$this->getEdenAiAudioModels($userId, $service),
+			);
+		}
+
 		return $modelsResponse;
+	}
+
+	/**
+	 * Eden AI keeps one catalogue per modality, so its main models endpoint
+	 * returns the text models only. Speech to text and text to speech have
+	 * their own endpoints, and without them the transcription and speech model
+	 * selectors in the admin settings have nothing to offer.
+	 *
+	 * A failure here is not fatal. The text models have already been retrieved
+	 * and are usable on their own, so we log and return what we have.
+	 *
+	 * @param ?string $userId
+	 * @param ServiceConfig $service
+	 * @return list<array> the audio models, or an empty list
+	 */
+	private function getEdenAiAudioModels(?string $userId, ServiceConfig $service): array {
+		$models = [];
+		foreach (['audio/transcriptions/models', 'audio/speech/models'] as $endPoint) {
+			try {
+				$response = $this->request($userId, $service, $endPoint);
+			} catch (Exception $e) {
+				$this->logger->warning('Error retrieving Eden AI models from ' . $endPoint . ' (exc): ' . $e->getMessage());
+				continue;
+			}
+			if (isset($response['error']) || !isset($response['data']) || !is_array($response['data'])) {
+				$this->logger->warning('Error retrieving Eden AI models from ' . $endPoint . ': ' . json_encode($response));
+				continue;
+			}
+			foreach ($response['data'] as $model) {
+				if (is_array($model) && isset($model['id'])) {
+					$models[] = $model;
+				}
+			}
+		}
+
+		return $models;
 	}
 
 	/**
