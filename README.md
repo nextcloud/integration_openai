@@ -30,10 +30,6 @@ or to any service that implements an API similar to the OpenAI one, for example:
 [IONOS AI Model Hub](https://docs.ionos.com/cloud/ai/ai-model-hub), [Plusserver](https://www.plusserver.com/en/ai-platform/), [MistralAI](https://mistral.ai) or [Eden AI](https://www.edenai.co).  
 Make sure to use the OpenAI-compatible endpoint instead of the custom ones they provide.
 
-Eden AI additionally offers a European endpoint, `https://api.eu.edenai.run/v3`, which only exposes
-models cleared for processing in the EU and refuses anything served elsewhere. Use it as the service
-URL when your instance needs the data to stay in Europe.
-
 :warning: This app is mainly tested with OpenAI. We do not guarantee it works perfectly
 with other services that implement OpenAI-compatible APIs with slight differences.
 
