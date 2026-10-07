@@ -257,7 +257,7 @@ OC.L10N.register(
     "Not a {format} size yet, so it is not saved" : "Zatiaľ to nie je veľkosť {format}, preto sa to neuloží",
     "Default image size" : "Predvolená veľkosť obrázka",
     "Use authentication for image retrieval request" : "Použite autentifikáciu pre požiadavku na získanie obrázka",
-    "TTS Voices" : "TTS Hlasy",
+    "TTS Voices" : "Hlasy TTS",
     "A list of voices supported by the endpoint you are using. Defaults to openai's list." : "Zoznam hlasov podporovaných koncovým bodom, ktorý používate. Predvolene sa používa zoznam spoločnosti OpenAI.",
     "Default voice to use" : "Predvolený hlas na použitie",
     "Usage quotas of this service" : "Kvóty používania tejto služby",
@@ -338,7 +338,7 @@ OC.L10N.register(
     "text to speech" : "text na reč",
     "Hide override config for {aiTask}" : "Skryť nastavenia pre prepísanie {aiTask}",
     "Show override config for {aiTask}" : "Zobraziť konfiguráciu pre prepísanie {aiTask}",
-    "Service url overridden for {task} to {url}" : "Služobné URL bola prepísané pre {task} na {url}",
+    "Service url overridden for {task} to {url}" : "URL služby bola prepísaná pre {task} na {url}",
     "Service URL override" : "Prepisovanie URL služby",
     "With the current configuration, the target URL used to get the models for {aiTask} is:" : "S aktuálnou konfiguráciou je cieľová URL adresa používaná na získanie modelov {aiTask} pre:"
 },
