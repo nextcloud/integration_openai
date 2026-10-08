@@ -545,10 +545,10 @@ export default {
 			const size = this.defaultImageSize.trim()
 			return size === '' || /^\d+x\d+$/.test(size)
 		},
-		/** Whether any row is new or half-typed, so the backend must not overwrite the list */
+		/** Whether any row is new, empty or not registerable yet, so the backend must not overwrite the list */
 		extraHeadersPending() {
 			return this.extraHeaders.some(
-				header => header.name.trim() === '' || this.headerDirty(header),
+				header => this.headerIncomplete(header) || this.headerDirty(header),
 			)
 		},
 		modalities() {
@@ -689,11 +689,11 @@ export default {
 			}
 			return false
 		},
+		headerIncomplete(header) {
+			return header.name.trim() === '' || header.value.trim() === ''
+		},
 		headerDirty(header) {
-			return header.name !== header.name.trim()
-				|| header.value !== header.value.trim()
-				|| this.headerNameInvalid(header.name)
-				|| this.headerValueInvalid(header.value)
+			return this.headerNameInvalid(header.name) || this.headerValueInvalid(header.value)
 		},
 		addExtraHeader() {
 			this.extraHeaders.push({ name: '', value: '' })
@@ -703,13 +703,14 @@ export default {
 			this.onExtraHeadersInput()
 		},
 		onExtraHeadersInput() {
-			// a half-typed row must not reject the rest of the sensitive
-			// payload it travels with, so hold it back until it is complete
+			// a half-typed or invalid row must not reject the rest of the
+			// sensitive payload it travels with, so hold it back until it can
+			// be registered, skipping the ones that are still empty
 			if (this.extraHeaders.some(header => this.headerDirty(header))) {
 				return
 			}
 			const headers = this.extraHeaders
-				.filter(header => header.name.trim() !== '')
+				.filter(header => !this.headerIncomplete(header))
 				.map(header => ({ name: header.name.trim(), value: header.value.trim() }))
 			this.onSensitiveInput({ extra_headers: headers })
 		},
