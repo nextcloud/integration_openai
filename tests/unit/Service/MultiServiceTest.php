@@ -884,6 +884,34 @@ class MultiServiceTest extends TestCase {
 		$this->assertSame('Bonjour le monde', $result['output']);
 	}
 
+	public function testInvalidHeaderFromTheHttpClientBecomesAConfigError(): void {
+		$service = $this->addService([
+			'url' => self::TEXT_BASE,
+			'api_key' => self::APIKEY_TEXT,
+			'text_models' => [self::TEXT_MODEL],
+		]);
+
+		// the HTTP client validates the headers when building the request and
+		// throws a bare InvalidArgumentException quoting the rejected value: the
+		// error must be reported without leaking the credentials it mentions
+		$this->iClient->expects($this->once())->method('post')->willThrowException(
+			new \InvalidArgumentException('"Bearer ' . self::APIKEY_TEXT . '" is not valid header value.'),
+		);
+
+		$thrown = null;
+		try {
+			$this->openAiApiService->createChatCompletion(
+				self::TEST_USER1, $service, self::TEXT_MODEL, 'Hello', 'You are a helpful assistant',
+			);
+		} catch (\Exception $e) {
+			$thrown = $e;
+		}
+
+		$this->assertInstanceOf(\Exception::class, $thrown);
+		$this->assertSame(\OCP\AppFramework\Http::STATUS_BAD_REQUEST, $thrown->getCode());
+		$this->assertStringNotContainsString(self::APIKEY_TEXT, $thrown->getMessage());
+	}
+
 	public function testProvidersOfDifferentServicesHaveDifferentIds(): void {
 		$first = $this->addService(['url' => self::IMAGE_BASE, 'image_models' => [self::IMAGE_MODEL]]);
 		$second = $this->addService(['url' => self::SPEECH_BASE, 'image_models' => [self::IMAGE_MODEL]]);

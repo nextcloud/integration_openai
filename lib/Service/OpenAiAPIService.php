@@ -1613,6 +1613,16 @@ class OpenAiAPIService {
 				intval($e->getCode()),
 				userFacingMessage: $this->l10n->t('%s API error: AI backend is currently not reachable. Contact your system administrator.', [$service->getDisplayName()]),
 			);
+		} catch (\InvalidArgumentException $e) {
+			// the HTTP client validates the headers while building the request and
+			// its message quotes the rejected value, which may hold credentials,
+			// so it only goes to the log and not into the error
+			$this->logger->warning('API request rejected with invalid headers on service ' . $service->getId(), ['exception' => $e]);
+			throw new Exception(
+				$this->l10n->t('The request headers configured for this service are invalid'),
+				Http::STATUS_BAD_REQUEST,
+				$e,
+			);
 		}
 	}
 
