@@ -436,7 +436,10 @@ class ServicesService {
 					throw new Exception('Invalid extra header. Expected a name and a value');
 				}
 				$name = trim($header['name']);
-				if ($name !== '' && preg_match(ServiceConfig::HEADER_NAME_PATTERN, $name) !== 1) {
+				if ($name === '') {
+					throw new Exception('Invalid extra header name. It cannot be empty');
+				}
+				if (preg_match(ServiceConfig::HEADER_NAME_PATTERN, $name) !== 1) {
 					throw new Exception('Invalid extra header name. Only the characters allowed in an HTTP header name are accepted: ' . $name);
 				}
 				if (preg_match('/[\r\n]/', $header['value']) === 1) {

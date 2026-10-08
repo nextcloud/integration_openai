@@ -468,7 +468,6 @@ class MultiServiceTest extends TestCase {
 			'url' => self::SPEECH_BASE,
 			'extra_headers' => [
 				['name' => ' X-Tenant ', 'value' => ' acme '],
-				['name' => '', 'value' => 'dropped along with its name'],
 			],
 		]);
 
@@ -492,6 +491,8 @@ class MultiServiceTest extends TestCase {
 	public function invalidExtraHeadersProvider(): array {
 		return [
 			'a name that is not an HTTP token' => [[['name' => 'X Api Key', 'value' => 'secret']]],
+			'an empty name' => [[['name' => '', 'value' => 'secret']]],
+			'a name that is only spaces' => [[['name' => ' ', 'value' => 'secret']]],
 			'a name with an injected line break' => [[['name' => "X-Tenant\r\nX-Evil", 'value' => 'a']]],
 			'a value with an injected line break' => [[['name' => 'X-Tenant', 'value' => "a\r\nb"]]],
 			'a row without a value' => [[['name' => 'X-Tenant']]],
