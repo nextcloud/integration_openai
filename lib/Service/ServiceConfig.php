@@ -510,8 +510,9 @@ class ServiceConfig implements JsonSerializable {
 	 * the ID of the conversation of the request being sent.
 	 *
 	 * A value using the variable of a request that has no conversation is not
-	 * meant to be sent at all: only chat requests know the conversation, so
-	 * the header is dropped for the other requests, which is signalled by
+	 * meant to be sent at all: the conversation is only known to the chat
+	 * completion requests whose input carries a conversation ID, so the
+	 * header is dropped for the other requests, which is signalled by
 	 * returning null. Anything else in the value, including text that merely
 	 * looks like a variable, travels literally.
 	 */

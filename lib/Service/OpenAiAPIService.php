@@ -1389,7 +1389,7 @@ class OpenAiAPIService {
 	 * @param string|null $contentType
 	 * @param bool $logErrors if set to false error logs will be suppressed
 	 * @param int $retryCount number of retries that have been attempted so far
-	 * @param string|null $conversationId the assistant conversation ID used to expand the {$conversation_id} token of the extra headers
+	 * @param string|null $conversationId the conversation ID of the request, used to expand the {$conversation_id} token of the extra headers
 	 * @return array decoded request result or error
 	 * @throws Exception|UserFacingProcessingException
 	 */

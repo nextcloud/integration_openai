@@ -67,7 +67,13 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 	}
 
 	public function getOptionalInputShape(): array {
-		return $this->textToImageProvider->getOptionalInputShape();
+		return array_merge($this->textToImageProvider->getOptionalInputShape(), [
+			'conversation_id' => new ShapeDescriptor(
+				$this->l10n->t('Conversation ID'),
+				$this->l10n->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
+		]);
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
@@ -125,8 +131,13 @@ class TextToImageImprovedPromptProvider implements ISynchronousWatermarkingProvi
 			. 'no preface, no markdown, no quotes around the JSON, no explanations.' . "\n\n"
 			. 'Original prompt:' . "\n" . $originalPrompt;
 		$improvedPrompts = array_fill(0, $nbImages, $originalPrompt);
+		$improveInput = ['input' => $instruction];
+		if (isset($input['conversation_id']) && is_string($input['conversation_id'])) {
+			$improveInput['conversation_id'] = $input['conversation_id'];
+		}
+
 		try {
-			$output = $this->textToTextProvider->process($userId, ['input' => $instruction], $reportProgress);
+			$output = $this->textToTextProvider->process($userId, $improveInput, $reportProgress);
 			if (isset($output['output']) && is_string($output['output']) && trim($output['output']) !== '') {
 				$parsed = $this->parseImprovedPrompts(trim($output['output']), $nbImages, $originalPrompt);
 				if ($parsed !== null) {

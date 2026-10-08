@@ -158,7 +158,7 @@
 			<NcNoteCard type="info">
 				{{ t('integration_openai', 'Headers sent with every request to this service. The service\'s own authentication always takes precedence over a configured Authorization header.') }}
 				<br>
-				{{ t('integration_openai', 'The only supported variable is {example}: it is replaced with the ID of the current assistant conversation, and such a header is only sent with the chat requests that know that ID.', { example: '{$conversation_id}' }) }}
+				{{ t('integration_openai', 'The only supported variable is {example}: it is replaced with the ID of the conversation the request belongs to, and such a header is only sent with the chat completion requests that know that ID.', { example: '{$conversation_id}' }) }}
 			</NcNoteCard>
 			<div v-for="(header, index) in extraHeaders" :key="index" class="line align-bottom">
 				<NcTextField

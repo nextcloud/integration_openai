@@ -61,6 +61,11 @@ class EmojiProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -100,11 +105,15 @@ class EmojiProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		$model = $this->model;
 
 		try {
 			if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
-				$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens);
+				$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens, conversationId: $conversationId);
 				$completion = $completion['messages'];
 			} else {
 				$completion = $this->openAiAPIService->createCompletion($userId, $this->service, $prompt, 1, $model, $maxTokens);

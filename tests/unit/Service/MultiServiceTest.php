@@ -14,6 +14,7 @@ namespace OCA\OpenAi\Tests\Unit\Service;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -21,6 +22,7 @@ use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\ServicesService;
 use OCA\OpenAi\Service\StreamingService;
+use OCA\OpenAi\Service\TranslateService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ImageToImageProvider;
@@ -28,6 +30,8 @@ use OCA\OpenAi\TaskProcessing\ProviderFactory;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
 use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
+use OCA\OpenAi\TaskProcessing\TextToTextProvider;
+use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
@@ -726,6 +730,130 @@ class MultiServiceTest extends TestCase {
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
 		$ttsProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null, includeWatermark: false);
+	}
+
+	/**
+	 * Non-chat providers that go through the chat completion endpoint must
+	 * expand the conversation ID too, otherwise services requiring the header
+	 * reject the request.
+	 */
+	public function testConversationIdHeaderIsExpandedOnFreePromptRequests(): void {
+		$service = $this->addService([
+			'url' => self::TEXT_BASE,
+			'api_key' => self::APIKEY_TEXT,
+			'text_models' => [self::TEXT_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'X-Session', 'value' => '{$conversation_id}'],
+			],
+		]);
+
+		$freePromptProvider = new TextToTextProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		$userPrompt = 'Hello';
+
+		$response = json_encode([
+			'choices' => [
+				['message' => ['role' => 'assistant', 'content' => 'Free prompt answer']],
+			],
+		]);
+
+		$url = self::TEXT_BASE . '/chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'X-Session' => '4242', 'Authorization' => 'Bearer ' . self::APIKEY_TEXT, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'model' => self::TEXT_MODEL,
+			'messages' => [
+				['role' => 'user', 'content' => $userPrompt],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $freePromptProvider->process(self::TEST_USER1, [
+			'input' => $userPrompt,
+			'conversation_id' => '4242',
+		], fn () => null);
+
+		$this->assertSame('Free prompt answer', $result['output']);
+	}
+
+	public function testConversationIdHeaderIsExpandedOnTranslationRequests(): void {
+		$service = $this->addService([
+			'url' => self::TEXT_BASE,
+			'api_key' => self::APIKEY_TEXT,
+			'text_models' => [self::TEXT_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'X-Session', 'value' => '{$conversation_id}'],
+			],
+		]);
+
+		$translateProvider = new TranslateProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			new TranslateService(
+				\OCP\Server::get(\Psr\Log\LoggerInterface::class),
+				$this->openAiApiService,
+				new ChunkService(),
+				\OCP\Server::get(ICacheFactory::class),
+			),
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		$inputText = 'Hello world';
+		$coreLanguages = TranslateService::getCoreLanguagesByCode();
+		$toLanguage = $coreLanguages['fr'] ?? 'fr';
+		$prompt = 'Translate the following text to ' . $toLanguage . ': ' . PHP_EOL . PHP_EOL . $inputText;
+
+		$response = json_encode([
+			'choices' => [
+				['message' => ['role' => 'assistant', 'content' => json_encode(['translation' => 'Bonjour le monde'])]],
+			],
+		]);
+
+		$url = self::TEXT_BASE . '/chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'X-Session' => '4242', 'Authorization' => 'Bearer ' . self::APIKEY_TEXT, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'response_format' => TranslateService::JSON_RESPONSE_FORMAT['response_format'],
+			'model' => self::TEXT_MODEL,
+			'messages' => [
+				['role' => 'system', 'content' => TranslateService::SYSTEM_PROMPT],
+				['role' => 'user', 'content' => $prompt],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $translateProvider->process(self::TEST_USER1, [
+			'input' => $inputText,
+			'origin_language' => 'detect_language',
+			'target_language' => 'fr',
+			'conversation_id' => '4242',
+		], fn () => null);
+
+		$this->assertSame('Bonjour le monde', $result['output']);
 	}
 
 	public function testProvidersOfDifferentServicesHaveDifferentIds(): void {

@@ -107,6 +107,11 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -210,6 +215,10 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		// translate
 		$maxTokens = $this->service->getMaxTokens();
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		try {
 			$reportTranslationOutput = function (string $translationOutput) use ($reportOutput, $transcription, $watermarkSuffix) {
 				$running = $reportOutput([
@@ -224,7 +233,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 				$this->service,
 				$transcription, $input['origin_language'], $input['target_language'],
 				$this->textModel, $maxTokens, $userId, null,
-				$preferStreaming, $reportTranslationOutput,
+				$preferStreaming, $reportTranslationOutput, $conversationId,
 			);
 
 			if ($preferStreaming) {
