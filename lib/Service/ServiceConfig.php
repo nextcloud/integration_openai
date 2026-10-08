@@ -65,7 +65,7 @@ class ServiceConfig implements JsonSerializable {
 	/** Characters an HTTP header name is made of (the RFC 7230 token) */
 	public const HEADER_NAME_PATTERN = '/^[a-zA-Z0-9!#$%&\'*+.^_`|~-]+$/';
 
-	/** The extra header value variable holding the assistant conversation ID of a chat request */
+	/** The extra header value variable holding the conversation ID of a chat completion request */
 	public const CONVERSATION_ID_VARIABLE = '{$conversation_id}';
 
 	/** The variables extra header values may use */
@@ -510,8 +510,8 @@ class ServiceConfig implements JsonSerializable {
 	 * the ID of the conversation of the request being sent.
 	 *
 	 * A value using the variable of a request that has no conversation is not
-	 * meant to be sent at all: the conversation is only known to the chat
-	 * completion requests whose input carries a conversation ID, so the
+	 * meant to be sent at all: chat completion requests always have a
+	 * conversation ID (the one of their task, or a generated one), so the
 	 * header is dropped for the other requests, which is signalled by
 	 * returning null. Anything else in the value, including text that merely
 	 * looks like a variable, travels literally.

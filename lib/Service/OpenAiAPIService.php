@@ -483,7 +483,7 @@ class OpenAiAPIService {
 			true,
 			0,
 			true,
-			$conversationId,
+			$this->resolveConversationId($conversationId),
 		);
 
 		$streamResult = yield from $this->streamingService->parseStreamChatResponse($response);
@@ -585,7 +585,7 @@ class OpenAiAPIService {
 			$stream,
 		);
 
-		return $this->request($userId, $service, 'chat/completions', $params, 'POST', conversationId: $conversationId);
+		return $this->request($userId, $service, 'chat/completions', $params, 'POST', conversationId: $this->resolveConversationId($conversationId));
 	}
 
 	/**
@@ -1216,6 +1216,20 @@ class OpenAiAPIService {
 		}
 
 		return $this->request($userId, $service, 'images/generations', $params, 'POST');
+	}
+
+	/**
+	 * The conversation ID a chat completion request is sent with.
+	 *
+	 * Chat completion requests always carry a conversation ID: tasks which do
+	 * not belong to a conversation get a throwaway random one, regenerated per
+	 * request so unrelated requests never share state on services which key
+	 * conversations on that ID.
+	 */
+	private function resolveConversationId(?string $conversationId): string {
+		return $conversationId !== null && $conversationId !== ''
+			? $conversationId
+			: bin2hex(random_bytes(16));
 	}
 
 	/**

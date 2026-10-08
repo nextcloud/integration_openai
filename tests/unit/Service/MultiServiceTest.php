@@ -624,7 +624,7 @@ class MultiServiceTest extends TestCase {
 		$this->assertSame('Chat answer', $result['output']);
 	}
 
-	public function testConversationIdHeaderIsDroppedWhenTheConversationIsUnknown(): void {
+	public function testConversationIdHeaderIsGeneratedWhenTheConversationIsUnknown(): void {
 		$service = $this->addService([
 			'url' => self::TEXT_BASE,
 			'api_key' => self::APIKEY_TEXT,
@@ -651,8 +651,8 @@ class MultiServiceTest extends TestCase {
 			],
 		]);
 
-		// the same request without the conversation_id input: only the header
-		// that does not reference it survives
+		// the same request without the conversation_id input: the header is
+		// still sent, with a throwaway ID generated for the request
 		$url = self::TEXT_BASE . '/chat/completions';
 		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'Authorization' => 'Bearer ' . self::APIKEY_TEXT, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
 		$options['body'] = json_encode([
@@ -671,7 +671,19 @@ class MultiServiceTest extends TestCase {
 		$iResponse->method('getBody')->willReturn($response);
 		$iResponse->method('getStatusCode')->willReturn(200);
 
-		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+		$generatedIds = [];
+		$this->iClient->expects($this->exactly(2))->method('post')->with(
+			$url,
+			$this->callback(static function (array $actualOptions) use ($options, &$generatedIds): bool {
+				$generatedId = $actualOptions['headers']['X-Session'] ?? null;
+				if (!is_string($generatedId) || preg_match('/^conv-[0-9a-f]{32}$/', $generatedId) !== 1) {
+					return false;
+				}
+				$generatedIds[] = $generatedId;
+				unset($actualOptions['headers']['X-Session']);
+				return $actualOptions == $options;
+			}),
+		)->willReturn($iResponse);
 
 		$result = $chatProvider->process(self::TEST_USER1, [
 			'input' => $userPrompt,
@@ -680,6 +692,19 @@ class MultiServiceTest extends TestCase {
 		], fn () => null);
 
 		$this->assertSame('Chat answer', $result['output']);
+
+		$result = $chatProvider->process(self::TEST_USER1, [
+			'input' => $userPrompt,
+			'system_prompt' => $systemPrompt,
+			'history' => [],
+		], fn () => null);
+
+		$this->assertSame('Chat answer', $result['output']);
+
+		// a different throwaway ID per request: unrelated tasks must not share
+		// a stateful conversation on the service
+		$this->assertCount(2, $generatedIds);
+		$this->assertNotSame($generatedIds[0], $generatedIds[1]);
 	}
 
 	public function testConversationIdHeaderIsDroppedOnNonChatRequests(): void {
