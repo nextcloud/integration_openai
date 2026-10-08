@@ -67,6 +67,7 @@ class TranslateService {
 	public function translate(
 		ServiceConfig $service, string $inputText, string $sourceLanguageCode, string $targetLanguageCode, string $model, ?int $maxTokens,
 		?string $userId, ?callable $reportProgress = null, bool $preferStreaming = false, ?callable $reportOutput = null,
+		?string $conversationId = null,
 	): string {
 		$chunks = $this->chunkService->chunkSplitPrompt($service, $inputText, true, $maxTokens);
 		$translation = '';
@@ -105,7 +106,8 @@ class TranslateService {
 
 			if ($service->isUsingOpenAi() || $service->getChatEndpointEnabled()) {
 				$completionsObj = $this->openAiAPIService->createChatCompletion(
-					$userId, $service, $model, $prompt, TranslateService::SYSTEM_PROMPT, null, 1, $maxTokens, TranslateService::JSON_RESPONSE_FORMAT
+					$userId, $service, $model, $prompt, TranslateService::SYSTEM_PROMPT, null, 1, $maxTokens, TranslateService::JSON_RESPONSE_FORMAT,
+					conversationId: $conversationId,
 				);
 				$completions = $completionsObj['messages'];
 			} else {

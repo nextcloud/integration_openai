@@ -65,6 +65,11 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 				$this->l->t('The maximum number of words/tokens that can be generated in the output.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -116,6 +121,10 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		$fileSizeTotal = array_reduce(
 			$files,
 			function ($carry, $file) {
@@ -145,6 +154,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 				if ($preferStreaming) {
 					$chunks = $this->openAiAPIService->createStreamedChatCompletion(
 						$userId, $this->service, $this->model, $userPrompt, $systemPrompt, null, 1, $maxTokens, null, null, null, [$file],
+						conversationId: $conversationId,
 					);
 					$time = microtime(true);
 					foreach ($chunks as $chunk) {
@@ -176,6 +186,7 @@ class ImageToTextOcrProvider implements IProvider, ISynchronousOptionsAwareProvi
 				} else {
 					$completion = $this->openAiAPIService->createChatCompletion(
 						$userId, $this->service, $this->model, $userPrompt, $systemPrompt, null, 1, $maxTokens, null, null, null, [$file],
+						conversationId: $conversationId,
 					);
 					$messages = $completion['messages'];
 				}

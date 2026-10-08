@@ -76,6 +76,11 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -123,6 +128,10 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		$coreLanguages = TranslateService::getCoreLanguagesByCode();
 		$fromLanguage = $input['origin_language'];
 		$toLanguage = $coreLanguages[$input['target_language']] ?? $input['target_language'];
@@ -140,7 +149,7 @@ class TranslateProvider implements IProvider, ISynchronousOptionsAwareProvider {
 				$this->service,
 				$inputText, $input['origin_language'] ?? '', $input['target_language'] ?? '',
 				$model, $maxTokens, $userId, $reportProgress,
-				$preferStreaming, $reportTranslationOutput,
+				$preferStreaming, $reportTranslationOutput, $conversationId,
 			);
 
 			$endTime = time();

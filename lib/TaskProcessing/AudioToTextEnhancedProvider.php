@@ -12,7 +12,9 @@ namespace OCA\OpenAi\TaskProcessing;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
+use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\ISynchronousProvider;
+use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\AudioToText;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -64,7 +66,13 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 	}
 
 	public function getOptionalInputShape(): array {
-		return $this->audioToTextProvider->getOptionalInputShape();
+		return array_merge($this->audioToTextProvider->getOptionalInputShape(), [
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
+		]);
 	}
 
 	public function getOptionalInputShapeEnumValues(): array {
@@ -95,8 +103,13 @@ class AudioToTextEnhancedProvider implements ISynchronousProvider {
 			return ['output' => $transcription];
 		}
 
+		$reformatInput = ['input' => $transcription];
+		if (isset($input['conversation_id']) && is_string($input['conversation_id'])) {
+			$reformatInput['conversation_id'] = $input['conversation_id'];
+		}
+
 		try {
-			$output = $this->reformatParagraphsProvider->process($userId, ['input' => $transcription], $reportProgress);
+			$output = $this->reformatParagraphsProvider->process($userId, $reformatInput, $reportProgress);
 			if (isset($output['output']) && is_string($output['output']) && $output['output'] !== '') {
 				return ['output' => $output['output']];
 			}
