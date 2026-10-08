@@ -62,8 +62,11 @@ class ServiceConfig implements JsonSerializable {
 	/** Properties that are stored encrypted and never sent to the frontend */
 	public const SECRET_PROPERTIES = ['api_key', 'basic_password'];
 
-	/** Characters an HTTP header name is made of (the RFC 7230 token) */
-	public const HEADER_NAME_PATTERN = '/^[a-zA-Z0-9!#$%&\'*+.^_`|~-]+$/';
+	/** Characters an HTTP header name is made of (the RFC 7230 token, as checked by Guzzle) */
+	public const HEADER_NAME_PATTERN = '/^[a-zA-Z0-9!#$%&\'*+.^_`|~-]+$/D';
+
+	/** Characters an HTTP header value may be made of: HTAB, printable and ISO-8859-1 bytes (the RFC 9110 field-value, as accepted by Guzzle) */
+	public const HEADER_VALUE_PATTERN = '/^[\x09\x20-\x7E\x80-\xFF]*$/D';
 
 	/** The extra header value variable holding the conversation ID of a chat completion request */
 	public const CONVERSATION_ID_VARIABLE = '{$conversation_id}';
@@ -524,9 +527,9 @@ class ServiceConfig implements JsonSerializable {
 			return null;
 		}
 		$expanded = str_replace(self::CONVERSATION_ID_VARIABLE, $conversationId, $value);
-		// the ID comes from the task input of another app, so line breaks in
-		// it must not be able to forge headers
-		return preg_match('/[\r\n]/', $expanded) === 1 ? null : $expanded;
+		// the ID comes from the task input of another app, so what it expands to
+		// must stay within the characters an HTTP client is willing to send
+		return preg_match(self::HEADER_VALUE_PATTERN, $expanded) === 1 ? $expanded : null;
 	}
 
 	/**

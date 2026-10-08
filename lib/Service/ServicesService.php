@@ -442,8 +442,8 @@ class ServicesService {
 				if (preg_match(ServiceConfig::HEADER_NAME_PATTERN, $name) !== 1) {
 					throw new Exception('Invalid extra header name. Only the characters allowed in an HTTP header name are accepted: ' . $name);
 				}
-				if (preg_match('/[\r\n]/', $header['value']) === 1) {
-					throw new Exception('Invalid extra header value. Line breaks are not allowed: ' . $name);
+				if (preg_match(ServiceConfig::HEADER_VALUE_PATTERN, $header['value']) !== 1) {
+					throw new Exception('Invalid extra header value. Only the characters allowed in an HTTP header value are accepted: ' . $name);
 				}
 				if (preg_match_all('/\{\$[^}]*\}/', $header['value'], $variables) > 0) {
 					foreach ($variables[0] as $variable) {

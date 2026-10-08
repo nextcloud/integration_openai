@@ -23,6 +23,8 @@ class ServiceConfigTest extends TestCase {
 			'an empty conversation ID' => ['{$conversation_id}', '', null],
 			'a mistyped variable travels literally' => ['{$Conversation_ID}', '42', '{$Conversation_ID}'],
 			'a conversation ID smuggling line breaks' => ['{$conversation_id}', "42\r\nX-Evil: yes", null],
+			'a conversation ID smuggling control characters' => ['{$conversation_id}', "42\x01", null],
+			'a conversation ID with a tab' => ['{$conversation_id}', "42\x09id", "42\x09id"],
 		];
 	}
 

@@ -495,6 +495,8 @@ class MultiServiceTest extends TestCase {
 			'a name that is only spaces' => [[['name' => ' ', 'value' => 'secret']]],
 			'a name with an injected line break' => [[['name' => "X-Tenant\r\nX-Evil", 'value' => 'a']]],
 			'a value with an injected line break' => [[['name' => 'X-Tenant', 'value' => "a\r\nb"]]],
+			'a value with a control character' => [[['name' => 'X-Tenant', 'value' => "a\x01b"]]],
+			'a value with the DEL character' => [[['name' => 'X-Tenant', 'value' => "a\x7fb"]]],
 			'a row without a value' => [[['name' => 'X-Tenant']]],
 			'a row that is not a pair' => [[['nope']]],
 			'a value with an unknown variable' => [[['name' => 'X-Session', 'value' => '{$conversationid}']]],
