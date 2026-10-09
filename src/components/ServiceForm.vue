@@ -279,7 +279,7 @@
 								:placeholder="t('integration_openai', 'Leave empty to use the default summary prompt')"
 								@update:model-value="onInput({ system_prompt_summary: $event })" />
 							<NcButton variant="tertiary"
-								:title="t('integration_openai', 'Used when a user does not provide their own summary prompt. The Format and Complexity options are still appended to it.')">
+								:title="t('integration_openai', 'When set, it replaces default summary prompt. The Format and Complexity options are still appended to it.')">
 								<template #icon>
 									<HelpCircleOutlineIcon />
 								</template>
