@@ -357,20 +357,10 @@ class ServiceConfig implements JsonSerializable {
 		return $this->chunkSize;
 	}
 
-	/**
-	 * The admin-configured fallback system prompt for the summary task type.
-	 * An empty string means the built-in default prompt is used.
-	 */
 	public function getSystemPromptSummary(): string {
 		return $this->systemPromptSummary;
 	}
 
-	/**
-	 * The admin-configured system prompt appended to the built-in translation
-	 * prompt for the translation task type. The built-in prompt is always kept,
-	 * as it enforces the expected JSON response format.
-	 * An empty string means only the built-in prompt is used.
-	 */
 	public function getSystemPromptTranslate(): string {
 		return $this->systemPromptTranslate;
 	}
