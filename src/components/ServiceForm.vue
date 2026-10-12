@@ -274,7 +274,7 @@
 							<NcTextArea
 								:id="'openai-summary-system-prompt-' + service.id"
 								:model-value="service.system_prompt_summary"
-								class="input"
+								class="input input--full"
 								:label="t('integration_openai', 'Summary system prompt')"
 								:placeholder="t('integration_openai', 'Leave empty to use the default summary prompt')"
 								@update:model-value="onInput({ system_prompt_summary: $event })" />
@@ -289,7 +289,7 @@
 							<NcTextArea
 								:id="'openai-translate-system-prompt-' + service.id"
 								:model-value="service.system_prompt_translate"
-								class="input"
+								class="input input--full"
 								:label="t('integration_openai', 'Translation system prompt')"
 								:placeholder="t('integration_openai', 'Leave empty to use the default translation prompt')"
 								@update:model-value="onInput({ system_prompt_translate: $event })" />
@@ -740,6 +740,10 @@ export default {
 
 	.input {
 		width: 300px;
+	}
+
+	.input--full {
+		width: 100%;
 	}
 }
 
