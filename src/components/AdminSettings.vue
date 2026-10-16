@@ -362,7 +362,8 @@ export default {
 		},
 		/**
 		 * @param {string} serviceId ID of the service to save
-		 * @param {boolean} sensitive whether to send the URL and the credentials
+		 * @param {boolean} sensitive whether to send the URL, the credentials
+		 *   and the extra headers
 		 */
 		async putService(serviceId, sensitive) {
 			const service = this.services.find(s => s.id === serviceId)
@@ -375,6 +376,7 @@ export default {
 					basic_user: (service.basic_user ?? '').trim(),
 					api_key: (service.api_key ?? '').trim(),
 					basic_password: (service.basic_password ?? '').trim(),
+					extra_headers: (service.extra_headers ?? []).map(header => ({ ...header })),
 				}
 				: {
 					name: service.name,

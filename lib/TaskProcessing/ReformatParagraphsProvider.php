@@ -110,6 +110,11 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -148,6 +153,10 @@ class ReformatParagraphsProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		$model = $this->model;
 		$chunks = $this->chunkService->chunkSplitPrompt($this->service, $prompt, false);
 		$result = '';
@@ -170,7 +179,7 @@ Aside from transportation, the price
 TEXT;
 			try {
 				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $chunk, $systemPrompt, null, 1, $maxTokens);
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $chunk, $systemPrompt, null, 1, $maxTokens, conversationId: $conversationId);
 					$completion = $completion['messages'];
 				} else {
 					$instruction = $systemPrompt . ' Here is the text:' . "\n\n" . $chunk;

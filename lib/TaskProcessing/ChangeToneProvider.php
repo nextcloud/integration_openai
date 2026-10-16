@@ -82,6 +82,11 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -131,6 +136,10 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		$model = $this->model;
 
 		$chunks = $this->chunkService->chunkSplitPrompt($this->service, $textInput, true, $maxTokens);
@@ -145,7 +154,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 			try {
 				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
 					if ($preferStreaming) {
-						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens);
+						$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens, conversationId: $conversationId);
 						$time = microtime(true);
 						foreach ($chunks as $chunk) {
 							if (!in_array($chunk['kind'] ?? null, ['content', 'reasoning_content'], true)) {
@@ -181,7 +190,7 @@ class ChangeToneProvider implements IProvider, ISynchronousOptionsAwareProvider 
 						$completion = $returnValue['messages'];
 						$reasoning = $returnValue['reasoning_messages'];
 					} else {
-						$returnValue = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens);
+						$returnValue = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, null, null, 1, $maxTokens, conversationId: $conversationId);
 						$completion = $returnValue['messages'];
 						$reasoning = $returnValue['reasoning_messages'];
 					}

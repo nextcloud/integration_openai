@@ -14,6 +14,7 @@ namespace OCA\OpenAi\Tests\Unit\Service;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -21,12 +22,16 @@ use OCA\OpenAi\Service\QuotaRuleService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\ServicesService;
 use OCA\OpenAi\Service\StreamingService;
+use OCA\OpenAi\Service\TranslateService;
 use OCA\OpenAi\Service\WatermarkingService;
 use OCA\OpenAi\TaskProcessing\AudioToTextProvider;
 use OCA\OpenAi\TaskProcessing\ImageToImageProvider;
 use OCA\OpenAi\TaskProcessing\ProviderFactory;
 use OCA\OpenAi\TaskProcessing\TextToImageProvider;
 use OCA\OpenAi\TaskProcessing\TextToSpeechProvider;
+use OCA\OpenAi\TaskProcessing\TextToTextChatProvider;
+use OCA\OpenAi\TaskProcessing\TextToTextProvider;
+use OCA\OpenAi\TaskProcessing\TranslateProvider;
 use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
@@ -53,6 +58,8 @@ class MultiServiceTest extends TestCase {
 	public const APIKEY_TRANSCRIPTION = 'This is a transcription PHPUnit test API key';
 	public const REQUEST_TIMEOUT_TRANSCRIPTION = 14;
 	public const TRANSCRIPTION_MODEL = 'my-whisper-model';
+	public const TEXT_BASE = 'https://text-generator.ai/v1';
+	public const APIKEY_TEXT = 'This is a text PHPUnit test API key';
 	public const TEXT_MODEL = 'my/text-model';
 
 	private OpenAiAPIService $openAiApiService;
@@ -454,6 +461,455 @@ class MultiServiceTest extends TestCase {
 		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
 
 		$audioToTextProvider->process(self::TEST_USER1, ['input' => $file], fn () => null);
+	}
+
+	public function testExtraHeadersAreStoredNormalized(): void {
+		$service = $this->addService([
+			'url' => self::SPEECH_BASE,
+			'extra_headers' => [
+				['name' => ' X-Tenant ', 'value' => ' acme '],
+			],
+		]);
+
+		$this->assertSame(
+			[['name' => 'X-Tenant', 'value' => 'acme']],
+			$service->getExtraHeaders(),
+		);
+	}
+
+	/**
+	 * @dataProvider invalidExtraHeadersProvider
+	 */
+	public function testInvalidExtraHeadersAreRejected(array $extraHeaders): void {
+		$this->expectException(\Exception::class);
+		$this->servicesService->addService([
+			'url' => self::SPEECH_BASE,
+			'extra_headers' => $extraHeaders,
+		]);
+	}
+
+	public function invalidExtraHeadersProvider(): array {
+		return [
+			'a name that is not an HTTP token' => [[['name' => 'X Api Key', 'value' => 'secret']]],
+			'an empty name' => [[['name' => '', 'value' => 'secret']]],
+			'a name that is only spaces' => [[['name' => ' ', 'value' => 'secret']]],
+			'a name with an injected line break' => [[['name' => "X-Tenant\r\nX-Evil", 'value' => 'a']]],
+			'a value with an injected line break' => [[['name' => 'X-Tenant', 'value' => "a\r\nb"]]],
+			'a value with a control character' => [[['name' => 'X-Tenant', 'value' => "a\x01b"]]],
+			'a value with the DEL character' => [[['name' => 'X-Tenant', 'value' => "a\x7fb"]]],
+			'a row without a value' => [[['name' => 'X-Tenant']]],
+			'a row that is not a pair' => [[['nope']]],
+			'a value with an unknown variable' => [[['name' => 'X-Session', 'value' => '{$conversationid}']]],
+			'a value with a mistyped variable' => [[['name' => 'X-Session', 'value' => '{$Conversation_ID}']]],
+			'a value with an empty variable' => [[['name' => 'X-Session', 'value' => '{$}']]],
+		];
+	}
+
+	public function testExtraHeadersAreSentAndCannotOverrideTheApiKey(): void {
+		$service = $this->addService([
+			'url' => self::SPEECH_BASE,
+			'api_key' => self::APIKEY_SPEECH,
+			'request_timeout' => self::REQUEST_TIMEOUT_SPEECH,
+			'tts_models' => [self::SPEECH_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'Authorization', 'value' => 'Bearer injected'],
+			],
+		]);
+
+		$ttsProvider = new TextToSpeechProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(WatermarkingService::class),
+			$service,
+			self::SPEECH_MODEL,
+		);
+
+		$inputText = 'This is a test prompt';
+
+		$response = file_get_contents(__DIR__ . '/../../res/speech.mp3');
+
+		if (!$response) {
+			throw new \RuntimeException('Could not read test resourcce `speech.mp3`');
+		}
+
+		$url = self::SPEECH_BASE . '/audio/speech';
+
+		$options = ['timeout' => self::REQUEST_TIMEOUT_SPEECH, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'Authorization' => 'Bearer ' . self::APIKEY_SPEECH, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'input' => $inputText,
+			'voice' => Application::DEFAULT_SPEECH_VOICE,
+			'model' => self::SPEECH_MODEL,
+			'response_format' => 'mp3',
+			'speed' => 1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$ttsProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null, includeWatermark: false);
+	}
+
+	public function testExtraHeadersInImageRequestOptions(): void {
+		$service = $this->addService([
+			'url' => self::IMAGE_BASE,
+			'api_key' => self::APIKEY_IMAGE,
+			'image_request_auth' => false,
+			'extra_headers' => [['name' => 'X-Tenant', 'value' => 'acme']],
+		]);
+
+		$options = $this->openAiApiService->getImageRequestOptions(self::TEST_USER1, $service);
+
+		$this->assertSame([
+			'timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT,
+			'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme'],
+		], $options);
+	}
+
+	public function testConversationIdHeaderIsExpandedOnChatRequests(): void {
+		$service = $this->addService([
+			'url' => self::TEXT_BASE,
+			'api_key' => self::APIKEY_TEXT,
+			'text_models' => [self::TEXT_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'X-Session', 'value' => '{$conversation_id}'],
+			],
+		]);
+
+		$chatProvider = new TextToTextChatProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		$systemPrompt = 'You are a helpful assistant';
+		$userPrompt = 'Hello';
+
+		$response = json_encode([
+			'choices' => [
+				['message' => ['role' => 'assistant', 'content' => 'Chat answer']],
+			],
+		]);
+
+		$url = self::TEXT_BASE . '/chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'X-Session' => '4242', 'Authorization' => 'Bearer ' . self::APIKEY_TEXT, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'model' => self::TEXT_MODEL,
+			'messages' => [
+				['role' => 'system', 'content' => $systemPrompt],
+				['role' => 'user', 'content' => $userPrompt],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $chatProvider->process(self::TEST_USER1, [
+			'input' => $userPrompt,
+			'system_prompt' => $systemPrompt,
+			'history' => [],
+			'conversation_id' => '4242',
+		], fn () => null);
+
+		$this->assertSame('Chat answer', $result['output']);
+	}
+
+	public function testConversationIdHeaderIsGeneratedWhenTheConversationIsUnknown(): void {
+		$service = $this->addService([
+			'url' => self::TEXT_BASE,
+			'api_key' => self::APIKEY_TEXT,
+			'text_models' => [self::TEXT_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'X-Session', 'value' => 'conv-{$conversation_id}'],
+			],
+		]);
+
+		$chatProvider = new TextToTextChatProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		$systemPrompt = 'You are a helpful assistant';
+		$userPrompt = 'Hello';
+
+		$response = json_encode([
+			'choices' => [
+				['message' => ['role' => 'assistant', 'content' => 'Chat answer']],
+			],
+		]);
+
+		// the same request without the conversation_id input: the header is
+		// still sent, with a throwaway ID generated for the request
+		$url = self::TEXT_BASE . '/chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'Authorization' => 'Bearer ' . self::APIKEY_TEXT, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'model' => self::TEXT_MODEL,
+			'messages' => [
+				['role' => 'system', 'content' => $systemPrompt],
+				['role' => 'user', 'content' => $userPrompt],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$generatedIds = [];
+		$this->iClient->expects($this->exactly(2))->method('post')->with(
+			$url,
+			$this->callback(static function (array $actualOptions) use ($options, &$generatedIds): bool {
+				$generatedId = $actualOptions['headers']['X-Session'] ?? null;
+				if (!is_string($generatedId) || preg_match('/^conv-[0-9a-f]{32}$/', $generatedId) !== 1) {
+					return false;
+				}
+				$generatedIds[] = $generatedId;
+				unset($actualOptions['headers']['X-Session']);
+				return $actualOptions == $options;
+			}),
+		)->willReturn($iResponse);
+
+		$result = $chatProvider->process(self::TEST_USER1, [
+			'input' => $userPrompt,
+			'system_prompt' => $systemPrompt,
+			'history' => [],
+		], fn () => null);
+
+		$this->assertSame('Chat answer', $result['output']);
+
+		$result = $chatProvider->process(self::TEST_USER1, [
+			'input' => $userPrompt,
+			'system_prompt' => $systemPrompt,
+			'history' => [],
+		], fn () => null);
+
+		$this->assertSame('Chat answer', $result['output']);
+
+		// a different throwaway ID per request: unrelated tasks must not share
+		// a stateful conversation on the service
+		$this->assertCount(2, $generatedIds);
+		$this->assertNotSame($generatedIds[0], $generatedIds[1]);
+	}
+
+	public function testConversationIdHeaderIsDroppedOnNonChatRequests(): void {
+		$service = $this->addService([
+			'url' => self::SPEECH_BASE,
+			'api_key' => self::APIKEY_SPEECH,
+			'request_timeout' => self::REQUEST_TIMEOUT_SPEECH,
+			'tts_models' => [self::SPEECH_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'X-Session', 'value' => '{$conversation_id}'],
+			],
+		]);
+
+		$ttsProvider = new TextToSpeechProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(WatermarkingService::class),
+			$service,
+			self::SPEECH_MODEL,
+		);
+
+		$inputText = 'This is a test prompt';
+
+		$response = file_get_contents(__DIR__ . '/../../res/speech.mp3');
+
+		if (!$response) {
+			throw new \RuntimeException('Could not read test resourcce `speech.mp3`');
+		}
+
+		// speech is not a chat, so the header referencing the conversation is
+		// not sent, while the static one is
+		$url = self::SPEECH_BASE . '/audio/speech';
+		$options = ['timeout' => self::REQUEST_TIMEOUT_SPEECH, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'Authorization' => 'Bearer ' . self::APIKEY_SPEECH, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'input' => $inputText,
+			'voice' => Application::DEFAULT_SPEECH_VOICE,
+			'model' => self::SPEECH_MODEL,
+			'response_format' => 'mp3',
+			'speed' => 1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$ttsProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => null, includeWatermark: false);
+	}
+
+	/**
+	 * Non-chat providers that go through the chat completion endpoint must
+	 * expand the conversation ID too, otherwise services requiring the header
+	 * reject the request.
+	 */
+	public function testConversationIdHeaderIsExpandedOnFreePromptRequests(): void {
+		$service = $this->addService([
+			'url' => self::TEXT_BASE,
+			'api_key' => self::APIKEY_TEXT,
+			'text_models' => [self::TEXT_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'X-Session', 'value' => '{$conversation_id}'],
+			],
+		]);
+
+		$freePromptProvider = new TextToTextProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		$userPrompt = 'Hello';
+
+		$response = json_encode([
+			'choices' => [
+				['message' => ['role' => 'assistant', 'content' => 'Free prompt answer']],
+			],
+		]);
+
+		$url = self::TEXT_BASE . '/chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'X-Session' => '4242', 'Authorization' => 'Bearer ' . self::APIKEY_TEXT, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'model' => self::TEXT_MODEL,
+			'messages' => [
+				['role' => 'user', 'content' => $userPrompt],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $freePromptProvider->process(self::TEST_USER1, [
+			'input' => $userPrompt,
+			'conversation_id' => '4242',
+		], fn () => null);
+
+		$this->assertSame('Free prompt answer', $result['output']);
+	}
+
+	public function testConversationIdHeaderIsExpandedOnTranslationRequests(): void {
+		$service = $this->addService([
+			'url' => self::TEXT_BASE,
+			'api_key' => self::APIKEY_TEXT,
+			'text_models' => [self::TEXT_MODEL],
+			'extra_headers' => [
+				['name' => 'X-Tenant', 'value' => 'acme'],
+				['name' => 'X-Session', 'value' => '{$conversation_id}'],
+			],
+		]);
+
+		$translateProvider = new TranslateProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			new TranslateService(
+				\OCP\Server::get(\Psr\Log\LoggerInterface::class),
+				$this->openAiApiService,
+				new ChunkService(),
+				\OCP\Server::get(ICacheFactory::class),
+			),
+			$service,
+			self::TEXT_MODEL,
+		);
+
+		$inputText = 'Hello world';
+		$coreLanguages = TranslateService::getCoreLanguagesByCode();
+		$toLanguage = $coreLanguages['fr'] ?? 'fr';
+		$prompt = 'Translate the following text to ' . $toLanguage . ': ' . PHP_EOL . PHP_EOL . $inputText;
+
+		$response = json_encode([
+			'choices' => [
+				['message' => ['role' => 'assistant', 'content' => json_encode(['translation' => 'Bonjour le monde'])]],
+			],
+		]);
+
+		$url = self::TEXT_BASE . '/chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'X-Tenant' => 'acme', 'X-Session' => '4242', 'Authorization' => 'Bearer ' . self::APIKEY_TEXT, 'Content-Type' => 'application/json'], 'nextcloud' => ['allow_local_address' => true]];
+		$options['body'] = json_encode([
+			'response_format' => TranslateService::JSON_RESPONSE_FORMAT['response_format'],
+			'model' => self::TEXT_MODEL,
+			'messages' => [
+				['role' => 'system', 'content' => TranslateService::SYSTEM_PROMPT],
+				['role' => 'user', 'content' => $prompt],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$result = $translateProvider->process(self::TEST_USER1, [
+			'input' => $inputText,
+			'origin_language' => 'detect_language',
+			'target_language' => 'fr',
+			'conversation_id' => '4242',
+		], fn () => null);
+
+		$this->assertSame('Bonjour le monde', $result['output']);
+	}
+
+	public function testInvalidHeaderFromTheHttpClientBecomesAConfigError(): void {
+		$service = $this->addService([
+			'url' => self::TEXT_BASE,
+			'api_key' => self::APIKEY_TEXT,
+			'text_models' => [self::TEXT_MODEL],
+		]);
+
+		// the HTTP client validates the headers when building the request and
+		// throws a bare InvalidArgumentException quoting the rejected value: the
+		// error must be reported without leaking the credentials it mentions
+		$this->iClient->expects($this->once())->method('post')->willThrowException(
+			new \InvalidArgumentException('"Bearer ' . self::APIKEY_TEXT . '" is not valid header value.'),
+		);
+
+		$thrown = null;
+		try {
+			$this->openAiApiService->createChatCompletion(
+				self::TEST_USER1, $service, self::TEXT_MODEL, 'Hello', 'You are a helpful assistant',
+			);
+		} catch (\Exception $e) {
+			$thrown = $e;
+		}
+
+		$this->assertInstanceOf(\Exception::class, $thrown);
+		$this->assertSame(\OCP\AppFramework\Http::STATUS_BAD_REQUEST, $thrown->getCode());
+		$this->assertStringNotContainsString(self::APIKEY_TEXT, $thrown->getMessage());
 	}
 
 	public function testProvidersOfDifferentServicesHaveDifferentIds(): void {

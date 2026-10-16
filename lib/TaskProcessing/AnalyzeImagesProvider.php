@@ -64,6 +64,11 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 				$this->l->t('The maximum number of words/tokens that can be generated in the output.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -126,6 +131,10 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 		if (isset($input['max_tokens']) && is_int($input['max_tokens'])) {
 			$maxTokens = $input['max_tokens'];
 		}
+
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
 		$fileSizeTotal = array_reduce(
 			$images,
 			function ($carry, $file) {
@@ -145,7 +154,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 		try {
 			$systemPrompt = 'Take the user\'s question and answer it based on the provided images. Ensure that the answer matches the language of the user\'s question.';
 			if ($preferStreaming) {
-				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $this->service, $model, $prompt, $systemPrompt, $history, 1, $maxTokens, null, null, null, $images);
+				$chunks = $this->openAiAPIService->createStreamedChatCompletion($userId, $this->service, $model, $prompt, $systemPrompt, $history, 1, $maxTokens, null, null, null, $images, conversationId: $conversationId);
 				$time = microtime(true);
 				$streamedOutput = '';
 				$streamedReasoning = '';
@@ -183,7 +192,7 @@ class AnalyzeImagesProvider implements IProvider, ISynchronousOptionsAwareProvid
 				$completion = $returnValue['messages'];
 				$reasoning = $returnValue['reasoning_messages'];
 			} else {
-				$returnValue = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, $systemPrompt, $history, 1, $maxTokens, null, null, null, $images);
+				$returnValue = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $prompt, $systemPrompt, $history, 1, $maxTokens, null, null, null, $images, conversationId: $conversationId);
 				$completion = $returnValue['messages'];
 				$reasoning = $returnValue['reasoning_messages'];
 			}

@@ -76,6 +76,11 @@ class SummaryProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -128,6 +133,10 @@ class SummaryProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		$model = $this->model;
 
 		$prompts = $this->chunkService->chunkSplitPrompt($this->service, $prompt);
@@ -164,7 +173,7 @@ class SummaryProvider implements ISynchronousProvider {
 				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
 
 					foreach ($prompts as $p) {
-						$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $p, $summarySystemPrompt, null, 1, $maxTokens);
+						$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $p, $summarySystemPrompt, null, 1, $maxTokens, conversationId: $conversationId);
 						$completions[] = $completion['messages'];
 						$progress += $increase;
 						$running = $reportProgress($progress);

@@ -153,6 +153,46 @@
 				</div>
 			</div>
 
+			<!-- Extra request headers -->
+			<h4>{{ t('integration_openai', 'Extra request headers') }}</h4>
+			<NcNoteCard type="info">
+				{{ t('integration_openai', 'Headers sent with every request to this service. The service\'s own authentication always takes precedence over a configured Authorization header.') }}
+				<br>
+				{{ t('integration_openai', 'The only supported variable is {example}: it is replaced with the conversation ID of the request, randomly generated when the task is not part of a conversation. Such a header is only sent with the chat completion requests.', { example: '{$conversation_id}' }) }}
+			</NcNoteCard>
+			<div v-for="(header, index) in extraHeaders" :key="index" class="line align-bottom">
+				<NcTextField
+					:id="'openai-extra-header-name-' + service.id + '-' + index"
+					v-model="header.name"
+					class="input"
+					:label="t('integration_openai', 'Header name')"
+					:placeholder="'X-Api-Key'"
+					:error="headerNameInvalid(header.name)"
+					:helper-text="headerNameInvalid(header.name) ? t('integration_openai', 'Not a valid header name yet, so it is not saved') : ''"
+					@update:model-value="onExtraHeadersInput" />
+				<NcTextField
+					:id="'openai-extra-header-value-' + service.id + '-' + index"
+					v-model="header.value"
+					class="input"
+					:label="t('integration_openai', 'Header value')"
+					:error="headerValueInvalid(header.value)"
+					:helper-text="headerValueInvalid(header.value) ? t('integration_openai', 'Not a supported variable yet, so it is not saved') : ''"
+					@update:model-value="onExtraHeadersInput" />
+				<NcButton variant="tertiary" :aria-label="t('integration_openai', 'Remove this header')" @click="removeExtraHeader(index)">
+					<template #icon>
+						<DeleteOutlineIcon :size="20" />
+					</template>
+				</NcButton>
+			</div>
+			<div class="line">
+				<NcButton variant="tertiary" @click="addExtraHeader">
+					<template #icon>
+						<PlusIcon :size="20" />
+					</template>
+					{{ t('integration_openai', 'Add a header') }}
+				</NcButton>
+			</div>
+
 			<!-- Models per modality -->
 			<h4>{{ t('integration_openai', 'Exposed models') }}</h4>
 			<NcNoteCard type="info">
@@ -402,6 +442,7 @@ import DeleteOutlineIcon from 'vue-material-design-icons/DeleteOutline.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import HelpCircleOutlineIcon from 'vue-material-design-icons/HelpCircleOutline.vue'
 import KeyOutlineIcon from 'vue-material-design-icons/KeyOutline.vue'
+import PlusIcon from 'vue-material-design-icons/Plus.vue'
 import RefreshIcon from 'vue-material-design-icons/Refresh.vue'
 import UnfoldLessHorizontalIcon from 'vue-material-design-icons/UnfoldLessHorizontal.vue'
 import UnfoldMoreHorizontalIcon from 'vue-material-design-icons/UnfoldMoreHorizontal.vue'
@@ -430,6 +471,7 @@ export default {
 		EarthIcon,
 		HelpCircleOutlineIcon,
 		KeyOutlineIcon,
+		PlusIcon,
 		RefreshIcon,
 		UnfoldLessHorizontalIcon,
 		UnfoldMoreHorizontalIcon,
@@ -470,6 +512,11 @@ export default {
 			// other property of the same request
 			llmExtraParams: this.service.llm_extra_params ?? '',
 			defaultImageSize: this.service.default_image_size ?? '',
+			// edited locally like the two above: rows that are still being
+			// typed, or whose name is not a valid header name yet, are not
+			// sent to the backend, which would reject them and with them the
+			// rest of the sensitive payload
+			extraHeaders: (this.service.extra_headers ?? []).map(header => ({ ...header })),
 			// to prevent some browsers from filling fields with remembered passwords
 			readonly: true,
 			models: null,
@@ -497,6 +544,12 @@ export default {
 		defaultImageSizeValid() {
 			const size = this.defaultImageSize.trim()
 			return size === '' || /^\d+x\d+$/.test(size)
+		},
+		/** Whether any row is new, empty or not registerable yet, so the backend must not overwrite the list */
+		extraHeadersPending() {
+			return this.extraHeaders.some(
+				header => this.headerIncomplete(header) || this.headerDirty(header),
+			)
 		},
 		modalities() {
 			return [
@@ -586,6 +639,11 @@ export default {
 				this.defaultImageSize = value ?? ''
 			}
 		},
+		'service.extra_headers'(value) {
+			if (!this.extraHeadersPending) {
+				this.extraHeaders = (value ?? []).map(header => ({ ...header }))
+			}
+		},
 	},
 
 	mounted() {
@@ -618,6 +676,43 @@ export default {
 			const parsed = parseInt(value)
 			quotas[index] = isNaN(parsed) || parsed < 0 ? 0 : parsed
 			this.onInput({ quotas })
+		},
+		headerNameInvalid(name) {
+			const trimmed = name.trim()
+			return trimmed !== '' && !/^[a-zA-Z0-9!#$%&'*+.^_`|~-]+$/.test(trimmed)
+		},
+		headerValueInvalid(value) {
+			for (const variable of value.matchAll(/\{\$[^}]*\}/g)) {
+				if (variable[0] !== '{$conversation_id}') {
+					return true
+				}
+			}
+			return false
+		},
+		headerIncomplete(header) {
+			return header.name.trim() === '' || header.value.trim() === ''
+		},
+		headerDirty(header) {
+			return this.headerNameInvalid(header.name) || this.headerValueInvalid(header.value)
+		},
+		addExtraHeader() {
+			this.extraHeaders.push({ name: '', value: '' })
+		},
+		removeExtraHeader(index) {
+			this.extraHeaders.splice(index, 1)
+			this.onExtraHeadersInput()
+		},
+		onExtraHeadersInput() {
+			// a half-typed or invalid row must not reject the rest of the
+			// sensitive payload it travels with, so hold it back until it can
+			// be registered, skipping the ones that are still empty
+			if (this.extraHeaders.some(header => this.headerDirty(header))) {
+				return
+			}
+			const headers = this.extraHeaders
+				.filter(header => !this.headerIncomplete(header))
+				.map(header => ({ name: header.name.trim(), value: header.value.trim() }))
+			this.onSensitiveInput({ extra_headers: headers })
 		},
 		async loadModels() {
 			this.loadingModels = true
@@ -703,6 +798,10 @@ export default {
 	&.column {
 		flex-direction: column;
 		align-items: start;
+	}
+
+	&.align-bottom {
+		align-items: flex-end;
 	}
 
 	.input {
