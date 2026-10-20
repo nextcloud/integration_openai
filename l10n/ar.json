@@ -104,7 +104,6 @@
     "Desired tone" : "النغمة المطلوبة",
     "In which tone should your text be rewritten?" : "بأي نغمة تريد إعادة صياغة نصك؟",
     "The rewritten text in the desired tone, written by the assistant:" : "النص المعاد صياغته من قِبَل \"المساعد\" بحسب النغمة المطلوبة:",
-    "OpenAI's DALL-E 2" : "OpenAI's DALL-E 2",
     "The model used to generate the images" : "النموذج المستعمل لتوليد الصِّوَر",
     "Failed to load models" : "تعذّر رفع النماذج",
     "Services with an OpenAI-compatible API:" : "خدمات متوافقة مع واجهة تطبيقات OpenAI:",

@@ -100,7 +100,6 @@ OC.L10N.register(
     "Desired tone" : "Pożądany ton wypowiedzi",
     "In which tone should your text be rewritten?" : "W jakim tonie powinien zostać napisany Twój tekst?",
     "The rewritten text in the desired tone, written by the assistant:" : "Przepisany tekst w pożądanym tonie, napisany przez asystenta:",
-    "OpenAI's DALL-E 2" : "OpenAI DALL-E 2",
     "The model used to generate the images" : "Model użyty do wygenerowania obrazów",
     "Generate speech" : "Generuj mowę",
     "Generate speech from a transcript" : "Wygeneruj mowę z transkryptu",
