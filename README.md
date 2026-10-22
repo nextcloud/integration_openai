@@ -26,8 +26,9 @@ Per modality, the following providers are registered for each selected model:
 They might work when connecting to other services, without any guarantee.
 
 Instead of connecting to the OpenAI API for these, you can also connect to a self-hosted [LocalAI](https://localai.io) instance or [Ollama](https://ollama.com/) instance
-or to any service that implements an API similar to the OpenAI one, for example:
-[IONOS AI Model Hub](https://docs.ionos.com/cloud/ai/ai-model-hub), [Plusserver](https://www.plusserver.com/en/ai-platform/), [MistralAI](https://mistral.ai) or [Eden AI](https://www.edenai.co).  
+or to any service that implements an API similar to the OpenAI one, for example [MistralAI](https://mistral.ai),
+[IONOS AI Model Hub](https://docs.ionos.com/cloud/ai/ai-model-hub) or [OpenRouter](https://openrouter.ai).
+See [the list of supported providers](docs/supported_providers.md) for more services and their service URLs.  
 Make sure to use the OpenAI-compatible endpoint instead of the custom ones they provide.
 
 :warning: This app is mainly tested with OpenAI. We do not guarantee it works perfectly
