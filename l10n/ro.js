@@ -7,6 +7,7 @@ OC.L10N.register(
     "Bad HTTP method" : "Metodă HTTP nepotrivită",
     "Bad credentials" : "Credențiale greșite",
     "Name" : "Nume",
+    "Detect language" : "Detectează limba",
     "Memories" : "Amintiri",
     "Speed" : "Viteză",
     "Language" : "Limba",
