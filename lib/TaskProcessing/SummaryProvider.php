@@ -11,7 +11,6 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\Service\ChunkService;
 use OCA\OpenAi\Service\OpenAiAPIService;
-use OCA\OpenAi\Service\OpenAiSettingsService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
@@ -25,11 +24,13 @@ use OCP\TaskProcessing\TaskTypes\TextToTextSummary;
 class SummaryProvider implements ISynchronousProvider {
 	use ProviderIdentity;
 
+	public const DEFAULT_SYSTEM_PROMPT = 'You are a helpful assistant that summarizes text in the same language as the text. '
+		. 'You should only return the summary without any additional information. ';
+
 	public function __construct(
 		private OpenAiAPIService $openAiAPIService,
 		private IL10N $l,
 		private ChunkService $chunkService,
-		private OpenAiSettingsService $openAiSettingsService,
 		private ServiceConfig $service,
 		private string $model,
 	) {
@@ -144,7 +145,15 @@ class SummaryProvider implements ISynchronousProvider {
 
 			try {
 				$completions = [];
-				$summarySystemPrompt = $this->openAiSettingsService->getSummarySystemPrompt() . ' ';
+
+				// Use the admin-configured prompt, then default. Format and complexity appended
+				$summarySystemPrompt = $this->service->getSystemPromptSummary();
+				if ($summarySystemPrompt === '') {
+					$summarySystemPrompt = self::DEFAULT_SYSTEM_PROMPT;
+				} else {
+					$summarySystemPrompt .= ' ';
+				}
+
 				if (isset($input['format'])) {
 					if ($input['format'] === 'paragraph') {
 						$summarySystemPrompt .= 'Return the summary as a paragraph. ';
@@ -161,6 +170,7 @@ class SummaryProvider implements ISynchronousProvider {
 						$summarySystemPrompt .= 'Use simple language and vocabulary appropriate for a 5 year old. ';
 					}
 				}
+
 				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
 
 					foreach ($prompts as $p) {
