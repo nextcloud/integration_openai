@@ -69,6 +69,11 @@ class ProofreadProvider implements ISynchronousProvider {
 				$this->l->t('The maximum number of words/tokens that can be generated in the completion.'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -119,6 +124,10 @@ class ProofreadProvider implements ISynchronousProvider {
 			$maxTokens = $input['max_tokens'];
 		}
 
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
+
 		$model = $this->model;
 
 		$chunks = $this->chunkService->chunkSplitPrompt($this->service, $textInput, true, $maxTokens);
@@ -129,7 +138,7 @@ class ProofreadProvider implements ISynchronousProvider {
 		foreach ($chunks as $textInput) {
 			try {
 				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $textInput, $systemPrompt, null, 1, $maxTokens);
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $textInput, $systemPrompt, null, 1, $maxTokens, conversationId: $conversationId);
 					$completion = $completion['messages'];
 				} else {
 					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $textInput;
@@ -156,7 +165,7 @@ class ProofreadProvider implements ISynchronousProvider {
 			$systemPrompt = 'Repeat the proofread feedback list. Ensure that no information is lost, but also not duplicated. ';
 			try {
 				if ($this->service->isUsingOpenAi() || $this->service->getChatEndpointEnabled()) {
-					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $result, $systemPrompt, null, 1, $maxTokens);
+					$completion = $this->openAiAPIService->createChatCompletion($userId, $this->service, $model, $result, $systemPrompt, null, 1, $maxTokens, conversationId: $conversationId);
 					$completion = $completion['messages'];
 				} else {
 					$prompt = $systemPrompt . ' Here is the text:' . "\n\n" . $result;

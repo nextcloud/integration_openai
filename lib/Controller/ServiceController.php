@@ -25,7 +25,7 @@ use OCP\IRequest;
  */
 class ServiceController extends Controller {
 	/** Properties that may only be changed with a confirmed password */
-	private const SENSITIVE_PROPERTIES = ['url', 'api_key', 'basic_user', 'basic_password'];
+	private const SENSITIVE_PROPERTIES = ['url', 'api_key', 'basic_user', 'basic_password', 'extra_headers'];
 
 	public function __construct(
 		string $appName,
@@ -59,7 +59,7 @@ class ServiceController extends Controller {
 	/**
 	 * Update the given properties of a service
 	 *
-	 * The URL and the credentials can only be set through
+	 * The URL, the credentials and the extra headers can only be set through
 	 * {@see self::updateSensitive()}.
 	 *
 	 * @param string $id ID of the service
@@ -76,7 +76,7 @@ class ServiceController extends Controller {
 	}
 
 	/**
-	 * Update the URL and the credentials of a service
+	 * Update the URL, the credentials and the extra headers of a service
 	 *
 	 * Secrets that are sent back unchanged (as the placeholder the frontend
 	 * received) are kept.

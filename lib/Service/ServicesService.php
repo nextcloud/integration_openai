@@ -429,6 +429,31 @@ class ServicesService {
 			&& preg_match('/^\d+x\d+$/', (string)$values['default_image_size']) !== 1) {
 			throw new Exception('Invalid image size value. Expected the format <width>x<height>');
 		}
+		if (isset($values['extra_headers'])) {
+			foreach ($values['extra_headers'] as $header) {
+				if (!is_array($header) || !isset($header['name'], $header['value'])
+					|| !is_string($header['name']) || !is_string($header['value'])) {
+					throw new Exception('Invalid extra header. Expected a name and a value');
+				}
+				$name = trim($header['name']);
+				if ($name === '') {
+					throw new Exception('Invalid extra header name. It cannot be empty');
+				}
+				if (preg_match(ServiceConfig::HEADER_NAME_PATTERN, $name) !== 1) {
+					throw new Exception('Invalid extra header name. Only the characters allowed in an HTTP header name are accepted: ' . $name);
+				}
+				if (preg_match(ServiceConfig::HEADER_VALUE_PATTERN, $header['value']) !== 1) {
+					throw new Exception('Invalid extra header value. Only the characters allowed in an HTTP header value are accepted: ' . $name);
+				}
+				if (preg_match_all('/\{\$[^}]*\}/', $header['value'], $variables) > 0) {
+					foreach ($variables[0] as $variable) {
+						if (!in_array($variable, ServiceConfig::SUPPORTED_HEADER_VARIABLES, true)) {
+							throw new Exception('Unknown variable in an extra header value: ' . $variable . '. Supported variables: ' . implode(', ', ServiceConfig::SUPPORTED_HEADER_VARIABLES));
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**

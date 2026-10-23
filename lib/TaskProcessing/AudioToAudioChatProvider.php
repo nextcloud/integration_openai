@@ -89,6 +89,11 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 					: $this->l->t('Speech speed modifier'),
 				EShapeType::Number
 			),
+			'conversation_id' => new ShapeDescriptor(
+				$this->l->t('Conversation ID'),
+				$this->l->t('The ID of the conversation this request belongs to.'),
+				EShapeType::Text
+			),
 		];
 	}
 
@@ -175,9 +180,13 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 			'audio' => ['voice' => $outputVoice, 'format' => 'mp3'],
 		];
 		$systemPrompt .= ' Producing text responses will break the user interface. Important: You have multimodal voice capability, and you use voice exclusively to respond.';
+		$conversationId = isset($input['conversation_id']) && is_string($input['conversation_id'])
+			? $input['conversation_id']
+			: null;
 		$completion = $this->openAiAPIService->createChatCompletion(
 			$userId, $this->service, $this->model, null, $systemPrompt, $history, 1, 1000,
-			$extraParams, null, null, [$inputFile]
+			$extraParams, null, null, [$inputFile],
+			conversationId: $conversationId,
 		);
 		$message = array_pop($completion['audio_messages']);
 		// TODO find a way to force the model to answer with audio when there is only text in the history
