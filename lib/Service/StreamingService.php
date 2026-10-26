@@ -48,24 +48,28 @@ class StreamingService {
 			$usage = null;
 			$choices = [];
 
-			while (!feof($body)) {
-				$chunk = fread($body, self::CHUNK_SIZE);
-				if ($chunk === false) {
-					throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
-				}
-				if ($chunk === '') {
-					continue;
+			try {
+				while (!$done && !feof($body)) {
+					$chunk = fread($body, self::CHUNK_SIZE);
+					if ($chunk === false) {
+						throw new Exception($this->l10n->t('Malformed API response'), Http::STATUS_INTERNAL_SERVER_ERROR);
+					}
+					if ($chunk === '') {
+						continue;
+					}
+
+					foreach ($this->parseSseChunk($chunk, $eventBuffer, $done, $usage, $choices) as $partial) {
+						yield $partial;
+					}
 				}
 
-				foreach ($this->parseSseChunk($chunk, $eventBuffer, $done, $usage, $choices) as $partial) {
-					yield $partial;
+				if (!$done) {
+					foreach ($this->parseSseChunk('', $eventBuffer, $done, $usage, $choices, true) as $partial) {
+						yield $partial;
+					}
 				}
-			}
-
-			if (!$done) {
-				foreach ($this->parseSseChunk('', $eventBuffer, $done, $usage, $choices, true) as $partial) {
-					yield $partial;
-				}
+			} finally {
+				fclose($body);
 			}
 
 			$result = [];
