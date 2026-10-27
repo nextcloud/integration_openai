@@ -31,6 +31,7 @@ OC.L10N.register(
     "Size" : "Størrelse",
     "Prompt" : "Spør",
     "Minimal" : "Minimal",
+    "Format" : "Format",
     "Auto" : "Auto",
     "Medium" : "Medium",
     "Cannot generate less than 1 image" : "Kan ikke generere mindre enn 1 bilde",

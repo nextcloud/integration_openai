@@ -11,6 +11,7 @@ OC.L10N.register(
     "Default" : "Por omisión",
     "Size" : "Tamaño",
     "Prompt" : "Prompt",
+    "Format" : "Formato",
     "Auto" : "Auto",
     "Medium" : "Medio",
     "Start date" : "Fecha de inicio",

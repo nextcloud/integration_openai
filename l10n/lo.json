@@ -55,6 +55,7 @@
     "Size" : "ຂະໜາດ",
     "Optional. The size of the generated images. Must be in 256x256 format. Default is %s" : "ທາງເລືອກ. ຂະໜາດຂອງຮູບພາບທີ່ສ້າງຂຶ້ນ. ຕ້ອງຢູ່ໃນຮູບແບບ 256x256. ຄ່າເລີ່ມຕົ້ນແມ່ນ %s",
     "Prompt" : "ຄຳສັ່ງ",
+    "Format" : "ຮູບແບບ",
     "Auto" : "ອັດຕະໂນມັດ",
     "Simple" : "ແບບງ່າຍ",
     "Medium" : "Medium",

@@ -22,6 +22,7 @@ OC.L10N.register(
     "Default" : "privzeto",
     "The maximum number of words/tokens that can be generated in the completion." : "Največje število besed / žetonov, ki jih je mogoče ustvariti v zaključku.",
     "Size" : "Velikost",
+    "Format" : "Zapis",
     "Auto" : "Samodejno",
     "Medium" : "Srednja",
     "Cannot generate less than 1 image" : "Ne morem izdelati manj kot 1 sliko",
