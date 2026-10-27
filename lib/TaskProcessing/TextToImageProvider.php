@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\FileFormatDetector;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\WatermarkingService;
@@ -18,6 +19,7 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\FileShaped;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\TaskTypes\TextToImage;
@@ -159,16 +161,16 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 				$imageResponse = $client->get($url, $requestOptions);
 				$image = $imageResponse->getBody();
 				$image = $includeWatermark ? $this->watermarkingService->markImage($image) : $image;
-				$output['images'][] = $image;
+				$output['images'][] = new FileShaped(EShapeType::Image, $image, FileFormatDetector::getImageExtension($image));
 			}
 			foreach ($b64s as $b64) {
 				$imagePayload = base64_decode($b64);
 				$image = $includeWatermark ? $this->watermarkingService->markImage($imagePayload) : $imagePayload;
-				$output['images'][] = $image;
+				$output['images'][] = new FileShaped(EShapeType::Image, $image, FileFormatDetector::getImageExtension($image));
 			}
 			$endTime = time();
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime, $this->service);
-			/** @var array<string, list<numeric|string>|numeric|string> $output */
+			/** @var array<string, list<numeric|string|FileShaped>|numeric|string|FileShaped> $output */
 			return $output;
 		} catch (UserFacingProcessingException $e) {
 			throw $e;

@@ -18,6 +18,7 @@ use OCP\Files\File;
 use OCP\Http\Client\IClientService;
 use OCP\IL10N;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\FileShaped;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -88,7 +89,9 @@ class ImageToImageProviderSizeTest extends TestCase {
 			->willReturn(['data' => [['b64_json' => base64_encode('img')]]]);
 
 		$result = $provider->process('user', $this->validInput(['size' => $size]), static fn () => null);
-		$this->assertSame(['output' => 'img'], $result);
+		$this->assertInstanceOf(FileShaped::class, $result['output']);
+		$this->assertSame('img', $result['output']->getData());
+		$this->assertSame('', $result['output']->getExtension());
 	}
 
 	/**
@@ -157,7 +160,9 @@ class ImageToImageProviderSizeTest extends TestCase {
 			->willReturn(['data' => [['b64_json' => base64_encode('img')]]]);
 
 		$result = $provider->process('user', $this->validInput(['size' => $size]), static fn () => null);
-		$this->assertSame(['output' => 'img'], $result);
+		$this->assertInstanceOf(FileShaped::class, $result['output']);
+		$this->assertSame('img', $result['output']->getData());
+		$this->assertSame('', $result['output']->getExtension());
 	}
 
 	/**

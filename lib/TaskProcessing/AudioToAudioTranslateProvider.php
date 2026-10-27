@@ -11,6 +11,7 @@ namespace OCA\OpenAi\TaskProcessing;
 
 use Exception;
 use OCA\OpenAi\AppInfo\Application;
+use OCA\OpenAi\Service\FileFormatDetector;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\TranslateService;
@@ -22,6 +23,7 @@ use OCP\L10N\IFactory;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\FileShaped;
 use OCP\TaskProcessing\IProvider;
 use OCP\TaskProcessing\ISynchronousOptionsAwareProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
@@ -296,7 +298,7 @@ class AudioToAudioTranslateProvider implements IProvider, ISynchronousOptionsAwa
 		// Translation
 		return [
 			'text_input' => $transcription . $watermarkSuffix,
-			'audio_output' => $translatedAudio,
+			'audio_output' => new FileShaped(EShapeType::Audio, $translatedAudio, FileFormatDetector::getAudioExtension($translatedAudio) ?: 'mp3'),
 			'text_output' => $translatedText . $watermarkSuffix,
 		];
 	}
