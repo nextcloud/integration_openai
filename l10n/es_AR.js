@@ -7,6 +7,7 @@ OC.L10N.register(
     "Language" : "Idioma",
     "Default" : "Por defecto",
     "Size" : "Tamaño",
+    "Format" : "Formato",
     "Medium" : "Medio",
     "Start date" : "Fecha de inicio",
     "API key" : "Llave de API",

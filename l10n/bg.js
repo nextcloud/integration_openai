@@ -14,6 +14,7 @@ OC.L10N.register(
     "Default" : "По подразбиране",
     "Prompt" : "Подкана",
     "Minimal" : "Минимална",
+    "Format" : "Формат",
     "Auto" : "Автоматично",
     "Simple" : "Обикновен",
     "Medium" : "Средна",

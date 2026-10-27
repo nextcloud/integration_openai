@@ -9,6 +9,7 @@ OC.L10N.register(
     "Speed" : "Ātrums",
     "Language" : "Valoda",
     "Size" : "Izmērs",
+    "Format" : "Formāts",
     "Auto" : "Automātiski",
     "Start date" : "Sākuma datums",
     "API key" : "API atslēga",
