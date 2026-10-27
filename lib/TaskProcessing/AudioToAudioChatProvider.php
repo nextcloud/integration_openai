@@ -16,6 +16,7 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\FileShaped;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
@@ -211,7 +212,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$result['audio_expires_at'] = $message['audio']['expires_at'];
 			}
 		}
-		$result['output'] = $output;
+		$result['output'] = new FileShaped(EShapeType::Audio, $output, 'mp3');
 		$result['output_transcript'] = $textResponse;
 
 		// the transcript of the input is part of the task output

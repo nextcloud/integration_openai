@@ -16,6 +16,7 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\FileShaped;
 use OCP\TaskProcessing\ISynchronousWatermarkingProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
@@ -141,7 +142,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 			}
 			$audio = $includeWatermark ? $this->watermarkingService->markAudio($apiResponse['body']) : $apiResponse['body'];
 
-			return ['speech' => $audio];
+			return ['speech' => new FileShaped(EShapeType::Audio, $audio, 'mp3')];
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
 		} catch (\Throwable $e) {

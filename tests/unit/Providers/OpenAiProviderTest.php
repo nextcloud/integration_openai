@@ -41,6 +41,8 @@ use OCP\Http\Client\IClient;
 use OCP\Http\Client\IClientService;
 use OCP\IAppConfig;
 use OCP\ICacheFactory;
+use OCP\TaskProcessing\EShapeType;
+use OCP\TaskProcessing\FileShaped;
 use OCP\TaskProcessing\SynchronousProviderOptions;
 use OCP\TaskProcessing\TaskTypes\TextToTextReformatParagraphs;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -1015,7 +1017,8 @@ class OpenAiProviderTest extends TestCase {
 		$this->assertArrayHasKey('audio_output', $result);
 		$this->assertEquals($transcribedText, $result['text_input']);
 		$this->assertEquals($translatedText, $result['text_output']);
-		$this->assertEquals($ttsResponse, $result['audio_output']);
+		$this->assertInstanceOf(FileShaped::class, $result['audio_output']);
+		$this->assertEquals($ttsResponse, $result['audio_output']->getData());
 
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
@@ -1114,6 +1117,9 @@ class OpenAiProviderTest extends TestCase {
 		$result = $TextToImageProvider->process(self::TEST_USER1, ['input' => $inputText, 'numberOfImages' => 1], fn () => true);
 		$this->assertArrayHasKey('images', $result);
 		$this->assertArrayHasKey(0, $result['images']);
+		$this->assertInstanceOf(FileShaped::class, $result['images'][0]);
+		$this->assertEquals(EShapeType::Image, $result['images'][0]->getShapeType());
+		$this->assertSame('jpeg', $result['images'][0]->getExtension());
 
 		// Check that token usage is logged properly (should be 21 characters)
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_IMAGE);
@@ -1187,7 +1193,10 @@ class OpenAiProviderTest extends TestCase {
 			fn () => true,
 		);
 		$this->assertArrayHasKey('output', $result);
-		$this->assertEquals($inputImage, $result['output']);
+		$this->assertInstanceOf(FileShaped::class, $result['output']);
+		$this->assertEquals(EShapeType::Image, $result['output']->getShapeType());
+		$this->assertSame('jpeg', $result['output']->getExtension());
+		$this->assertEquals($inputImage, $result['output']->getData());
 
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_IMAGE);
 		$this->assertEquals(1, $usage);
