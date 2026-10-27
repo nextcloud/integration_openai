@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
+use OCA\OpenAi\Service\FileFormatDetector;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCP\Files\File;
@@ -212,7 +213,7 @@ class AudioToAudioChatProvider implements ISynchronousProvider {
 				$result['audio_expires_at'] = $message['audio']['expires_at'];
 			}
 		}
-		$result['output'] = new FileShaped(EShapeType::Audio, $output, 'mp3');
+		$result['output'] = new FileShaped(EShapeType::Audio, $output, FileFormatDetector::getAudioExtension($output) ?: 'mp3');
 		$result['output_transcript'] = $textResponse;
 
 		// the transcript of the input is part of the task output

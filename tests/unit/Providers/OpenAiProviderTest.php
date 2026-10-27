@@ -1019,6 +1019,7 @@ class OpenAiProviderTest extends TestCase {
 		$this->assertEquals($translatedText, $result['text_output']);
 		$this->assertInstanceOf(FileShaped::class, $result['audio_output']);
 		$this->assertEquals($ttsResponse, $result['audio_output']->getData());
+		$this->assertSame('mp3', $result['audio_output']->getExtension());
 
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
@@ -1062,6 +1063,8 @@ class OpenAiProviderTest extends TestCase {
 
 		$result = $TTSProvider->process(self::TEST_USER1, ['input' => $inputText], fn () => true);
 		$this->assertArrayHasKey('speech', $result);
+		$this->assertInstanceOf(FileShaped::class, $result['speech']);
+		$this->assertSame('mp3', $result['speech']->getExtension());
 
 		// Check that token usage is logged properly (should be 21 characters)
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_SPEECH);

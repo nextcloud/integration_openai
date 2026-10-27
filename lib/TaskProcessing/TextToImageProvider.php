@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\ImageFormatDetector;
+use OCA\OpenAi\Service\FileFormatDetector;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\WatermarkingService;
@@ -161,12 +161,12 @@ class TextToImageProvider implements ISynchronousWatermarkingProvider {
 				$imageResponse = $client->get($url, $requestOptions);
 				$image = $imageResponse->getBody();
 				$image = $includeWatermark ? $this->watermarkingService->markImage($image) : $image;
-				$output['images'][] = new FileShaped(EShapeType::Image, $image, ImageFormatDetector::getImageExtension($image));
+				$output['images'][] = new FileShaped(EShapeType::Image, $image, FileFormatDetector::getImageExtension($image));
 			}
 			foreach ($b64s as $b64) {
 				$imagePayload = base64_decode($b64);
 				$image = $includeWatermark ? $this->watermarkingService->markImage($imagePayload) : $imagePayload;
-				$output['images'][] = new FileShaped(EShapeType::Image, $image, ImageFormatDetector::getImageExtension($image));
+				$output['images'][] = new FileShaped(EShapeType::Image, $image, FileFormatDetector::getImageExtension($image));
 			}
 			$endTime = time();
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime, $this->service);

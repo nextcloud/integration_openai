@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\TaskProcessing;
 
+use OCA\OpenAi\Service\FileFormatDetector;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\WatermarkingService;
@@ -142,7 +143,7 @@ class TextToSpeechProvider implements ISynchronousWatermarkingProvider {
 			}
 			$audio = $includeWatermark ? $this->watermarkingService->markAudio($apiResponse['body']) : $apiResponse['body'];
 
-			return ['speech' => new FileShaped(EShapeType::Audio, $audio, 'mp3')];
+			return ['speech' => new FileShaped(EShapeType::Audio, $audio, FileFormatDetector::getAudioExtension($audio) ?: 'mp3')];
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
 		} catch (\Throwable $e) {

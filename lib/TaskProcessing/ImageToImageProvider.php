@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OCA\OpenAi\TaskProcessing;
 
 use OCA\OpenAi\AppInfo\Application;
-use OCA\OpenAi\Service\ImageFormatDetector;
+use OCA\OpenAi\Service\FileFormatDetector;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCA\OpenAi\Service\WatermarkingService;
@@ -223,7 +223,7 @@ class ImageToImageProvider implements ISynchronousOptionsAwareProvider {
 			$image = $includeWatermark ? $this->watermarkingService->markImage($image) : $image;
 			$endTime = time();
 			$this->openAiAPIService->updateExpImgProcessingTime($endTime - $startTime, $this->service);
-			return ['output' => new FileShaped(EShapeType::Image, $image, ImageFormatDetector::getImageExtension($image))];
+			return ['output' => new FileShaped(EShapeType::Image, $image, FileFormatDetector::getImageExtension($image))];
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
 		} catch (\Throwable $e) {
