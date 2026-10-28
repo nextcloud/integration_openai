@@ -17,6 +17,7 @@ use OCP\IL10N;
 use OCP\TaskProcessing\EShapeType;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
+use OCP\TaskProcessing\FileShaped;
 use OCP\TaskProcessing\ISynchronousProvider;
 use OCP\TaskProcessing\ShapeDescriptor;
 use OCP\TaskProcessing\ShapeEnumValue;
@@ -162,7 +163,7 @@ class AudioToTextSubtitlesProvider implements ISynchronousProvider {
 
 		try {
 			$transcription = $this->openAiAPIService->transcribeFile($userId, $this->service, $inputFile, false, $model, $language, $format);
-			return ['output' => $transcription];
+			return ['output' => new FileShaped(EShapeType::File, $transcription, $format)];
 		} catch (UserFacingProcessingException $e) {
 			throw $e;
 		} catch (\Throwable $e) {
