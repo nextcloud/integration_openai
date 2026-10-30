@@ -10,6 +10,7 @@ OC.L10N.register(
     "Speed" : "Брзина",
     "Language" : "Јазик",
     "Default" : "Предефиниран",
+    "Edit image" : "Уреди слика",
     "Format" : "Формат",
     "Auto" : "Автоматски",
     "Cannot generate less than 1 image" : "Неможе да се генерира помалку од една слика",
