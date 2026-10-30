@@ -628,6 +628,7 @@ class OpenAiAPIService {
 			];
 		}
 		if ($history !== null) {
+			$lastHistoryToolCall = null;
 			foreach ($history as $historyEntry) {
 				$message = json_decode($historyEntry, true);
 				if ($message['role'] === 'human') {
@@ -649,6 +650,24 @@ class OpenAiAPIService {
 						unset($formattedToolCall['function']['type']);
 						return $formattedToolCall;
 					}, $message['tool_calls']);
+					// remember the last call so a following tool result can be
+					// completed to the full OpenAI shape (Groq rejects
+					// role:tool history entries without name/tool_call_id)
+					$lastCall = end($message['tool_calls']);
+					if ($lastCall !== false) {
+						$lastHistoryToolCall = $lastCall;
+					}
+				}
+				if (($message['role'] ?? null) === 'tool' && $lastHistoryToolCall !== null) {
+					// complete tool results carried in the history to the
+					// shape providers require: name + tool_call_id of the
+					// assistant call they answer
+					if (!isset($message['name']) || $message['name'] === null) {
+						$message['name'] = $lastHistoryToolCall['function']['name'];
+					}
+					if (!isset($message['tool_call_id']) || $message['tool_call_id'] === null) {
+						$message['tool_call_id'] = $lastHistoryToolCall['id'];
+					}
 				}
 				// Handle file attachments in the history
 				if (isset($message['content']) && is_array($message['content'])) {
@@ -713,8 +732,29 @@ class OpenAiAPIService {
 		}
 		if ($toolMessage !== null) {
 			$msgs = json_decode($toolMessage, true);
+			// Resolve the function name for each tool result from the
+			// assistant tool_calls in the history: Groq (serving e.g.
+			// gpt-oss) rejects role:tool messages whose name is missing
+			// ("for 'role:tool' ... 'name': Value is not nullable").
+			$toolNames = [];
+			foreach ($messages as $message) {
+				if (($message['role'] ?? null) === 'assistant' && !empty($message['tool_calls'])) {
+					foreach ($message['tool_calls'] as $call) {
+						if (isset($call['id'], $call['function']['name'])) {
+							$toolNames[$call['id']] = $call['function']['name'];
+						}
+					}
+				}
+			}
 			foreach ($msgs as $msg) {
 				$msg['role'] = 'tool';
+				if (isset($msg['tool_call_id'], $toolNames[$msg['tool_call_id']])) {
+					$msg['name'] = $toolNames[$msg['tool_call_id']];
+				} elseif (!isset($msg['name'])) {
+					// Some providers require a non-null name even when the
+					// call cannot be matched; a generic one stays valid.
+					$msg['name'] = 'tool';
+				}
 				if (!is_string($msg['content'])) {
 					// IONOS requires tool contents to be strings
 					$msg['content'] = json_encode($msg['content']);
