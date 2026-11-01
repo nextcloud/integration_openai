@@ -40,6 +40,36 @@ class StreamingServiceTest extends TestCase {
 		$this->assertFalse(is_resource($body));
 	}
 
+	public function testTypedContentChunksAreAssembledAndStreamed(): void {
+		$body = fopen('php://temp', 'r+');
+		$this->assertIsResource($body);
+		fwrite($body, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":[{\"type\":\"thinking\",\"thinking\":[{\"type\":\"text\",\"text\":\"Thinking\"}]}]}}]}\n\n"
+			. "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":[{\"type\":\"text\",\"text\":\"Hel\"}]}}]}\n\n"
+			. "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":[{\"type\":\"text\",\"text\":\"lo\"},{\"type\":\"reference\",\"reference_ids\":[1]}]},\"finish_reason\":\"stop\"}]}\n\n"
+			. "data: [DONE]\n\n");
+		rewind($body);
+
+		$l10n = $this->createMock(IL10N::class);
+		$l10n->method('t')->willReturnArgument(0);
+		$service = new StreamingService($l10n);
+		$generator = $service->parseStreamChatResponse([
+			'body' => $body,
+			'content-type' => 'text/event-stream',
+		]);
+
+		$this->assertSame([
+			['kind' => 'content', 'text' => 'Hel', 'index' => 0],
+			['kind' => 'content', 'text' => 'lo', 'index' => 0],
+		], iterator_to_array($generator, false));
+		$this->assertSame([
+			'choices' => [[
+				'index' => 0,
+				'message' => ['content' => 'Hello'],
+				'finish_reason' => 'stop',
+			]],
+		], $generator->getReturn());
+	}
+
 	public function testDoneEventStopsReadingAnOpenStreamAndClosesIt(): void {
 		$events = "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Hello\"}}]}\n\n"
 			. "data: {\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n"

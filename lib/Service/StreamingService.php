@@ -146,7 +146,13 @@ class StreamingService {
 				$choices[$index]['finish_reason'] = $choice['finish_reason'];
 			}
 
-			if (isset($choice['delta']['content']) && is_string($choice['delta']['content']) && $choice['delta']['content'] !== '') {
+			if (isset($choice['delta']['content']) && is_array($choice['delta']['content'])) {
+				$deltaText = $this->contentChunksToText($choice['delta']['content']);
+				if ($deltaText !== '') {
+					$choices[$index]['message']['content'] = ($choices[$index]['message']['content'] ?? '') . $deltaText;
+					$partials[] = ['kind' => 'content', 'text' => $deltaText, 'index' => $index];
+				}
+			} elseif (isset($choice['delta']['content']) && is_string($choice['delta']['content']) && $choice['delta']['content'] !== '') {
 				$choices[$index]['message']['content'] = ($choices[$index]['message']['content'] ?? '') . $choice['delta']['content'];
 				$partials[] = ['kind' => 'content', 'text' => $choice['delta']['content'], 'index' => $index];
 			} elseif (isset($choice['message']['content']) && is_string($choice['message']['content']) && $choice['message']['content'] !== '') {
@@ -236,6 +242,22 @@ class StreamingService {
 		}
 
 		return $partials;
+	}
+
+	/**
+	 * Extract the text of typed content chunks, such as Mistral's `text`, `thinking` and
+	 * `reference` parts. Parts with another type are skipped.
+	 *
+	 * @param array<int, mixed> $chunks
+	 */
+	private function contentChunksToText(array $chunks): string {
+		$text = '';
+		foreach ($chunks as $chunk) {
+			if (is_array($chunk) && ($chunk['type'] ?? null) === 'text' && isset($chunk['text']) && is_string($chunk['text'])) {
+				$text .= $chunk['text'];
+			}
+		}
+		return $text;
 	}
 
 	/**
