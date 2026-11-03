@@ -732,6 +732,10 @@ class OpenAiAPIService {
 		}
 		if ($toolMessage !== null) {
 			$msgs = json_decode($toolMessage, true);
+			// The documented contract (and the chat-with-tools task input) is a
+			// single message object; a list is accepted defensively. Iterating
+			// the bare object would yield its field values instead of messages.
+			$msgs = array_is_list($msgs) ? $msgs : [$msgs];
 			// Resolve the function name for each tool result from the
 			// assistant tool_calls in the history: Groq (serving e.g.
 			// gpt-oss) rejects role:tool messages whose name is missing
