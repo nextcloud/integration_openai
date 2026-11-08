@@ -146,7 +146,7 @@ class StreamingService {
 				$choices[$index]['finish_reason'] = $choice['finish_reason'];
 			}
 
-			if (isset($choice['delta']['content']) && is_array($choice['delta']['content'])) {
+			if (isset($choice['delta']['content']) && is_array($choice['delta']['content']) && $choice['delta']['content'] !== []) {
 				$deltaText = $this->contentChunksToText($choice['delta']['content']);
 				if ($deltaText !== '') {
 					$choices[$index]['message']['content'] = ($choices[$index]['message']['content'] ?? '') . $deltaText;
@@ -245,12 +245,14 @@ class StreamingService {
 	}
 
 	/**
-	 * Extract the text of typed content chunks, such as Mistral's `text`, `thinking` and
-	 * `reference` parts. Parts with another type are skipped.
+	 * Extract the text of typed content chunks. Only chunks with type `text` and a
+	 * string `text` value contribute; `thinking`, `reference` and other types are skipped.
+	 *
+	 * This is shared with the non-streamed response path in OpenAiAPIService.
 	 *
 	 * @param array<int, mixed> $chunks
 	 */
-	private function contentChunksToText(array $chunks): string {
+	public function contentChunksToText(array $chunks): string {
 		$text = '';
 		foreach ($chunks as $chunk) {
 			if (is_array($chunk) && ($chunk['type'] ?? null) === 'text' && isset($chunk['text']) && is_string($chunk['text'])) {
