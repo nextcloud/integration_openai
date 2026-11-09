@@ -54,6 +54,9 @@ class MultiServiceTest extends TestCase {
 	public const REQUEST_TIMEOUT_TRANSCRIPTION = 14;
 	public const TRANSCRIPTION_MODEL = 'my-whisper-model';
 	public const TEXT_MODEL = 'my/text-model';
+	public const CHAT_BASE = 'https://chat-completion-generator.ai/v1';
+	public const APIKEY_CHAT = 'This is a chat PHPUnit test API key';
+	public const REQUEST_TIMEOUT_CHAT = 16;
 
 	private OpenAiAPIService $openAiApiService;
 	private ServicesService $servicesService;
@@ -524,5 +527,83 @@ class MultiServiceTest extends TestCase {
 
 		$other = $this->addService(['url' => self::IMAGE_BASE]);
 		$this->assertFalse($other->isUsingEdenAi());
+	}
+
+	public function testChatCompletionCompletesToolMessages(): void {
+		$service = $this->addService([
+			'url' => self::CHAT_BASE,
+			'api_key' => self::APIKEY_CHAT,
+			'request_timeout' => self::REQUEST_TIMEOUT_CHAT,
+		]);
+
+		$history = [
+			json_encode(['role' => 'human', 'content' => 'What is the weather in Paris?']),
+			json_encode([
+				'role' => 'assistant',
+				'content' => null,
+				'tool_calls' => [
+					['id' => 'call_1', 'name' => 'get_weather', 'args' => ['city' => 'Paris']],
+				],
+			]),
+			// the tool result carried in the history has neither name nor tool_call_id
+			json_encode(['role' => 'tool', 'content' => '{"temperature": 20}']),
+		];
+
+		// the current-turn tool result carries a null name
+		$toolMessage = json_encode([
+			'role' => 'tool',
+			'content' => '{"temperature": 20}',
+			'tool_call_id' => 'call_1',
+			'name' => null,
+		]);
+
+		$response = json_encode([
+			'choices' => [
+				[
+					'message' => ['role' => 'assistant', 'content' => 'It is 20 degrees in Paris.'],
+					'finish_reason' => 'stop',
+				],
+			],
+			'usage' => ['total_tokens' => 10],
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+
+		$capturedBody = null;
+		$this->iClient->expects($this->once())->method('post')->willReturnCallback(
+			function (string $url, array $options) use ($iResponse, &$capturedBody): \OCP\Http\Client\IResponse {
+				$capturedBody = json_decode($options['body'], true);
+				return $iResponse;
+			}
+		);
+
+		$this->openAiApiService->createChatCompletion(
+			self::TEST_USER1,
+			$service,
+			'my/chat-model',
+			'What is the weather in Paris?',
+			null,
+			$history,
+			1,
+			null,
+			null,
+			$toolMessage,
+		);
+
+		$this->assertNotNull($capturedBody);
+		$toolMessages = array_values(array_filter(
+			$capturedBody['messages'],
+			static fn (array $message): bool => $message['role'] === 'tool',
+		));
+		// one tool message from the history, one from the current turn
+		$this->assertCount(2, $toolMessages);
+		foreach ($toolMessages as $toolResultMessage) {
+			// Groq-style validators reject a null name and a missing tool_call_id
+			$this->assertSame('get_weather', $toolResultMessage['name']);
+			$this->assertSame('call_1', $toolResultMessage['tool_call_id']);
+		}
 	}
 }
