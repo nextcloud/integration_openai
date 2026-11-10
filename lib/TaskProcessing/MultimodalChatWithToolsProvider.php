@@ -159,7 +159,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 		try {
 			if ($preferStreaming) {
 				$chunks = $this->openAiAPIService->createStreamedChatCompletion(
-					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments
+					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments, true
 				);
 				$time = microtime(true);
 				$streamedOutput = '';
@@ -197,7 +197,7 @@ class MultimodalChatWithToolsProvider implements IProvider, ISynchronousOptionsA
 				$returnValue = $chunks->getReturn();
 			} else {
 				$returnValue = $this->openAiAPIService->createChatCompletion(
-					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments
+					$userId, $this->service, $this->model, $userPrompt, $systemPrompt, $history, 1, $maxTokens, null, $toolMessage, $tools, $inputAttachments, true
 				);
 			}
 		} catch (UserFacingProcessingException $e) {

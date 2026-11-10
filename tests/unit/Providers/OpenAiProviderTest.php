@@ -74,6 +74,10 @@ class OpenAiProviderTest extends TestCase {
 	 * @var MockObject|IClient
 	 */
 	private $iClient;
+	/**
+	 * @var MockObject|\OCP\Files\IRootFolder
+	 */
+	private $rootFolder;
 	private QuotaUsageMapper $quotaUsageMapper;
 
 	public static function setUpBeforeClass(): void {
@@ -112,6 +116,8 @@ class OpenAiProviderTest extends TestCase {
 			'multimodal_image_enabled' => true,
 		]);
 
+		$this->rootFolder = $this->createMock(\OCP\Files\IRootFolder::class);
+
 		$this->openAiApiService = new OpenAiAPIService(
 			\OCP\Server::get(\Psr\Log\LoggerInterface::class),
 			$this->createMock(\OCP\IL10N::class),
@@ -122,7 +128,7 @@ class OpenAiProviderTest extends TestCase {
 			$this->streamingService,
 			new OpenAiFileService(
 				$this->createMock(\OCP\IL10N::class),
-				$this->createMock(\OCP\Files\IRootFolder::class),
+				$this->rootFolder,
 				$this->createMock(\OCP\TaskProcessing\IManager::class),
 				$this->createMock(\Psr\Log\LoggerInterface::class),
 			),
@@ -1405,6 +1411,11 @@ TEXT;
 		$file->method('getSize')->willReturn(strlen($imageContent));
 		$file->method('getMimeType')->willReturn('image/jpeg');
 		$file->method('fopen')->with('rb')->willReturn($stream);
+		$file->method('getName')->willReturn('photo.jpg');
+		$file->method('getId')->willReturn(42);
+		$userFolder = $this->createMock(\OCP\Files\Folder::class);
+		$userFolder->method('getFirstNodeById')->with(42)->willReturn($file);
+		$this->rootFolder->method('getUserFolder')->with(self::TEST_USER1)->willReturn($userFolder);
 
 		$response = '{
 			"id": "chatcmpl-123",
@@ -1440,6 +1451,10 @@ TEXT;
 				[
 					'role' => 'user',
 					'content' => [
+						[
+							'type' => 'text',
+							'text' => 'Attached file "photo.jpg" (file ID: 42)',
+						],
 						[
 							'type' => 'image_url',
 							'image_url' => [

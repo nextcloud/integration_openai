@@ -14,6 +14,7 @@ use OCA\OpenAi\Vendor\RtfHtmlPhp\Html\HtmlFormatter;
 use OCA\OpenAi\Vendor\Smalot\PdfParser\Parser;
 use OCP\Files\File;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotPermittedException;
 use OCP\IL10N;
 use OCP\TaskProcessing\Exception\ProcessingException;
 use OCP\TaskProcessing\Exception\UserFacingProcessingException;
@@ -86,11 +87,12 @@ class OpenAiFileService {
 	 * @param ?string $userId The user ID.
 	 * @param ?int $taskId The ID of the task
 	 * @param ServiceConfig $service The service the content is built for
+	 * @param bool $includeFileId Whether to prepend a text part exposing the file ID to the model (e.g. for tool calls)
 	 * @return list<array<string, mixed>> Content parts suitable for OpenAI chat message content.
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContentFromId(int $fileId, ?string $userId, ?int $taskId, ServiceConfig $service): array {
+	public function buildFileContentFromId(int $fileId, ?string $userId, ?int $taskId, ServiceConfig $service, bool $includeFileId = false): array {
 		$file = null;
 		if ($taskId !== null) {
 			$task = $this->taskProcessingManager->getUserTask($taskId, $userId);
@@ -109,7 +111,7 @@ class OpenAiFileService {
 			$userFolder = $this->rootFolder->getUserFolder($userId);
 			$file = $userFolder->getFirstNodeById($fileId);
 		}
-		return $this->buildFileContentFromFile($file, $service, $userId);
+		return $this->buildFileContentFromFile($file, $service, $userId, $includeFileId);
 	}
 
 	/**
@@ -117,14 +119,45 @@ class OpenAiFileService {
 	 *
 	 * @param ?File $file The file to build content from.
 	 * @param ServiceConfig $service The service the content is built for
+	 * @param bool $includeFileId Whether to prepend a text part exposing the file ID to the model (e.g. for tool calls)
 	 * @return list<array<string, mixed>> Content parts suitable for OpenAI chat message content.
 	 * @throws ProcessingException
 	 * @throws UserFacingProcessingException
 	 */
-	public function buildFileContentFromFile(?File $file, ServiceConfig $service, ?string $userId = null): array {
+	public function buildFileContentFromFile(?File $file, ServiceConfig $service, ?string $userId = null, bool $includeFileId = false): array {
 		if (!$file instanceof File || !$file->isReadable()) {
 			throw new ProcessingException('File is not readable');
 		}
+		$content = $this->buildContentForFileType($file, $service, $userId);
+		if ($includeFileId && $this->isInUserFolder($file, $userId)) {
+			array_unshift($content, [
+				'type' => 'text',
+				'text' => 'Attached file "' . $file->getName() . '" (file ID: ' . $file->getId() . ')',
+			]);
+		}
+		return $content;
+	}
+
+	/**
+	 * Only files in the user's folder can be used by tools, files in appdata (e.g. task outputs) cannot
+	 */
+	private function isInUserFolder(File $file, ?string $userId): bool {
+		if ($userId === null) {
+			return false;
+		}
+		try {
+			return $this->rootFolder->getUserFolder($userId)->getFirstNodeById($file->getId()) !== null;
+		} catch (NotPermittedException $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * @return list<array<string, mixed>>
+	 * @throws ProcessingException
+	 * @throws UserFacingProcessingException
+	 */
+	private function buildContentForFileType(File $file, ServiceConfig $service, ?string $userId): array {
 		// Maximum file size for openai is 50MB.
 		if ($service->isUsingOpenAi() && $file->getSize() > self::MAX_FILE_SIZE_BYTES) {
 			throw new UserFacingProcessingException(

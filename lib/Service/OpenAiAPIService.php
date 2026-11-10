@@ -451,6 +451,7 @@ class OpenAiAPIService {
 		?string $toolMessage = null,
 		?array $tools = null,
 		?array $files = null,
+		bool $includeFileIds = false,
 	): \Generator {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT, $service)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -470,6 +471,7 @@ class OpenAiAPIService {
 			$tools,
 			$files,
 			true,
+			$includeFileIds,
 		);
 
 		$response = $this->request(
@@ -511,11 +513,12 @@ class OpenAiAPIService {
 		?string $toolMessage = null,
 		?array $tools = null,
 		?array $files = null,
+		bool $includeFileIds = false,
 	): array {
 		$response = $this->requestChatCompletion(
 			$userId, $service, $model, $userPrompt, $systemPrompt, $history,
 			$n, $maxTokens, $extraParams, $toolMessage, $tools, $files,
-			false,
+			false, $includeFileIds,
 		);
 
 		if (isset($response['usage'], $response['usage']['total_tokens'])) {
@@ -560,6 +563,7 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?array $files = null,
 		bool $stream = false,
+		bool $includeFileIds = false,
 	): array {
 		if ($this->isQuotaExceeded($userId, Application::QUOTA_TYPE_TEXT, $service)) {
 			throw new Exception($this->l10n->t('Text generation quota exceeded'), Http::STATUS_TOO_MANY_REQUESTS);
@@ -579,6 +583,7 @@ class OpenAiAPIService {
 			$tools,
 			$files,
 			$stream,
+			$includeFileIds,
 		);
 
 		return $this->request($userId, $service, 'chat/completions', $params, 'POST');
@@ -597,6 +602,7 @@ class OpenAiAPIService {
 	 * @param array|null $tools
 	 * @param array|null $files Array of File objects
 	 * @param bool $stream
+	 * @param bool $includeFileIds Expose the IDs of attached files to the model so it can pass them to tools
 	 * @return array<string, mixed>
 	 */
 	private function buildChatCompletionRequestParams(
@@ -613,6 +619,7 @@ class OpenAiAPIService {
 		?array $tools = null,
 		?array $files = null,
 		bool $stream = false,
+		bool $includeFileIds = false,
 	): array {
 		$modelRequestParam = $this->modelParam($service, $model, Application::DEFAULT_COMPLETION_MODEL_ID);
 
@@ -673,7 +680,7 @@ class OpenAiAPIService {
 							}
 							// If the history contains a file that isn't supported anymore we should skip it so the chat isn't broken
 							try {
-								$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null, $service));
+								$content = array_merge($content, $this->openAiFileService->buildFileContentFromId($item['file_id'], $userId, $item['ocp_task_id'] ?? null, $service, $includeFileIds));
 							} catch (ProcessingException|UserFacingProcessingException $e) {
 								$this->logger->warning('Could not build file content from id: ' . $item['file_id'] . '. Error: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 							}
@@ -693,7 +700,7 @@ class OpenAiAPIService {
 			}
 			$content = [];
 			foreach ($files as $file) {
-				$content = array_merge($content, $this->openAiFileService->buildFileContentFromFile($file, $service, $userId));
+				$content = array_merge($content, $this->openAiFileService->buildFileContentFromFile($file, $service, $userId, $includeFileIds));
 			}
 			if ($userPrompt !== null) {
 				$content[] = [
