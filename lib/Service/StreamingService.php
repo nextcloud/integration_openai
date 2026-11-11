@@ -272,7 +272,8 @@ class StreamingService {
 				if (!is_array($existingFunction)) {
 					$existingFunction = [];
 				}
-				if (isset($toolCallDelta['function']['name']) && is_string($toolCallDelta['function']['name'])) {
+				// Some OpenAI-compatible providers (e.g. Mistral) repeat the name as an empty string in later deltas
+				if (isset($toolCallDelta['function']['name']) && is_string($toolCallDelta['function']['name']) && $toolCallDelta['function']['name'] !== '') {
 					$existingFunction['name'] = $toolCallDelta['function']['name'];
 				}
 				if (isset($toolCallDelta['function']['arguments']) && is_string($toolCallDelta['function']['arguments'])) {
