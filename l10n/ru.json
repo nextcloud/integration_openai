@@ -174,7 +174,7 @@
     "Basic Auth user" : "Пользователь Basic Auth",
     "Basic Auth password" : "Пароль Basic Auth",
     "Usage quota info" : "Информация о квоте использования",
-    "If you see a shared quota usage of 50% and a usage of 10% that means that you have used 10% of the total shared quota, and the sum of all other users affected by this quota is 40%." : "Если общее использование квоты составляет 50 %, а ваше — 10 %, значит, вы израсходовали 10 % общей квоты, а все остальные пользователи, на которых она распространяется, — 40 %.",
+    "If you see a shared quota usage of 50% and a usage of 10% that means that you have used 10% of the total shared quota, and the sum of all other users affected by this quota is 40%." : "Если общее использование квоты составляет 50 %, а ваше — 10 %, значит, вы израсходовали 10 % общей квоты, а все остальные пользователи, на которых она распространяется, — 40 %.",
     "You use your own credentials for this service, so no quota applies to you." : "Для этой службы используются свои учётные данные, поэтому квота на вас не распространяется.",
     "Shared Usage" : "Общее использование",
     "Not Shared" : "Не общая",
