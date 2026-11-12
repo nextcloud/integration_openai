@@ -29,6 +29,7 @@ OC.L10N.register(
     "Cannot generate less than 1 image" : "Ezin da irudi 1 baino gutxiago sortu",
     "Usage limits" : "Erabilpen mugak",
     "Start date" : "Hasiera-data",
+    "End date" : "Bukaera data",
     "Quota type" : "Kuota mota",
     "Service" : "Zerbitzua",
     "Default language" : "Hizkuntza lehenetsia",
