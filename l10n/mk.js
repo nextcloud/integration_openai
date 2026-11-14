@@ -1,6 +1,7 @@
 OC.L10N.register(
     "integration_openai",
     {
+    "Image generation" : "Генерирање на слики",
     "Unknown" : "Непознат",
     "seconds" : "секунди",
     "Bad credentials" : "Неточни акредитиви",
