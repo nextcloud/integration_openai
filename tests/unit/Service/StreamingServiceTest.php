@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OCA\OpenAi\Tests\Unit\Service;
 
+use OCA\OpenAi\Service\ContentChunkParserService;
 use OCA\OpenAi\Service\StreamingService;
 use OCP\IL10N;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +23,7 @@ class StreamingServiceTest extends TestCase {
 
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
-		$service = new StreamingService($l10n);
+		$service = new StreamingService($l10n, new ContentChunkParserService());
 		$generator = $service->parseStreamChatResponse([
 			'body' => $body,
 			'content-type' => 'text/event-stream',
@@ -51,7 +52,7 @@ class StreamingServiceTest extends TestCase {
 
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
-		$service = new StreamingService($l10n);
+		$service = new StreamingService($l10n, new ContentChunkParserService());
 		$generator = $service->parseStreamChatResponse([
 			'body' => $body,
 			'content-type' => 'text/event-stream',
@@ -81,7 +82,7 @@ class StreamingServiceTest extends TestCase {
 
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
-		$service = new StreamingService($l10n);
+		$service = new StreamingService($l10n, new ContentChunkParserService());
 		$generator = $service->parseStreamChatResponse([
 			'body' => $body,
 			'content-type' => 'text/event-stream',
@@ -109,7 +110,7 @@ class StreamingServiceTest extends TestCase {
 
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
-		$service = new StreamingService($l10n);
+		$service = new StreamingService($l10n, new ContentChunkParserService());
 		$generator = $service->parseStreamChatResponse([
 			'body' => $body,
 			'content-type' => 'text/event-stream',
@@ -146,7 +147,7 @@ class StreamingServiceTest extends TestCase {
 
 			$l10n = $this->createMock(IL10N::class);
 			$l10n->method('t')->willReturnArgument(0);
-			$service = new StreamingService($l10n);
+			$service = new StreamingService($l10n, new ContentChunkParserService());
 			$generator = $service->parseStreamChatResponse([
 				'body' => $body,
 				'content-type' => 'text/event-stream',
@@ -182,7 +183,7 @@ class StreamingServiceTest extends TestCase {
 
 		$l10n = $this->createMock(IL10N::class);
 		$l10n->method('t')->willReturnArgument(0);
-		$service = new StreamingService($l10n);
+		$service = new StreamingService($l10n, new ContentChunkParserService());
 		$generator = $service->parseStreamChatResponse([
 			'body' => $body,
 			'content-type' => 'text/event-stream',
@@ -214,7 +215,7 @@ class StreamingServiceTest extends TestCase {
 
 			$l10n = $this->createMock(IL10N::class);
 			$l10n->method('t')->willReturnArgument(0);
-			$service = new StreamingService($l10n);
+			$service = new StreamingService($l10n, new ContentChunkParserService());
 			$generator = $service->parseStreamChatResponse([
 				'body' => $body,
 				'content-type' => 'text/event-stream',

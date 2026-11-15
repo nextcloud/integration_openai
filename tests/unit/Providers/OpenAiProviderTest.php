@@ -15,6 +15,7 @@ namespace OCA\OpenAi\Tests\Unit\Provider;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
 use OCA\OpenAi\Service\ChunkService;
+use OCA\OpenAi\Service\ContentChunkParserService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -69,6 +70,7 @@ class OpenAiProviderTest extends TestCase {
 	private ServiceConfig $service;
 	private ChunkService $chunkService;
 	private StreamingService $streamingService;
+	private ContentChunkParserService $contentChunkParserService;
 	private TranslateService $translateService;
 	/**
 	 * @var MockObject|IClient
@@ -95,8 +97,10 @@ class OpenAiProviderTest extends TestCase {
 		$this->openAiSettingsService = \OCP\Server::get(OpenAiSettingsService::class);
 
 		$this->chunkService = \OCP\Server::get(ChunkService::class);
+		$this->contentChunkParserService = new ContentChunkParserService();
 		$this->streamingService = new StreamingService(
 			$this->createMock(\OCP\IL10N::class),
+			$this->contentChunkParserService,
 		);
 
 		$this->quotaUsageMapper = \OCP\Server::get(QuotaUsageMapper::class);
@@ -126,6 +130,7 @@ class OpenAiProviderTest extends TestCase {
 			\OCP\Server::get(QuotaUsageMapper::class),
 			$this->openAiSettingsService,
 			$this->streamingService,
+			$this->contentChunkParserService,
 			new OpenAiFileService(
 				$this->createMock(\OCP\IL10N::class),
 				$this->rootFolder,

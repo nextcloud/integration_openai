@@ -14,6 +14,7 @@ namespace OCA\OpenAi\Tests\Unit\Service;
 
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\OpenAi\Service\ContentChunkParserService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -100,6 +101,7 @@ class MultiServiceTest extends TestCase {
 			new StreamingService(
 				$this->createMock(\OCP\IL10N::class),
 			),
+			new ContentChunkParserService(),
 			new OpenAiFileService(
 				$this->createMock(\OCP\IL10N::class),
 				$this->createMock(\OCP\Files\IRootFolder::class),
