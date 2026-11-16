@@ -154,20 +154,24 @@ class StreamingService {
 				$partials[] = ['kind' => 'content', 'text' => $choice['message']['content'], 'index' => $index];
 			}
 
-			if (isset($choice['delta']['reasoning_content']) && is_string($choice['delta']['reasoning_content']) && $choice['delta']['reasoning_content'] !== '') {
-				$choices[$index]['message']['reasoning_content'] = ($choices[$index]['message']['reasoning_content'] ?? '') . $choice['delta']['reasoning_content'];
+			$reasoningDelta = $this->getReasoningText($choice['delta'] ?? null);
+			if ($reasoningDelta !== null) {
+				$choices[$index]['message']['reasoning_content'] = ($choices[$index]['message']['reasoning_content'] ?? '') . $reasoningDelta;
 				$partials[] = [
 					'kind' => 'reasoning_content',
-					'text' => $choice['delta']['reasoning_content'],
+					'text' => $reasoningDelta,
 					'index' => $index,
 				];
-			} elseif (isset($choice['message']['reasoning_content']) && is_string($choice['message']['reasoning_content']) && $choice['message']['reasoning_content'] !== '') {
-				$choices[$index]['message']['reasoning_content'] = $choice['message']['reasoning_content'];
-				$partials[] = [
-					'kind' => 'reasoning_content',
-					'text' => $choice['message']['reasoning_content'],
-					'index' => $index,
-				];
+			} else {
+				$reasoningMessage = $this->getReasoningText($choice['message'] ?? null);
+				if ($reasoningMessage !== null) {
+					$choices[$index]['message']['reasoning_content'] = $reasoningMessage;
+					$partials[] = [
+						'kind' => 'reasoning_content',
+						'text' => $reasoningMessage,
+						'index' => $index,
+					];
+				}
 			}
 
 			if (isset($choice['delta']['audio']) && is_array($choice['delta']['audio'])) {
@@ -284,5 +288,24 @@ class StreamingService {
 
 		ksort($toolCalls);
 		$message['tool_calls'] = array_values($toolCalls);
+	}
+
+	/**
+	 * LocalAI uses `reasoning` instead of `reasoning_content`
+	 *
+	 * @param mixed $payload
+	 */
+	private function getReasoningText(mixed $payload): ?string {
+		if (!is_array($payload)) {
+			return null;
+		}
+
+		foreach (['reasoning_content', 'reasoning'] as $key) {
+			if (isset($payload[$key]) && is_string($payload[$key]) && $payload[$key] !== '') {
+				return $payload[$key];
+			}
+		}
+
+		return null;
 	}
 }

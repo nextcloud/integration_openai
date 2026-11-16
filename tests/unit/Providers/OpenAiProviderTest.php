@@ -293,14 +293,22 @@ class OpenAiProviderTest extends TestCase {
 	}
 
 	public function testCreateStreamedChatCompletionCanYieldStructuredReasoningChunks(): void {
+		$this->assertStreamedReasoningChunksUseField('reasoning_content');
+	}
+
+	public function testCreateStreamedChatCompletionCanYieldReasoningFieldChunks(): void {
+		$this->assertStreamedReasoningChunksUseField('reasoning');
+	}
+
+	private function assertStreamedReasoningChunksUseField(string $reasoningField): void {
 		$stream = fopen('php://temp', 'r+');
 		if ($stream === false) {
 			throw new \RuntimeException('Could not open temp stream');
 		}
 
-		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":\"Thinking... \"}}]}\n\n");
+		fwrite($stream, 'data: {"choices":[{"index":0,"delta":{"' . $reasoningField . '":"Thinking... "}}]}' . "\n\n");
 		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Answer \"}}]}\n\n");
-		fwrite($stream, "data: {\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":\"done.\",\"content\":\"ready\"},\"finish_reason\":\"stop\"}],\"usage\":{\"total_tokens\":21}}\n\n");
+		fwrite($stream, 'data: {"choices":[{"index":0,"delta":{"' . $reasoningField . '":"done.","content":"ready"},"finish_reason":"stop"}],"usage":{"total_tokens":21}}' . "\n\n");
 		fwrite($stream, "data: [DONE]\n\n");
 		rewind($stream);
 
