@@ -661,7 +661,26 @@ class OpenAiAPIService {
 				if (isset($message['content']) && is_array($message['content'])) {
 					$content = [];
 					foreach ($message['content'] as $item) {
+						if (is_string($item)) {
+							// Some providers build history content as a mix of
+							// bare text strings and typed file parts
+							$content[] = ['type' => 'text', 'text' => $item];
+							continue;
+						}
+						if (!is_array($item)) {
+							throw new UserFacingProcessingException(
+								'Invalid message history content',
+								0,
+								null,
+								$this->l10n->t('Invalid message history content'),
+							);
+						}
 						if (!isset($item['type'])) {
+							if (isset($item['text']) && is_string($item['text'])) {
+								// Untyped text part, normalize it
+								$content[] = ['type' => 'text', 'text' => $item['text']];
+								continue;
+							}
 							throw new UserFacingProcessingException(
 								'Invalid message history content',
 								0,

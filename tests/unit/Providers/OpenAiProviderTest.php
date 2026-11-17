@@ -152,6 +152,17 @@ class OpenAiProviderTest extends TestCase {
 		]);
 	}
 
+	/**
+	 * IRootFolder::getUserFolder() returns IUserFolder (introduced in Nextcloud 36)
+	 * but Folder on older server versions, so mock the one available.
+	 */
+	private function createUserFolderMock(): \OCP\Files\Folder {
+		$class = interface_exists(\OCP\Files\IUserFolder::class)
+			? \OCP\Files\IUserFolder::class
+			: \OCP\Files\Folder::class;
+		return $this->createMock($class);
+	}
+
 	protected function tearDown(): void {
 		$this->servicesService->setUserCredentials(self::TEST_USER1, $this->service->getId(), [
 			'api_key' => '',
@@ -1413,7 +1424,7 @@ TEXT;
 		$file->method('fopen')->with('rb')->willReturn($stream);
 		$file->method('getName')->willReturn('photo.jpg');
 		$file->method('getId')->willReturn(42);
-		$userFolder = $this->createMock(\OCP\Files\Folder::class);
+		$userFolder = $this->createUserFolderMock();
 		$userFolder->method('getFirstNodeById')->with(42)->willReturn($file);
 		$this->rootFolder->method('getUserFolder')->with(self::TEST_USER1)->willReturn($userFolder);
 
@@ -1499,6 +1510,126 @@ TEXT;
 		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
 		$this->assertEquals(21, $usage);
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
+	/**
+	 * History built by other providers can mix bare text strings and typed
+	 * file parts in array content (e.g. the context agent fallback); the
+	 * request builder must normalize them instead of rejecting the message.
+	 */
+	public function testMultimodalChatWithToolsProviderHistoryContentNormalization(): void {
+		$provider = new MultimodalChatWithToolsProvider(
+			$this->openAiApiService,
+			$this->createMock(\OCP\IL10N::class),
+			$this->createMock(\Psr\Log\LoggerInterface::class),
+			\OCP\Server::get(WatermarkingService::class),
+			$this->service,
+			self::TEXT_MODEL,
+		);
+
+		$prompt = 'What is in this image?';
+		$systemPrompt = 'You are a helpful assistant.';
+		$toolsJson = '[]';
+		$history = [
+			json_encode(['role' => 'assistant', 'content' => [
+				'Hi there!',
+				['type' => 'file', 'file_id' => 42],
+			]]),
+		];
+		$imageContent = 'fake-jpeg-bytes';
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Could not open temp stream');
+		}
+		fwrite($stream, $imageContent);
+		rewind($stream);
+
+		$file = $this->createMock(\OCP\Files\File::class);
+		$file->method('isReadable')->willReturn(true);
+		$file->method('getSize')->willReturn(strlen($imageContent));
+		$file->method('getMimeType')->willReturn('image/jpeg');
+		$file->method('fopen')->with('rb')->willReturn($stream);
+		$file->method('getName')->willReturn('photo.jpg');
+		$file->method('getId')->willReturn(42);
+		$userFolder = $this->createUserFolderMock();
+		$userFolder->method('getFirstNodeById')->with(42)->willReturn($file);
+		$this->rootFolder->method('getUserFolder')->with(self::TEST_USER1)->willReturn($userFolder);
+
+		$response = '{
+			"id": "chatcmpl-123",
+			"object": "chat.completion",
+			"created": 1677652288,
+			"model": "gpt-4.1-mini",
+			"system_fingerprint": "fp_44709d6fcb",
+			"choices": [
+			  {
+				"index": 0,
+				"message": {
+				  "role": "assistant",
+				  "content": "This is a test response."
+				},
+				"finish_reason": "stop"
+			  }
+			],
+			"usage": {
+			  "prompt_tokens": 9,
+			  "completion_tokens": 12,
+			  "total_tokens": 21
+			}
+		}';
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json']];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [
+				['role' => 'system', 'content' => $systemPrompt],
+				[
+					'role' => 'assistant',
+					'content' => [
+						[
+							'type' => 'text',
+							'text' => 'Hi there!',
+						],
+						[
+							'type' => 'image_url',
+							'image_url' => [
+								'url' => 'data:image/jpeg;base64,' . base64_encode($imageContent),
+							],
+						],
+					],
+				],
+				['role' => 'user', 'content' => $prompt],
+			],
+			'n' => 1,
+			'stream' => false,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($response);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->with('Content-Type')->willReturn('application/json');
+
+		$this->iClient->expects($this->once())->method('post')->willReturnCallback(function ($urlArg, $optionsArg) use ($url, $options, $iResponse) {
+			$GLOBALS['__debugDiff'] = ($optionsArg['body'] ?? '') . "\n===EXPECTED===\n" . ($options['body'] ?? '');
+			return $iResponse;
+		});
+
+		$result = $provider->process(self::TEST_USER1, [
+			'input' => $prompt,
+			'system_prompt' => $systemPrompt,
+			'tool_message' => '',
+			'tools' => $toolsJson,
+			'history' => $history,
+			'input_attachments' => [],
+		], fn () => true, new SynchronousProviderOptions(preferStreaming: false));
+
+		$this->assertEquals('This is a test response.', $result['output']);
+		$this->assertEquals([], $result['output_attachments']);
+		$this->assertEquals('', $result['reasoning']);
+		$this->assertEquals('', $result['tool_calls']);
 	}
 
 }
