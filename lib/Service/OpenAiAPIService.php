@@ -1295,9 +1295,24 @@ class OpenAiAPIService {
 			$params['model'] = $modelParam;
 		}
 		$params['response_format'] = 'mp3';
-		$params['speed'] = $speed;
+		// strict OpenAI-compatible APIs (e.g. Mistral) reject unknown body fields,
+		// so only send the default speed to OpenAI itself
+		if ($service->isUsingOpenAi() || $speed !== 1.0) {
+			$params['speed'] = $speed;
+		}
 
 		$apiResponse = $this->request($userId, $service, 'audio/speech', $params, 'POST');
+
+		// some services (e.g. Mistral) answer with JSON {"audio_data": "<base64>"} instead of binary audio
+		if (isset($apiResponse['audio_data']) && is_string($apiResponse['audio_data'])) {
+			$decoded = base64_decode($apiResponse['audio_data'], true);
+			if ($decoded !== false) {
+				$apiResponse = [
+					'body' => $decoded,
+					'content-type' => 'audio/mpeg',
+				];
+			}
+		}
 
 		try {
 			$charCount = mb_strlen($prompt);
