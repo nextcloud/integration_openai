@@ -338,7 +338,7 @@
 								v-model="defaultImageSize"
 								class="input"
 								:error="!defaultImageSizeValid"
-								:helper-text="defaultImageSizeValid ? '' : t('integration_openai', 'Not a {format} size yet, so it is not saved', { format: '<width>x<height>' })"
+								:helper-text="defaultImageSizeValid ? '' : defaultImageSizeError"
 								:label="t('integration_openai', 'Default image size')"
 								@update:model-value="onDefaultImageSizeInput" />
 							<NcButton variant="tertiary" :title="defaultImageSizeParamHint">
@@ -530,6 +530,10 @@ export default {
 		defaultImageSizeValid() {
 			const size = this.defaultImageSize.trim()
 			return size === '' || /^\d+x\d+$/.test(size)
+		},
+		defaultImageSizeError() {
+			// TRANSLATORS Error below the "Default image size" field while the value is not valid yet. {format} is the literal text <width>x<height>, e.g. 1024x1024
+			return t('integration_openai', 'Not a {format} size yet, so it is not saved', { format: '<width>x<height>' })
 		},
 		modalities() {
 			return [
