@@ -113,6 +113,36 @@ class StreamingServiceTest extends TestCase {
 		$this->assertFalse(is_resource($body));
 	}
 
+	public function testEmptyToolNameInLaterDeltaDoesNotOverwriteTheName(): void {
+		$body = fopen('php://temp', 'r+');
+		$this->assertIsResource($body);
+		fwrite($body,
+			"data: {\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"id\":\"call_1\",\"type\":\"function\",\"function\":{\"name\":\"schedule_event\",\"arguments\":\"\"},\"index\":0}]}}]}\n\n"
+			. "data: {\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"function\":{\"name\":\"\",\"arguments\":\"{\\\"title\\\": \"},\"index\":0}]}}]}\n\n"
+			. "data: {\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"function\":{\"name\":\"\",\"arguments\":\"\\\"Test\\\"}\"},\"index\":0}]},\"finish_reason\":\"tool_calls\"}]}\n\n"
+			. "data: [DONE]\n\n"
+		);
+		rewind($body);
+
+		$l10n = $this->createMock(IL10N::class);
+		$l10n->method('t')->willReturnArgument(0);
+		$service = new StreamingService($l10n);
+		$generator = $service->parseStreamChatResponse([
+			'body' => $body,
+			'content-type' => 'text/event-stream',
+		]);
+		iterator_to_array($generator, false);
+
+		$this->assertSame([[
+			'id' => 'call_1',
+			'type' => 'function',
+			'function' => [
+				'name' => 'schedule_event',
+				'arguments' => '{"title": "Test"}',
+			],
+		]], $generator->getReturn()['choices'][0]['message']['tool_calls']);
+	}
+
 	public function testAbandonedGeneratorClosesTheStream(): void {
 		$contents = "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Hello\"}}]}\n\n";
 		$paddingLength = (64 - ((strlen($contents) + 2) % 64)) % 64;
