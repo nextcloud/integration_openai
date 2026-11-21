@@ -101,10 +101,21 @@ class StreamingServiceTest extends TestCase {
 		], $generator->getReturn());
 	}
 
-	public function testEmptyContentArrayFallsBackToMessageContent(): void {
+	public static function contentArrayWithoutTextProvider(): array {
+		return [
+			'empty array' => ['[]'],
+			'thinking chunk only' => ['[{"type":"thinking","thinking":[{"type":"text","text":"Thinking"}]}]'],
+			'reference chunk only' => ['[{"type":"reference","reference_ids":[1]}]'],
+		];
+	}
+
+	/**
+	 * @dataProvider contentArrayWithoutTextProvider
+	 */
+	public function testContentArrayWithoutTextFallsBackToMessageContent(string $deltaContent): void {
 		$body = fopen('php://temp', 'r+');
 		$this->assertIsResource($body);
-		fwrite($body, "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":[]},\"message\":{\"content\":\"Fallback\"},\"finish_reason\":\"stop\"}]}\n\n"
+		fwrite($body, 'data: {"choices":[{"index":0,"delta":{"content":' . $deltaContent . '},"message":{"content":"Fallback"},"finish_reason":"stop"}]}' . "\n\n"
 			. "data: [DONE]\n\n");
 		rewind($body);
 
