@@ -95,6 +95,7 @@ class QuotaTest extends TestCase {
 			$this->openAiSettingsService,
 			new StreamingService(
 				$this->createMock(IL10N::class),
+				new ContentChunkParserService(),
 			),
 			new ContentChunkParserService(),
 			new OpenAiFileService(
