@@ -100,6 +100,7 @@ class MultiServiceTest extends TestCase {
 			\OCP\Server::get(OpenAiSettingsService::class),
 			new StreamingService(
 				$this->createMock(\OCP\IL10N::class),
+				new ContentChunkParserService(),
 			),
 			new ContentChunkParserService(),
 			new OpenAiFileService(
