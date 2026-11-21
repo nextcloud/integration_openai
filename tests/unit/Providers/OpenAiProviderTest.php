@@ -368,6 +368,76 @@ class OpenAiProviderTest extends TestCase {
 		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
 	}
 
+	/**
+	 * Mistral may stream delta.content as a list of typed chunks instead of a plain string
+	 */
+	public function testCreateStreamedChatCompletionExtractsMistralTypedTextContent(): void {
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Could not open temp stream');
+		}
+
+		$deltas = [
+			['role' => 'assistant', 'content' => ''],
+			['content' => [['type' => 'thinking', 'thinking' => [['type' => 'text', 'text' => 'The user asks about Amsterdam.']]]]],
+			['content' => [['type' => 'text', 'text' => 'Amsterdam was founded around 1000 CE']]],
+			['content' => [['type' => 'reference', 'reference_ids' => [1, 3]], ['type' => 'text', 'text' => '. It is worth ']]],
+			['content' => 'visiting.'],
+		];
+		foreach ($deltas as $delta) {
+			fwrite($stream, 'data: ' . json_encode(['choices' => [['index' => 0, 'delta' => $delta, 'finish_reason' => null]]]) . "\n\n");
+		}
+		fwrite($stream, 'data: ' . json_encode(['choices' => [['index' => 0, 'delta' => ['content' => ''], 'finish_reason' => 'stop']], 'usage' => ['total_tokens' => 21]]) . "\n\n");
+		fwrite($stream, "data: [DONE]\n\n");
+		rewind($stream);
+
+		$url = self::OPENAI_API_BASE . 'chat/completions';
+		$options = ['timeout' => Application::OPENAI_DEFAULT_REQUEST_TIMEOUT, 'headers' => ['User-Agent' => Application::USER_AGENT, 'Authorization' => self::AUTHORIZATION_HEADER, 'Content-Type' => 'application/json', 'Accept' => 'text/event-stream'], 'stream' => true, 'version' => '1.1', 'curl' => [\CURLOPT_HTTP_VERSION => \CURL_HTTP_VERSION_1_1]];
+		$options['body'] = json_encode([
+			'model' => Application::DEFAULT_COMPLETION_MODEL_ID,
+			'messages' => [['role' => 'user', 'content' => 'Tell me more about Amsterdam']],
+			'n' => 1,
+			'stream' => true,
+			'max_completion_tokens' => Application::DEFAULT_MAX_NUM_OF_TOKENS,
+			'user' => self::TEST_USER1,
+			'stream_options' => ['include_usage' => true],
+		]);
+
+		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
+		$iResponse->method('getBody')->willReturn($stream);
+		$iResponse->method('getStatusCode')->willReturn(200);
+		$iResponse->method('getHeader')->willReturnMap([
+			['Content-Type', 'text/event-stream'],
+		]);
+
+		$this->iClient->expects($this->once())->method('post')->with($url, $options)->willReturn($iResponse);
+
+		$generator = $this->openAiApiService->createStreamedChatCompletion(
+			self::TEST_USER1,
+			$this->service,
+			Application::DEFAULT_MODEL_ID,
+			'Tell me more about Amsterdam',
+		);
+		$chunks = iterator_to_array($generator, false);
+
+		$this->assertSame([
+			['kind' => 'content', 'text' => 'Amsterdam was founded around 1000 CE', 'index' => 0],
+			['kind' => 'content', 'text' => '. It is worth ', 'index' => 0],
+			['kind' => 'content', 'text' => 'visiting.', 'index' => 0],
+		], $chunks);
+		$this->assertSame([
+			'messages' => ['Amsterdam was founded around 1000 CE. It is worth visiting.'],
+			'reasoning_messages' => [],
+			'tool_calls' => [],
+			'audio_messages' => [],
+			'images' => [],
+		], $generator->getReturn());
+
+		$usage = $this->quotaUsageMapper->getQuotaUnitsOfUser(self::TEST_USER1, Application::QUOTA_TYPE_TEXT);
+		$this->assertEquals(21, $usage);
+		$this->quotaUsageMapper->deleteUserQuotaUsages(self::TEST_USER1);
+	}
+
 	public function testEmojiProvider(): void {
 		$emojiProvider = new EmojiProvider(
 			$this->openAiApiService,
