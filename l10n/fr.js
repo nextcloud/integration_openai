@@ -249,6 +249,7 @@ OC.L10N.register(
     "System prompts" : "Prompts système",
     "Summary system prompt" : "Prompt système pour résumés",
     "Leave empty to use the default summary prompt" : "Laisser vide pour utiliser le prompt par défaut pour les résumés",
+    "When set, it replaces default summary prompt. The Format and Complexity options are still appended to it." : "Si défini, remplace le prompt par défaut pour les résumés. Les options de Format et de Complexité restent néanmoins ajoutées.",
     "Translation system prompt" : "Prompt système pour traductions",
     "Leave empty to use the default translation prompt" : "Laisser vide pour utiliser le prompt par défaut pour les traductions ",
     "Additional instructions for translations." : "Instructions supplémentaires pour les traductions.",
