@@ -16,6 +16,7 @@ class StreamingService {
 
 	public function __construct(
 		private IL10N $l10n,
+		private ContentChunkParserService $contentChunkParserService,
 	) {
 	}
 
@@ -146,9 +147,15 @@ class StreamingService {
 				$choices[$index]['finish_reason'] = $choice['finish_reason'];
 			}
 
-			if (isset($choice['delta']['content']) && is_string($choice['delta']['content']) && $choice['delta']['content'] !== '') {
-				$choices[$index]['message']['content'] = ($choices[$index]['message']['content'] ?? '') . $choice['delta']['content'];
-				$partials[] = ['kind' => 'content', 'text' => $choice['delta']['content'], 'index' => $index];
+			$deltaContent = $choice['delta']['content'] ?? null;
+			if (is_array($deltaContent)) {
+				// Mistral can stream the content as a list of typed chunks instead of a string
+				$deltaContent = $this->contentChunkParserService->contentChunksToText($deltaContent);
+			}
+
+			if (is_string($deltaContent) && $deltaContent !== '') {
+				$choices[$index]['message']['content'] = ($choices[$index]['message']['content'] ?? '') . $deltaContent;
+				$partials[] = ['kind' => 'content', 'text' => $deltaContent, 'index' => $index];
 			} elseif (isset($choice['message']['content']) && is_string($choice['message']['content']) && $choice['message']['content'] !== '') {
 				$choices[$index]['message']['content'] = $choice['message']['content'];
 				$partials[] = ['kind' => 'content', 'text' => $choice['message']['content'], 'index' => $index];

@@ -15,6 +15,7 @@ use Exception;
 use OCA\OpenAi\AppInfo\Application;
 use OCA\OpenAi\Db\EntityType;
 use OCA\OpenAi\Db\QuotaUsageMapper;
+use OCA\OpenAi\Service\ContentChunkParserService;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\OpenAiFileService;
 use OCA\OpenAi\Service\OpenAiSettingsService;
@@ -94,7 +95,9 @@ class QuotaTest extends TestCase {
 			$this->openAiSettingsService,
 			new StreamingService(
 				$this->createMock(IL10N::class),
+				new ContentChunkParserService(),
 			),
+			new ContentChunkParserService(),
 			new OpenAiFileService(
 				$this->createMock(IL10N::class),
 				$this->createMock(\OCP\Files\IRootFolder::class),

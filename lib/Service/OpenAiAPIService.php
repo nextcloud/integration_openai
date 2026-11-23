@@ -49,6 +49,7 @@ class OpenAiAPIService {
 		private QuotaUsageMapper $quotaUsageMapper,
 		private OpenAiSettingsService $openAiSettingsService,
 		private StreamingService $streamingService,
+		private ContentChunkParserService $contentChunkParserService,
 		private OpenAiFileService $openAiFileService,
 		private INotificationManager $notificationManager,
 		private QuotaRuleService $quotaRuleService,
@@ -1649,14 +1650,8 @@ class OpenAiAPIService {
 				if (is_string($choice['message']['content'])) {
 					$completions['messages'][] = $choice['message']['content'];
 				} elseif (is_array($choice['message']['content'])) {
-					$messageContent = [];
 					// Handles more complex mistral message content (TODO: missing reasoning for now look at https://github.com/nextcloud/integration_openai/pull/409#discussion_r3638108824)
-					foreach ($choice['message']['content'] as $content) {
-						if ($content['type'] === 'text' && is_string($content['text'])) {
-							$messageContent[] = $content['text'];
-						}
-					}
-					$completions['messages'][] = implode('', $messageContent);
+					$completions['messages'][] = $this->contentChunkParserService->contentChunksToText($choice['message']['content']);
 				}
 			}
 			if (isset($choice['message']['reasoning_content']) && is_string($choice['message']['reasoning_content'])) {
