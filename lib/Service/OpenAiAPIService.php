@@ -1654,8 +1654,15 @@ class OpenAiAPIService {
 					$completions['messages'][] = $this->contentChunkParserService->contentChunksToText($choice['message']['content']);
 				}
 			}
+			$reasoning = null;
 			if (isset($choice['message']['reasoning_content']) && is_string($choice['message']['reasoning_content'])) {
-				$completions['reasoning_messages'][] = $choice['message']['reasoning_content'];
+				$reasoning = $choice['message']['reasoning_content'];
+			} elseif (isset($choice['message']['reasoning']) && is_string($choice['message']['reasoning'])) {
+				// LocalAI uses `reasoning` instead of `reasoning_content`
+				$reasoning = $choice['message']['reasoning'];
+			}
+			if ($reasoning !== null) {
+				$completions['reasoning_messages'][] = $reasoning;
 			}
 			if (isset($choice['message']['audio'], $choice['message']['audio']['data']) && is_string($choice['message']['audio']['data'])) {
 				$completions['audio_messages'][] = $choice['message'];
