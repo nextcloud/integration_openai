@@ -1303,22 +1303,26 @@ class OpenAiAPIService {
 
 		$apiResponse = $this->request($userId, $service, 'audio/speech', $params, 'POST');
 
-		// some services (e.g. Mistral) answer with JSON {"audio_data": "<base64>"} instead of binary audio
-		if (isset($apiResponse['audio_data']) && is_string($apiResponse['audio_data'])) {
-			$decoded = base64_decode($apiResponse['audio_data'], true);
-			if ($decoded !== false) {
-				$apiResponse = [
-					'body' => $decoded,
-					'content-type' => 'audio/mpeg',
-				];
-			}
-		}
-
 		try {
 			$charCount = mb_strlen($prompt);
 			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount, $service);
 		} catch (DBException $e) {
 			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_SPEECH . '. Error: ' . $e->getMessage());
+		}
+
+		// some services (e.g. Mistral) answer with JSON {"audio_data": "<base64>"} instead of binary audio
+		if (isset($apiResponse['audio_data']) && is_string($apiResponse['audio_data'])) {
+			$decoded = base64_decode($apiResponse['audio_data'], true);
+			if ($decoded === false) {
+				$this->logger->warning('Could not base64 decode the audio_data of the speech response');
+				throw new Exception($this->l10n->t('Invalid audio data in the speech response'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			}
+			$mimeType = (new \finfo(FILEINFO_MIME_TYPE))->buffer($decoded);
+			return [
+				'body' => $decoded,
+				// fall back to the requested format if the bytes are not recognized as audio
+				'content-type' => is_string($mimeType) && str_starts_with($mimeType, 'audio/') ? $mimeType : 'audio/mpeg',
+			];
 		}
 		return $apiResponse;
 	}
