@@ -1296,16 +1296,45 @@ class OpenAiAPIService {
 			$params['model'] = $modelParam;
 		}
 		$params['response_format'] = 'mp3';
-		$params['speed'] = $speed;
+		// strict OpenAI-compatible APIs (e.g. Mistral) reject unknown body fields,
+		// so only send the default speed to OpenAI itself
+		if ($service->isUsingOpenAi() || $speed !== 1.0) {
+			$params['speed'] = $speed;
+		}
 
 		$apiResponse = $this->request($userId, $service, 'audio/speech', $params, 'POST');
 
-		try {
-			$charCount = mb_strlen($prompt);
-			$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount, $service);
-		} catch (DBException $e) {
-			$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_SPEECH . '. Error: ' . $e->getMessage());
+		// some services (e.g. Mistral) answer with JSON {"audio_data": "<base64>"} instead of binary audio
+		if (isset($apiResponse['audio_data']) && is_string($apiResponse['audio_data'])) {
+			$decoded = base64_decode($apiResponse['audio_data'], true);
+			if ($decoded === false || $decoded === '') {
+				$this->logger->warning('The audio_data of the speech response is empty or not valid base64');
+				throw new Exception($this->l10n->t('Invalid audio data in the speech response'), Http::STATUS_INTERNAL_SERVER_ERROR);
+			}
+			$apiResponse = [
+				'body' => $decoded,
+				// fall back to the requested format if the bytes are not recognized as audio
+				'content-type' => match (FileFormatDetector::getAudioExtension($decoded)) {
+					'wav' => 'audio/wav',
+					'ogg' => 'audio/ogg',
+					'flac' => 'audio/flac',
+					'm4a', 'mp4' => 'audio/mp4',
+					'aac' => 'audio/aac',
+					default => 'audio/mpeg',
+				},
+			];
 		}
+
+		// only count responses that actually contain audio
+		if (isset($apiResponse['body'])) {
+			try {
+				$charCount = mb_strlen($prompt);
+				$this->createQuotaUsage($userId ?? '', Application::QUOTA_TYPE_SPEECH, $charCount, $service);
+			} catch (DBException $e) {
+				$this->logger->warning('Could not create quota usage for user: ' . $userId . ' and quota type: ' . Application::QUOTA_TYPE_SPEECH . '. Error: ' . $e->getMessage());
+			}
+		}
+
 		return $apiResponse;
 	}
 

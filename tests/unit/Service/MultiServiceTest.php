@@ -187,7 +187,6 @@ class MultiServiceTest extends TestCase {
 			'voice' => Application::DEFAULT_SPEECH_VOICE,
 			'model' => self::SPEECH_MODEL,
 			'response_format' => 'mp3',
-			'speed' => 1,
 		]);
 
 		$iResponse = $this->createMock(\OCP\Http\Client\IResponse::class);
