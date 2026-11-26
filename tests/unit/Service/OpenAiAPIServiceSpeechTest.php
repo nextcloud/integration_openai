@@ -12,6 +12,7 @@ namespace OCA\OpenAi\Tests\Unit\Service;
 use OCA\OpenAi\Service\OpenAiAPIService;
 use OCA\OpenAi\Service\ServiceConfig;
 use OCP\IL10N;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -82,7 +83,7 @@ class OpenAiAPIServiceSpeechTest extends TestCase {
 		$config = new ServiceConfig('s1', url: 'https://api.mistral.ai/v1');
 		$response = $service->requestSpeechCreation('user', $config, 'hello', 'model', 'voice', 1);
 		$this->assertSame($wav, $response['body']);
-		$this->assertSame('audio/x-wav', $response['content-type']);
+		$this->assertSame('audio/wav', $response['content-type']);
 	}
 
 	public function testInvalidBase64AudioIsLoggedAndReported(): void {
@@ -91,6 +92,39 @@ class OpenAiAPIServiceSpeechTest extends TestCase {
 		$this->logger->expects($this->once())->method('warning');
 		$config = new ServiceConfig('s1', url: 'https://api.mistral.ai/v1');
 		$this->expectException(\Exception::class);
+		$service->requestSpeechCreation('user', $config, 'hello', 'model', 'voice', 1);
+	}
+
+	public function testValidAudioIsCountedTowardsTheQuota(): void {
+		$captured = null;
+		$service = $this->getService(['audio_data' => base64_encode('MP3BYTES')], $captured);
+		$service->expects($this->once())->method('createQuotaUsage');
+		$config = new ServiceConfig('s1', url: 'https://api.mistral.ai/v1');
+		$service->requestSpeechCreation('user', $config, 'hello', 'model', 'voice', 1);
+	}
+
+	#[DataProvider('invalidAudioDataProvider')]
+	public function testInvalidAudioDataIsRejectedAndNotCounted(string $audioData): void {
+		$captured = null;
+		$service = $this->getService(['audio_data' => $audioData], $captured);
+		$service->expects($this->never())->method('createQuotaUsage');
+		$config = new ServiceConfig('s1', url: 'https://api.mistral.ai/v1');
+		$this->expectException(\Exception::class);
+		$service->requestSpeechCreation('user', $config, 'hello', 'model', 'voice', 1);
+	}
+
+	public static function invalidAudioDataProvider(): array {
+		return [
+			'empty' => [''],
+			'not base64' => ['data:audio/mpeg;base64,SUQz'],
+		];
+	}
+
+	public function testResponseWithoutAudioIsNotCounted(): void {
+		$captured = null;
+		$service = $this->getService(['error' => 'Bad credentials'], $captured);
+		$service->expects($this->never())->method('createQuotaUsage');
+		$config = new ServiceConfig('s1');
 		$service->requestSpeechCreation('user', $config, 'hello', 'model', 'voice', 1);
 	}
 
